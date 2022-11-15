@@ -99,7 +99,7 @@ Medusa/CMakeLists.txt.user*
 # Protobuf
 Medusa/*.pb.*
 Medusa/*_pb2.py
-Medusa/src/LuaModule/lua_zeus.cpp
+# Medusa/src/LuaModule/lua_zeus.cpp
 Medusa/share/proto/cpp/
 
 
