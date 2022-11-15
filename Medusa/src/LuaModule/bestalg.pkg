@@ -1,0 +1,16 @@
+$#include <fstream>
+$#include <singleton.h>
+$#include "Vision/VisionModule.h"
+$#include "geometry.h"
+$#include "gpuBestAlgThread.h"
+
+class CGPUBestAlgThread {
+	CGPUBestAlgThread();
+	~CGPUBestAlgThread();
+	void initialize(CVisionModule* _pVision);
+	void generatePointValue();
+	bool isLastOneValid(const CGeoPoint& p);
+	void setSendPoint(const CGeoPoint passPoint);
+	double getPosPotential(const CGeoPoint p);
+	CGeoPoint getBestPointFromArea(int area_idx);
+};

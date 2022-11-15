@@ -1,0 +1,9 @@
+$#include "Vision/VisionModule.h"
+$#include "singleton.h"
+$#include "PointCalculation/GuardPos.h"
+
+class CGuardPos
+{
+    CGuardPos();
+    CGeoPoint backPos(int guardNum, int index);
+};
