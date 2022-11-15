@@ -493,13 +493,20 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
             是峪狍镝  妄荇租咛
     */
 	last_target_dir = targetDir;
-	//printf("%d %.5lf %.5lf\n", ShootOrPass, myDir, targetDir);
-	if (abs(targetDir - last_target_dir) > 0.3 * Param::Math::PI / SHOOT_PRECISION) {
+
+    if (ShootOrPass) {
+        CGeoLine start2Target = CGeoLine(me.Pos(), myDir);
+        CGeoLineLineIntersection Intersection = CGeoLineLineIntersection(start2Target, GOATLINE);
+        if (abs(Intersection.IntersectPoint().y()) > 60) return false;
+    }
+    /*交点必须位于球门里面*/
+
+    if (abs(targetDir - last_target_dir) > 0.3 * Param::Math::PI / SHOOT_PRECISION) {
 		last_dir_deviation = 100;  //重置角度差
 	}
 	if (Me2OppTooclose(pVision, vecNumber)) {
 		/*太近了 快射*/
-		if (abs(myDir - targetDir) < Param::Math::PI / SHOOT_PRECISION) {
+        if (abs(myDir - targetDir) < 0.5 * Param::Math::PI / SHOOT_PRECISION) {
 			last_dir_deviation = 100;
 			return true;
 		}
@@ -662,11 +669,10 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 		/*当前点可以射门的条件：我方有人在旁边，没有阻挡，射门可以*/
 		if (isCanUse[i])OneOfUsCanShoot = 1;
 	}
-
-	if (isOurNearPoint[LastPassPoint] && (abs(me.Dir() - (SupportPoint[LastPassPoint] - me.Pos()).dir()) < 0.5 * Param::Math::PI / SHOOT_PRECISION)) {
-		ReturnValue.dir = (SupportPoint[LastPassPoint] - me.Pos()).dir();
-		ReturnValue.pos = SupportPoint[LastPassPoint];
-		return ReturnValue;
+    ReturnValue.dir = (SupportPoint[LastPassPoint] - me.Pos()).dir();
+    ReturnValue.pos = SupportPoint[LastPassPoint];
+    if (SupportPoint[LastPassPoint].x() > me.X() && isOurNearPoint[LastPassPoint] && (abs(me.Dir() - (SupportPoint[LastPassPoint] - me.Pos()).dir()) < 0.5 * Param::Math::PI / SHOOT_PRECISION)) {
+        return ReturnValue;
 	}
 	/*保持系统稳定性 */
 
@@ -686,9 +692,9 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 			}
 		}
 		for (int i = 0; i < NumberOfSupport; ++i)
-			if (isCanUse[i])TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
-	}
-	else {
+            if (isCanUse[i] && SupportPoint[i].x() > -330)TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
+    }
+    else {
 		/*否则就有人的地方全都可以传 因为现在已经在决定传球方向了*/
 		IsMeSupport = JudgeIsMeSupport(pVision, vecNumber);
 		if (IsMeSupport) {
@@ -704,8 +710,8 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 			}
 		}
 		for (int i = 0; i < NumberOfSupport; ++i)
-			if(isOurNearPoint[i])TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
-	}
+            if(isOurNearPoint[i] && SupportPoint[i].x() > -330)TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
+    }
 	double NowValue = -1, MinValue = 1e9; int Maxidx = -1;
 	for (int i = 0; i < TheNumberOfCanShootPoint; ++i) {
 		int NowIdx = TheidxOfCanShootPoint[i];

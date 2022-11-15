@@ -13,7 +13,7 @@ Page{
     property bool simConnect : false;
     property bool crazyConnect : false;
     property bool ifEdgeTest : false;
-    property bool isRecoring: true;
+    property bool isRecoring: false;
     property bool monitorConnect : false;
     property bool isLogPlay: false;
     property bool isRecFile: false;
@@ -341,17 +341,6 @@ Page{
                     }
                 }
             }
-//            ZSS.Display{
-//                type:1;
-//                width:parent.width - 2*parent.padding;
-//                height:300;
-//                onWidthChanged: {
-//                    resetSize(width,height);
-//                }
-//                onHeightChanged: {
-//                    resetSize(width,height);
-//                }
-//            }
         }
         RefereeBox{
         }
@@ -610,6 +599,17 @@ Page{
                            color: "white";
                        }
                    }
+               }
+           }
+           ZSS.Display{
+               type:1;
+               width:parent.width - 2*parent.padding;
+               height:300;
+               onWidthChanged: {
+                   resetSize(width,height);
+               }
+               onHeightChanged: {
+                   resetSize(width,height);
                }
            }
 

@@ -141,7 +141,7 @@ void CDefenceInfo::updateDefenceInfo(const CVisionModule *pVision){
 			
             double  t = _oplayer[i]->getThreatenValue();
             QString roleValue;
-            roleValue = QString("%f").arg(t);
+            roleValue = QString("%1").arg(t);
             //GDebugEngine::Instance()->gui_debug_msg(playerPos+CVector(-20,0),roleValue,COLOR_WHITE);
 		}
 	}

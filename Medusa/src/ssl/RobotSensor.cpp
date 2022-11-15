@@ -82,6 +82,8 @@ void CRobotSensor::receiveRobotStatus()
 
 void CRobotSensor::Update(int cycle)
 {
+//    if(IS_SIMULATION) return;
+
     static int last_cycle = 0;
     if (cycle == last_cycle)
         return;
@@ -98,7 +100,12 @@ void CRobotSensor::Update(int cycle)
 }
 
 bool CRobotSensor::IsInfraredOn(int num)				
-{ 
-    return robotInfoBuffer[num].bInfraredInfo;
+{
+//    if(IS_SIMULATION){
+//        return BestPlayer::Instance()->isOurPlayerStrictControlBall(num);
+//    }
+//    else{
+        return robotInfoBuffer[num].bInfraredInfo;
+//    }
 }
 
