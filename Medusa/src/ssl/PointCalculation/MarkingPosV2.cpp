@@ -16,7 +16,6 @@
 #include "GDebugEngine.h"
 #include "CornerAreaPos.h"
 #include "defence/DefenceInfo.h"
-#include <cstring>
 #include <ssl/ParamManagerNew.h>
 
 namespace NameSpaceMarkingPosV2{
@@ -307,10 +306,10 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 						if (debug)
 						{
 							GDebugEngine::Instance()->gui_debug_x(finalPoint,COLOR_YELLOW);
-//							CString denyBall;
-//							denyBall.Format("%d: deny Ball",oppNum);
-//							GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(25+oppNum*10,-50),denyBall,COLOR_YELLOW);
-						}
+                            QString denyBall;
+                            denyBall = QString("%d: deny Ball").arg(oppNum);
+                            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(25+oppNum*10,-50),denyBall.toLatin1(),COLOR_YELLOW);
+                        }
 						//退出绕前判断
 						bool defenderChange = DEFENDER_NUM_LOG[oppNum] != defenderNum;
 						bool oppLeaves = oppPos.dist(opp2ballVelLineProj) > EXIT_DENY_DIST;
@@ -415,10 +414,10 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 				{
 					//动作点计算
 					if (debug){
-//						CString backLine;
-//						backLine.Format("%d: back line",oppNum);
-//						GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(25+oppNum*10,50),backLine,COLOR_YELLOW);
-					}
+                        QString backLine;
+                        backLine = QString("%1: back line").arg(oppNum);
+                        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(25+oppNum*10,50),backLine.toLatin1(),COLOR_YELLOW);
+                    }
 					CGeoPoint RtargetPoint = DefendUtils::reversePoint(oppPrePos);
 					CGeoPoint Rgoal = DefendUtils::reversePoint(ourGoal);
 					finalPoint = DefendUtils::reversePoint(DefendUtils::calcDefenderPointV2(RtargetPoint,CVector(Rgoal - RtargetPoint).dir(),POS_SIDE_MIDDLE,0,1.0));
@@ -509,9 +508,9 @@ bool CMarkingPosV2::checkInSpecialArea_A(const CGeoPoint p,const CGeoPoint ballP
 	if (p.x() < SPECIAL_AREA_X_BUFFER && (goal2oppDir*theFlag > refDir*theFlag))
 	{
 		if (debug){
-//			CString backLine;
-//			backLine.Format("%d: special line",oppNum);
-//			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(125+oppNum*10,50),backLine,COLOR_YELLOW);
+            QString backLine;
+            backLine.append(QString("%1: special line").arg(oppNum));
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(125+oppNum*10,50),backLine.toLatin1(),COLOR_YELLOW);
 		}
 		return true;
 	}

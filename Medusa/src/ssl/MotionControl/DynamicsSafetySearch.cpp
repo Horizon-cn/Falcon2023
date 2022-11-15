@@ -245,7 +245,11 @@ CVector CDynamicSafetySearch::SafetySearch(const int player, CVector Vnext, cons
 		if (find_flag[player] == false) {
 			string str;
 			char appdex[10];
-            //itoa(player, appdex, 10);
+#ifdef WIN32
+            itoa(player, appdex, 10);
+#else
+            sprintf(appdex, "%d", player);
+#endif
 			str = str.append(appdex).append(" NOT FIND");
 			GDebugEngine::Instance()->gui_debug_msg(target, str.c_str(), 1);
 		}

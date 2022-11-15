@@ -77,7 +77,7 @@ void CDecisionModule::DoTeamMode()
 	if (USE_LUA_SCRIPTS){
 		LuaModule::Instance()->RunScript("./lua_scripts/ssl/SelectPlay.lua");
 	} else {
-        //LogInfo("other decision yet to be implemented, plz use lua");
+        qDebug()<<"other decision yet to be implemented, plz use lua";
 	}
 
 	return ;

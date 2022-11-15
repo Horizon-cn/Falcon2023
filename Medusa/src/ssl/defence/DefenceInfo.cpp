@@ -35,7 +35,7 @@ CDefenceInfo::CDefenceInfo(){
 	_attackerNum = 0;
 	for(int i = 0;i < Param::Field::MAX_PLAYER;i++)_attackArray[i] = 0;
 	for(int i = 0;i < Param::Field::MAX_PLAYER;i++)_steadyAttackArray[i] = 0;
-	for(int i = 0;i < Param::Field::MAX_PLAYER;i++)_oplayer[i] = new COppPlayer();
+    for(int i = 0;i < Param::Field::MAX_PLAYER;i++)_oplayer[i] = new COppPlayer();
 	initialization();
 	_ballTaken = false;
 	
@@ -46,20 +46,20 @@ CDefenceInfo::CDefenceInfo(){
 
 	_noChangeAttackNum = 0;
 	for(int i = 0;i < Param::Field::MAX_PLAYER;i++)_noChangeAttackArray[i] = 0;
-	for(int i = 0;i < Param::Field::MAX_PLAYER;i++)_noChangeOplayer[i] = new COppPlayer();
+    for(int i = 0;i < Param::Field::MAX_PLAYER;i++)_noChangeOplayer[i] = new COppPlayer();
 }
 
 CDefenceInfo::~CDefenceInfo()
 {
-    //delete []_oplayer;
-    //delete []_noChangeOplayer;
+    // delete [] _oplayer;
+    // delete [] _noChangeOplayer;
 }
 
 void CDefenceInfo::changeAttrSet(CAttributeSet& as)
 {
 	for (int i = 0; i < Param::Field::MAX_PLAYER;++i)
 	{
-		_oplayer[i]->setProperty(i,as);
+        _oplayer[i]->setProperty(i,as);
 	}
 }
 
@@ -90,8 +90,8 @@ void CDefenceInfo::updateDefenceInfo(const CVisionModule *pVision){
 		if (pVision->TheirPlayer(i).Valid())
 		{
 			//cout<<"saaaaa "<<i<<endl;
-			_oplayer[i]->evaluate(pVision);
-			_oplayer[i]->matchRole(); 
+            _oplayer[i]->evaluate(pVision);
+            _oplayer[i]->matchRole();
 		}		
 	}
 	//更新进攻序列
@@ -108,20 +108,24 @@ void CDefenceInfo::updateDefenceInfo(const CVisionModule *pVision){
 	if (DEFENCE_DEBUG_MODE)
 	{
 		//cout << "attack array is ";
-//        std::string attackInform;
-		int attcnt = getAttackNum();
-//		attackInform.Format("attackInform: %d: %d %d %d %d %d %d %d %d ",attcnt,_attackArray[0],_attackArray[1],_attackArray[2],_attackArray[3],_attackArray[4],_attackArray[5],_attackArray[6], _attackArray[7]);
-        string attackSteadyInform;
-//		attackSteadyInform.Format("steady attack: %d %d %d %d %d %d %d %d ",_steadyAttackArray[0],_steadyAttackArray[1],_steadyAttackArray[2],_steadyAttackArray[3],_steadyAttackArray[4],_steadyAttackArray[5],_steadyAttackArray[6], _steadyAttackArray[7]);
-//		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, -450),attackInform,COLOR_YELLOW);
-//		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-400,-450),attackSteadyInform,COLOR_YELLOW);
+        int attcnt = getAttackNum();
+        QString attackInform;
+        attackInform.append(QString("attackInform: %1:").arg(attcnt));
+        for(int i = 0; i < attcnt; i++)
+            attackInform.append(QString(" %1").arg(_attackArray[i]));
+        QString attackSteadyInform;
+        attackSteadyInform.append(QString("steady attack:"));
+        for(int i = 0; i < attcnt; i++)
+            attackSteadyInform.append(QString(" %1").arg(_steadyAttackArray[i]));
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, -450),attackInform.toLatin1(),COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-400,-450),attackSteadyInform.toLatin1(),COLOR_YELLOW);
 		for (int i = 0; i < Param::Field::MAX_PLAYER; ++i)
 		{
 			//cout << _attackArray[i-1];
 		
 			CGeoPoint playerPos = pVision->TheirPlayer(i).Pos();
 			char oppRoleName[2];
-			oppRoleName[0] = _oplayer[i]->getRoleName().c_str()[1];
+            oppRoleName[0] = _oplayer[i]->getRoleName().c_str()[1];
 			oppRoleName[1] = 0;
 			GDebugEngine::Instance()->gui_debug_msg(playerPos, oppRoleName, COLOR_YELLOW);
 			/*
@@ -135,10 +139,11 @@ void CDefenceInfo::updateDefenceInfo(const CVisionModule *pVision){
 			GDebugEngine::Instance()->gui_debug_msg(playerPos + CVector(-15, 0),subvalue,COLOR_CYAN);
 			*/
 			
-			double  t = _oplayer[i]->getThreatenValue();
-//			CString roleValue;
-//			roleValue.Format("%f",t);
-			//GDebugEngine::Instance()->gui_debug_msg(playerPos+CVector(-20,0),roleValue,COLOR_WHITE);
+            double  t = _oplayer[i]->getThreatenValue();
+            char* roleValue = new char;
+            sprintf(roleValue,"%f",t);
+            //GDebugEngine::Instance()->gui_debug_msg(playerPos+CVector(-20,0),roleValue,COLOR_WHITE);
+            delete roleValue;
 		}
 	}
 }
@@ -220,9 +225,9 @@ void CDefenceInfo::updateAttackArray(const CVisionModule* pVision)
 	{
 		if (!pVision->TheirPlayer(i).Valid())continue;
 		_oppoNum += 1;
-		if (_oplayer[i]->getThreatenPri() < PRIORITY_DEFENCE)
+        if (_oplayer[i]->getThreatenPri() < PRIORITY_DEFENCE)
 		{
-			attackerTempList.push_back(AttackerStruct(i,_oplayer[i]->getThreatenPri(),_oplayer[i]->getThreatenValue()));
+            attackerTempList.push_back(AttackerStruct(i,_oplayer[i]->getThreatenPri(),_oplayer[i]->getThreatenValue()));
 		}
 	}
 	if (0 != attackerTempList.size())

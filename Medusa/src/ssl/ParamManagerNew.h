@@ -112,8 +112,8 @@ class CParamManagerSkill : public CParamManagerNew {
             loadParam(BalltoMeVelTime, "Advance/BalltoMeVelTime", 1.0);
             loadParam(KICKPOWER, "Advance/KICKPOWER", 700);
             loadParam(CHIPPOWER, "Advance/CHIPPOWER", 240);
-            loadParam(ADV_FPASSPOWER, "Advance/ADV_FPASSPOWER", 600);
-            loadParam(ADV_CPASSPOWER, "Advance/ADV_CPASSPOWER", 350);
+            loadParam(ADV_FPASSPOWER, "Advance/ADV_FPASSPOWER", 2);
+            loadParam(ADV_CPASSPOWER, "Advance/ADV_CPASSPOWER", 1);
             loadParam(RELIEF_POWER, "Advance/RELIEF_POWER", 400);
             loadParam(BACK_POWER, "Advance/BACK_POWER", 300);
             loadParam(BACK_POWER_V3, "Advance/BACK_POWER_V3", 160);

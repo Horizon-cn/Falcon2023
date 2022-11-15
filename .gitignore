@@ -108,7 +108,7 @@ Medusa/share/proto/cpp/
 ZBin/Qt*
 ZBin/*.dll
 ZBin/*.exe
-ZBin/*.ini
+# ZBin/*.ini
 ZBin/*.txt
 ZBin/*.label*
 
