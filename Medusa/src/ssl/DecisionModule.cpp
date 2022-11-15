@@ -15,7 +15,6 @@
 //#include <skill/Factory.h>
 #include <TaskMediator.h>
 
-#include <tinyxml/ParamReader.h>
 #include "LuaModule.h"
 namespace {
 	/// 是否状态化的策略库
@@ -78,7 +77,7 @@ void CDecisionModule::DoTeamMode()
 	if (USE_LUA_SCRIPTS){
 		LuaModule::Instance()->RunScript("./lua_scripts/ssl/SelectPlay.lua");
 	} else {
-		LogInfo("other decision yet to be implemented, plz use lua");
+        //LogInfo("other decision yet to be implemented, plz use lua");
 	}
 
 	return ;

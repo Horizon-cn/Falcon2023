@@ -7,7 +7,6 @@
 #include <cornell/Trajectory.h>
 #include <WorldModel/RobotCapability.h>
 #include <MotionControl/CMmotion.h>
-#include <TimeCounter.h>
 #include <RobotSensor.h>
 #include "utils.h"
 #include "ShootRangeList.h"
@@ -67,10 +66,8 @@ namespace
 
 CChaseKickV2::CChaseKickV2()
 {
-	DECLARE_PARAM_READER_BEGIN(JAM_AND_PUSH)
-		READ_PARAM(KICKPOWER)
-		READ_PARAM(CHIPPOWER)
-		DECLARE_PARAM_READER_END
+    KICKPOWER = ParamManager::Instance()->KICKPOWER;
+    CHIPPOWER = ParamManager::Instance()->CHIPPOWER;
 	_directCommand = NULL;
 	_lastCycle = 0;
 	_stateCounter=0;

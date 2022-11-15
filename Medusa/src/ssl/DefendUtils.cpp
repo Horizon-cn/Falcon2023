@@ -1,5 +1,5 @@
 #include "DefendUtils.h"
-#include "Param.h"
+#include "param.h"
 #include <iostream>
 #include <cmath>
 #include <sstream>
@@ -33,15 +33,15 @@ namespace DefendUtils {
 	// temp for use
 	const double OUR_PENALTY_Y_LEFT = -Param::Field::PENALTY_AREA_WIDTH / 2;
 	const double OUR_PENALTY_Y_RIGHT = Param::Field::PENALTY_AREA_WIDTH / 2;
-	const double OUR_PENALTY_X_TOP = -Param::Field::PITCH_LENGTH / 2 + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH");
+    const double OUR_PENALTY_X_TOP = -Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH;
 	const double OUR_PENALTY_X_BOTTOM = -Param::Field::PITCH_LENGTH / 2;
 	const CGeoPoint OUR_PENALTY_LEFT_TOP(OUR_PENALTY_X_TOP, OUR_PENALTY_Y_LEFT);
 	const CGeoPoint OUR_PENALTY_RIGHT_TOP(OUR_PENALTY_X_TOP, OUR_PENALTY_Y_RIGHT);
 
 	//一些计算用的中间点
 	double AVOID_PENALTY_BUFFER = Param::Vehicle::V2::PLAYER_SIZE;
-	double PEN_RADIUS = sqrt(pow(Param::Field::PENALTY_AREA_WIDTH / 2, 2) + pow(queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH"), 2)) + Param::Vehicle::V2::PLAYER_SIZE + AVOID_PENALTY_BUFFER;
-	double PEN_DEPTH = queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") + Param::Vehicle::V2::PLAYER_SIZE + AVOID_PENALTY_BUFFER;
+    double PEN_RADIUS = sqrt(pow(Param::Field::PENALTY_AREA_WIDTH / 2, 2) + pow(ParamManager::Instance()->PENALTY_AREA_DEPTH, 2)) + Param::Vehicle::V2::PLAYER_SIZE + AVOID_PENALTY_BUFFER;
+    double PEN_DEPTH = ParamManager::Instance()->PENALTY_AREA_DEPTH + Param::Vehicle::V2::PLAYER_SIZE + AVOID_PENALTY_BUFFER;
 	//防守队员 站位的 门前线段两边的两个极限点
 	//CGeoPoint RCENTER_LEFT = CGeoPoint(Param::Field::PITCH_LENGTH/2 - PEN_DEPTH,-Param::Field::PENALTY_AREA_L/2);
 	//CGeoPoint RCENTER_RIGHT = CGeoPoint(Param::Field::PITCH_LENGTH/2 - PEN_DEPTH,Param::Field::PENALTY_AREA_L/2);
@@ -74,33 +74,33 @@ namespace DefendUtils {
 	const double AVOIDBUFFER = 2 * Param::Vehicle::V2::PLAYER_SIZE;
 
 	// 1. 普通后卫
-	CGeoEllipse RD_ELLIPSE = CGeoEllipse(CENTERPOINT, queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH")*1.2 + 15 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH*1.2 + 55 + AVOIDBUFFER * 2) / 2);
+    CGeoEllipse RD_ELLIPSE = CGeoEllipse(CENTERPOINT, ParamManager::Instance()->PENALTY_AREA_DEPTH * 1.2 + 15 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH*1.2 + 55 + AVOIDBUFFER * 2) / 2);
 	//leftback/rightback 站点 added by Wang in 2018/3/22
-	CGeoRectangle RD_RECTANGLE = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") - AVOIDBUFFER, Param::Field::PENALTY_AREA_WIDTH / 2 + AVOIDBUFFER), CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2 - AVOIDBUFFER));
+    CGeoRectangle RD_RECTANGLE = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH - AVOIDBUFFER, Param::Field::PENALTY_AREA_WIDTH / 2 + AVOIDBUFFER), CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2 - AVOIDBUFFER));
 	// 2. 球在禁区内时 后卫
-	CGeoEllipse RD_ELLIPSE1 = CGeoEllipse(CENTERPOINT, queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") + 20 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH + 60 + AVOIDBUFFER * 2) / 2);
+    CGeoEllipse RD_ELLIPSE1 = CGeoEllipse(CENTERPOINT, ParamManager::Instance()->PENALTY_AREA_DEPTH + 20 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH + 60 + AVOIDBUFFER * 2) / 2);
 	//defendMiddle 站点 added by Wang in 2018/3/23
-	CGeoRectangle RD_RECTANGLE1 = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") - AVOIDBUFFER - 20, Param::Field::PENALTY_AREA_WIDTH / 2 + AVOIDBUFFER + 20), CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2 - AVOIDBUFFER - 20));
+    CGeoRectangle RD_RECTANGLE1 = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH - AVOIDBUFFER - 20, Param::Field::PENALTY_AREA_WIDTH / 2 + AVOIDBUFFER + 20), CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2 - AVOIDBUFFER - 20));
 	// 3. 弃用
-	CGeoEllipse RD_ELLIPSE2 = CGeoEllipse(CENTERPOINT, queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") + 15 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH + 30 + AVOIDBUFFER * 2) / 2);
+    CGeoEllipse RD_ELLIPSE2 = CGeoEllipse(CENTERPOINT, ParamManager::Instance()->PENALTY_AREA_DEPTH + 15 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH + 30 + AVOIDBUFFER * 2) / 2);
 
 	// 4. 后腰所用椭圆
-	CGeoEllipse RD_ELLIPSE3 = CGeoEllipse(CENTERPOINT, queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH")*1.9 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH*1.8 + AVOIDBUFFER * 2) / 2);
+    CGeoEllipse RD_ELLIPSE3 = CGeoEllipse(CENTERPOINT, ParamManager::Instance()->PENALTY_AREA_DEPTH * 1.9 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH*1.8 + AVOIDBUFFER * 2) / 2);
 	//defendHead 站点 added by Wang in 2018/3/23
-	CGeoRectangle RD_RECTANGLE2 = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") - AVOIDBUFFER, Param::Field::PENALTY_AREA_WIDTH / 2 + AVOIDBUFFER), CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2 - AVOIDBUFFER));
+    CGeoRectangle RD_RECTANGLE2 = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH - AVOIDBUFFER, Param::Field::PENALTY_AREA_WIDTH / 2 + AVOIDBUFFER), CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2 - AVOIDBUFFER));
 	// 5. 球在禁区内时 后腰
-	CGeoEllipse RD_ELLIPSE4 = CGeoEllipse(CENTERPOINT, queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH")*2.7 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH*1.8 + AVOIDBUFFER * 2) / 2);
+    CGeoEllipse RD_ELLIPSE4 = CGeoEllipse(CENTERPOINT, ParamManager::Instance()->PENALTY_AREA_DEPTH * 2.7 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH*1.8 + AVOIDBUFFER * 2) / 2);
 	//defendMiddle 站点 added by Wang in 2018/3/23  may not need to change
-	CGeoRectangle RD_RECTANGLE3 = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH")*2.5 - AVOIDBUFFER, Param::Field::PENALTY_AREA_WIDTH*2.0 / 2 + AVOIDBUFFER), CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH*2.0 / 2 - AVOIDBUFFER));
+    CGeoRectangle RD_RECTANGLE3 = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH * 2.5 - AVOIDBUFFER, Param::Field::PENALTY_AREA_WIDTH*2.0 / 2 + AVOIDBUFFER), CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH*2.0 / 2 - AVOIDBUFFER));
 	//calcPenaltyLine规划线
 	CGeoPoint DCENTERPOINT = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
-	CGeoEllipse D_ELLIPSE = CGeoEllipse(DCENTERPOINT, queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") + 5 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH + 8 + AVOIDBUFFER * 2) / 2);
+    CGeoEllipse D_ELLIPSE = CGeoEllipse(DCENTERPOINT, ParamManager::Instance()->PENALTY_AREA_DEPTH + 5 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH + 8 + AVOIDBUFFER * 2) / 2);
 	//判断是否需要进入penaltycleaner
-	CGeoEllipse D_ELLIPSE1 = CGeoEllipse(DCENTERPOINT, queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") + 38 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH + 68 + AVOIDBUFFER * 2) / 2);
+    CGeoEllipse D_ELLIPSE1 = CGeoEllipse(DCENTERPOINT, ParamManager::Instance()->PENALTY_AREA_DEPTH + 38 + AVOIDBUFFER, (Param::Field::PENALTY_AREA_WIDTH + 68 + AVOIDBUFFER * 2) / 2);
 
 	// 后卫相关临界值
-	CGeoPoint LEFTBACK_CRITICAL_POINT = CGeoPoint(-(Param::Field::PITCH_LENGTH / 2 - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") - Param::Vehicle::V2::PLAYER_SIZE), -(Param::Field::PITCH_WIDTH / 2 - Param::Field::MAX_PLAYER_SIZE * 2));
-	CGeoPoint RIGHTBACK_CRITICAL_POINT = CGeoPoint(-(Param::Field::PITCH_LENGTH / 2 - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") - Param::Vehicle::V2::PLAYER_SIZE), Param::Field::PITCH_WIDTH / 2 - Param::Field::MAX_PLAYER_SIZE * 2);
+    CGeoPoint LEFTBACK_CRITICAL_POINT = CGeoPoint(-(Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE), -(Param::Field::PITCH_WIDTH / 2 - Param::Field::MAX_PLAYER_SIZE * 2));
+    CGeoPoint RIGHTBACK_CRITICAL_POINT = CGeoPoint(-(Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE), Param::Field::PITCH_WIDTH / 2 - Param::Field::MAX_PLAYER_SIZE * 2);
 	const double SIDEBACK_DEFEND_CRITICAL_X = -Param::Field::PITCH_LENGTH / 6;
 	const double SIDEBACK_DEFEND_BOUNDARY_DIR_MAX = (RIGHTBACK_CRITICAL_POINT - GOAL_CENTRE_POS).dir();
 	const double SIDEBACK_DEFEND_BOUNDARY_DIR_MIN = SIDEBACK_DEFEND_BOUNDARY_DIR_MAX - Param::Math::PI / 5;
@@ -936,7 +936,7 @@ namespace DefendUtils {
 			}
 		}
 		else {
-			double x = queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") + AVOIDBUFFER;
+			double x = ParamManager::Instance()->PENALTY_AREA_DEPTH + AVOIDBUFFER;
 			double y = (Param::Field::PENALTY_AREA_WIDTH + AVOIDBUFFER * 2) / 2;
 			x = x + ratio * 10;
 			y = y + ratio * 10;
@@ -1212,8 +1212,8 @@ namespace DefendUtils {
 		const double BallVelDir = Ball.Vel().dir();
 		const double BallVel = Ball.Vel().mod();
 
-		if (Ball.Pos().x() > -(Param::Field::PITCH_LENGTH / 2 + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH"))
-			&& Ball.Pos().x() < queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH")
+		if (Ball.Pos().x() > -(Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH)
+			&& Ball.Pos().x() < ParamManager::Instance()->PENALTY_AREA_DEPTH
 			&& BallVel > 50
 			&& Ball.VelX() < 0) {
 			const double RBallVelDir = Utils::Normalize(BallVelDir + Param::Math::PI);
@@ -1475,14 +1475,14 @@ namespace DefendUtils {
 		if (up == true) {
 			// 靠前的椭圆
 			ROriginX = Param::Field::PITCH_LENGTH / 2 + Param::Vehicle::V2::PLAYER_SIZE;
-			m = queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") - Param::Vehicle::V2::PLAYER_SIZE * 5;
+            m = ParamManager::Instance()->PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE * 5;
 			n = Param::Field::GOAL_WIDTH + Param::Vehicle::V2::PLAYER_SIZE;
 		}
 		else {
 			// 靠后的椭圆
 			ROriginX = Param::Field::PITCH_LENGTH / 2 - Param::Vehicle::V2::PLAYER_SIZE / 3;
 			//m = Param::Vehicle::V2::PLAYER_SIZE*1.5;// 紧贴goalline
-			m = queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") - Param::Vehicle::V2::PLAYER_SIZE * 5; //浪逼
+			m = ParamManager::Instance()->PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE * 5; //浪逼
 			n = Param::Field::GOAL_WIDTH / 2 + Param::Vehicle::V2::PLAYER_SIZE;
 		}
 
@@ -1522,8 +1522,8 @@ namespace DefendUtils {
 						if (up == true) {
 							// 向前的补充
 							reverseDefenceLine = CGeoLine(RGOAL_RIGHT_POS, RTarget);
-							CGeoLine pointLine = CGeoLine(CGeoPoint(ROriginX - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") / 4, Param::Field::PITCH_WIDTH / 2),
-								CGeoPoint(ROriginX - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") / 4, -Param::Field::PITCH_WIDTH / 2));
+							CGeoLine pointLine = CGeoLine(CGeoPoint(ROriginX - ParamManager::Instance()->PENALTY_AREA_DEPTH / 4, Param::Field::PITCH_WIDTH / 2),
+								CGeoPoint(ROriginX - ParamManager::Instance()->PENALTY_AREA_DEPTH / 4, -Param::Field::PITCH_WIDTH / 2));
 							CGeoLineLineIntersection intersectionB = CGeoLineLineIntersection(reverseDefenceLine, pointLine);
 							if (intersectionB.Intersectant() == true)
 								RGoaliePoint = intersectionB.IntersectPoint();
@@ -1537,8 +1537,8 @@ namespace DefendUtils {
 					else {
 						if (up == true) {
 							reverseDefenceLine = CGeoLine(RGOAL_LEFT_POS, RTarget);
-							CGeoLine pointLine = CGeoLine(CGeoPoint(ROriginX - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") / 4, Param::Field::PITCH_WIDTH / 2),
-								CGeoPoint(ROriginX - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") / 4, -Param::Field::PITCH_WIDTH / 2));
+							CGeoLine pointLine = CGeoLine(CGeoPoint(ROriginX - ParamManager::Instance()->PENALTY_AREA_DEPTH / 4, Param::Field::PITCH_WIDTH / 2),
+								CGeoPoint(ROriginX - ParamManager::Instance()->PENALTY_AREA_DEPTH / 4, -Param::Field::PITCH_WIDTH / 2));
 							CGeoLineLineIntersection intersectionB = CGeoLineLineIntersection(reverseDefenceLine, pointLine);
 							if (intersectionB.Intersectant() == true)
 								RGoaliePoint = intersectionB.IntersectPoint();
@@ -1587,8 +1587,8 @@ namespace DefendUtils {
 //            //	GDebugEngine::Instance()->gui_debug_arc(reversePoint(intersect.point1()), 5, 0, 360, COLOR_WHITE);
 //            //	GDebugEngine::Instance()->gui_debug_arc(reversePoint(intersect.point2()), 5, 0, 360, COLOR_WHITE);
 //            //} else {
-//            //	GDebugEngine::Instance()->gui_debug_line(CGeoPoint(-ROriginX + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH")/4, Param::Field::PITCH_WIDTH/2),
-//            //																					CGeoPoint(-ROriginX + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH")/4, -Param::Field::PITCH_WIDTH/2),
+//            //	GDebugEngine::Instance()->gui_debug_line(CGeoPoint(-ROriginX + ParamManager::Instance()->PENALTY_AREA_DEPTH/4, Param::Field::PITCH_WIDTH/2),
+//            //																					CGeoPoint(-ROriginX + ParamManager::Instance()->PENALTY_AREA_DEPTH/4, -Param::Field::PITCH_WIDTH/2),
 //            //																					COLOR_WHITE);
 //            //}
 
@@ -1761,7 +1761,7 @@ namespace DefendUtils {
 		CGeoPoint transPoint = DCENTERPOINT + transVector;
 		CGeoLine targetLine = CGeoLine(transPoint, dir);
 		/*
-		double x = queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") +3 +AVOIDBUFFER;
+		double x = ParamManager::Instance()->PENALTY_AREA_DEPTH +3 +AVOIDBUFFER;
 		double y = (Param::Field::PENALTY_AREA_WIDTH + 2 +AVOIDBUFFER*2)/2;
 		x = x + ratio*5;
 		y = y + ratio*5;

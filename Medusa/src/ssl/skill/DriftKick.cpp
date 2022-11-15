@@ -7,7 +7,6 @@
 #include <cornell/Trajectory.h>
 #include <WorldModel/RobotCapability.h>
 #include <MotionControl/CMmotion.h>
-#include <TimeCounter.h>
 #include <WorldModel/KickStatus.h>
 #include <RobotSensor.h>
 #include "utils.h"

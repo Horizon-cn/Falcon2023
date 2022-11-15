@@ -13,7 +13,11 @@ getBayesParam 输出一只队伍的参数
 #include<fstream>
 #include<sstream>
 
+#ifdef WIN32
 const string CBayesReader::SCRIPT_PATH = "data\\ssl\\params\\GameFilterParam\\"; 
+#else
+const string CBayesReader::SCRIPT_PATH = "data/ssl/params/GameFilterParam/";
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // define some helper functions in default namespace
@@ -76,7 +80,7 @@ CBayesReader::CBayesReader()
 // read in parameters from list file
 void CBayesReader::readBayesParam(const std::string &opplist)
 {
-	string suffix = ".list";
+    string suffix = ".List";
 	string fullName = SCRIPT_PATH + opplist+suffix;
 	ifstream infile(fullName.c_str());
 	if (!infile) {

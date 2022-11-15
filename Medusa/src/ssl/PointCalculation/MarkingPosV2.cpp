@@ -16,7 +16,7 @@
 #include "GDebugEngine.h"
 #include "CornerAreaPos.h"
 #include "defence/DefenceInfo.h"
-#include <atlstr.h>
+#include <cstring>
 #include <ssl/ParamManagerNew.h>
 
 namespace NameSpaceMarkingPosV2{
@@ -68,11 +68,9 @@ using namespace NameSpaceMarkingPosV2;
 
 CMarkingPosV2::CMarkingPosV2()
 {
-	DECLARE_PARAM_READER_BEGIN(Defence)
-	READ_PARAM(DENY_BALL_MODE)
-	READ_PARAM(BACK_LINE_MODE)
-	READ_PARAM(SPECIAL_AREA_BACK_LINE_MODE)
-	DECLARE_PARAM_READER_END
+    DENY_BALL_MODE = ParamManager::Instance()->DENY_BALL_MODE;
+    BACK_LINE_MODE = ParamManager::Instance()->BACK_LINE_MODE;
+    SPECIAL_AREA_BACK_LINE_MODE = ParamManager::Instance()->SPECIAL_AREA_BACK_LINE_MODE;
 	for (int i = 0;i < Param::Field::MAX_PLAYER;++i)logCycle[i] = 0;
 	for (int i = 0;i < Param::Field::MAX_PLAYER;++i)markingPoint[i] = CGeoPoint(0,0);
 	oppPriority = 0;
@@ -309,9 +307,9 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 						if (debug)
 						{
 							GDebugEngine::Instance()->gui_debug_x(finalPoint,COLOR_YELLOW);
-							CString denyBall;
-							denyBall.Format("%d: deny Ball",oppNum);
-							GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(25+oppNum*10,-50),denyBall,COLOR_YELLOW);
+//							CString denyBall;
+//							denyBall.Format("%d: deny Ball",oppNum);
+//							GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(25+oppNum*10,-50),denyBall,COLOR_YELLOW);
 						}
 						//退出绕前判断
 						bool defenderChange = DEFENDER_NUM_LOG[oppNum] != defenderNum;
@@ -417,9 +415,9 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 				{
 					//动作点计算
 					if (debug){
-						CString backLine;
-						backLine.Format("%d: back line",oppNum);
-						GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(25+oppNum*10,50),backLine,COLOR_YELLOW);
+//						CString backLine;
+//						backLine.Format("%d: back line",oppNum);
+//						GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(25+oppNum*10,50),backLine,COLOR_YELLOW);
 					}
 					CGeoPoint RtargetPoint = DefendUtils::reversePoint(oppPrePos);
 					CGeoPoint Rgoal = DefendUtils::reversePoint(ourGoal);
@@ -489,7 +487,7 @@ bool CMarkingPosV2::isInSpecialAreaBackLineMode(const CVisionModule *pVision,con
 					}
 					theBallLogCycle = pVision->Cycle();
 				}
-				if (logBallPos.x() < -Param::Field::PITCH_LENGTH / 2 + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") + 10)//条件：我方角球
+                if (logBallPos.x() < -Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH + 10)//条件：我方角球
 				{
 					const PlayerVisionT& opp = pVision->TheirPlayer(num);
 					CGeoPoint oppPrePos = opp.Pos() + Utils::Polar2Vector(opp.Vel().mod() * SPECIAL_AREA_PRE_TIME,opp.Vel().dir());
@@ -505,15 +503,15 @@ bool CMarkingPosV2::isInSpecialAreaBackLineMode(const CVisionModule *pVision,con
 bool CMarkingPosV2::checkInSpecialArea_A(const CGeoPoint p,const CGeoPoint ballPos)
 {
 	int theFlag = ballPos.y() > 0 ? -1 : 1;
-	CGeoPoint p1 = CGeoPoint(-Param::Field::PITCH_LENGTH/2.0 + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH"),theFlag*Param::Field::PENALTY_AREA_L/2.0);
+    CGeoPoint p1 = CGeoPoint(-Param::Field::PITCH_LENGTH/2.0 + ParamManager::Instance()->PENALTY_AREA_DEPTH,theFlag*Param::Field::PENALTY_AREA_L/2.0);
 	double refDir = CVector(p1 - CGeoPoint(-Param::Field::PITCH_LENGTH/2.0,0)).dir();
 	double goal2oppDir = CVector(p - CGeoPoint(-Param::Field::PITCH_LENGTH/2.0,0)).dir();
 	if (p.x() < SPECIAL_AREA_X_BUFFER && (goal2oppDir*theFlag > refDir*theFlag))
 	{
 		if (debug){
-			CString backLine;
-			backLine.Format("%d: special line",oppNum);
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(125+oppNum*10,50),backLine,COLOR_YELLOW);
+//			CString backLine;
+//			backLine.Format("%d: special line",oppNum);
+//			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(125+oppNum*10,50),backLine,COLOR_YELLOW);
 		}
 		return true;
 	}

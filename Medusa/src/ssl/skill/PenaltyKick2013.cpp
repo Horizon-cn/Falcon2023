@@ -1,4 +1,4 @@
-#include ".\penaltykick2013.h"
+#include "PenaltyKick2013.h"
 #include "skill/Factory.h"
 #include <CommandFactory.h>
 #include <utils.h>

@@ -8,7 +8,7 @@
 #include "BallSpeedModel.h"
 #include <TaskMediator.h>
 #include "PointCalculation/ChipBallJudge.h"
-#include <atlstr.h>
+#include <cstring>
 
 namespace{
 	const double GoalBuffer = 2;

@@ -1,7 +1,7 @@
 #include "OptionModule.h"
 #include <param.h>
 #include "WorldModel/WorldModel.h"
-#include <robokit/core/rbk_config.h>
+#include "parammanager.h"
 
 COptionModule::COptionModule()
 {
@@ -18,12 +18,9 @@ COptionModule::~COptionModule(void)
 
 //too many couplings, can't use
 void COptionModule::update() {
-	auto pParamManager = rbk::ParamsServer::Instance()->find("ParamManager");
-	std::string value;
-	pParamManager->get("IsRight", value);
-	bool isRightSide = value == "0" ? 0 : 1;
-	pParamManager->get("IsYellow", value);
-	bool isYellowTeam = value == "0" ? 0 : 1;
+    bool isRightSide, isYellowTeam;
+    ZSS::ZParamManager::instance()->loadParam(isRightSide, "ZAlert/IsRight", 0);
+    ZSS::ZParamManager::instance()->loadParam(isYellowTeam, "ZAlert/IsYellow", 0);
 
 	if (!isRightSide) {
 		_side = Param::Field::POS_SIDE_LEFT;
@@ -37,7 +34,5 @@ void COptionModule::update() {
 	}
 	else {
 		_color = TEAM_BLUE;
-	}
-	//std::cout << "Side : " << ((_side == Param::Field::POS_SIDE_LEFT) ? "left" : "right")
-	//	<< ", Color : " << ((_color == TEAM_YELLOW) ? "yellow" : "blue") << " is running..." << Param::Output::NewLineCharacter;
+    }
 }

@@ -15,7 +15,7 @@ public:
 	virtual CPlayerCommand* execute(const CVisionModule* pVision);
 protected:
 	virtual void toStream(std::ostream& os) const { os << "Skill: DribbleTurn\n" << std::endl; }
-	bool CDribbleTurn::isVisionHasBall(const CVisionModule* pVision, const int vecNumber);
+    bool isVisionHasBall(const CVisionModule* pVision, const int vecNumber);
 
 private:
 	enum TestCircleBall {

@@ -9,8 +9,8 @@
 #include "TaskMediator.h"
 #include "OppAttributesFactory.h"
 #include "GDebugEngine.h"
-#include <atlstr.h>
-#include "TimeCounter.h"//²âÊ±Ä£¿é
+#include <cstring>
+
 namespace{
 	bool DEFENCE_DEBUG_MODE;
 	bool ATTACK_DEF_MODE;
@@ -51,8 +51,8 @@ CDefenceInfo::CDefenceInfo(){
 
 CDefenceInfo::~CDefenceInfo()
 {
-	delete []_oplayer;
-	delete[]_noChangeOplayer;
+    //delete []_oplayer;
+    //delete []_noChangeOplayer;
 }
 
 void CDefenceInfo::changeAttrSet(CAttributeSet& as)
@@ -108,13 +108,13 @@ void CDefenceInfo::updateDefenceInfo(const CVisionModule *pVision){
 	if (DEFENCE_DEBUG_MODE)
 	{
 		//cout << "attack array is ";
-		CString attackInform;
+//        std::string attackInform;
 		int attcnt = getAttackNum();
-		attackInform.Format("attackInform: %d: %d %d %d %d %d %d %d %d ",attcnt,_attackArray[0],_attackArray[1],_attackArray[2],_attackArray[3],_attackArray[4],_attackArray[5],_attackArray[6], _attackArray[7]);
-		CString attackSteadyInform;
-		attackSteadyInform.Format("steady attack: %d %d %d %d %d %d %d %d ",_steadyAttackArray[0],_steadyAttackArray[1],_steadyAttackArray[2],_steadyAttackArray[3],_steadyAttackArray[4],_steadyAttackArray[5],_steadyAttackArray[6], _steadyAttackArray[7]);
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, -450),attackInform,COLOR_YELLOW);
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-400,-450),attackSteadyInform,COLOR_YELLOW);
+//		attackInform.Format("attackInform: %d: %d %d %d %d %d %d %d %d ",attcnt,_attackArray[0],_attackArray[1],_attackArray[2],_attackArray[3],_attackArray[4],_attackArray[5],_attackArray[6], _attackArray[7]);
+        string attackSteadyInform;
+//		attackSteadyInform.Format("steady attack: %d %d %d %d %d %d %d %d ",_steadyAttackArray[0],_steadyAttackArray[1],_steadyAttackArray[2],_steadyAttackArray[3],_steadyAttackArray[4],_steadyAttackArray[5],_steadyAttackArray[6], _steadyAttackArray[7]);
+//		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, -450),attackInform,COLOR_YELLOW);
+//		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-400,-450),attackSteadyInform,COLOR_YELLOW);
 		for (int i = 0; i < Param::Field::MAX_PLAYER; ++i)
 		{
 			//cout << _attackArray[i-1];
@@ -136,8 +136,8 @@ void CDefenceInfo::updateDefenceInfo(const CVisionModule *pVision){
 			*/
 			
 			double  t = _oplayer[i]->getThreatenValue();
-			CString roleValue;
-			roleValue.Format("%f",t);
+//			CString roleValue;
+//			roleValue.Format("%f",t);
 			//GDebugEngine::Instance()->gui_debug_msg(playerPos+CVector(-20,0),roleValue,COLOR_WHITE);
 		}
 	}

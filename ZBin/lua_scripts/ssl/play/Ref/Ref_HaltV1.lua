@@ -11,8 +11,10 @@ end,
 	["Assister"] = task.stop(),
 	["Defender"] = task.stop(),
 	["Middle"]   = task.stop(),
+	["Engine"]   = task.stop(),
+	["Powerhouse"] = task.stop(),
 	["Goalie"]   = task.stop(),
-	match = "[LSADM]"
+	match = "[LSADMEP]"
 },
 
 name = "Ref_HaltV1",

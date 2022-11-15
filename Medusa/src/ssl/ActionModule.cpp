@@ -11,30 +11,27 @@
 /* E-mail:	cliffyin007@gmail.com										*/
 /************************************************************************/	
 
-#include "SSLStrategy.h"
-
 #include "ActionModule.h"
-#include <tinyxml/ParamReader.h>
 #include <WorldModel/KickStatus.h>
 #include <WorldModel/DribbleStatus.h>
 #include <TaskMediator.h>
 #include <PlayerCommandV2.h>
-
+#include "staticparams.h"
 #include <CommandFactory.h>
 //#include <PathPlan/PathPlanner.h>
 #include <BallStatus.h>
-#include <robokit/core/rbk_config.h>
 
 CActionModule::CActionModule(const COptionModule* pOption,CVisionModule* pVision,const CDecisionModule* pDecision)
 : _pOption(pOption),_pVision(pVision),_pDecision(pDecision)
 {
-	rbk::Config::Instance()->get("simOppo", isYellow);
-	//cmds_socket.bind(cmd_bind_port[(int)isYellow]);
+    isYellow = (pOption->MyColor() == TEAM_YELLOW);
+    cmds_socket = new QUdpSocket();
 }
 
 CActionModule::~CActionModule(void)
 {
-
+    delete cmds_socket;
+    cmds_socket = nullptr;
 }
 
 // 用于当场上有的车号大于5的情况
@@ -104,8 +101,8 @@ bool CActionModule::sendAction(const GameInfoT& vInfo)
 		//std::cout << "kickPower: " << kickPower << std::endl;
 		BallStatus::Instance()->setCommand(vecNum, kickPower, chipkickDist, dribble, _pVision->Cycle());
 	}
-	
-	//sendToOwl(cmds);
+
+    sendToOwl(cmds);
 
 	/************************************************************************/
 	/* 第二步：指令清空处理                                                 */
@@ -117,7 +114,6 @@ bool CActionModule::sendAction(const GameInfoT& vInfo)
 	//// 清除上一周期的障碍物标记
 	//CPathPlanner::resetObstacleMask();
 
-	GRBKHandle::Instance()->publishTopic(cmds);
 	return true;
 }
 
@@ -136,39 +132,47 @@ bool CActionModule::sendNoAction(const GameInfoT& vInfo)
 		// 记录指令
 		_pVision->SetPlayerCommand(pCmd->number(), pCmd);
 	}
-	GRBKHandle::Instance()->publishTopic(cmds);
+    sendToOwl(cmds);
 	return true;
 }
 
 void CActionModule::sendToOwl(const rbk::protocol::SRC_Cmd& cmds)
 {
-	SRC_cmds = new rbk::protocol::SRC_Cmd;
 	int totalnum = cmds.command_size();
-	//LogInfo(totalnum);
 	if (totalnum >= 24) {
-		LogWarn("!!!!!!!!!To Many Command Message To Owl!!!!!!!!!!!!!!!!!!!!!!!!");
-		return;
+        qDebug()<<"too many commands!!!";
+        return;
 	}
-
-	for (int i = 0; i < totalnum; i++) {
-		auto& cmd = cmds.command(i);
-		rbk::protocol::Message_SSL_Command *SRC_cmd = SRC_cmds->add_command();
-		SRC_cmd->set_robot_id(cmd.robot_id());
-		SRC_cmd->set_velocity_x(cmd.velocity_x());
-		SRC_cmd->set_velocity_y(cmd.velocity_y());
-		SRC_cmd->set_velocity_r(cmd.velocity_r());
-		SRC_cmd->set_flat_kick(cmd.flat_kick());
-		SRC_cmd->set_chip_kick(cmd.chip_kick());
-		SRC_cmd->set_dribbler_spin(cmd.dribbler_spin());
-	}
-	//发送cmd//
-	int size = SRC_cmds->ByteSize();
-	char *output = new char[size];
-	SRC_cmds->SerializeToArray(output, size);
-	cmds_socket.writeTo(output, size, "127.0.0.1", cmd_port[(int)isYellow]);
-	//cmds_socket.writeTo(output, size, "127.0.0.1", cmd_port[0]);
-
-	//删除掉message的部分，回收空间//
-	SRC_cmds->Clear();
-	delete[]SRC_cmds;
+    else if (totalnum <= 0) {
+        qDebug()<<"no command!!!";
+    }
+    //qDebug()<<"ready to send!!!";
+    for (int i = 0; i < cmds.command_size(); i++) {
+        auto zss_cmd = ZSS_CMDS.add_command();
+        auto src_cmd = cmds.command(i);
+        zss_cmd->set_robot_id(src_cmd.robot_id());
+        zss_cmd->set_velocity_x(src_cmd.velocity_x()); // m/s
+        zss_cmd->set_velocity_y(src_cmd.velocity_y());
+        zss_cmd->set_velocity_r(src_cmd.velocity_r());
+        zss_cmd->set_dribbler_spin(src_cmd.dribbler_spin());
+        if (src_cmd.flat_kick() > 0.01) {
+            zss_cmd->set_kick(false);
+            zss_cmd->set_power(src_cmd.flat_kick());
+        }
+        else if (src_cmd.chip_kick() > 0.01) {
+            zss_cmd->set_kick(true);
+            zss_cmd->set_power(src_cmd.chip_kick());
+        }
+        else {
+            zss_cmd->set_kick(false);
+            zss_cmd->set_power(0);
+        }
+    }
+    //发送cmd//
+    int port = ZSS::Athena::CONTROL_SEND[isYellow];
+    int size = ZSS_CMDS.ByteSize();
+    QByteArray data(size, 0);
+    ZSS_CMDS.SerializeToArray(data.data(), size);
+    cmds_socket->writeDatagram(data.data(), size, QHostAddress(ZSS::LOCAL_ADDRESS), port);
+    ZSS_CMDS.Clear();
 }

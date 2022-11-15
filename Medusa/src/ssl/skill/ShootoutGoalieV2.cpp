@@ -2,7 +2,7 @@
 yangda
 2017.7
 */
-#include "ShootoutGoalieV2.h"
+#include "shootoutGoalieV2.h"
 #include "BallSpeedModel.h"
 #include "PointCalculation/DefPos2015.h"
 #include "DefendUtils.h"

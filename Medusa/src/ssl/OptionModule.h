@@ -1,6 +1,5 @@
 #ifndef _OPTION_MODULE_H_
 #define _OPTION_MODULE_H_
-#include <robokit/core/rbk_core.h>
 /**
 * COptionModule.
 * 一些初始化参数

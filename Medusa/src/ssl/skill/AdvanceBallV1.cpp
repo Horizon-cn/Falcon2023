@@ -36,12 +36,9 @@ namespace{
 }
 CAdvanceBallV1::CAdvanceBallV1()
 {
-	DECLARE_PARAM_READER_BEGIN(JAM_AND_PUSH)
-	READ_PARAM(WEAK_OPP)
-	READ_PARAM(GENTLE_MODE)
-	READ_PARAM(OPP_HAS_BALL_DIST)
-	READ_PARAM(CIRCLE_FRONT)
-	DECLARE_PARAM_READER_END
+    WEAK_OPP = ParamManager::Instance()->WEAK_OPP;
+    OPP_HAS_BALL_DIST = ParamManager::Instance()->OPP_HAS_BALL_DIST;
+    CIRCLE_FRONT = ParamManager::Instance()->CIRCLE_FRONT;
 	dribble_last_state = 0;
 	isBallInPenalty = false;
 	pullCnt = 0;

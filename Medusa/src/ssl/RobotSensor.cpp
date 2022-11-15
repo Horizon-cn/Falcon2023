@@ -4,120 +4,101 @@
 #include <WorldModel/WorldModel.h>
 #include <fstream>
 #include "Global.h"
-#include "src_cmd.pb.h"
-#include "SSLStrategy.h"
+#include "zss_cmd.pb.h"
+#include <thread>
+#include <QUdpSocket>
+#include <QMutex>
+#include "staticparams.h"
+#include <QNetworkInterface>
 
 using namespace std;
 
 extern bool IS_SIMULATION;
 
-namespace {	
+namespace {
+    std::thread* robot_status_thread = nullptr;
+    QUdpSocket* robot_status_socket = nullptr;
+    QMutex robot_status_mutex;
 	//ofstream stopmsgfile("D:\\stopmsg.txt");
 	bool debug = true;
 }
 
 CRobotSensor::CRobotSensor()
 {
+    auto pOption = new COptionModule();
+    int team = (pOption->MyColor() == TEAM_YELLOW);
+    delete pOption;
+    robot_status_socket = new QUdpSocket();
+    robot_status_socket->bind(QHostAddress::AnyIPv4, ZSS::Athena::CONTROL_BACK_RECEIVE[team], QUdpSocket::ShareAddress);
+    robot_status_thread = new std::thread([=] {receiveRobotStatus();});
+    robot_status_thread->detach();
 	// 数据进行初始化
 	memset(_isValid, false, sizeof(_isValid));
-	memset(_lastKickingChecked, false, sizeof(_lastKickingChecked));
-	memset(_lastCheckedKickingCycle, 0, sizeof(_lastCheckedKickingCycle));	
 
-	for(int i = 0; i < Param::Field::MAX_PLAYER - 10; i ++) {
-		robotInfoBuffer[i].bInfraredInfo = false;
-		robotInfoBuffer[i].nKickInfo = 0;
-
-		_lastInfraredInfo[i] = false;
-		_last_change_num[i] = -1;
-		_last_real_num_index[i] = -1;
+    for(int i = 0; i < Param::Field::MAX_PLAYER; i ++) {
+        robotInfoBuffer[i].bInfraredInfo = false;
+        robotInfoBuffer[i].nKickInfo = 0;
+        robotInfoBuffer[i].nRobotNum = 0;
+        rawDataBuffer[i] = robotInfoBuffer[i];
 	}
+}
+
+CRobotSensor::~CRobotSensor()
+{
+    delete robot_status_socket;
+    robot_status_socket = nullptr;
+    delete robot_status_thread;
+    robot_status_thread = nullptr;
+}
+
+void CRobotSensor::receiveRobotStatus()
+{
+    ZSS::Protocol::Robot_Status robot_status;
+    QByteArray datagram;
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        while (robot_status_socket->state() == QUdpSocket::BoundState && robot_status_socket->hasPendingDatagrams()) {
+            datagram.resize(robot_status_socket->pendingDatagramSize());
+            robot_status_socket->readDatagram(datagram.data(), datagram.size());
+            robot_status.ParseFromArray(datagram, datagram.size());
+            if (!robot_status.has_robot_id()) {
+                qDebug()<<"no robot status";
+                continue;
+            }
+            auto&& id = robot_status.robot_id();
+            if(id < 0 || id >= Param::Field::MAX_PLAYER) {
+                qDebug() << "ERROR received error robot id in command interface." << id;
+                continue;
+            }
+            robot_status_mutex.lock();
+            rawDataBuffer[id].bInfraredInfo = robot_status.infrared();
+            rawDataBuffer[id].nRobotNum = id;
+            rawDataBuffer[id].nKickInfo = robot_status.chip_kick() || robot_status.flat_kick();
+            qDebug()<<"receive"<<rawDataBuffer[id].nRobotNum<<"infrared"<<rawDataBuffer[id].bInfraredInfo<<"kick"<<rawDataBuffer[id].nKickInfo;
+            robot_status_mutex.unlock();
+        }
+    }
 }
 
 void CRobotSensor::Update(int cycle)
 {
-	// 仿真不处理，直接予以返回
-	if (IS_SIMULATION) {
-		return;
-	}
-
-	rbk::protocol::Robots_Status robots_status;
-	GRBKHandle::Instance()->getSubscriberData(robots_status);
-	if (robots_status.robots_status_size() > 0) {
-		//std::cout<<robots_status.DebugString()<<std::endl;
-	}
-	//std::cout << "SIZE: "<<robots_status.robots_status_size() << std::endl;
-	//TODO: make num compatible!!!!!!!!2020-11-05
-	for (int i = 0; i < Param::Field::MAX_PLAYER - 10; i ++) {
-		int realNum = i;
-		if (robots_status.robots_status_size() > 0) {
-			rbk::protocol::Robot_Status rs = robots_status.robots_status(realNum);
-			if (rs.robot() != realNum) {
-				LogError("Do not match real number: "<< rs.robot()<<" "<<realNum);
-			} 
-			else{
-				rawDataBuffer.bInfraredInfo = rs.infrared();
-				rawDataBuffer.nRobotNum = rs.robot();
-				rawDataBuffer.nKickInfo = rs.chip_kick() || rs.flat_kick();
-				//std::cout << "rawDataBuffer.nKickInfo: " << rawDataBuffer.nKickInfo << std::endl;
-			}
-
-			// 强制保持一段时间球被踢出
-			if (_lastKickingChecked[i] || robotInfoBuffer[i].nKickInfo > 0) {
-				if (cycle - _lastCheckedKickingCycle[i] > 5) {
-					_lastKickingChecked[i] = false;
-					robotInfoBuffer[i].nKickInfo = 0;
-				}
-			}
-
-			if (rs.change_num() != _last_change_num[i] || rs.robot() != _last_real_num_index[i]) {
-				_last_change_num[i] = rs.change_num();
-				_last_real_num_index[i] = rs.robot();
-				//std::cout <<"This is num changed: "<< rs.infrared() << " " << rs.flat_kick() << " " << rs.chip_kick() << std::endl;
-				_isValid[i] = true;
-
-				UpdateBallDetected(i);
-
-				// 表明是踢球的包
-				if (rawDataBuffer.nKickInfo) {
-					robotInfoBuffer[i] = rawDataBuffer;
-					_lastKickingChecked[i] = true;
-					_lastCheckedKickingCycle[i] = cycle;
-				}
-			} 
-			else {
-				_lastKickingChecked[i] = false;
-			}
-		}
-	}
+    static int last_cycle = 0;
+    if (cycle == last_cycle)
+        return;
+    last_cycle = cycle;
+    robot_status_mutex.lock();
+    for (int i = 0; i < Param::Field::MAX_PLAYER; i ++) {
+        robotInfoBuffer[i] = rawDataBuffer[i];
+        if (robotInfoBuffer[i].nRobotNum == i)
+            _isValid[i] = true;
+        else
+            _isValid[i] = false;
+    }
+    robot_status_mutex.unlock();
 }
 
 bool CRobotSensor::IsInfraredOn(int num)				
 { 
-	if(IS_SIMULATION){
-		return BestPlayer::Instance()->isOurPlayerStrictControlBall(num);
-	} 
-	else{
-		return robotInfoBuffer[num].bInfraredInfo; 
-	}
+    return robotInfoBuffer[num].bInfraredInfo;
 }
 
-void CRobotSensor::UpdateBallDetected(int num)
-{
-	// 丢掉除了自己本身的数据
-	int realnum = num;
-	if (realnum != rawDataBuffer.nRobotNum) {
-		return ;
-	}
-
-	// 现在红外信号时改变才上传 [8/7/2011 cliffyin]
-	// 红外
-	bool currentInfraredInfo = rawDataBuffer.bInfraredInfo;
-	// std::cout << realnum << ": This is infrared: " << currentInfraredInfo << ". \n";
-	// std::cout << "last: "<< _lastInfraredInfo[num] << ", curr: " << currentInfraredInfo << "\n";
-	if (_lastInfraredInfo[num] != currentInfraredInfo) {
-		_lastInfraredInfo[num] = currentInfraredInfo;
-		robotInfoBuffer[num].bInfraredInfo = currentInfraredInfo;
-	}
-
-	return ;
-}

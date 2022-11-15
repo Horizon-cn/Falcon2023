@@ -3,7 +3,6 @@
 #include <Vision/VisionModule.h>
 #include <GDebugEngine.h>
 #include <WorldModel/RobotCapability.h>
-#include <TimeCounter.h>
 #include "vector.h"
 #include <math.h>
 #include <utils.h>

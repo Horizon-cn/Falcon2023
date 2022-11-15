@@ -10,7 +10,7 @@
 /*                                concrete skill                            */
 /************************************************************************/
 //0.working skills
-#include "Break.h"
+#include "break.h"
 
 //1.atom skills(TODO)
 #include "GotoPosition.h"
@@ -49,7 +49,7 @@
 #include "Goalie2013.h"
 #include "Goalie2022.h"
 #include "ShootoutGoalie.h"
-#include "ShootoutGoalieV2.h"
+#include "shootoutGoalieV2.h"
 #include "InterceptBall.h"
 #include "ShootBall.h"
 #include "ShootBallV2.h"

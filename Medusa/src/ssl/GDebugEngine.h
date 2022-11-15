@@ -14,6 +14,9 @@ EMAIL: qxzzju@gmail.com
 #include <singleton.h>
 #include <geometry.h>
 #include <queue>
+#include <QUdpSocket>
+#include <QHostAddress>
+
 class CGDebugEngine{
 public:
 	CGDebugEngine();
@@ -25,8 +28,10 @@ public:
 	void gui_debug_robot(const CGeoPoint& p, double robot_dir);
 	void gui_debug_msg(const CGeoPoint& p, const char* msgstr, char debug_color = 1);
 	void gui_debug_curve(const double num, const double maxLimit, const double minLimit, char debug_color = 1);
+    void send(bool teamIsBlue);
 private:
 	void gui_debug_add(const net_gdebug& new_debug);
+    QUdpSocket debug_socket;
 };
 typedef NormalSingleton< CGDebugEngine > GDebugEngine;
 

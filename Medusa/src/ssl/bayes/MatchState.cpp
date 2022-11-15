@@ -31,24 +31,15 @@ namespace {
 	const bool RecordFlag = false;
 	std::string RecordName = "../running_folder/params/GameFilterParam/output.txt";		// 对方使能记录文件
 	ofstream RecordFile;
-	bool USE_LUA_SCRIPTS = false;
+    bool USE_LUA_SCRIPTS = false; // useless
 };
 
 /// constructor
 CMatchState::CMatchState()
 {
 	// read in some strings
-	{
-		DECLARE_PARAM_READER_BEGIN(CMatchState)
-			READ_PARAM(BAYESLIST)
-			READ_PARAM(BAYESPARAM)
-		DECLARE_PARAM_READER_END
-	}
-	{
-		DECLARE_PARAM_READER_BEGIN(General)
-		READ_PARAM(USE_LUA_SCRIPTS)
-		DECLARE_PARAM_READER_END
-	}
+    BAYESLIST = ParamManager::Instance()->BAYESLIST.toStdString();
+    BAYESPARAM = ParamManager::Instance()->BAYESPARAM.toStdString();
 	if (RecordFlag) {
 		RecordFile.open(RecordName.c_str(),ios::out);
 		if (RecordFile.is_open()) {

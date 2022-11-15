@@ -4,7 +4,11 @@
 #include <WorldModel/WorldModel.h>
 #include <WorldModel/server.h>
 #include "zss_debug.pb.h"
+#include "staticparams.h"
+#include <QMutex>
+
 extern ZSS::Protocol::Debug_Msgs guiDebugMsgs;
+extern QMutex* _debug_mutex;
 CGDebugEngine::CGDebugEngine(){
 }
 CGDebugEngine::~CGDebugEngine(){
@@ -179,4 +183,21 @@ void CGDebugEngine::gui_debug_curve(const double num, const double maxLimit, con
 void CGDebugEngine::gui_debug_add(const net_gdebug& new_debug)
 {
 	//_debugs.push(new_debug);
+}
+
+void CGDebugEngine::send(bool teamIsBlue){
+    static QByteArray data;
+    _debug_mutex->lock();
+    int size = guiDebugMsgs.ByteSize();
+    data.resize(size);
+    guiDebugMsgs.SerializeToArray(data.data(),size);
+    int sent_size = 0;
+    if(teamIsBlue){
+        sent_size = debug_socket.writeDatagram(data,data.size(),QHostAddress(ZSS::LOCAL_ADDRESS),ZSS::Medusa::DEBUG_MSG_SEND[Param::BLUE]);
+    } else {
+        sent_size = debug_socket.writeDatagram(data,data.size(),QHostAddress(ZSS::LOCAL_ADDRESS),ZSS::Medusa::DEBUG_MSG_SEND[Param::YELLOW]);
+    }
+//    std::cout << "size: " << data.size() << ' ' << sent_size << std::endl;
+    guiDebugMsgs.clear_msgs();
+    _debug_mutex->unlock();
 }

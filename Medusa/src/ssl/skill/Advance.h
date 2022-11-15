@@ -66,8 +66,8 @@ private:
 	/*射门力度参数*/
 	int KICKPOWER ;
 	int CHIPPOWER ;
-	int ADV_FPASSPOWER ;
-	int ADV_CPASSPOWER ;
+    int ADV_FPASSPOWER_Alpha;
+    int ADV_CPASSPOWER_Alpha ;
 	int RELIEF_POWER ;
 	int  BACK_POWER ;
 	int Advance_DEBUG_ENGINE;
@@ -133,6 +133,8 @@ private:
 	CGeoPoint GenerateBreakShootPoint(const CVisionModule* pVision, int vecNumber);
 	CGeoPoint GenerateBreakPassPoint(const CVisionModule* pVision, int vecNumber);
 	double TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint);
+    double GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint);
+    double GetCPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint);
 
 protected:
 

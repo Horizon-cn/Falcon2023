@@ -8,7 +8,6 @@
 #include "WorldModel/WorldModel.h"
 #include "defence/DefenceInfo.h"
 #include "PointCalculation/MarkingPosV2.h"
-#include "tinyxml/ParamReader.h"
 #include <ssl/ParamManagerNew.h>
 
 namespace{

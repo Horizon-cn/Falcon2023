@@ -38,8 +38,8 @@ namespace {
 CDefendDribble::CDefendDribble()
 {
 	//本算法的初始化
-	_DeDribblePos = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") + 20, 0);
-	_lastDeDribblePos = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") + 20, 0);
+    _DeDribblePos = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH + 20, 0);
+    _lastDeDribblePos = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH + 20, 0);
 	GOAL_LEFT_POS = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 - GoalBuffer);
 	GOAL_RIGHT_POS = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 + GoalBuffer);
 	GOAL_CENTRE_POS = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
@@ -66,7 +66,7 @@ CGeoPoint CDefendDribble::getDeDribblePos(const CVisionModule* pVision)
 
 CGeoPoint CDefendDribble::generateDeDribblePos(const CVisionModule* pVision)
 {
-	_DeDribblePos = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH") + 20, 0);
+    _DeDribblePos = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH + 20, 0);
 	//以下部分不进行反向计算
 	const BallVisionT& ball = pVision->Ball();
 	const CGeoPoint ballPos = ball.Pos();

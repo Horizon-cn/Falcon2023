@@ -70,36 +70,33 @@ CGotoPosition::CGotoPosition()
 	RECORD_COMMAND = paramManager->RECORD_COMMAND;
 	NOT_MOVE = paramManager->NOT_MOVE;
 	{
-		DECLARE_PARAM_READER_BEGIN(Capability)
-		READ_PARAM(SLOW_FACTOR)
+        SLOW_FACTOR = ParamManager::Instance()->SLOW_FACTOR;
 
 		// 守门员单独控制平动参数
-		READ_PARAM(MAX_TRANSLATION_SPEED_GOALIE)
-		READ_PARAM(MAX_TRANSLATION_ACC_GOALIE)
-		READ_PARAM(MAX_TRANSLATION_DEC_GOALIE)
-		READ_PARAM(MAX_ROTATION_ACC_GOALIE)
-		READ_PARAM(MAX_ROTATION_SPEED_GOALIE)
+        MAX_TRANSLATION_SPEED_GOALIE = ParamManager::Instance()->MAX_TRANSLATION_SPEED_GOALIE;
+        MAX_TRANSLATION_ACC_GOALIE = ParamManager::Instance()->MAX_TRANSLATION_ACC_GOALIE;
+        MAX_TRANSLATION_DEC_GOALIE = ParamManager::Instance()->MAX_TRANSLATION_DEC_GOALIE;
+        MAX_ROTATION_ACC_GOALIE = ParamManager::Instance()->MAX_ROTATION_ACC_GOALIE;
+        MAX_ROTATION_SPEED_GOALIE = ParamManager::Instance()->MAX_ROTATION_SPEED_GOALIE;
 
 		// 后卫单独控制平动参数
-		READ_PARAM(MAX_TRANSLATION_SPEED_BACK)
-		READ_PARAM(MAX_TRANSLATION_ACC_BACK)
-		READ_PARAM(MAX_TRANSLATION_DEC_BACK)
-		READ_PARAM(MAX_ROTATION_ACC_BACK)
-		READ_PARAM(MAX_ROTATION_SPEED_BACK)
+        MAX_TRANSLATION_SPEED_BACK = ParamManager::Instance()->MAX_TRANSLATION_SPEED_BACK;
+        MAX_TRANSLATION_ACC_BACK = ParamManager::Instance()->MAX_TRANSLATION_ACC_BACK;
+        MAX_TRANSLATION_DEC_BACK = ParamManager::Instance()->MAX_TRANSLATION_DEC_BACK;
+        MAX_ROTATION_ACC_BACK = ParamManager::Instance()->MAX_ROTATION_ACC_BACK;
+        MAX_ROTATION_SPEED_BACK = ParamManager::Instance()->MAX_ROTATION_SPEED_BACK;
 
 		// 其他车的平动参数
-		READ_PARAM(MAX_TRANSLATION_SPEED)
-		READ_PARAM(MAX_TRANSLATION_ACC)
-		READ_PARAM(MAX_TRANSLATION_DEC)
+        MAX_TRANSLATION_SPEED = ParamManager::Instance()->MAX_TRANSLATION_SPEED;
+        MAX_TRANSLATION_ACC = ParamManager::Instance()->MAX_TRANSLATION_ACC;
+        MAX_TRANSLATION_DEC = ParamManager::Instance()->MAX_TRANSLATION_DEC;
 
-		READ_PARAM(MAX_ROTATION_SPEED)
-		READ_PARAM(MAX_ROTATION_ACC)
+        MAX_ROTATION_SPEED = ParamManager::Instance()->MAX_ROTATION_SPEED;
+        MAX_ROTATION_ACC = ParamManager::Instance()->MAX_ROTATION_ACC;
 		
-		READ_PARAM(TRANSLATION_ACC_LIMIT)
-		READ_PARAM(TRANSLATION_SPEED_LIMIT)
-		READ_PARAM(TRANSLATION_ROTATE_ACC_LIMIT)
-
-		DECLARE_PARAM_READER_END
+        TRANSLATION_ACC_LIMIT = ParamManager::Instance()->TRANSLATION_ACC_LIMIT;
+        TRANSLATION_SPEED_LIMIT = ParamManager::Instance()->TRANSLATION_SPEED_LIMIT;
+        TRANSLATION_ROTATE_ACC_LIMIT = ParamManager::Instance()->TRANSLATION_ROTATE_ACC_LIMIT;
 	}
 }
 
@@ -239,8 +236,8 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	if (RECORD_COMMAND && vecNumber == paramManager->RECORD_NUM) {
 		velCommandData << vecPos.x() << "  " << vecPos.y() <<"  "<< self.Dir() << "  " << globalVel.x() << " " << globalVel.y()<<"  "<< rotVel << std::endl;
 	}
-	
-	if(NOT_MOVE)
+
+    if(NOT_MOVE)
 		return pCmdFactory->newCommand(CPlayerSpeedV2(vecNumber, 0, 0, 0, dribblePower));
 	else
 		return pCmdFactory->newCommand(CPlayerSpeedV2(vecNumber, localVel.x(), localVel.y(), rotVel, dribblePower));

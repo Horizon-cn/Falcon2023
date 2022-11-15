@@ -2,7 +2,7 @@
 #include "GDebugEngine.h"
 #include <utils.h>
 #include <string.h>
-#include <atlstr.h>
+#include <cstring>
 
 CRobotPredictor::CRobotPredictor() : _isHasRotation(true) {
 }

@@ -21,6 +21,7 @@ using namespace std;
 
 #ifndef M_2PI
 #define M_2PI 6.28318530717958647693
+#define EPSILON (1.0E-10)
 #endif
 
 // 将x限制在low与high之间

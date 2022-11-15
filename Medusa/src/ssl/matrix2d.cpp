@@ -3,6 +3,7 @@
 #include "matrix2d.h"
 #include <cassert>
 #include <algorithm>
+#include <cstring>
 #define EPS 1e-10
 using std::ostream;
 using std::istream;

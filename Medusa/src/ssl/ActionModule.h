@@ -19,8 +19,9 @@
 //////////////////////////////////////////////////////////////////////////
 // include files
 #include "DecisionModule.h"						// Decision for the match
-#include <robokit\utils\udp\udp_client.h>
+#include <QUdpSocket>
 #include "src_cmd.pb.h"
+#include "zss_cmd.pb.h"
 
 /**
 @brief		比赛动作模块，提供外部调用接口。
@@ -82,11 +83,9 @@ private:
 	
 	void sendToOwl(const rbk::protocol::SRC_Cmd &);
 
-	bool isYellow;
-	int cmd_port[2] = { 50001, 50002 };
-	int cmd_bind_port[2] = { 50005, 50006 };
-	rbk::utils::udp::SyncUDPClient cmds_socket;
-	rbk::protocol::SRC_Cmd *SRC_cmds;
+    int isYellow;
+    QUdpSocket* cmds_socket;
+    ZSS::Protocol::Robots_Command ZSS_CMDS;
 	
 };
 

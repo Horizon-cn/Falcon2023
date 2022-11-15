@@ -66,13 +66,11 @@ namespace {
 
 CGetBallV3::CGetBallV3()
 {
-	DECLARE_PARAM_READER_BEGIN(ADVANCE)
-		READ_PARAM(GETBALL_BIAS)
-		READ_PARAM(BALL_NEAR_ROBOT)
-		READ_PARAM(HEAD_LIMIT)
-		READ_PARAM(DEBUG_ENGINE)
-		READ_PARAM(IS_DRIBBLE)
-	DECLARE_PARAM_READER_END
+    GETBALL_BIAS = ParamManager::Instance()->GETBALL_BIAS;
+    BALL_NEAR_ROBOT = ParamManager::Instance()->BALL_NEAR_ROBOT;
+    HEAD_LIMIT = ParamManager::Instance()->HEAD_LIMIT;
+    DEBUG_ENGINE = ParamManager::Instance()->GetBall_Debug;
+    IS_DRIBBLE = ParamManager::Instance()->IS_DRIBBLE;
 	_lastCycle = 0;
 }
 

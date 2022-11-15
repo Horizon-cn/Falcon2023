@@ -52,10 +52,10 @@ namespace Utils{
 	extern CGeoPoint MakeInField(const CGeoPoint& p,const double buffer = 0);///<让点在场内
 	extern bool OutOfField(const CGeoPoint& p,const double buffer = 0); ///<判断点是否在场内
 	bool IsInField(const CGeoPoint p, double buffer);
-	inline double FieldLeft(){ return -Param::Field::PITCH_LENGTH/2 + Param::Field::PITCH_MARGIN - queryParamByName("data\\ssl\\params\\params.xml", "FIELD_WALL_DIST"); }
-	inline double FieldRight(){ return Param::Field::PITCH_LENGTH/2 - Param::Field::PITCH_MARGIN + queryParamByName("data\\ssl\\params\\params.xml", "FIELD_WALL_DIST"); }
-	inline double FieldTop(){ return -Param::Field::PITCH_WIDTH/2   + Param::Field::PITCH_MARGIN - queryParamByName("data\\ssl\\params\\params.xml", "FIELD_WALL_DIST"); }
-	inline double FieldBottom(){ return Param::Field::PITCH_WIDTH/2 - Param::Field::PITCH_MARGIN + queryParamByName("data\\ssl\\params\\params.xml", "FIELD_WALL_DIST"); }
+    inline double FieldLeft(){ return -Param::Field::PITCH_LENGTH/2 + Param::Field::PITCH_MARGIN - ParamManager::Instance()->FIELD_WALL_DIST; }
+    inline double FieldRight(){ return Param::Field::PITCH_LENGTH/2 - Param::Field::PITCH_MARGIN + ParamManager::Instance()->FIELD_WALL_DIST; }
+    inline double FieldTop(){ return -Param::Field::PITCH_WIDTH/2   + Param::Field::PITCH_MARGIN - ParamManager::Instance()->FIELD_WALL_DIST; }
+    inline double FieldBottom(){ return Param::Field::PITCH_WIDTH/2 - Param::Field::PITCH_MARGIN + ParamManager::Instance()->FIELD_WALL_DIST; }
 	inline CGeoPoint LeftTop(){ return CGeoPoint(FieldLeft(),FieldTop()); }
 	inline CGeoPoint RightBottom(){ return CGeoPoint(FieldRight(),FieldBottom()); }
 	inline int Sign(double d){ return (d >= 0) ? 1 : -1; }

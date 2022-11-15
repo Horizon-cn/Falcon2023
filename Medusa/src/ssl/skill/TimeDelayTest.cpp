@@ -6,10 +6,9 @@
 #include <CommandFactory.h>
 #include <math.h>
 #include <fstream>
-#include <TimeCounter.h>
+#include <QTime>
 
 using namespace std;
-
 
 namespace{
 	const bool Verbose = true;	
@@ -19,8 +18,8 @@ namespace{
 	bool canTakeTest = false;
 	unsigned int countNum = 0;
 	ofstream timeDelayData("./timeDelayData.txt");
-	CUsecTimer _usecTimer;
 	//ofstream timeDelayData_X("./timeDelayData_X.txt");
+    QTime cur_time;
 }
 
 CTimeDelayTest::CTimeDelayTest()
@@ -32,6 +31,7 @@ CTimeDelayTest::CTimeDelayTest()
 	{
 		timeDelayData<<"time,send_x_speed,pos_x,pos_y,dir"<<endl;
 		isOutPut = false;
+        cur_time = QTime::currentTime();
 	}	
 }
 
@@ -78,10 +78,9 @@ void CTimeDelayTest::plan(const CVisionModule* pVision)
 		//setSubTask(PlayerRole::makeItRun(myNum,0.0,x_speed,0.5 * (Param::Math::PI/2.0-me.Dir())));
 		double x_speed = 50;
 		_directCommand = CmdFactory::Instance()->newCommand(CPlayerSpeedV2(myNum,x_speed,0.0,0.0,true));
-		_usecTimer.stop();
-		timeDelayData << _usecTimer.time() * 0.000001 << "," << x_speed << ",";
+        double cost_time = fabs(QTime::currentTime().msecsTo(cur_time));
+        timeDelayData << cost_time * 0.001 << "," << x_speed << ",";
 		timeDelayData << pVision->OurPlayer(myNum).X() << "," << pVision->OurPlayer(myNum).Y() << "," << pVision->OurPlayer(myNum).Dir() << endl;
-		_usecTimer.start();
 		//countNum++;
 	}
 

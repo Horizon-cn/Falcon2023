@@ -78,7 +78,7 @@ void Communicator::receiveCommand(int t) {
             for(int i = 0; i < commands.command_size(); i++) {
                 auto& command = commands.command(i);
 				auto vy = NoVelY ? 0.0f : command.velocity_y();
-                RobotSpeed rs(command.velocity_x(), vy, command.velocity_r());
+                RobotSpeed rs(command.velocity_x()*1000, -vy*1000, -command.velocity_r());
                 commandBuffer[t].robotSpeed[command.robot_id()] = rs;
             }
             if(isSimulation) {

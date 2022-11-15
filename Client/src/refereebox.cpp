@@ -5,9 +5,10 @@
 #include "staticparams.h"
 #include "ssl_referee.pb.h"
 #include "globalsettings.h"
+
 void multicastCommand(int state);
 
-RefereeBox::RefereeBox(QObject *parent) : QObject(parent),currentCommand(GameState::HALTED),nextCommand(GameState::HALTED){
+RefereeBox::RefereeBox(QObject *parent) : QObject(parent),currentCommand(GameState::HALTED),nextCommand(GameState::HALTED),sendSocket(){
     ZSS::ZParamManager::instance()->loadParam(port,"AlertPorts/ZSS_RefereePort",39991);
     sendSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, 1);
     commandCounter = 1;
@@ -33,7 +34,7 @@ void RefereeBox::multicastCommand(){
 
     ssl_referee.set_command_timestamp(0);//todo
     Referee_TeamInfo *yellow = ssl_referee.mutable_yellow();
-    yellow->set_name("ZJUNlict");//todo
+    yellow->set_name("SRC");//todo
     yellow->set_score(0);//todo
     yellow->set_red_cards(0);//todo
     //yellow->set_yellow_card_times(0,0); //todo
@@ -42,7 +43,7 @@ void RefereeBox::multicastCommand(){
     yellow->set_timeout_time(0.0);//todo
     yellow->set_goalkeeper(0); //todo
     Referee_TeamInfo *blue = ssl_referee.mutable_blue();
-    blue->set_name("ZJUNlict");
+    blue->set_name("SRC");
     blue->set_score(0);//todo
     blue->set_red_cards(0);//todo
     //blue->set_yellow_card_times(0,0); //todo
@@ -58,6 +59,7 @@ void RefereeBox::multicastCommand(){
     int size = ssl_referee.ByteSize();
     QByteArray buffer(size,0);
     ssl_referee.SerializeToArray(buffer.data(), buffer.size());
+    //qDebug()<<"send"<<QHostAddress(ZSS::REF_ADDRESS)<<port;
     sendSocket.writeDatagram(buffer.data(), buffer.size(),
                                  QHostAddress(ZSS::REF_ADDRESS), port);
     sendSocket.writeDatagram(buffer.data(), buffer.size(),

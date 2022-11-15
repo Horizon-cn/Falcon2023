@@ -18,7 +18,7 @@
 #include <BestPlayer.h>
 #include <TaskMediator.h>
 #include "Global.h"
-#include <atlstr.h>
+#include <cstring>
 
 CAdvance::CAdvance()
 {
@@ -35,8 +35,9 @@ CAdvance::CAdvance()
 	/*射门力度参数*/
 	KICKPOWER = paramManager->KICKPOWER;
 	CHIPPOWER = paramManager->CHIPPOWER; // 暂时不用了
-	ADV_FPASSPOWER = paramManager->ADV_FPASSPOWER;
-	ADV_CPASSPOWER = paramManager->ADV_CPASSPOWER;
+    ADV_FPASSPOWER_Alpha = paramManager->ADV_FPASSPOWER;
+    ADV_CPASSPOWER_Alpha = paramManager->ADV_CPASSPOWER;
+    // max:600 350
 	RELIEF_POWER = paramManager->RELIEF_POWER;
     BACK_POWER = paramManager->BACK_POWER;
 	Advance_DEBUG_ENGINE = paramManager->Advance_DEBUG_ENGINE;
@@ -102,9 +103,13 @@ void CAdvance::plan(const CVisionModule* pVision)
 	double Me2Receiver = (me.Pos() - pVision->OurPlayer(tandemNum).Pos()).mod();
 	double me2BestOppDist = CVector(pVision->TheirPlayer(opponentID).Pos() - me.Pos()).mod();
 	
-	//if (me2goal.mod() < KICK_DIST)
-	//	KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
-	
+    if (KickorPassDir < 1e-3)
+        KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
+
+    PassDirOrPos TMP;
+    CGeoPoint PassPos;
+    /*??痦??*/
+
 	CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
 
 	for(int i=0;i<9;++i)
@@ -282,10 +287,12 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (CanSupportKick(pVision, _executor) == 1 || toChipOrToFlat(pVision, _executor) == 1) {
 			/*鉴定为可以平传球 则平传球*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "FLATPASS", COLOR_ORANGE);
-			KickorPassDir = PassDir(pVision, _executor);
+            TMP = PassDirInside(pVision, _executor);
+            KickorPassDir = TMP.dir;
+            PassPos = TMP.pos;
 			if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
-				KickStatus::Instance()->setKick(_executor, ADV_FPASSPOWER);
-				KickStatus::Instance()->setAdvancerPassTo(GenerateBreakPassPoint(pVision, _executor));
+                KickStatus::Instance()->setKick(_executor, GetFPassPower(me.Pos(), PassPos));
+                KickStatus::Instance()->setAdvancerPassTo(PassPos);
 				setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "FLAT isDirOK", COLOR_ORANGE);
 			}
@@ -298,10 +305,12 @@ void CAdvance::plan(const CVisionModule* pVision)
 		else {
 			/*鉴定为不能平传球 则选择挑传 考虑函数同样为flatPassDir*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHIPPASS", COLOR_CYAN);
-			KickorPassDir = PassDir(pVision, _executor);
+            TMP = PassDirInside(pVision, _executor);
+            KickorPassDir = TMP.dir;
+            PassPos = TMP.pos;
 			if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
-				KickStatus::Instance()->setChipKick(_executor, ADV_CPASSPOWER);
-				KickStatus::Instance()->setAdvancerPassTo(GenerateBreakPassPoint(pVision, _executor));
+                KickStatus::Instance()->setChipKick(_executor, GetCPassPower(me.Pos(), PassPos));
+                KickStatus::Instance()->setAdvancerPassTo(PassPos);
 				setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHIP isDirOK", COLOR_ORANGE);
 			}
@@ -316,10 +325,12 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case JUSTCHIPPASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "CHIP", COLOR_YELLOW);
 		KickStatus::Instance()->clearAll();
-		KickorPassDir = PassDir(pVision, _executor);
+        TMP = PassDirInside(pVision, _executor);
+        KickorPassDir = TMP.dir;
+        PassPos = TMP.pos;
 		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
-			KickStatus::Instance()->setChipKick(_executor, ADV_CPASSPOWER);
-			KickStatus::Instance()->setAdvancerPassTo(GenerateBreakPassPoint(pVision, _executor));
+            KickStatus::Instance()->setChipKick(_executor, GetCPassPower(me.Pos(), PassPos));
+            KickStatus::Instance()->setAdvancerPassTo(PassPos);
 			setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHIP isDirOK", COLOR_ORANGE);
 		}
@@ -468,6 +479,8 @@ bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber)
 
 bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int ShootOrPass) {
 	double ShootPrecision = SHOOT_PRECISION;
+    //double offset = 0.05;
+
 	const BallVisionT& ball = pVision->Ball();
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
@@ -475,6 +488,10 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 	CVector opp2ball = ball.Pos() - opp.Pos();
 	CVector ball2goal = theirCenter - ball.Pos();
 	if (!ShootOrPass) ShootPrecision = ShootPrecision * 0.85;
+    /*if (myDir - targetDir > 0)targetDir -= offset;
+    else targetDir += offset;
+            是峪狍镝  妄荇租咛
+    */
 	last_target_dir = targetDir;
 	//printf("%d %.5lf %.5lf\n", ShootOrPass, myDir, targetDir);
 	if (abs(targetDir - last_target_dir) > 0.3 * Param::Math::PI / SHOOT_PRECISION) {
@@ -731,6 +748,15 @@ CGeoPoint CAdvance::GenerateBreakShootPoint(const CVisionModule* pVision, int ve
 CGeoPoint CAdvance::GenerateBreakPassPoint(const CVisionModule* pVision, int vecNumber) {
 	PassDirOrPos ReturnValue = PassDirInside(pVision, vecNumber);
 	return ReturnValue.pos;
+}
+
+double CAdvance::GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
+    double dist = (StartPoint - targetPoint).mod();
+    return min(600.0, ADV_FPASSPOWER_Alpha* dist);
+}
+double CAdvance::GetCPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
+    double dist = (StartPoint - targetPoint).mod();
+    return min(350.0, ADV_CPASSPOWER_Alpha * dist);
 }
 
 CPlayerCommand* CAdvance::execute(const CVisionModule* pVision)

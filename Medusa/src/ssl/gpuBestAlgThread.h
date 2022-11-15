@@ -15,20 +15,16 @@
 #ifndef _GPU_BEST_ALG_THREAD_H
 #define _GPU_BEST_ALG_THREAD_H
 
-#include <winsock2.h>
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include <QUdpSocket>
+#include <QMutex>
 
 #include <fstream>
-#include <MultiThread.h>
 #include <singleton.h>
 #include <deque>
 #include "Vision/VisionModule.h"
 #include "geometry.h"
 #include "NormalPlayUtils.h"
 #include "param.h"
-
-//#include <robokit/utils/udp/udp_client.h>
 
 #define AREANUM 9 // 区域数目
 
@@ -188,7 +184,7 @@ public:
 
 	/**
 	@brief	开启线程所用的函数*/
-	static CThreadCreator::CallBackReturnType THREAD_CALLBACK doBestCalculation(CThreadCreator::CallBackParamType lpParam);
+    void doBestCalculation();
 
 private:
 	/**
@@ -233,12 +229,10 @@ private:
 	int halfLength; // 场地半长
 	int halfWidth;  // 场地半宽
 	int halfGoalWidth;
-	float _pitch_info[4] = { Param::Field::PITCH_LENGTH, Param::Field::PITCH_WIDTH, Param::Field::PENALTY_AREA_DEPTH, Param::Field::PENALTY_AREA_WIDTH }; // 场地信息，依次为场地长、宽、禁区深度、宽
+    float _pitch_info[4] = { static_cast<float>(Param::Field::PITCH_LENGTH), static_cast<float>(Param::Field::PITCH_WIDTH), static_cast<float>(Param::Field::PENALTY_AREA_DEPTH), static_cast<float>(Param::Field::PENALTY_AREA_WIDTH) }; // 场地信息，依次为场地长、宽、禁区深度、宽
 
 	PointValueList pointValueList;
-	SOCKET udpServer;
-	SOCKADDR_IN heatAddr;
-	//rbk::utils::udp::SyncUDPClient heat_socket;
+    QUdpSocket udpServer;
 	bool is_change_port;
 	int heat_port, heat_bind_port;
 };

@@ -1,7 +1,8 @@
 #ifndef  _ADVANCE_BALL_V2_H_
 #define _ADVANCE_BALL_V2_H_
 
-#include <skill/PlayerTask.h>
+#include "PlayerTask.h"
+#include "param.h"
 /**********************************************************
 * High Level Skill: Advance Ball
 * Author: yys

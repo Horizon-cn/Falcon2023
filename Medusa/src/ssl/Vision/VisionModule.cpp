@@ -4,7 +4,6 @@
 #include <WorldModel/WorldModel.h>
 #include <utils.h>
 #include <playmode.h>
-#include <tinyxml/ParamReader.h>
 #include <WorldModel/DribbleStatus.h>
 #include <TaskMediator.h>
 #include <BestPlayer.h>
@@ -51,9 +50,7 @@ CVisionModule::CVisionModule()
 {	
 	WorldModel::Instance()->registerVision(this);
 	{
-		DECLARE_PARAM_READER_BEGIN(General)
-		READ_PARAM(PENALTY_FIGHT)
-		DECLARE_PARAM_READER_END
+        PENALTY_FIGHT = ParamManager::Instance()->PENALTY_FIGHT;
 	}
 
 
@@ -150,9 +147,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
     /////////////////////////////////////////////////////////////////////////////
 	/// @brief Step 3: 更新双向通讯的数据，仅针对实物模式
     /////////////////////////////////////////////////////////////////////////////
-	if (! IS_SIMULATION) {
-		RobotSensor::Instance()->Update(this->Cycle());
-	}
+    RobotSensor::Instance()->Update(this->Cycle());
 	
 	judgeBallVelStable();
 

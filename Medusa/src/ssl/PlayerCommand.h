@@ -3,7 +3,6 @@
 #include <misc_types.h>
 #include <string>
 #include <ostream>
-#include <tinyxml/ParamReader.h>
 
 class CPlayerCommand{
 public:

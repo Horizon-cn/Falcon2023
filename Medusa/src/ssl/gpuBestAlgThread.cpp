@@ -18,15 +18,13 @@
 #include "Vision/VisionModule.h"
 #include "GDebugEngine.h"
 #include "ShootRangeList.h"
-#include "TimeCounter.h"
-#include "tinyxml/ParamReader.h"
 #include "param.h"
-#include <robokit/core/rbk_config.h>
-#include "src_heatMap.pb.h"
+//#include "src_heatMap.pb.h"
 #include <time.h>
+#include <thread>
 
 
-#define has_GPU true
+#define has_GPU false
 
 #if has_GPU
 extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float* pitch_info);
@@ -40,7 +38,7 @@ void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, 
 #define BALL_NUM		1
 
 namespace gpuCalcArea {
-	CThreadCreator* _best_calculation_thread = 0;
+    std::thread* _best_calculation_thread = nullptr;
 	const double PI = 3.1415926;
 	const int Color_Size = 256;
 
@@ -49,14 +47,14 @@ namespace gpuCalcArea {
 	const double centerLeftBorderY = -Param::Field::PENALTY_AREA_WIDTH / 2;
 	const double centerRightBorderY = Param::Field::PENALTY_AREA_WIDTH / 2;
 
-	const double sideLineLeftBorderY = -queryParamByName("data\\ssl\\params\\params.xml", "SUPPORT_DIST") * Param::Field::PITCH_WIDTH / 2;
-	const double sideLineRightBorderY = queryParamByName("data\\ssl\\params\\params.xml", "SUPPORT_DIST") * Param::Field::PITCH_WIDTH / 2;
+	const double sideLineLeftBorderY = -ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
+	const double sideLineRightBorderY = ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
 
-	const double goalLineFrontBorderX = Param::Field::PITCH_LENGTH / 2 - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH");
-	const double goalLineBackBorderX = -Param::Field::PITCH_LENGTH / 2 + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH");
+	const double goalLineFrontBorderX = Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH;
+	const double goalLineBackBorderX = -Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH;
 
-	const double penaltyFrontBorderX = (Param::Field::PITCH_LENGTH / 2 - queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH")) / 2;
-	const double penaltyBackBorderX = -(Param::Field::PITCH_LENGTH / 2 + queryParamByName("data\\ssl\\params\\params.xml", "PENALTY_AREA_DEPTH")) / 2;
+	const double penaltyFrontBorderX = (Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH) / 2;
+	const double penaltyBackBorderX = -(Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH) / 2;
 
 	// 场地标号
 	// 新的场地信息
@@ -69,11 +67,11 @@ namespace gpuCalcArea {
 
 	FieldRectangle fieldRectangleArray[AREANUM] = {
 		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
-		FieldRectangle(CGeoPoint(middleFrontBorderX,centerRightBorderY),CGeoPoint(penaltyFrontBorderX,centerLeftBorderY)),
+        FieldRectangle(CGeoPoint(middleFrontBorderX + 100.0,centerRightBorderY),CGeoPoint(penaltyFrontBorderX,centerLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
-		FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX,centerLeftBorderY)),
+        FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + 100.0,centerLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleBackBorderX,sideLineRightBorderY),CGeoPoint(middleFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(goalLineBackBorderX,centerLeftBorderY),CGeoPoint(middleBackBorderX,sideLineLeftBorderY)),
@@ -82,8 +80,8 @@ namespace gpuCalcArea {
 	};
 }
 
-extern CMutex* _best_visiondata_copy_mutex;
-extern CMutex* _value_getter_mutex;
+extern QMutex* _best_visiondata_copy_mutex;
+extern QMutex* _value_getter_mutex;
 
 CGPUBestAlgThread::CGPUBestAlgThread() {
 	sendPoint = CGeoPoint(0, 0);
@@ -131,19 +129,20 @@ CGPUBestAlgThread::~CGPUBestAlgThread() {
 	free(_PointPotentialOrigin);
 	free(_PointPotential);
 	free(_start_pos_cpu);
-	closesocket(udpServer);
+    udpServer.abort();
 }
 
 void CGPUBestAlgThread::initialize(CVisionModule* pVision) {
 	_pVision = pVision;
 	// 开启 GPU 计算的线程
 	if (has_GPU) {
-		gpuCalcArea::_best_calculation_thread = new CThreadCreator(doBestCalculation, 0);
+        gpuCalcArea::_best_calculation_thread = new std::thread([=] {doBestCalculation();});
+        gpuCalcArea::_best_calculation_thread->detach();
 	}
 }
 
 void CGPUBestAlgThread::startComm() {
-	rbk::Config::Instance()->get("simOppo", is_change_port);
+    //rbk::Config::Instance()->get("simOppo", is_change_port);
 	if (is_change_port)
 	{
 		heat_port = 20004;
@@ -155,12 +154,13 @@ void CGPUBestAlgThread::startComm() {
 		heat_bind_port = 20008;
 	}
 	//heat_socket.bind(heat_bind_port);
-
+/**
 	udpServer = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (udpServer == INVALID_SOCKET)LogInfo("udpServer is an invalid_socket");
 	heatAddr.sin_family = AF_INET;
 	heatAddr.sin_port = htons(heat_port);
 	heatAddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+**/
 }
 
 void CGPUBestAlgThread::setSendPoint(const CGeoPoint passPoint) {
@@ -241,7 +241,7 @@ void CGPUBestAlgThread::generatePointValue() {
 		_value_getter_mutex->unlock();
 	}
 	else {
-		Sleep(10);
+        std::this_thread::sleep_for(std::chrono::microseconds(10000));
 		//cout << "not in cycle" << endl;
 	}
 	// cout << "genarate time" << ends - start << endl;
@@ -396,11 +396,11 @@ bool CGPUBestAlgThread::isLastOneValid(const CGeoPoint& p) {
 	return false;
 }
 
-CThreadCreator::CallBackReturnType THREAD_CALLBACK CGPUBestAlgThread::doBestCalculation(CThreadCreator::CallBackParamType lpParam) {
+void CGPUBestAlgThread::doBestCalculation() {
 	while (true) {
 		GPUBestAlgThread::Instance()->generatePointValue();
 		GPUBestAlgThread::Instance()->setPointValue();
-		GPUBestAlgThread::Instance()->sendPointValue();
+        //GPUBestAlgThread::Instance()->sendPointValue();
 	}
 }
 
@@ -421,7 +421,7 @@ void CGPUBestAlgThread::setPointValue() {
 	}
 	_value_getter_mutex->unlock();
 }
-
+/**
 void CGPUBestAlgThread::sendPointValue() {
 	//将点均分为若干个颜色,现在情况为把所有点按分值大小分配为256部分，每部分对应一个颜色
 	sort(pointValueList.begin(), pointValueList.end(), greater<PointValueStruct>());
@@ -450,3 +450,4 @@ void CGPUBestAlgThread::sendPointValue() {
 		//delete[] msgs;
 	}
 }
+**/

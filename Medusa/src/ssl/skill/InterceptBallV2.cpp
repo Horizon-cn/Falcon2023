@@ -7,7 +7,6 @@
 #include <cornell/Trajectory.h>
 #include <WorldModel/RobotCapability.h>
 #include <MotionControl/CMmotion.h>
-#include <TimeCounter.h>
 #include <RobotSensor.h>
 #include "utils.h"
 #include "ShootRangeList.h"
@@ -80,13 +79,9 @@ CInterceptBallV2::CInterceptBallV2(){
 	_drribleKickCounter = 0;
 	_normalKickCounter = 0;
 	{
-		DECLARE_PARAM_READER_BEGIN(Capability)
-			READ_PARAM(MAX_TRANSLATION_ACC)
-			READ_PARAM(MAX_TRANSLATION_DEC)
-		DECLARE_PARAM_READER_END
+        MAX_TRANSLATION_ACC = ParamManager::Instance()->MAX_TRANSLATION_ACC;
+        MAX_TRANSLATION_DEC = ParamManager::Instance()->MAX_TRANSLATION_DEC;
 	}
-
-
 }
 
 
@@ -131,7 +126,7 @@ void CInterceptBallV2::plan(const CVisionModule* pVision){
 	bool isBallInVision =  isVisionHasBall(pVision, robotNum);
 	int enemyNum = checkEnemy(pVision);                                   //If there is an enemy, show the enemy number, otherwise zero
 	//SlackTime Calculation
-	CGeoLine& ballVelLine = CGeoLine(ballRawPos, ball.Vel().dir());
+    const CGeoLine& ballVelLine = CGeoLine(ballRawPos, ball.Vel().dir());
 	CGeoPoint projPoint = ballVelLine.projection(me.Pos());
 	const CGeoSegment ballVelSeg = CGeoSegment(ballPos, ballPos + Utils::Polar2Vector(800, ball.Vel().dir()));
 	double me2projDist = projPoint.dist(me.Pos());										//The distance between the car and the projection

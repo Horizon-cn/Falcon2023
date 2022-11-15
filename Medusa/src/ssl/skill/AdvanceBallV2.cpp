@@ -50,25 +50,21 @@ namespace {
 }
 
 CAdvanceBallV2::CAdvanceBallV2() {
-	DECLARE_PARAM_READER_BEGIN(ADVANCE)
-	READ_PARAM(OPP_HAS_BALL_DIST)
-	READ_PARAM(WEAK_OPP)
-	READ_PARAM(USE_DRIBBLE_TURN)
-	READ_PARAM(CIRCLE_FRONT)
-	READ_PARAM(KICKPOWER)
-	READ_PARAM(CHIPPOWER)
-	READ_PARAM(DEBUG_ENGINE)
-	READ_PARAM(SHOOT_PRECISION)
-	READ_PARAM(CHIP_ANGLE)
-	READ_PARAM(FLAT_DIST)
-	READ_PARAM(PULL_DIST)
-	READ_PARAM(RELIEF_DIST)
-	READ_PARAM(RELIEF_POWER)
-	READ_PARAM(RELIEF_BIAS)
-	READ_PARAM(RELIEF_POWER_PENALTY)
-	READ_PARAM(BACK_POWER)
-	READ_PARAM(BACK_POWER_PENALTY)
-	DECLARE_PARAM_READER_END
+    OPP_HAS_BALL_DIST = ParamManager::Instance()->OPP_HAS_BALL_DIST;
+    WEAK_OPP = ParamManager::Instance()->WEAK_OPP;
+    USE_DRIBBLE_TURN = ParamManager::Instance()->USE_DRIBBLE_TURN;
+    CIRCLE_FRONT = ParamManager::Instance()->CIRCLE_FRONT;
+    KICKPOWER = ParamManager::Instance()->KICKPOWER;
+    CHIPPOWER = ParamManager::Instance()->CHIPPOWER;
+    DEBUG_ENGINE = ParamManager::Instance()->Advance_DEBUG_ENGINE;
+    SHOOT_PRECISION = ParamManager::Instance()->SHOOT_PRECISION;
+    CHIP_ANGLE = ParamManager::Instance()->CHIP_ANGLE;
+    FLAT_DIST = ParamManager::Instance()->FLAT_DIST;
+    PULL_DIST = ParamManager::Instance()->PULL_DIST;
+    RELIEF_DIST = ParamManager::Instance()->RELIEF_DIST;
+    RELIEF_POWER = ParamManager::Instance()->RELIEF_POWER;
+    RELIEF_BIAS = ParamManager::Instance()->RELIEF_BIAS;
+    BACK_POWER = ParamManager::Instance()->BACK_POWER;
 	pullCnt = 0;
 	turnCnt = 0;
 	pullBackFlag = false;

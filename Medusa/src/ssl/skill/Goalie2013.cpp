@@ -11,7 +11,7 @@
 #include "BallSpeedModel.h"
 #include "WorldModel/WorldModel.h"
 #include <TaskMediator.h>
-#include <atlstr.h>
+#include <cstring>
 
 namespace{
 	const double dangerFactor = 2.5;

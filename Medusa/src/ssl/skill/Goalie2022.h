@@ -1,6 +1,7 @@
 #ifndef __GOALIE_2022_H__
 #define __GOALIE_2022_H__
-#include <skill/PlayerTask.h>
+#include "PlayerTask.h"
+#include "param.h"
 
 class CGoalie2022 :public CStatedTask {
 public:

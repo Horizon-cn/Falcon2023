@@ -1,0 +1,41 @@
+syntax = "proto3";
+package rbk.protocol;
+
+message Ball{
+	bool ball_found = 1;
+	float x = 2;
+	float y = 3;
+	bool image_valid = 4;
+	float image_x = 5;
+	float image_y = 6;
+	float vel_x = 7;
+	float vel_y = 8;
+	float  chip_predict_x =9;
+	float  chip_predict_y =10;
+	float raw_x = 11;
+	float raw_y = 12;
+	string  P = 13;
+	string  Q = 14;
+}
+
+message Robot{
+	uint32 robot_id 	= 1;
+	float x 			= 2;
+	float y 			= 3;
+	float orientation 	= 4;
+	bool robot_found	= 5;
+	float  vel_x         =  6;
+	float  vel_y         =  7; 
+	float  accelerate_x  =  8;
+	float  accelerate_y  =  9;
+	string  P = 10;
+	string  Q = 11;
+}
+
+message SRC_RawVision{
+	uint32 frame_number 			= 1;
+	uint32 mode 					= 2;
+	repeated Robot robots_yellow	= 3;
+	repeated Robot robots_blue		= 4;
+	Ball ball 						= 5;
+}

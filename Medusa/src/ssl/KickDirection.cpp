@@ -37,8 +37,12 @@ CKickDirection::CKickDirection( )
 {
 	reset();
 	Shoot2Goal = CGeoPoint(Param::Field::PITCH_LENGTH / 2.0, 0.0);
-	const string path ="data\\ssl\\play_books\\";
-	string fullname = path +"data.txt";
+#ifdef WIN32
+    const string path ="data\\ssl\\play_books\\";
+#else
+    const string path ="data/ssl/play_books/";
+#endif
+    string fullname = path +"data.txt";
 	ifstream infile(fullname.c_str());
 	if (!infile) {
 		cerr << "error opening file data"<< endl;

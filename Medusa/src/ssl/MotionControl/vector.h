@@ -547,7 +547,7 @@ inline void lineRectangleInter(float lineA, float lineB, float lineC,
 		LineLineInter(a, b, c, px1, py1, px2, py2, interPointX, interPointY, isLineLineInter); //直线与矩形每边所在直线的交点
 		if (isLineLineInter && pointOnLineOnSeg(px1, py1, px2, py2, interPointX, interPointY)) { //要求交点在矩形边的线段上
 			if (num >= 2) {
-				printf("Error in CGeoLineRectangleIntersection, Num be: %d \n", num);
+                //printf("Error in CGeoLineRectangleIntersection, Num be: %d \n", num);
 				break; //如果找到的交点数达到3个及以上，报错并跳出
 			}
 			IPX[num] = interPointX;   //用数组保存求得的交点的x坐标

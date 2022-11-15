@@ -6,7 +6,11 @@
 #include <sstream>
 
 namespace{
+#ifdef WIN32
 	const string CONFIG_PATH = "data\\ssl\\defence_config\\";
+#else	
+	const string CONFIG_PATH = "data/ssl/defence_config/";
+#endif	
 }
 COppRoleMatcher::COppRoleMatcher()
 {
@@ -22,7 +26,7 @@ COppRoleMatcher::~COppRoleMatcher()
 	{
 		delete *it;
 	}
-	delete []_role;
+    //delete []_role;
 }
 
 void COppRoleMatcher::readInConfig(std::string fileName)

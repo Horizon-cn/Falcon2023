@@ -44,11 +44,9 @@ namespace {
 /************************************************************************/
 CDynamicSafetySearch::CDynamicSafetySearch() {
 	{
-		DECLARE_PARAM_READER_BEGIN(Capability)
-			READ_PARAM(MAX_TRANSLATION_SPEED)
-			READ_PARAM(MAX_TRANSLATION_ACC)
-			READ_PARAM(MAX_TRANSLATION_DEC)
-		DECLARE_PARAM_READER_END
+        MAX_TRANSLATION_SPEED = ParamManager::Instance()->MAX_TRANSLATION_SPEED;
+        MAX_TRANSLATION_ACC = ParamManager::Instance()->MAX_TRANSLATION_ACC;
+        MAX_TRANSLATION_DEC = ParamManager::Instance()->MAX_TRANSLATION_DEC;
 	}
 	_e = 0.0f;                    //权值
 	_gamma = 0.0f;                //小车的行驶时间
@@ -247,7 +245,7 @@ CVector CDynamicSafetySearch::SafetySearch(const int player, CVector Vnext, cons
 		if (find_flag[player] == false) {
 			string str;
 			char appdex[10];
-			itoa(player, appdex, 10);
+            //itoa(player, appdex, 10);
 			str = str.append(appdex).append(" NOT FIND");
 			GDebugEngine::Instance()->gui_debug_msg(target, str.c_str(), 1);
 		}

@@ -1,7 +1,6 @@
 #include "Compensate.h"
 #include "Global.h"
-#include <./tinyxml/ParamReader.h>
-
+#include "Eigen/Dense"
 
 #define COMPENSATION_TEST_MODE false
 #define DEBUG if(COMPENSATION_TEST_MODE)
@@ -20,7 +19,11 @@ CCompensate::~CCompensate() {
 }
 
 void CCompensate::readCompensateTable(){
+#ifdef WIN32
 	const string path = "data\\ssl\\play_books\\";
+#else
+	const string path = "data/ssl/play_books/";
+#endif
 	string sCarNum;
 
 	//cout << "reading playbooks:" << endl;

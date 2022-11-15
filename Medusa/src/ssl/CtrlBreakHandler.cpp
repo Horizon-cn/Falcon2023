@@ -1,12 +1,13 @@
 #include <CtrlBreakHandler.h>
-#include <windows.h>
 #include <iostream>
 #include <param.h>
+#include <signal.h>
 namespace{
 	bool breakPressed = false;
 	bool haltPressed = false;
-	int countAfterBreak = 0;
-	BOOL CtrlHandler(DWORD fdwCtrlType) 
+    int countAfterBreak = 0;
+#ifdef WIN32
+    bool CtrlHandler(DWORD fdwCtrlType)
 	{ 
 		switch (fdwCtrlType){ 
 		case CTRL_C_EVENT:
@@ -28,13 +29,34 @@ namespace{
 		default: 
 			return FALSE; 
 		} 
-	} 
+    }
+#else
+    extern "C"
+    void CtrlHandler(int a) {
+        if(haltPressed){
+            std::cout << "resume system" << std::endl;
+            haltPressed = false;
+        }
+        else{
+            std::cout << "halt system" << std::endl;
+            haltPressed = true;
+        }
+    }
+#endif
 }
 CCtrlBreakHandler::CCtrlBreakHandler()
 {
-	if (!SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlHandler,TRUE)){
+#ifdef WIN32
+    if (!SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlHandler,TRUE)){
 		std::cout << "Could not set control handler" << Param::Output::NewLineCharacter;
-	}
+    }
+#else
+    struct sigaction newhandler;
+    newhandler.sa_handler = &CtrlHandler;
+    sigaddset(&newhandler.sa_mask, SIGQUIT);
+    newhandler.sa_flags = 0;
+    sigaction(SIGINT, &newhandler, NULL);
+#endif
 }
 int CCtrlBreakHandler::breaked()
 {

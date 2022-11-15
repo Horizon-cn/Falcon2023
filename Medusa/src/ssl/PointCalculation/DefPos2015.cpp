@@ -7,7 +7,7 @@
 #include "GDebugEngine.h"
 #include "TaskMediator.h"
 #include "WorldModel/WorldModel.h"
-#include "Param.h"
+#include "param.h"
 #include "utils.h"
 
 #include <cmath>

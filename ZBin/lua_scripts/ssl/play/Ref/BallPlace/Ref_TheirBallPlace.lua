@@ -69,7 +69,7 @@ switch = function()
 		enemy.attackNum() <= 8 and enemy.attackNum() > 0 then
 		return "attacker"..enemy.attackNum()
 	else
-		if cond.isGameOn() and cond.OurBallPlace() then
+		if cond.isGameOn() and cond.ourBallPlace() then
 			return "exit"
 		elseif enemy.situChanged() and
 			enemy.attackNum() <= 8 and enemy.attackNum() > 0 then

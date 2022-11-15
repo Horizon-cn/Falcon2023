@@ -44,11 +44,9 @@ namespace {
 
 CFetchBall::CFetchBall() {
 	{
-		DECLARE_PARAM_READER_BEGIN(PlaceBall)
-			READ_PARAM(VERBOSE)
-			READ_PARAM(GETBALLMAXCNT)
-			READ_PARAM(WAIT_BUFFER)
-			DECLARE_PARAM_READER_END
+        VERBOSE = ParamManager::Instance()->VERBOSE;
+        GETBALLMAXCNT = ParamManager::Instance()->GETBALLMAXCNT;
+        WAIT_BUFFER = ParamManager::Instance()->WAIT_BUFFER;
 	}
 }
 

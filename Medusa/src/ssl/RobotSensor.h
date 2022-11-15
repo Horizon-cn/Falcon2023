@@ -25,7 +25,7 @@ public:
 	// 构造函数
 	CRobotSensor();
 	// 析构函数
-	~CRobotSensor() {}
+    ~CRobotSensor();
 
 	// 全局更新借口
 	void Update(int cycle);
@@ -36,27 +36,21 @@ public:
 	// 小车是否产生红外信号，一般表示球在嘴前方
 	bool IsInfraredOn(int num);
 	// 重置小车的红外信号
-	void ResetInraredOn(int num)			{ _lastInfraredInfo[num] = false;  robotInfoBuffer[num].bInfraredInfo = false; }
+    void ResetInraredOn(int num)			{ robotInfoBuffer[num].bInfraredInfo = false; }
 
 	// 小车有否启动平射或挑射的机构
 	int IsKickerOn(int num)					{ return robotInfoBuffer[num].nKickInfo; }
 
 private:
+    void receiveRobotStatus();
 	// 更新的内部接口
 	void UpdateBallDetected(int num);
 
 	ROBOTINFO robotInfoBuffer[Param::Field::MAX_PLAYER];		// 存放过滤后的结果
-	ROBOTINFO rawDataBuffer;
+    ROBOTINFO rawDataBuffer[Param::Field::MAX_PLAYER];
 
-	int _last_real_num_index[Param::Field::MAX_PLAYER];
-	int _last_change_num[Param::Field::MAX_PLAYER];
-
-	bool _lastKickingChecked[Param::Field::MAX_PLAYER];
-	int _lastCheckedKickingCycle[Param::Field::MAX_PLAYER];
-                         
 	bool _isValid[Param::Field::MAX_PLAYER];					// 当前数据是否是最新的
 
-	bool _lastInfraredInfo[Param::Field::MAX_PLAYER];			// 历史的红外数据
 };
 
 typedef NormalSingleton< CRobotSensor > RobotSensor;			// 全局访问接口

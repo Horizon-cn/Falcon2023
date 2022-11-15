@@ -28,7 +28,7 @@ private:
     //help track robot trace
     CGeoPoint lastFrameposition;
     double dribbleDist = 0;
-    bool CBreak::isVisionHasBall(const CVisionModule* pVision, const int vecNumber);
+    bool isVisionHasBall(const CVisionModule* pVision, const int vecNumber);
 };
 
 #endif 

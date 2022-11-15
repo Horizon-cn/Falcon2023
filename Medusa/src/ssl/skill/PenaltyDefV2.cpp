@@ -30,11 +30,9 @@ namespace {
 }
 
 CPenaltyDefV2::CPenaltyDefV2() {
-	DECLARE_PARAM_READER_BEGIN(PENALTY_DEFENCE)
-	READ_PARAM(CATEGORY)
-	READ_PARAM(FRAME)
-	READ_PARAM(AHEAD)
-	DECLARE_PARAM_READER_END
+    CATEGORY = ParamManager::Instance()->CATEGORY;
+    FRAME = ParamManager::Instance()->FRAME;
+    AHEAD = ParamManager::Instance()->AHEAD;
 	_category = CATEGORY;
 	_theirPenaltyNum = 0;
 	_isFirst = false;

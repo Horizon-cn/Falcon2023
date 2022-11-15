@@ -5,7 +5,7 @@ module(..., package.seeall)
 --~ -----------------------------------------------
 
 function ourBallPlace()
-	return vision:getCurrentRefereeMsg() == "OurBallPlacement"
+	return vision:GetCurrentRefereeMsg() == "OurBallPlacement"
 end
 
 function theirBallPlace()

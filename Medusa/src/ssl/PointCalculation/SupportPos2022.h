@@ -3,6 +3,7 @@
 #include <skill/PlayerTask.h>
 #include "ValueRange.h"
 #include <list>
+#include "singleton.h"
 
 /**********************************************************
 * Description: SupportPos

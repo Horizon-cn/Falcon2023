@@ -17,17 +17,17 @@ CDefenceInfo* defenceInfo;
 CChipBallJudge* chipBallJudge;
 CSupportPos* supportPos;
 CSupportPos2022* supportPos2022;
-CParamManagerNew* paramManager;
+CParamManagerSkill* paramManager;
 
 
 void initializeSingleton()
 {
 	paramManager    = ParamManager::Instance();
 	vision			= VisionModule::Instance();
-	kickStatus		= KickStatus::Instance();
+    kickStatus		= KickStatus::Instance();
 	dribbleStatus	= DribbleStatus::Instance();
-	debugEngine		= GDebugEngine::Instance();
-	world			= WorldModel::Instance();
+    debugEngine		= GDebugEngine::Instance();
+    world			= WorldModel::Instance();
 	kickDirection	= KickDirection::Instance();
 	bestAlg			= GPUBestAlgThread::Instance();
 	supportPos		= SupportPos::Instance();

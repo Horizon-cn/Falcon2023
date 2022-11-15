@@ -64,17 +64,29 @@ static std::string findScript(const char *pFname)
 {
 	FILE *fTest;
 
-	char drive[_MAX_DRIVE];
-	char dir[_MAX_DIR];
-	char fname[_MAX_FNAME];
-	char ext[_MAX_EXT];
+#if defined(_WIN32)
+    char drive[_MAX_DRIVE];
+    char dir[_MAX_DIR];
+    char fname[_MAX_FNAME];
+    char ext[_MAX_EXT];
+    _splitpath(pFname, drive, dir, fname, ext);
+    std::string strTestFile = (std::string) drive + dir + "Scripts\\" + fname + ".LUB";
+#else
+    std::string pname = pFname;
+    int l = pname.length();
+    char name[l+1];
+    strcpy(name,pname.c_str());
+    std::string drive = "";
+    std::string dir = "";//dirname(name);
+    std::string fname = basename(name);// Mark : not work /error
+    std::string ext = "";
+    std::string scriptsString = "Scripts/";
+    std::string strTestFile(pFname);
+#endif
 
-	_splitpath(pFname, drive, dir, fname, ext);
-
-	std::string strTestFile = (std::string) drive + dir + "Scripts\\" + fname + ".LUB";
 	fTest = fopen(strTestFile.c_str(), "r");
 	if (fTest == NULL)
-	{
+    {
 		//not that one...
 		strTestFile = (std::string) drive + dir + "Scripts\\" + fname + ".LUA";
 		fTest = fopen(strTestFile.c_str(), "r");
@@ -138,6 +150,7 @@ bool CLuaModule::RunScript(const char *pFname)
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 50), luaL_checkstring(m_pScriptContext, -1), COLOR_RED);
 		return false;
 	}
+
 	return true;
 
 }
@@ -641,7 +654,7 @@ extern "C" int Skill_ReceivePass(lua_State *L)
 extern "C" int Skill_FetchBall(lua_State *L)    //-----------------------------------------
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
-	paramManager->PlACEBALL_PLAYER_NUM = runner;
+    paramManager->PlACEBALL_PLAYER_NUM = runner;
 	double targetPosX = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double targetPosY = LuaModule::Instance()->GetNumberArgument(3, NULL);
 	double kickPower = LuaModule::Instance()->GetNumberArgument(4, NULL);

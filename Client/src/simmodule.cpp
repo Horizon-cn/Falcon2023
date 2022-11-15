@@ -161,18 +161,18 @@ void SimModule::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
         //set flatkick or chipk    ick
         if (!commands.kick()) {
             grsim_robots[id]->set_kickspeedz(0);
-            grsim_robots[id]->set_kickspeedx(trans_length(commands.power()));
+            grsim_robots[id]->set_kickspeedx(commands.power() >= 6.5? 6.5 : commands.power());
         } else {
             double radian = ZSS::Sim::CHIP_ANGLE * ZSS::Sim::PI / 180.0;
-            double vx = sqrt(trans_length(commands.power()) * ZSS::Sim::G / 2.0 / tan(radian));
+            double vx = sqrt(commands.power() * ZSS::Sim::G / 2.0 / tan(radian));
             double vz = vx * tan(radian);
             grsim_robots[id]->set_kickspeedz(vx);
             grsim_robots[id]->set_kickspeedx(vz);
         }
         //set velocity and dribble
         double vx = commands.velocity_x();
-        double vy = NoVelY ? 0.0f : commands.velocity_y();
-        double vr = commands.velocity_r();
+        double vy = NoVelY ? 0.0f : -commands.velocity_y();
+        double vr = -commands.velocity_r();
         double dt = 1. / Athena::FRAME_RATE;
         double theta = - vr * dt;
         CVector v(vx, vy);
@@ -184,11 +184,10 @@ void SimModule::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
             vy = v.y();
             //            if (i==0) cout << vx << " "<< vy << " " << endl;
         }
-
-        grsim_robots[id]->set_veltangent(trans_length(vx));
-        grsim_robots[id]->set_velnormal(trans_length(vy));
-        grsim_robots[id]->set_velangular(trans_vr(vr));
-        grsim_robots[id]->set_spinner(trans_dribble(commands.dribbler_spin()));
+        grsim_robots[id]->set_veltangent(vx);
+        grsim_robots[id]->set_velnormal(vy);
+        grsim_robots[id]->set_velangular(vr);
+        grsim_robots[id]->set_spinner(commands.dribbler_spin() > 0);
     }
     int size = grsim_packet.ByteSize();
     data.resize(size);

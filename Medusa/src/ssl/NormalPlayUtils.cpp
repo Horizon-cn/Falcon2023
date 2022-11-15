@@ -1,5 +1,5 @@
 #include "NormalPlayUtils.h"
-#include "gpuBestAlgThread.h"
+//#include "gpuBestAlgThread.h"
 #include "TaskMediator.h"
 #include "Global.h"
 #include <time.h>
