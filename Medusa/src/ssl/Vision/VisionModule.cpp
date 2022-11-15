@@ -181,7 +181,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	// 特殊情况一
 	// 一些特殊比赛状态下，对于球的特殊处理，与场地的尺寸参数相关
 	// 一般要求球看不到才予以处理
-	//if (!IS_SIMULATION) {
+    //if (!IS_SIMULATION) {
 		if (_gameState.kickoff()) {				// 开球时
 			if (!Ball().Valid() || Ball().Pos().dist(CGeoPoint(0,0)) > 20) {
 				_ballPredictor.setPos(Cycle(),CGeoPoint(0,0));
@@ -205,7 +205,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 				}
 			}
 		}
-	//}
+    //}
 	
 	// 特殊情况二：
 	// 红外有信息，若球没看到，则予以位置修正，球若看到则检查红外信号，用以替换owl2中的处理 zyj

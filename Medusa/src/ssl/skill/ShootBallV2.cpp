@@ -139,11 +139,11 @@ void CShootBallV2::plan(const CVisionModule* pVision)
 		case CHASE_KICK:
 			{
 				//finalDir = 	KickDirection::Instance()->getRawKickDir();
-				setSubTask(PlayerRole::makeItChaseKickV1(runner, finalDir, flags));
+                setSubTask(PlayerRole::makeItChaseKickV2(runner, finalDir, flags));
 			}
 			break;
 		default:
-			setSubTask(PlayerRole::makeItChaseKickV1(runner, finalDir, flags));
+            setSubTask(PlayerRole::makeItChaseKickV2(runner, finalDir, flags));
 			break;
 	}
 

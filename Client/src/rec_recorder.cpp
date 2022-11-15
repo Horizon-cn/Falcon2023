@@ -24,7 +24,7 @@ RecRecorder::RecRecorder() {
     ZSS::ZParamManager::instance()->loadParam(DRAW_VELOCITY,"Lesson/DrawVelocity",true);
 }
 void RecRecorder::init() {
-    isRun = true;
+    isRun = false;
 //        qDebug() << "I AM RUNNING";
     QDateTime datetime;
 //        qDebug() << datetime.currentDateTime().toString("yyyy-MM-dd-HH-mm-ss");

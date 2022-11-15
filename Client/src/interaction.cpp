@@ -195,7 +195,7 @@ bool Interaction::controlMedusa2(bool control) {
         }
     } else {
         medusaProcess2 = new QProcess();
-        QString name = "./Medusa";
+        QString name = "./Medusa2";
         medusaProcess2->start(name);
         QTextStream(stdout) << "\n------------------------------------\n" << "running 2 " << name << "\n------------------------------------\n";
     }

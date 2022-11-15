@@ -76,7 +76,9 @@ private:
 	* Author: Ã∑”Ó∫Í
 	* Created Date: 2022/10/10
 	***********************************************************/
-	CGeoPoint theirLeft = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
+    const CGeoLine GOATLINE = CGeoLine(CGeoPoint(600, -60), CGeoPoint(600, 60));
+
+    CGeoPoint theirLeft = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
 	CGeoPoint theirRight = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
 	CGeoPoint theirCenter = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
 	CGeoPoint ourGoal = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);

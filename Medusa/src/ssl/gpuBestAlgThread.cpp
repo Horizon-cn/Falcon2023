@@ -48,14 +48,17 @@ namespace gpuCalcArea {
 	const double centerRightBorderY = Param::Field::PENALTY_AREA_WIDTH / 2;
 
 	const double sideLineLeftBorderY = -ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
-	const double sideLineRightBorderY = ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
-
+    //-450
+    const double sideLineRightBorderY = ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
+    //450
 	const double goalLineFrontBorderX = Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH;
-	const double goalLineBackBorderX = -Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH;
-
+    //480
+    const double goalLineBackBorderX = -Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH;
+    //-480
 	const double penaltyFrontBorderX = (Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH) / 2;
-	const double penaltyBackBorderX = -(Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH) / 2;
-
+    //240
+    const double penaltyBackBorderX = -(Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH) / 2;
+    //-240
 	// 场地标号
 	// 新的场地信息
 	//           6 3 0  
@@ -67,8 +70,9 @@ namespace gpuCalcArea {
 
 	FieldRectangle fieldRectangleArray[AREANUM] = {
 		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
-        FieldRectangle(CGeoPoint(middleFrontBorderX + 100.0,centerRightBorderY),CGeoPoint(penaltyFrontBorderX,centerLeftBorderY)),
-		FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
+        FieldRectangle(CGeoPoint(middleFrontBorderX + 100.0,centerRightBorderY),CGeoPoint(goalLineFrontBorderX - 50,centerLeftBorderY)),
+        //FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
+        FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
         FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + 100.0,centerLeftBorderY)),
