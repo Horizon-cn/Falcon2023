@@ -12,7 +12,7 @@ typedef struct PosT {
 	void setValid(int _value) {
 		valid = _value;
 	}
-}; 	PosT;
+} PosT;
 
 typedef struct VehicleInfoT{
 	VehicleInfoT() : dir(0), type(0), dirvel(0) {}

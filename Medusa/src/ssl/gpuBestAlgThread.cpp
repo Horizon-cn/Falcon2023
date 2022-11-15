@@ -24,7 +24,7 @@
 #include <thread>
 
 
-#define has_GPU false
+#define has_GPU true
 
 #if has_GPU
 extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float* pitch_info);

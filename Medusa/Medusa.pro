@@ -84,8 +84,54 @@ unix:!macx{
 INCLUDEPATH += \
     $$ZSS_INCLUDES
 
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
+
 LIBS += \
-    $$ZSS_LIBS
+    $$ZSS_LIBS \
+    -L"/usr/local/lib" \
+    -L"/usr/local/cuda/lib64" \
+    -lcudart -lcufft \
+    -L"/usr/lib/gcc/x86_64-linux-gnu/7" \
+
+CUDA_SOURCES += src/ssl/cudatest.cu
+
+CUDA_SDK = "/usr/local/cuda/"
+CUDA_DIR = "/usr/local/cuda/"
+SYSTEM_NAME = ubuntu
+SYSTEM_TYPE = 64
+CUDA_ARCH = compute_86
+NVCC_OPTIONS = --use_fast_math
+INCLUDEPATH += $$CUDA_DIR/include
+QMAKE_LIBDIR += $$CUDA_DIR/lib64/
+CUDA_OBJECTS_DIR = ./
+
+CUDA_LIBS = cudart cufft
+CUDA_INC = $$join(INCLUDEPATH, '" -I"', '-I"', '"')
+NVCC_LIBS = $$join(CUDA_LIBS, ' -l', '-l', '')
+
+CONFIG(debug, debug|release) {
+cuda_d.input = CUDA_SOURCES
+cuda_d.output = $$CUDA_OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.o
+cuda_d.commands = $$CUDA_DIR/bin/nvcc -D_DEBUG $$NVCC_OPTIONS $$CUDA_INC $$NVCC_LIBS --machine $$SYSTEM_TYPE -arch=$$CUDA_ARCH -c -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_NAME}
+cuda_d.dependency_type = TYPE_C
+QMAKE_EXTRA_COMPILERS += cuda_d
+}
+else {
+cuda.input = CUDA_SOURCES
+cuda.output = $$CUDA_OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.o
+cuda.commands = $$CUDA_DIR/bin/nvcc $$NVCC_OPTIONS $$CUDA_INC $$NVCC_LIBS --machine $$SYSTEM_TYPE -arch=$$CUDA_ARCH -O3 -c -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_NAME}
+cuda.dependency_type = TYPE_C
+QMAKE_EXTRA_COMPILERS += cuda
+}
+
+
+DEPENDPATH += .
+
+DISTFILES += \
+    cudatest.cu
 
 INCLUDEPATH += \
     share \

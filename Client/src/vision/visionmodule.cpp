@@ -67,7 +67,7 @@ void CVisionModule::udpSocketConnect(bool real) {
         connect(&sim_timer,SIGNAL(timeout()),this,SLOT(oneStepSimData()),Qt::DirectConnection);
         dealThread = new std::thread([ = ] {readSimData();});
         dealThread->detach();
-        sim_timer.start(16);
+        sim_timer.start(14);
     }
     ReceiveVisionMessage temp;
     for (int i = 0; i < PARAM::CAMERA; i++) {
