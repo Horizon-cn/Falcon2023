@@ -86,6 +86,8 @@ void CMaintain::run() {  //TODO move to visionmodule
 //                result.ball[0].fill(realpos.x(), realpos.y(), realpos.z(), CVector(0, 0)); ///TO TEST!!!
             } else
                 result.ball[0].ball_state_machine.ballState = _flat_pass;
+        if(result.ball[0].height > PARAM::Field::BALL_SIZE)
+            result.ball[0].ball_state_machine.ballState = _chip_pass;
     }
 
     GlobalData::instance()->maintain.push(result);

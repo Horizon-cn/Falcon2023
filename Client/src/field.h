@@ -33,7 +33,8 @@ public:
 #if QT_CONFIG(wheelevent)
     void wheelEvent(QWheelEvent * event) override;
 #endif
-    virtual ~Field() {}
+    //virtual ~Field() {}
+    ~Field();
 
 public slots:
     void draw();
@@ -119,11 +120,12 @@ private:
 //    };
 //    Score score;
     QUdpSocket * socket_score;
+    QUdpSocket * socket_score2;
     bool draw_heatMap;
     int field_width, draw_step, start_x, start_y;
 
     void receiveScore();
-    void parseScores(QUdpSocket* const);
+    void parseScores(QUdpSocket* const, int);
 
     QMutex score_mutex;
     QPixmap *score_pixmap;

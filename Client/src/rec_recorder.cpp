@@ -12,7 +12,7 @@ using namespace ZSS::Protocol;
 namespace  {
 auto GS = GlobalSettings::instance();
 //RecMsg recMsg;
-bool isRun = true;
+bool isRun = false;
 bool DRAW_VELOCITY = true;
 QFile recordFile;
 QIODevice* recIO;
@@ -24,7 +24,7 @@ RecRecorder::RecRecorder() {
     ZSS::ZParamManager::instance()->loadParam(DRAW_VELOCITY,"Lesson/DrawVelocity",true);
 }
 void RecRecorder::init() {
-    isRun = false;
+    isRun = true;
 //        qDebug() << "I AM RUNNING";
     QDateTime datetime;
 //        qDebug() << datetime.currentDateTime().toString("yyyy-MM-dd-HH-mm-ss");
@@ -168,6 +168,7 @@ void RecRecorder::store() {
 void RecRecorder::stop() {
     isRun = false;
     recIO = nullptr;
+    if (filename == nullptr) return;
     QFileInfo afterFile(filename);
     if (afterFile.size() < 1) {
 //        QFile emptyFile(filename);

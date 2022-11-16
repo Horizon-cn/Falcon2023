@@ -197,7 +197,7 @@ void CVisionModule::parse(void * ptr, int size) {
         for (int i = 0; i < ballSize; i++) {
             const SSL_DetectionBall& ball = detection.balls(i);
             if (GlobalSettings::instance()->inChosenArea(saoConvert(CGeoPoint(ball.x(), ball.y())))) {
-                message.addBall(saoConvert(CGeoPoint(ball.x(), ball.y())));
+                message.addBall(saoConvert(CGeoPoint(ball.x(), ball.y())), ball.z(), message.camID);
             }
         }
         for (int i = 0; i < blueSize; i++) {

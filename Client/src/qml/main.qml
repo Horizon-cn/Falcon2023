@@ -76,17 +76,17 @@ Window {
                         border.width: 1;
                         color: "#303030";
                         anchors.fill: parent;
-                        ZSS.Field{
-                            property int _index:index;
-                            type:_index+1;
-                            draw:_index == fields.currentIndex;
-//                            type:0;
-//                            draw:true;
-                            width:fields.width;
-                            height:fields.height - 20;
-                        }
                     }
                 }
+            }
+            ZSS.Field{
+                //property int _index:index;
+                type:fields.currentIndex+1;
+                draw:true; //_index == fields.currentIndex;
+//              type:0;
+//              draw:true;
+                width:fields.width;
+                height:fields.height - 20;
             }
             style: TabViewStyle {
                 frameOverlap: 0

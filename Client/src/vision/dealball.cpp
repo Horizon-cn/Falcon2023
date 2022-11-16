@@ -87,6 +87,7 @@ void CDealBall::mergeBall() {
     else {
         for (i = 0; i < actualBallNum; i++) {
             double weight = 0;
+            double height = 0;
             CGeoPoint average(0, 0);
             for(j = 0; j < PARAM::CAMERA; j++) {
                 if (ballSequence[i][j].pos.x() > -30000 && ballSequence[i][j].pos.y() > -30000) {
@@ -98,9 +99,10 @@ void CDealBall::mergeBall() {
                     weight += _weight;
                     average.setX(average.x() + ballSequence[i][j].pos.x() * _weight);
                     average.setY(average.y() + ballSequence[i][j].pos.y() * _weight);
+                    height += ballSequence[i][j].height * _weight;
                 }
             }
-            if (weight != 0)result.addBall(average.x() / weight, average.y() / weight);
+            if (weight != 0)result.addBall(average.x() / weight, average.y() / weight, height / weight);
             if (PARAM::DEBUG) std::cout << "have merged NO. " << i << " ball with" << average << " " << weight << "\n";
         }
     }
@@ -113,7 +115,7 @@ void CDealBall::init() {
             for(int j = 0; j < GlobalData::instance()->camera[i][0].ballSize; j++) {
                 Ball currentball = GlobalData::instance()->camera[i][0].ball[j];
                 result.addBall(GlobalData::instance()->camera[i][0].ball[j].pos.x(),
-                               GlobalData::instance()->camera[i][0].ball[j].pos.y(), 0, i);
+                               GlobalData::instance()->camera[i][0].ball[j].pos.y(), GlobalData::instance()->camera[i][0].ball[j].height, i);
             }
         }
     }
@@ -229,7 +231,7 @@ void CDealBall::updateVel(const Matrix2d& tempMatrix, ReceiveVisionMessage& resu
         }
         ballVel.setVector(velMod * std::cos(predictDir), velMod * std::sin(predictDir));
     }
-    result.ball[0].fill(result.ball[0].pos.x(), result.ball[0].pos.y(), 0, ballVel);
+    result.ball[0].fill(result.ball[0].pos.x(), result.ball[0].pos.y(), GlobalData::instance()->processBall[0].ball[0].height, ballVel);
 
     if(validBall) lostFrame = 1;
     else lostFrame ++;

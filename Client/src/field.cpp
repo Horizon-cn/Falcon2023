@@ -192,7 +192,16 @@ Field::Field(QQuickItem *parent)
     score_thread = new std::thread([ = ] {receiveScore();});
 
     //record
-    ZRecRecorder::instance()->init();
+    //ZRecRecorder::instance()->init();
+}
+
+Field::~Field() {
+    delete socket_score;
+    socket_score = nullptr;
+    delete socket_score2;
+    socket_score2 = nullptr;
+    delete score_thread;
+    score_thread = nullptr;
 }
 
 void Field::paint(QPainter* painter) {
@@ -567,8 +576,11 @@ void Field::repaint() {//change here!!!!!!!
         break;
     case 3:
         pixmap->fill(COLOR_DARKGREEN);
+        pixmapPainter.setOpacity(0.3);
         score_mutex.lock();
+        pixmapPainter.drawPixmap(0, 0, *score_pixmap);
         score_mutex.unlock();
+        pixmapPainter.setOpacity(1);
         paintInit();
         drawMaintainVision(0);
         if (selectRobots) paintSelectedCar();
@@ -758,7 +770,10 @@ void Field::paintCarShadow(const QColor& color,qreal x, qreal y, qreal radian) {
 void Field::paintBall(const QColor& color, qreal x, qreal y) {
     pixmapPainter.setBrush(QBrush(color));
     pixmapPainter.setPen(Qt::NoPen);
-    pixmapPainter.drawEllipse(QRectF(::x(x - ballDiameter / 2.0), ::y(y - ballDiameter / 2.0), ::w(ballDiameter), ::h(ballDiameter)));
+    if (GlobalData::instance()->maintain[0].ball[0].height > PARAM::Field::BALL_SIZE)
+        pixmapPainter.drawEllipse(QRectF(::x(x - ballDiameter), ::y(y - ballDiameter), ::w(ballDiameter*2), ::h(ballDiameter*2)));
+    else
+        pixmapPainter.drawEllipse(QRectF(::x(x - ballDiameter / 2.0), ::y(y - ballDiameter / 2.0), ::w(ballDiameter), ::h(ballDiameter)));
 }
 void Field::paintpredict() {
     pixmapPainter.setBrush(QBrush(Qt::black));
@@ -904,10 +919,13 @@ float Field::fieldYFromCoordinate(int y) {
 void Field::receiveScore() {
     socket_score = new QUdpSocket();
     socket_score->bind(QHostAddress(ZSS::LOCAL_ADDRESS), ZSS::Medusa::DEBUG_SCORE_SEND[PARAM::BLUE]);
+    socket_score2 = new QUdpSocket();
+    socket_score2->bind(QHostAddress(ZSS::LOCAL_ADDRESS), ZSS::Medusa::DEBUG_SCORE_SEND[PARAM::YELLOW]);
     score_mutex.lock();
     score_pixmap->fill(COLOR_DARKGREEN);
     score_mutex.unlock();
     scorePainter.setPen(Qt::NoPen);
+    bool side, color;
     ZSS::ZParamManager::instance()->loadParam(draw_heatMap, "HeatMap/draw", true);
     ZSS::ZParamManager::instance()->loadParam(field_width, "HeatMap/field_width", 9000); // mm
     ZSS::ZParamManager::instance()->loadParam(draw_step, "HeatMap/draw_step", 100);
@@ -936,11 +954,17 @@ void Field::receiveScore() {
 //        }
 //        qDebug() << "mark fuck : " << timer.nsecsElapsed()/1000000.0 << "millisecond";
 
-    if(draw_heatMap)
-        parseScores(socket_score);
+        if(draw_heatMap) {
+            ZSS::ZParamManager::instance()->loadParam(color, "ZAlert/IsYellow", false);
+            ZSS::ZParamManager::instance()->loadParam(side, "ZAlert/IsRight", false);
+            if(_type == 2)
+                parseScores(socket_score, ((color+side)%2? -1 : 1));
+            else if(_type == 3)
+                parseScores(socket_score2, ((color+side)%2? 1 : -1));
+        }
     }
 }
-void Field::parseScores(QUdpSocket* const socket) {
+void Field::parseScores(QUdpSocket* const socket, int invert) {
     static QByteArray datagram;
     static OWL::Protocol::Heat_Map_New scores;
     while (socket->state() == QUdpSocket::BoundState && socket->hasPendingDatagrams()) {
@@ -967,7 +991,7 @@ void Field::parseScores(QUdpSocket* const socket) {
                 int point_num_width = field_width / draw_step; //宽边可以绘制的点数
                 float pos_x = start_x + int(pos / point_num_width) * draw_step; //mm，默认从左上角开始，纵向给点编号
                 float pos_y = start_y + pos % point_num_width * draw_step;
-                scorePainter.drawRect(QRectF(::x(pos_x), ::y(-pos_y), ::w(draw_step), ::h(-draw_step)));
+                scorePainter.drawRect(QRectF(::x(pos_x*invert), ::y(-pos_y*invert), ::w(draw_step*invert), ::h(-draw_step*invert)));
                 score_mutex.unlock();
             }
         }
