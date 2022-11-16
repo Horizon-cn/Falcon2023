@@ -14,6 +14,7 @@
 #include "geometry.h"
 #include <QElapsedTimer>
 #include <thread>
+#include "src_heatMap.pb.h"
 using namespace ZSS::Protocol;
 namespace {
 const static float MIN_LENGTH = 500;//area length : mm
@@ -464,6 +465,8 @@ void Field::middleNoModifierMoveEvent(QMouseEvent *e) {
     zoomStart.setX(limitRange(t.x(), 0, int(area.width() * (1 - zoomRatio))));
     zoomStart.setY(limitRange(t.y(), 0, int(area.height() * (1 - zoomRatio))));
     initPainterPath();
+    score_pixmap->fill(COLOR_DARKGREEN);
+    scorePainter.setPen(Qt::NoPen);
 }
 void Field::middleNoModifierPressEvent(QMouseEvent *e) {
     MiddleEvent::zoomStart = zoomStart;
@@ -508,6 +511,8 @@ void Field::wheelEvent (QWheelEvent *e) {
     zoomStart.setY(limitRange(zoomStart.y(), 0, int(area.height() * (1 - zoomRatio))));
     pixmapPainter.setRenderHint(QPainter::Antialiasing, zoomRatio>0.5);
     initPainterPath();
+    score_pixmap->fill(COLOR_DARKGREEN);
+    scorePainter.setPen(Qt::NoPen);
     repaint();
 }
 #endif
@@ -898,11 +903,16 @@ float Field::fieldYFromCoordinate(int y) {
 //}
 void Field::receiveScore() {
     socket_score = new QUdpSocket();
-    socket_score->bind(QHostAddress(ZSS::LOCAL_ADDRESS), 20003);
+    socket_score->bind(QHostAddress(ZSS::LOCAL_ADDRESS), ZSS::Medusa::DEBUG_SCORE_SEND[PARAM::BLUE]);
     score_mutex.lock();
     score_pixmap->fill(COLOR_DARKGREEN);
     score_mutex.unlock();
     scorePainter.setPen(Qt::NoPen);
+    ZSS::ZParamManager::instance()->loadParam(draw_heatMap, "HeatMap/draw", true);
+    ZSS::ZParamManager::instance()->loadParam(field_width, "HeatMap/field_width", 9000); // mm
+    ZSS::ZParamManager::instance()->loadParam(draw_step, "HeatMap/draw_step", 100);
+    ZSS::ZParamManager::instance()->loadParam(start_x, "HeatMap/start_x", -6000);
+    ZSS::ZParamManager::instance()->loadParam(start_y, "HeatMap/start_y", -4500);
 //    double c = 0;
 //    double step = 0.0000001;
     while(true) {
@@ -926,35 +936,38 @@ void Field::receiveScore() {
 //        }
 //        qDebug() << "mark fuck : " << timer.nsecsElapsed()/1000000.0 << "millisecond";
 
-
+    if(draw_heatMap)
         parseScores(socket_score);
     }
 }
 void Field::parseScores(QUdpSocket* const socket) {
     static QByteArray datagram;
-    static Debug_Scores scores;
+    static OWL::Protocol::Heat_Map_New scores;
     while (socket->state() == QUdpSocket::BoundState && socket->hasPendingDatagrams()) {
         datagram.resize(socket->pendingDatagramSize());
         socket->readDatagram(datagram.data(), datagram.size());
         scores.ParseFromArray(datagram.data(), datagram.size());
-        auto size = scores.scores_size();
+        auto size = scores.points_size();
         for(int i = 0; i < size; i++) {
-            auto score = scores.scores(i);
-            auto color = score.color();
+            auto heatPoints = scores.points(i);
+            auto color = heatPoints.color();
             if(color < 0 || color >= COLOR_LEVEL) {
-                std::cerr << "DEBUG_SCORE : not correct color : " << color << std::endl;
+                std::cerr << "Error : not correct color for heat: " << color << std::endl;
                 continue;
             }
-            auto size = score.p_size();
-            auto c = limitRange((double)(color) / COLOR_LEVEL, 0.0, 1.0);
+            auto size = heatPoints.pos_size();
+            auto c = limitRange((double)(color) / COLOR_LEVEL, 0.0, 1.0); // 确定颜色，化为RGB
             auto r = limitRange(4 * c - 2, 0.0, 1.0) * 255;
             auto g = limitRange(c < 0.5 ? 2 * c : 4 - 4 * c, 0.0, 1.0) * 255;
             auto b = limitRange(-2 * c + 1, 0.0, 1.0) * 255;
             scorePainter.setBrush(QColor(r, g, b));
             for(int k = 0; k < size; k++) {
-                auto p = score.p(k);
+                auto pos = heatPoints.pos(k); // 以传入的点为端点画方框，减少复杂度
                 score_mutex.lock();
-                scorePainter.drawRect(QRectF(::x(p.x()), ::y(-p.y()), ::w(RECT_SIZE), ::h(-RECT_SIZE)));
+                int point_num_width = field_width / draw_step; //宽边可以绘制的点数
+                float pos_x = start_x + int(pos / point_num_width) * draw_step; //mm，默认从左上角开始，纵向给点编号
+                float pos_y = start_y + pos % point_num_width * draw_step;
+                scorePainter.drawRect(QRectF(::x(pos_x), ::y(-pos_y), ::w(draw_step), ::h(-draw_step)));
                 score_mutex.unlock();
             }
         }

@@ -119,6 +119,9 @@ private:
 //    };
 //    Score score;
     QUdpSocket * socket_score;
+    bool draw_heatMap;
+    int field_width, draw_step, start_x, start_y;
+
     void receiveScore();
     void parseScores(QUdpSocket* const);
 

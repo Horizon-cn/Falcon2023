@@ -118,6 +118,7 @@ set(PROTO_LIST
     zss_cmd
     zss_debug
     zss_rec_old
+    src_heatMap
 )
 get_pb_file(PROTO_H PROTO_CPP ${PROTO_LIST})
 

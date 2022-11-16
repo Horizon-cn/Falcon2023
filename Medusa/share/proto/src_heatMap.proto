@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package OWL.Protocol;
+
+message Point{
+	required float x = 1;
+	required float y = 2;
+}
+message Heat_Points{
+    required int32 color = 1;
+    repeated Point pos = 2;
+}
+message Heat_Map{
+	repeated Heat_Points points = 1;
+}
+message Heat_Points_New{
+    required int32 color = 1;
+    repeated int32 pos = 2;
+}
+message Heat_Map_New{
+	repeated Heat_Points_New points = 1;
+}
+

@@ -19,10 +19,10 @@
 #include "GDebugEngine.h"
 #include "ShootRangeList.h"
 #include "param.h"
-//#include "src_heatMap.pb.h"
+#include "src_heatMap.pb.h"
 #include <time.h>
 #include <thread>
-
+#include <staticparams.h>
 
 #define has_GPU true
 
@@ -39,6 +39,8 @@ void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, 
 
 namespace gpuCalcArea {
     std::thread* _best_calculation_thread = nullptr;
+    QUdpSocket* heatMap_socket;
+    int heatMap_port;
 	const double PI = 3.1415926;
 	const int Color_Size = 256;
 
@@ -125,7 +127,6 @@ CGPUBestAlgThread::CGPUBestAlgThread() {
 		for (int i = 0; i < 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num; i++) {
 			_start_pos_cpu[i] = 0;
 		}
-		startComm();
 	}
 }
 
@@ -133,7 +134,10 @@ CGPUBestAlgThread::~CGPUBestAlgThread() {
 	free(_PointPotentialOrigin);
 	free(_PointPotential);
 	free(_start_pos_cpu);
-    udpServer.abort();
+    delete gpuCalcArea::heatMap_socket;
+    gpuCalcArea::heatMap_socket = nullptr;
+    delete gpuCalcArea::_best_calculation_thread;
+    gpuCalcArea::_best_calculation_thread = nullptr;
 }
 
 void CGPUBestAlgThread::initialize(CVisionModule* pVision) {
@@ -146,25 +150,10 @@ void CGPUBestAlgThread::initialize(CVisionModule* pVision) {
 }
 
 void CGPUBestAlgThread::startComm() {
-    //rbk::Config::Instance()->get("simOppo", is_change_port);
-	if (is_change_port)
-	{
-		heat_port = 20004;
-		heat_bind_port = 20009;
-	}
-	else
-	{
-		heat_port = 20003;
-		heat_bind_port = 20008;
-	}
-	//heat_socket.bind(heat_bind_port);
-/**
-	udpServer = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (udpServer == INVALID_SOCKET)LogInfo("udpServer is an invalid_socket");
-	heatAddr.sin_family = AF_INET;
-	heatAddr.sin_port = htons(heat_port);
-	heatAddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
-**/
+    gpuCalcArea::heatMap_socket = new QUdpSocket();
+    COptionModule* pOption = new COptionModule();
+    gpuCalcArea::heatMap_port = ZSS::Medusa::DEBUG_SCORE_SEND[pOption->MyColor() == TEAM_YELLOW];
+    delete pOption;
 }
 
 void CGPUBestAlgThread::setSendPoint(const CGeoPoint passPoint) {
@@ -401,10 +390,11 @@ bool CGPUBestAlgThread::isLastOneValid(const CGeoPoint& p) {
 }
 
 void CGPUBestAlgThread::doBestCalculation() {
+    startComm();
 	while (true) {
 		GPUBestAlgThread::Instance()->generatePointValue();
 		GPUBestAlgThread::Instance()->setPointValue();
-        //GPUBestAlgThread::Instance()->sendPointValue();
+        GPUBestAlgThread::Instance()->sendPointValue();
 	}
 }
 
@@ -425,13 +415,13 @@ void CGPUBestAlgThread::setPointValue() {
 	}
 	_value_getter_mutex->unlock();
 }
-/**
+
 void CGPUBestAlgThread::sendPointValue() {
 	//将点均分为若干个颜色,现在情况为把所有点按分值大小分配为256部分，每部分对应一个颜色
 	sort(pointValueList.begin(), pointValueList.end(), greater<PointValueStruct>());
 	int point_size = pointValueList.size();
-	//Heat_Map msgs;
-	Heat_Map_New msgs;
+    //Heat_Map msgs;
+    OWL::Protocol::Heat_Map_New msgs;
 	for (int m = gpuCalcArea::Color_Size - 1; m >= 0; m--) { //先把重要的点发过去
 		auto points = msgs.add_points();
 		for (int n = m * point_size / gpuCalcArea::Color_Size; n < (m + 1) * point_size / gpuCalcArea::Color_Size; n++) {
@@ -444,14 +434,11 @@ void CGPUBestAlgThread::sendPointValue() {
 		//由于UDP发包大小的限制，所以将颜色信息分批次发送
 		//发送message//
 		int size = msgs.ByteSize();
-		char* output = new char[size];
-		msgs.SerializeToArray(output, size);
-		//heat_socket.writeTo(output, size, "127.0.0.1", heat_port);
-		sendto(udpServer, output, size, 0, (sockaddr*)&heatAddr, sizeof(heatAddr));
+        QByteArray output(size, 0);
+        msgs.SerializeToArray(output.data(), size);
+        gpuCalcArea::heatMap_socket->writeDatagram(output.data(), size, QHostAddress(ZSS::LOCAL_ADDRESS), gpuCalcArea::heatMap_port);
 		//删除掉message的部分，回收空间//
 		msgs.Clear();
-		delete[] output;
 		//delete[] msgs;
 	}
 }
-**/

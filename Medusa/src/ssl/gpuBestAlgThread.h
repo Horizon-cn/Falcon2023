@@ -15,7 +15,6 @@
 #ifndef _GPU_BEST_ALG_THREAD_H
 #define _GPU_BEST_ALG_THREAD_H
 
-#include <QUdpSocket>
 #include <QMutex>
 
 #include <fstream>
@@ -232,9 +231,6 @@ private:
     float _pitch_info[4] = { static_cast<float>(Param::Field::PITCH_LENGTH), static_cast<float>(Param::Field::PITCH_WIDTH), static_cast<float>(Param::Field::PENALTY_AREA_DEPTH), static_cast<float>(Param::Field::PENALTY_AREA_WIDTH) }; // 场地信息，依次为场地长、宽、禁区深度、宽
 
 	PointValueList pointValueList;
-    QUdpSocket udpServer;
-	bool is_change_port;
-	int heat_port, heat_bind_port;
 };
 
 typedef NormalSingleton<CGPUBestAlgThread> GPUBestAlgThread;

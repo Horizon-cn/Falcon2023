@@ -161,6 +161,7 @@ SOURCES += \
     share/proto/cpp/src_cmd.pb.cc \
     share/proto/cpp/referee.pb.cc \
     share/proto/cpp/src_rawvision.pb.cc \
+    share/proto/cpp/src_heatMap.pb.cc \
     share/proto/cpp/messages_robocup_ssl_detection.pb.cc \
     share/proto/cpp/messages_robocup_ssl_geometry_legacy.pb.cc \
     share/proto/cpp/messages_robocup_ssl_geometry.pb.cc \
@@ -336,6 +337,7 @@ HEADERS += \
     share/proto/cpp/src_cmd.pb.h \
     share/proto/cpp/referee.pb.h \
     share/proto/cpp/src_rawvision.pb.h \
+    share/proto/cpp/src_heatMap.pb.h \
     share/proto/cpp/messages_robocup_ssl_detection.pb.h \
     share/proto/cpp/messages_robocup_ssl_geometry_legacy.pb.h \
     share/proto/cpp/messages_robocup_ssl_geometry.pb.h \
