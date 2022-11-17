@@ -37,7 +37,7 @@ namespace {
     float msgAngle2InfoAngle(float angle) { return -angle; }
 }
 CDataReceiver4rbk::CDataReceiver4rbk():referee_socket(){
-	m_play_mode = PMNone;
+    refereeInfo.mode = m_play_mode = PMNone;
     auto pOption = new COptionModule();
     isYellow = pOption->MyColor();
     delete pOption;
@@ -189,6 +189,7 @@ void CDataReceiver4rbk::receiveRefMsgs() {
     Referee ssl_referee;
     QByteArray datagram;
     static unsigned char former_cmd_index = 0;
+    static Referee_Command last_next_command = Referee_Command_HALT;
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         while (referee_socket.state() == QUdpSocket::BoundState && referee_socket.hasPendingDatagrams()) {
@@ -198,10 +199,13 @@ void CDataReceiver4rbk::receiveRefMsgs() {
             PlayMode next_play_mode = PMNone; // avoid next command is none
             if (ssl_referee.has_next_command()) { // check next command first
                 Referee_Command next_command = ssl_referee.next_command();
-                next_play_mode = translateRefMsgs(next_command);
-                referee_mutex.lock();
-                refereeInfo.next_mode = next_play_mode;
-                referee_mutex.unlock();
+                if (last_next_command != next_command) { // update next command
+                    last_next_command = next_command;
+                    next_play_mode = translateRefMsgs(next_command);
+                    referee_mutex.lock();
+                    refereeInfo.next_mode = next_play_mode;
+                    referee_mutex.unlock();
+                }
             }
             unsigned long command_counter = ssl_referee.command_counter();
             if (command_counter == former_cmd_index) continue;
