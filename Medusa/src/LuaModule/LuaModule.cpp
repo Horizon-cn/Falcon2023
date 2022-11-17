@@ -45,6 +45,8 @@ CLuaModule::CLuaModule()
 	tolua_zeus_open(m_pScriptContext);
 	InitLuaGlueFunc();
 	//	RunScript("./lua_scripts/ssl/StartZeus.lua");
+
+    pOption = new COptionModule();
 }
 
 void CLuaModule::InitLuaGlueFunc()
@@ -58,6 +60,7 @@ CLuaModule::~CLuaModule()
 {
 	if (m_pScriptContext)
 		lua_close(m_pScriptContext);
+    delete pOption;
 }
 
 static std::string findScript(const char *pFname)
@@ -127,12 +130,13 @@ bool CLuaModule::RunScript(const char *pFname)
 			char buf[256];
 			sprintf(buf, "Lua Error - Script Load\nScript Name:%s\nError Message:%s\n", pFilename, luaL_checkstring(m_pScriptContext, -1));
 			m_pErrorHandler(buf);
-		}
-		double x = -650;
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -100), "Lua Error - Script Load", COLOR_RED);
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -50), pFilename, COLOR_RED);
+        }
+        int invert = pOption->MySide() == Param::Field::POS_SIDE_RIGHT? -1 : 1;
+        double x = -650 * invert;
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -100 * invert), "Lua Error - Script Load", COLOR_RED);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -50 * invert), pFilename, COLOR_RED);
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 0), luaL_checkstring(m_pScriptContext, 1), COLOR_RED);
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 50), luaL_checkstring(m_pScriptContext, -1), COLOR_RED);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 50 * invert), luaL_checkstring(m_pScriptContext, -1), COLOR_RED);
 		return false;
 	}
 	if (0 != lua_pcall(m_pScriptContext, 0, LUA_MULTRET, 0))
@@ -142,12 +146,13 @@ bool CLuaModule::RunScript(const char *pFname)
 			char buf[256];
 			sprintf(buf, "Lua Error - Script Run\nScript Name:%s\nError Message:%s\n", pFilename, luaL_checkstring(m_pScriptContext, -1));
 			m_pErrorHandler(buf);
-		}
-		double x = -650;
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -100), "Lua Error - Script Compile", COLOR_RED);
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -50), pFilename, COLOR_RED);
+        }
+        int invert = pOption->MySide() == Param::Field::POS_SIDE_RIGHT? -1 : 1;
+        double x = -650 * invert;
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -100 * invert), "Lua Error - Script Compile", COLOR_RED);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -50 * invert), pFilename, COLOR_RED);
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 0), luaL_checkstring(m_pScriptContext, 1), COLOR_RED);
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 50), luaL_checkstring(m_pScriptContext, -1), COLOR_RED);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 50 * invert), luaL_checkstring(m_pScriptContext, -1), COLOR_RED);
 		return false;
 	}
 
@@ -1059,7 +1064,12 @@ extern "C" int Skill_GoAroundRobot(lua_State* L) {
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
-
+extern "C" int Skill_GoTechChalPos(lua_State* L) {
+    int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
+    CPlayerTask* pTask = PlayerRole::makeItGoTechChalPos(runner);
+    TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
+    return 0;
+}
 extern "C" int Skill_SpeedInRobot(lua_State* L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double speedX = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -1148,6 +1158,7 @@ luaDef GUIGlue[] =
 	{"CGoCmuRush",			Skill_GoCmuRush},
 	{"SmartGotoPos",		Skill_SmartGotoPoint},
 	{"CGoAroundRobot",		Skill_GoAroundRobot},
+    {"CGoTechChalPos",      Skill_GoTechChalPos},
 	//ÆäËû
 	{"CGoSupport",          Skill_GoSupport},
 	{"CStopRobot",			Skill_Stop},

@@ -246,6 +246,7 @@ SOURCES += \
     src/ssl/skill/FetchBall.cpp \
     src/ssl/skill/ForceStartRush.cpp \
     src/ssl/skill/GetBallV3.cpp \
+    src/ssl/skill/GoTechChalPos.cpp \
     src/ssl/skill/Goalie2013.cpp \
     src/ssl/skill/Goalie2022.cpp \
     src/ssl/skill/GoAndTurn.cpp \
@@ -473,6 +474,7 @@ HEADERS += \
     src/ssl/skill/TimeDelayTest.h \
     src/ssl/skill/TouchKick.h \
     src/ssl/skill/WaitTouch.h \
+    src/ssl/skill/GoTechChalPos.h \
     src/ssl/Vision/BallPredictor.h \
     src/ssl/Vision/DataReceiver4rbk.h \
     src/ssl/Vision/RobotPredictor.h \

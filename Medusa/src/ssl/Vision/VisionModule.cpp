@@ -68,6 +68,7 @@ void CVisionModule::registerOption(const COptionModule* pOption)
 {
 	_pOption = pOption;
 	_gameState.init(pOption->MyColor());
+    _next_gameState.init(pOption->MyColor());
 }
 
 CVisionModule::~CVisionModule(void)
@@ -170,9 +171,11 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	/////////////////////////////////////////////////////////////////////////////
 	CheckKickoffStatus(vInfo);
 	int ref_mode = vInfo.mode;
+    int next_ref_mode = vInfo.next_mode;
 	// 更新裁判盒信息，一般当且仅当比赛模式为停球状态时，判断球是否被踢出
-	if (ref_mode >= PMStop && ref_mode< PMNone) {
-		_gameState.transition(playModePair[ref_mode].ch, _ballKicked);
+    if (ref_mode >= PMStop && ref_mode < PMNone) {
+        _gameState.transition(playModePair[ref_mode].ch, _ballKicked);
+        _next_gameState.transition(playModePair[next_ref_mode].ch, _ballKicked);
 	}
 
 	//更新裁判盒信息
@@ -369,8 +372,11 @@ void CVisionModule::UpdateRefereeMsg()
 			GDebugEngine::Instance()->gui_debug_x(_ballPlacementPosition, COLOR_YELLOW);
 			GDebugEngine::Instance()->gui_debug_msg(_ballPlacementPosition, "BP_Point", COLOR_WHITE);
 			GDebugEngine::Instance()->gui_debug_arc(_ballPlacementPosition, 15, 0, 360, COLOR_WHITE);
-		} else {
-			_refereeMsg = "gameStop";
+        } else {
+            if (_next_gameState.theirIndirectKick() || _next_gameState.theirDirectKick())
+                _refereeMsg = "theirIndirectKick";
+            else
+                _refereeMsg = "gameStop";
 		}
 	} else if( _gameState.ourRestart()){
 		if( _gameState.ourKickoff() ) {

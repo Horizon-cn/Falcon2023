@@ -80,9 +80,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 	int GoalieNumber = 0;
 	int NumofPlayerInFrontfiled = 0;
 	bool isMeHasBall = false;
-	bool isMechHasBall = infraredOn >= 5;
+    bool isMechHasBall = infraredOn >= 1;
 	bool visionHasBall = isVisionHasBall(pVision, _executor);
-	isMeHasBall = visionHasBall; //isMechHasBall&
+    isMeHasBall = isMechHasBall; //visionHasBall; //isMechHasBall&
 	/* 此处仅仅只是用视觉判断 红外判断需要实车进行调试 */
 
 	if (isMeHasBall) {
@@ -103,8 +103,14 @@ void CAdvance::plan(const CVisionModule* pVision)
 	double Me2Receiver = (me.Pos() - pVision->OurPlayer(tandemNum).Pos()).mod();
 	double me2BestOppDist = CVector(pVision->TheirPlayer(opponentID).Pos() - me.Pos()).mod();
 	
-    if (KickorPassDir < 1e-3)
-        KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
+    if (KickorPassDir < 1e-3) {
+            if (me2goal.mod() < KICK_DIST && (Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor))) {
+                KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, ball.Pos());
+            }
+            else KickorPassDir = PassDir(pVision, _executor);
+        }
+
+
 
     PassDirOrPos TMP;
     CGeoPoint PassPos;
@@ -244,8 +250,12 @@ void CAdvance::plan(const CVisionModule* pVision)
 		}
 		else if (isPassBalltoMe(pVision, _executor)) {
 			/*我方给我进行传球*/
-			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "pass ball to me", COLOR_ORANGE);
-			KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
+            if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "pass ball to me", COLOR_ORANGE);
+
+            if (me2goal.mod() < KICK_DIST && (Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor))) {
+                KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
+            }
+            else KickorPassDir = PassDir(pVision, _executor);
 			setSubTask(PlayerRole::makeItReceivePass(_executor, KickorPassDir));
 		}
 		else {
@@ -367,7 +377,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 bool CAdvance::isVisionHasBall(const CVisionModule* pVision, const int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const BallVisionT& ball = pVision->Ball();
-	double visionJudgDist = 12;
+    double visionJudgDist = 11.3;
 	bool distVisionHasBall = CVector(me.Pos() - ball.Pos()).mod() <= visionJudgDist;
 	bool dirVisionHasBall;
 	double meDir = me.Dir();
@@ -487,7 +497,7 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 	double myDir = me.Dir();
 	CVector opp2ball = ball.Pos() - opp.Pos();
 	CVector ball2goal = theirCenter - ball.Pos();
-	if (!ShootOrPass) ShootPrecision = ShootPrecision * 0.85;
+    if (!ShootOrPass) ShootPrecision = ShootPrecision * 0.8;
     /*if (myDir - targetDir > 0)targetDir -= offset;
     else targetDir += offset;
             是峪狍镝  妄荇租咛
@@ -718,6 +728,7 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 		NowValue = ChangeDir[NowIdx];
 		if (NowValue < MinValue)Maxidx = NowIdx, MinValue = NowValue;
 	}
+    if (Maxidx < 0)Maxidx = 1;
 	NowShootNumber = Maxidx;
 	ReturnValue.dir = (SupportPoint[NowShootNumber] - me.Pos()).dir();
 	ReturnValue.pos = SupportPoint[NowShootNumber];
@@ -748,7 +759,12 @@ double CAdvance::TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision,
 }
 CGeoPoint CAdvance::GenerateBreakShootPoint(const CVisionModule* pVision, int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	return KickDirection::Instance()->GetTheShootPoint(pVision, me.Pos());
+    CGeoPoint ShootPoint = KickDirection::Instance()->GetTheShootPoint(pVision, me.Pos());
+    ShootPoint.setY(ShootPoint.y() - me.VelY()*3);
+    //double MeVel = me.VelY()
+    if(ShootPoint.y() > 50)return GOATPoint1;
+    else if(ShootPoint.y() < -50)return GOATPoint2;
+    return ShootPoint;
 }
 
 CGeoPoint CAdvance::GenerateBreakPassPoint(const CVisionModule* pVision, int vecNumber) {

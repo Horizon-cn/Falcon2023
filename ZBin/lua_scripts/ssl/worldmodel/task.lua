@@ -726,6 +726,11 @@ function goWaitAdvancePos(role)
 	return {mexe, mpos}
 end
 
+function goTechChalPos(role)
+	local mexe, mpos = GoTechChalPos{  }
+	return {mexe, mpos}
+end
+
 function runMultiPos(p, c, d, idir, a)
 	if c == nil then
 		c = false

@@ -129,7 +129,8 @@ bool CGoalie2022::ShouldAttack(const CVisionModule* pVision)
 	/* 若对面在靠中前的位置打算单刀，且我方后卫支援困难，这种时候就要主动出击。
 	   同时，主动出击风险较大，因此用return false添加限制逻辑为主  by SYLG */
 	/************************************************************************/
-	int robotNum = task().executor;
+
+    int robotNum = task().executor;
 	const PlayerVisionT& enemy = pVision->TheirPlayer(BestPlayer::Instance()->getTheirBestPlayer());
 	const BallVisionT& ball = pVision->Ball();
 

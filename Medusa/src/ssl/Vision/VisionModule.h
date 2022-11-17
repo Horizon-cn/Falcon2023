@@ -296,6 +296,7 @@ private:
 	const COptionModule* _pOption;   			///< 比赛相关参数，是左半场还是右半场. 
 	static const int MAX_SAVE_CYCLES = 64;		///< 保存的最多周期数. 
 	GameState _gameState;						///< 比赛状态，裁判盒信息.
+    GameState _next_gameState;					///< 比赛的下一状态，裁判盒信息.
 
 	/// 比赛相关的周期（时间）
 	int _timeCycle;								///< 当前周期数.

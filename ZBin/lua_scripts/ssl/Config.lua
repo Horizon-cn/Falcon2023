@@ -5,7 +5,7 @@ OPPONENT_NAME = "other"
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
-gTestPlay = "Test_Advance"
+gTestPlay = "Test_GoTechChalPos"
 gNormalPlay = "NormalPlayDefend"
 gSwitchNum = {
 	["normal"]  = 6,
@@ -41,6 +41,7 @@ gSkill = {
 	"RunMultiPos",
 	"RunMultiPosV2",
 	"RunMultiPosVel",
+	"GoTechChalPos",
 	--踢球
 	"WaitKick",
 	"TouchKick",
@@ -165,4 +166,5 @@ gTestPlayTable = {
 	"Test_Goalie",
 	"Test_ProtectBall",
 	"Test_TimeDelayTest",
+	"Test_GoTechChalPos",
 }

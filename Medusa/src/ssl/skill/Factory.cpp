@@ -69,6 +69,7 @@
 #include "InterceptBallV4.h"
 #include "InterceptBallV2.h"
 #include "GoSupport.h"
+#include "GoTechChalPos.h"
 
 /************************************************************************/
 /*                      TaskFactoryV2                                    */
@@ -184,7 +185,9 @@ CPlayerTask* CTaskFactoryV2::CarzyPush(const TaskT& task) {
 CPlayerTask* CTaskFactoryV2::GoAroundRobot(const TaskT& task) {
 	return MakeTask< CGoAroundRobot >(task);
 }
-
+CPlayerTask* CTaskFactoryV2::GoTechChalPos(const TaskT& task) {
+    return MakeTask< CGoTechChalPos >(task);
+}
 CPlayerTask* CTaskFactoryV2::PenaltyDefV1(const TaskT& task) {
 	return MakeTask< CPenaltyDefV1 >(task);
 }
@@ -698,6 +701,12 @@ namespace PlayerRole {
         playerTask.player.pos = circleCenter;
         playerTask.player.rotvel = radius;
         return TaskFactoryV2::Instance()->GoAroundRobot(playerTask);
+    }
+    CPlayerTask* makeItGoTechChalPos(const int num)
+    {
+        static TaskT playerTask;
+        playerTask.executor = num;
+        return TaskFactoryV2::Instance()->GoTechChalPos(playerTask);
     }
     CPlayerTask* makeItSlowGetBall(const int num, const double dir, const int flags)
     {

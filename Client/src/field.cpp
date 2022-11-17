@@ -770,7 +770,7 @@ void Field::paintCarShadow(const QColor& color,qreal x, qreal y, qreal radian) {
 void Field::paintBall(const QColor& color, qreal x, qreal y) {
     pixmapPainter.setBrush(QBrush(color));
     pixmapPainter.setPen(Qt::NoPen);
-    if (GlobalData::instance()->maintain[0].ball[0].height > PARAM::Field::BALL_SIZE)
+    if (GlobalData::instance()->maintain[0].ball[0].height > 1.5 * PARAM::Field::BALL_SIZE)
         pixmapPainter.drawEllipse(QRectF(::x(x - ballDiameter), ::y(y - ballDiameter), ::w(ballDiameter*2), ::h(ballDiameter*2)));
     else
         pixmapPainter.drawEllipse(QRectF(::x(x - ballDiameter / 2.0), ::y(y - ballDiameter / 2.0), ::w(ballDiameter), ::h(ballDiameter)));

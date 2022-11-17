@@ -17,7 +17,7 @@ public:
     CPlayerTask* SmartGotoPosition(const TaskT& task);
 
 	CPlayerTask* GoAroundRobot(const TaskT& task);
-
+    CPlayerTask* GoTechChalPos(const TaskT& task);
 	//½ø¹¥µÄSkill. by HXY
 	CPlayerTask* ChaseKickV1(const TaskT& task);
 	CPlayerTask* ChaseKickV2(const TaskT& task);
@@ -142,6 +142,9 @@ namespace PlayerRole {
 	CPlayerTask* makeItGoAndTurn(const int num, const double targetdir, const double kickprecision = Param::Math::PI * 5 / 180, const int flags = 0);
 	CPlayerTask* makeItTestCircleBall(const int num, const double targetdir, const double kickprecision = Param::Math::PI * 5 / 180, const int flags = 0);
 	CPlayerTask* makeItGoAroundRobot(const int num, const double faceDir, const CGeoPoint circleCenter, int circleDir, double radius = 25, int flags = 0);
+
+    CPlayerTask* makeItGoTechChalPos(const int num);
+
 	CPlayerTask* makeItSlowGetBall(const int num, const double dir, const int flags = 0);
 	CPlayerTask* makeItTimeDelayTest(const int num, const int flags = 0);
 	CPlayerTask* makeItMarkEnemy(const int num, const int enemy, const bool front = false, const int flags = 0, const CGeoPoint pos = CGeoPoint(1000, 1000), const double dir = 999);

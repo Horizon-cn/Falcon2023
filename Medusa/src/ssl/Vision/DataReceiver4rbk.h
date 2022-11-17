@@ -5,6 +5,7 @@
 #include "singleton.h"
 #include "playmode.h"
 #include <QUdpSocket>
+#include "ssl_referee.pb.h"
 
 class COptionModule;
 class CDataReceiver4rbk{
@@ -17,6 +18,7 @@ private:
 	bool rawVision2VisualInfo(const COptionModule *,GameInfoT&);
     void receiveRefMsgs();
     bool getNewRefMsgs(GameInfoT&);
+    PlayMode translateRefMsgs(Referee_Command);
 	PlayMode m_play_mode;
     QUdpSocket referee_socket;
 };

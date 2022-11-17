@@ -28,12 +28,14 @@ switch = function()
     --此处上方可能ball，placement使用错误
     Leader   = LEADER_TASK(),
     Assister = task.goCmuRush(ball.readyplacementPos(), dir.playerToBall, ACC, BALL_PLACE_FLAG),
-    --Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
-    --Defender = task.leftBack(),
-    --Middle   = task.rightBack(),
-    --Goalie   = task.goalie(),
-    --match    = "{LA}[SDMG]"
-    match    = "{LA}"
+    Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
+    Defender = task.leftBack(),
+    Middle   = task.rightBack(),
+    Engine   = task.goLeftSupport(),
+    Powerhouse = task.goRightSupport(),
+    Goalie   = task.goalieNew(),
+    match    = "{LA}[SDMEP]"
+    --match    = "{LA}"
 },
 
 ["beginning1"] ={
@@ -47,12 +49,14 @@ switch = function()
     Leader   = LEADER_TASK(),
     --Leader =   task.getBall(),
     Assister = task.goCmuRush(ball.readyplacementPos(), dir.playerToBall, ACC, BALL_PLACE_FLAG),
-   -- Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
-   -- Defender = task.leftBack(),
-    --Middle   = task.rightBack(),
-   -- Goalie   = task.goalie(),
-    --match    = "{LA}[SDMG]"
-    match    = "{LA} "
+    Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
+    Defender = task.leftBack(),
+    Middle   = task.rightBack(),
+    Engine   = task.goLeftSupport(),
+    Powerhouse = task.goRightSupport(),
+    Goalie   = task.goalieNew(),
+    match    = "{LA}[SDMEP]"
+    --match    = "{LA} "
 }, 
 
 ["pass"] ={
@@ -67,12 +71,14 @@ switch = function()
     Leader   = task.flatPass("Assister",600),
     --Leader   = task.passToPos(ball.placementPos(),500),
     Assister = task.goCmuRush(ball.readyplacementPos(), dir.playerToBall, ACC, BALL_PLACE_FLAG), 
-    --Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
-    --Defender = task.leftBack(),
-    --Middle   = task.rightBack(),
-    --Goalie   = task.goalie(),
-    --match    = "{LA}[SDMG]"
-    match    = "{LA}"
+    Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
+    Defender = task.leftBack(),
+    Middle   = task.rightBack(),
+    Engine   = task.goLeftSupport(),
+    Powerhouse = task.goRightSupport(),
+    Goalie   = task.goalieNew(),
+    match    = "{LA}[SDMEP]"
+    --match    = "{LA}"
 }, 
 
 ["receive1"] ={
@@ -83,12 +89,14 @@ switch = function()
  end,
    Leader   = task.goCmuRush(PointA, dir.playerToBall, ACC, BALL_PLACE_FLAG),
    Assister = task.receivePass("Leader"),
-    --Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
-    --Defender = task.leftBack(),
-    --Middle   = task.rightBack(),
-    --Goalie   = task.goalie(),
-    --match    = "{LA}[SDMG]"
-   match    = "{LA}"
+   Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
+   Defender = task.leftBack(),
+   Middle   = task.rightBack(),
+    Engine   = task.goLeftSupport(),
+    Powerhouse = task.goRightSupport(),
+    Goalie   = task.goalieNew(),
+    match    = "{LA}[SDMEP]"
+   --match    = "{LA}"
 }, 
 
 ["place1"] ={
@@ -99,12 +107,14 @@ switch = function()
  end,
     Leader   = task.goCmuRush(ball.readyplacementPos(), dir.playerToBall, ACC, BALL_PLACE_FLAG),
     Assister = LEADER_TASK(),
-    --Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
-    --Defender = task.leftBack(),
-    --Middle   = task.rightBack(),
-    --Goalie   = task.goalie(),
-    --match    = "{LA}[SDMG]"
-    match    = "{LA}"
+    Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
+    Defender = task.leftBack(),
+    Middle   = task.rightBack(),
+    Engine   = task.goLeftSupport(),
+    Powerhouse = task.goRightSupport(),
+    Goalie   = task.goalieNew(),
+    match    = "{LA}[SDMEP]"
+    --match    = "{LA}"
 }, 
 
 ["beginning2"] = {
@@ -115,12 +125,14 @@ switch = function()
     end,
     Leader   = LEADER_TASK(),
     Assister = task.goCmuRush(ball.readyplacementPos(), dir.playerToBall, ACC, BALL_PLACE_FLAG),
-    --Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
-    --Defender = task.leftBack(),
-    --Middle   = task.rightBack(),
-    --Goalie   = task.goalie(),
-    --match    = "{LA}[SDMG]"
-    match    = "{LA}"
+    Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
+    Defender = task.leftBack(),
+    Middle   = task.rightBack(),
+    Engine   = task.goLeftSupport(),
+    Powerhouse = task.goRightSupport(),
+    Goalie   = task.goalieNew(),
+    match    = "{LA}[SDMEP]"
+    --match    = "{LA}"
 },
 
 
@@ -132,12 +144,14 @@ switch = function()
 end,
   Leader     = LEADER_TASK(),
   Assister = task.goCmuRush(ball.readyplacementPos(), dir.playerToBall, ACC, BALL_PLACE_FLAG),
-  --Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
-  --Defender = task.leftBack(),
-  --Middle   = task.rightBack(),
-  --Goalie   = task.goalie(),
-  --match    = "{LA}[SDMG]"
-  match    = "{LA}"
+  Special  = task.goCmuRush(PointB, dir.playerToBall, ACC, BALL_PLACE_FLAG),
+  Defender = task.leftBack(),
+  Middle   = task.rightBack(),
+    Engine   = task.goLeftSupport(),
+    Powerhouse = task.goRightSupport(),
+    Goalie   = task.goalieNew(),
+    match    = "{LA}[SDMEP]"
+  --match    = "{LA}"
 },
 
 

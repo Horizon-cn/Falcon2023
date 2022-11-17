@@ -39,7 +39,7 @@ end,
 	Middle   = task.goSpeciPos(COR_DEF_POS1, player.toBallDir),
 	Defender = task.goSpeciPos(COR_DEF_POS2, player.toBallDir),
 	Assister = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][DASM]"
 },
 
@@ -49,7 +49,7 @@ end,
 	Assister = task.leftBack(),
 	Middle   = task.goSpeciPos(COR_DEF_POS1, player.toBallDir),
 	Defender = task.goSpeciPos(COR_DEF_POS2, player.toBallDir),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][DASM]"
 },
 
@@ -59,7 +59,7 @@ end,
 	Middle   = task.defendHead(),
 	Assister = task.marking("First"),
 	Special  = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[A][M][D][L][S]"
 },
 
@@ -69,7 +69,7 @@ end,
 	Middle   = task.defendHead(),
 	Assister = task.marking("First"),
 	Special  = task.marking("Second"),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[M][D][A][LS]"
 },
 
@@ -79,7 +79,7 @@ end,
 	Middle   = task.defendHead(),
 	Assister = task.marking("First"),
 	Special  = task.marking("Second"),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[M][D][A][LS]"
 },
 
@@ -89,7 +89,7 @@ end,
 	Middle   = task.defendHead(),
 	Assister = task.marking("First"),
 	Special  = task.marking("Second"),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[M][D][A][LS]"
 },
 
@@ -99,7 +99,7 @@ end,
 	Middle   = task.defendHead(),
 	Assister = task.marking("First"),
 	Special  = task.marking("Second"),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[M][D][A][LS]"
 },
 
@@ -109,7 +109,7 @@ end,
 	Middle   = task.markingFront("Second"),
 	Defender = task.defendMiddleHead(),
 	Assister = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][S][D][MA]"
 },
 
@@ -119,7 +119,7 @@ end,
 	Middle   = task.markingFront("Second"),
 	Defender = task.defendMiddleHead(),
 	Assister = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][S][D][MA]"
 },
 

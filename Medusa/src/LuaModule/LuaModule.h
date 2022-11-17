@@ -4,6 +4,8 @@
 #include "singleton.h"
 #include <map>
 #include <vector>
+#include "geometry.h"
+#include "OptionModule.h"
 using namespace std;
 struct lua_State;
 
@@ -34,6 +36,7 @@ public:
 	lua_State	*GetLuaState(void)		{return m_pScriptContext;}
 private:
 	lua_State	*m_pScriptContext;
+    COptionModule* pOption;
 
 	void(*m_pErrorHandler)(const char *pError);
 

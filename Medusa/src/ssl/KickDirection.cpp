@@ -29,7 +29,7 @@ namespace {
 	double compensatevalue[100][50];
 	double SHOOT_BLOCKED_RANGE = 3;
 	double w = Param::Field::GOAL_WIDTH;
-	double goal[9] = { -0.4 * w,-0.3 * w,-0.2 * w,-0.1 * w,0,0.1 * w,0.2 * w,0.3 * w,0.4 * w };
+    double goal[9] = { -0.4 * w,-0.3 * w,-0.2 * w,-0.1 * w,0,0.1 * w,0.2 * w,0.3 * w,0.4 * w };
 };
 
 
@@ -194,13 +194,13 @@ double CKickDirection::getPointShootDir(const CVisionModule* pVision, CGeoPoint 
 
 	double opp2LineDist_max = 0;
 	int best_i = -1;
-	for (int i = 0;i < 9;i++) {
+    for (int i = 1;i < 8;i++) {
 		//去除同边角，不易进球，易撞球门
 		if (i == 0) {
-			if (startPoint.y() < -0.5 * Param::Field::PITCH_WIDTH + 150 ||
+            if (startPoint.y() < -0.5 * Param::Field::PITCH_WIDTH + 150 ||
 				(startPoint.x() > 0.5 * Param::Field::PITCH_LENGTH - 150 && startPoint.y() < -0.5 * Param::Field::PITCH_WIDTH + 200) ||
 				(startPoint.x() > 0.5 * Param::Field::PITCH_LENGTH - 200 && startPoint.y() < -0.5 * Param::Field::PITCH_WIDTH + 180))
-				continue;
+                continue;
 		}
 		if (i == 1) {
 			if ((startPoint.x() > 0.5 * Param::Field::PITCH_LENGTH - 100 && startPoint.y() < -0.5 * Param::Field::PITCH_WIDTH + 200) ||
@@ -208,17 +208,17 @@ double CKickDirection::getPointShootDir(const CVisionModule* pVision, CGeoPoint 
 
 				continue;
 		}
-		if (i == 8) {
+        if (i == 7) {
 			if ((startPoint.x() > 0.5 * Param::Field::PITCH_LENGTH - 100 && startPoint.y() > 0.5 * Param::Field::PITCH_WIDTH - 200) ||
 				(startPoint.x() > 0.5 * Param::Field::PITCH_LENGTH - 200 && startPoint.y() > 0.5 * Param::Field::PITCH_WIDTH - 180))
 
 				continue;
 		}
-		if (i == 9) {
-			if (startPoint.y() > 0.5 * Param::Field::PITCH_WIDTH - 150 ||
+        if (i == 8) {
+            if (startPoint.y() > 0.5 * Param::Field::PITCH_WIDTH - 150 ||
 				(startPoint.x() > 0.5 * Param::Field::PITCH_LENGTH - 150 && startPoint.y() > 0.5 * Param::Field::PITCH_WIDTH - 200) ||
 				(startPoint.x() > 0.5 * Param::Field::PITCH_LENGTH - 200 && startPoint.y() > 0.5 * Param::Field::PITCH_WIDTH - 180))
-				continue;
+                continue;
 		}
 		double shootDir = (CGeoPoint(Param::Field::PITCH_LENGTH / 2.0, goal[i]) - startPoint).dir();
 		CGeoLine ball2ourGoal = CGeoLine(startPoint, shootDir);

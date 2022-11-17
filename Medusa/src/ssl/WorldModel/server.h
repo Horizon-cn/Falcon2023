@@ -54,6 +54,7 @@ typedef struct GameInfoT_
 	BallInfoT ball;
 	RefInfoT refMsg;
 	int mode;
+    int next_mode;
 } 	GameInfoT;
 
 #endif // _ZSS_SERVER_H_

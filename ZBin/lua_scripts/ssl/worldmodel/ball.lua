@@ -453,7 +453,7 @@ function readyplacementPos()
 		          end
                end
                if ball.posX() <= ball.placementPos():x() and  ball.posY() >ball.placementPos():y() and ball.placementPos():x()-ball.posX()<= ball.posY()-ball.placementPos():y()  then
-		          if ball.placementPos():x()-250>-450 then
+		          if ball.placementPos():x()-250>-600 then
 		            return CGeoPoint(ball.placementPos():x()-250, ball.placementPos():y())
 		          else
 		          	return CGeoPoint(ball.placementPos():x()+250, ball.placementPos():y())
@@ -461,14 +461,14 @@ function readyplacementPos()
                end
                --放球点在左下
                if ball.posX() > ball.placementPos():x() and  ball.posY() <=ball.placementPos():y() and ball.posX()-ball.placementPos():x()> ball.placementPos():y()-ball.posY()  then
-		         if ball.placementPos():y()-250>-600 then 
+		         if ball.placementPos():y()-250>-450 then 
 		            return CGeoPoint(ball.placementPos():x(), ball.placementPos():y()-250)
 		         else 
 		         	return CGeoPoint(ball.placementPos():x(), ball.placementPos():y()+250)
 		         end
                end
                if ball.posX() > ball.placementPos():x() and  ball.posY() <=ball.placementPos():y() and ball.posX()-ball.placementPos():x()<= ball.placementPos():y()-ball.posY()  then
-		         if ball.placementPos():x()+250<450 then
+		         if ball.placementPos():x()+250<600 then
 		            return CGeoPoint(ball.placementPos():x()+250, ball.placementPos():y())
 		         else
 		         	return CGeoPoint(ball.placementPos():x()-250, ball.placementPos():y())
@@ -476,14 +476,14 @@ function readyplacementPos()
                end
                --放球点在右下
                if ball.posX() <= ball.placementPos():x() and  ball.posY() <=ball.placementPos():y() and ball.posX()-ball.placementPos():x()> ball.placementPos():y()-ball.posY()  then
-		         if  ball.placementPos():y()-250>-650 then
+		         if  ball.placementPos():y()-250>-450 then
  		           return CGeoPoint(ball.placementPos():x(), ball.placementPos():y()-250)
  		         else
  		           return CGeoPoint(ball.placementPos():x(), ball.placementPos():y()+250)
  		         end
                end
                if ball.posX() <= ball.placementPos():x() and  ball.posY() <=ball.placementPos():y() and ball.posX()-ball.placementPos():x()<= ball.placementPos():y()-ball.posY()  then
-		         if ball.placementPos():x()-250>-450 then
+		         if ball.placementPos():x()-250>-600 then
 		           return CGeoPoint(ball.placementPos():x()-250, ball.placementPos():y())
 		         else
 		           return CGeoPoint(ball.placementPos():x()+250, ball.placementPos():y())

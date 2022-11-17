@@ -3,7 +3,7 @@ gOppoConfig = {
 
 	CornerKick  = {8}, -- kf
 	
-	FrontKick   = {41},
+	FrontKick   = {23},
 
 	MiddleKick  = {5},
 
