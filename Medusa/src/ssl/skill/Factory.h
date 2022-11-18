@@ -143,7 +143,7 @@ namespace PlayerRole {
 	CPlayerTask* makeItTestCircleBall(const int num, const double targetdir, const double kickprecision = Param::Math::PI * 5 / 180, const int flags = 0);
 	CPlayerTask* makeItGoAroundRobot(const int num, const double faceDir, const CGeoPoint circleCenter, int circleDir, double radius = 25, int flags = 0);
 
-    CPlayerTask* makeItGoTechChalPos(const int num);
+    CPlayerTask* makeItGoTechChalPos(const int num, const int flag);
 
 	CPlayerTask* makeItSlowGetBall(const int num, const double dir, const int flags = 0);
 	CPlayerTask* makeItTimeDelayTest(const int num, const int flags = 0);

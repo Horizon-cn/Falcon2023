@@ -149,6 +149,10 @@ class CParamManagerSkill : public CParamManagerNew {
             loadParam(FRAME, "PENALTY_DEFENCE/FRAME", 0);
             loadParam(AHEAD, "PENALTY_DEFENCE/AHEAD", 20);
 
+            loadParam(CheckBackPos, "MultiBack/CheckBackPos", true);
+            loadParam(dangerVel, "MultiBack/dangerVel", 15);
+            loadParam(dangerDist, "MultiBack/dangerDist", 50);
+
             loadParam(BAYESLIST, "CMatchState/BAYESLIST", "BayesParams1");
             loadParam(BAYESPARAM, "CMatchState/BAYESPARAM", "Skuba_Attack");
 
@@ -291,6 +295,10 @@ class CParamManagerSkill : public CParamManagerNew {
         int CATEGORY;
         int FRAME;
         int AHEAD;
+        // MultiBack
+        bool CheckBackPos;
+        int dangerVel;
+        int dangerDist;
         // MatchState
         QString BAYESLIST;
         QString BAYESPARAM;

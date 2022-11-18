@@ -2,7 +2,7 @@ function GotoMatchPos(task)
 	local mpos
 	local mdir
 	local mflag = task.flag or 0
-	local msender = task.sender or 0
+	local msender = task.sender or 0 -- 只执行一次
 	local mrole = task.srole or ""
 	local macc = task.acc or 0
 	local mmethod = task.method or 4
@@ -19,7 +19,12 @@ function GotoMatchPos(task)
 	execute = function(runner)
 		if runner>=0 and runner < param.maxPlayer then
 			if mrole ~= "" then
-				CRegisterRole(runner, mrole)
+				if mrole == "multiBack" then -- multiBack不注册
+					guardPos:setBackNum(runner, task.sender)
+					msender = 0 -- 只是借用task.sender把index传进来，用完后清零
+				else
+					CRegisterRole(runner, mrole)
+				end
 			end
 		else
 			print("Error runner in GotoMatchPos", runner)

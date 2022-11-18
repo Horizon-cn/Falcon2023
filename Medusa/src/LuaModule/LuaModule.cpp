@@ -1066,7 +1066,8 @@ extern "C" int Skill_GoAroundRobot(lua_State* L) {
 }
 extern "C" int Skill_GoTechChalPos(lua_State* L) {
     int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
-    CPlayerTask* pTask = PlayerRole::makeItGoTechChalPos(runner);
+    int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
+    CPlayerTask* pTask = PlayerRole::makeItGoTechChalPos(runner, flag);
     TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
     return 0;
 }

@@ -17,9 +17,12 @@ private:
     void generatePos(int guardNum);
     bool leftNextPos(CGeoPoint basePos, CGeoPoint& nextPos, double dist=-9999);
     bool rightNextPos(CGeoPoint basePos, CGeoPoint& nextPos, double dist=-9999);
+    void checkBackPos(int guardNum);
     CGeoPoint _backPos[Param::Field::MAX_PLAYER];
     int _backNum[Param::Field::MAX_PLAYER];
     int _missingBack[Param::Field::MAX_PLAYER];
+    bool _readyBack[Param::Field::MAX_PLAYER];
+    int _backCycle[Param::Field::MAX_PLAYER];
 };
 
 typedef NormalSingleton<CGuardPos> GuardPos;

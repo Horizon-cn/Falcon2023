@@ -347,7 +347,7 @@ function canFlatPassTo(role1, role2)
 		if enemy.valid(i) then
 			local dist = seg:projection(enemy.pos(i)):dist(enemy.pos(i))
 			local isprjon = seg:IsPointOnLineOnSegment(seg:projection(enemy.pos(i)))
-			if dist < 12 and isprjon then
+			if dist < 15 and isprjon then
 				return false
 			end
 		end

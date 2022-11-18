@@ -36,7 +36,11 @@ function toTarget(p)
 		end
 
 		if IS_SIMULATION then
-			return player.toPointDist(role, target)*1.2 + 150
+			local pw=player.toPointDist(role, target)*1.2 + 150
+			if pw>650 then
+				pw=650
+			end
+			return pw
 		else
 			local pw = player.toPointDist(role, target) * 1.5714 + 42.857
 			if gCurrentPlay == "Nor_PassAndShoot" then

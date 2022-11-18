@@ -1,7 +1,6 @@
 function ChaseKickV2(task)
 	local mdir
 	local mflag = task.flag or 0
-    print("3432543543")
 	execute = function(runner)
 		if type(task.dir) == "function" then
 			mdir = task.dir(runner)

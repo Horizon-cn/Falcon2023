@@ -727,7 +727,13 @@ function goWaitAdvancePos(role)
 end
 
 function goTechChalPos(role)
-	local mexe, mpos = GoTechChalPos{  }
+	local tmp = 0
+	if role == "Pass" then
+		tmp = 1
+	end
+	
+	local mexe, mpos = GoTechChalPos{ pos = tmp }
+
 	return {mexe, mpos}
 end
 
@@ -901,11 +907,11 @@ end
 function multiBack(guardNum, index, p)
 	local ipower
 	if p == nil then
-		ipower = 2700
+		ipower = 450
 	else
 		ipower = p
 	end
-	local mexe, mpos = GotoMatchPos{ method = 4, acc = 1000, pos = pos.multiBackPos(guardNum, index), dir = dir.backSmartGotoDir, flag = bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
+	local mexe, mpos = GotoMatchPos{ method = 4, sender = index, srole = "multiBack", acc = 1000, pos = pos.multiBackPos(guardNum, index), dir = dir.backSmartGotoDir, flag = bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
 	return {mexe, mpos, kick.chip, dir.defendBackClear(), pre.fieldDefender(), kp.specified(ipower),cp.specified(ipower), bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
 end
 

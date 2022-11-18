@@ -25,8 +25,9 @@ firstState = "Run",
 			return "Run";
 		end
 	end,
-    Leader = task.goTechChalPos(),
-    match = "[L]"
+    Kicker = task.goTechChalPos("Kick"),
+    Receiver = task.goTechChalPos("Pass"),
+    match = ""
 },
 
 name = "Test_GoTechChalPos",

@@ -135,8 +135,8 @@ Window {
                 hoverEnabled: true;
                 acceptedButtons: Qt.NoButton;
                 onPositionChanged: {
-                    positionDisplay.strX = (interaction.getRealX(mouseX)).toString();
-                    positionDisplay.strY = (-interaction.getRealY(mouseY)).toString();
+                    positionDisplay.strX = (interaction.getRealX(mouseX)/10).toString();
+                    positionDisplay.strY = (-interaction.getRealY(mouseY)/10).toString();
                 }
             }
         }

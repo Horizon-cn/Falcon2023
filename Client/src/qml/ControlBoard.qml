@@ -600,7 +600,7 @@ Page{
                        }
                    }
                }
-           }/**
+           }
            ZSS.Display{
                type:1;
                width:parent.width - 2*parent.padding;
@@ -611,7 +611,7 @@ Page{
                onHeightChanged: {
                    resetSize(width,height);
                }
-           }**/
+           }
 
         //    ZGroupBox{
         //        title: qsTr("Log")

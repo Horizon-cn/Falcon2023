@@ -5,7 +5,7 @@ OPPONENT_NAME = "other"
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
-gTestPlay = "Test_GoTechChalPos"
+gTestPlay = "Test_GoTechChalPos" -- "Test_GoTechChalPos"
 gNormalPlay = "NormalPlayDefend"
 gSwitchNum = {
 	["normal"]  = 6,
@@ -89,6 +89,7 @@ gRefPlayTable = {
 	"Ref/KickOff/Ref_KickOffV6",
 
 	--角球进攻
+	"Ref/CornerKick/Ref_CornerKickV1",
 	"Ref/CornerKick/Ref_CornerKickV8",
 	"Ref/CornerKick/Ref_CornerKickV30",
 	"Ref/CornerKick/Ref_CornerKickV201",
@@ -99,9 +100,11 @@ gRefPlayTable = {
 	"Ref/FrontKick/Ref_FrontKickV41",
 
 	--中场进攻
+	"Ref/MiddleKick/Ref_MiddleKickV1",
 	"Ref/MiddleKick/Ref_MiddleKickV5",
 
 	--后场进攻
+	"Ref/BackKick/Ref_BackKickV1",
 	"Ref/BackKick/Ref_ImmortalKickV1",
 	
 	--开球防守
@@ -141,6 +144,7 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_Stop4SideLine",
 	"Ref/GameStop/Ref_Stop4FrontKick",
 	"Ref/GameStop/Ref_Stop4MiddleKick",
+	"Ref/GameStop/Ref_Stop4ChaKick",
 
 	--强制停止
 	"Ref/Ref_HaltV1",
@@ -164,6 +168,7 @@ gTestPlayTable = {
 	"Test_TouchKick",
 	"Test_Defence",
 	"Test_Goalie",
+	"Test_MultiBack",
 	"Test_ProtectBall",
 	"Test_TimeDelayTest",
 	"Test_GoTechChalPos",

@@ -1,6 +1,6 @@
 function GoTechChalPos(task)
 	execute = function(runner)
-		return CGoTechChalPos(runner)
+		return CGoTechChalPos(runner, task.pos)
 	end
 
 	matchPos = function(runner)
