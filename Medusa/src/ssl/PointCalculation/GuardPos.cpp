@@ -2,6 +2,7 @@
 #include "GDebugEngine.h"
 #include "Global.h"
 #include "param.h"
+#include "TaskMediator.h"
 
 namespace {
     const CGeoPoint GOAL_MIDDLE = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
@@ -110,11 +111,12 @@ void CGuardPos::checkBackPos(int guardNum)
 {
     // 2020???§Û???????????????????????????????????????????????????
     // ???????????????
-    if (!CheckBackPos || guardNum != 3) return;
+    if (!CheckBackPos || (guardNum != 3 && guardNum != 2)) return;
     int ready_cnt = 0;
     int ready_index = 0;
     for (int i = 0; i < guardNum; i++) {
-        if (vision->OurPlayer(_backNum[i]).Pos().dist(_backPos[i]) > dangerDist || abs(_backCycle[i] - vision->Cycle()) > 10)
+        if (vision->OurPlayer(_backNum[i]).Pos().dist(_backPos[i]) > dangerDist ||
+            abs(_backCycle[i] - vision->Cycle()) > 10 || _backNum[i] == TaskMediator::Instance()->goalie())
             _readyBack[i] = false;
         else {
             _readyBack[i] = true;
@@ -134,31 +136,37 @@ void CGuardPos::checkBackPos(int guardNum)
     bool rightDanger = (defendTargetPosX > PENALTY_RIGHT_UP.x() && defendTargetVelY > dangerVel) ||
                     (defendTargetPosX < PENALTY_RIGHT_UP.x() && defendTargetPosY > 0 && defendTargetVelX < -dangerVel) ||
                     (defendTargetPosX < PENALTY_RIGHT_UP.x() && defendTargetPosY < 0 && defendTargetVelX > dangerVel);
+    CGeoPoint midPoint = _backPos[1], rightPoint = _backPos[2], leftPoint = _backPos[0];
     switch (ready_cnt) {
     case 1:
         GDebugEngine::Instance()->gui_debug_msg(GOAL_MIDDLE, "SingleBack");
+        if (guardNum == 2) {
+            midPoint = _backPos[0].midPoint(_backPos[1]);
+            rightPoint = _backPos[1];
+        }
         if (leftDanger)
-            _backPos[ready_cnt] = _backPos[1].midPoint(_backPos[0]);
+            _backPos[ready_cnt] = midPoint.midPoint(leftPoint);
         else if (rightDanger)
-            _backPos[ready_cnt] = _backPos[1].midPoint(_backPos[2]);
+            _backPos[ready_cnt] = midPoint.midPoint(rightPoint);
         else
-            _backPos[ready_cnt] = _backPos[1];
+            _backPos[ready_cnt] = midPoint;
         break;
     case 2:
+        if (guardNum == 2) break;
         if (!_readyBack[1]) { // ?§Ü????????????¦Ë??????left/rightBack
             GDebugEngine::Instance()->gui_debug_msg(GOAL_MIDDLE, "MiddleBack");
-            _backPos[0] = _backPos[1] + CVector(0, Param::Field::BALL_SIZE);
-            _backPos[2] = _backPos[1] + CVector(0, -Param::Field::BALL_SIZE);
+            _backPos[0] = midPoint + CVector(0, Param::Field::BALL_SIZE);
+            _backPos[2] = midPoint + CVector(0, -Param::Field::BALL_SIZE);
         }
         else if (!_readyBack[0] && leftDanger) { // ??????????????????????
             GDebugEngine::Instance()->gui_debug_msg(GOAL_MIDDLE + CVector(0, -20), "LeftBack");
-            _backPos[2] = _backPos[1];
-            _backPos[1] = _backPos[0];
+            _backPos[2] = midPoint;
+            _backPos[1] = leftPoint;
         }
         else if (!_readyBack[2] && rightDanger) { // ?????????????????????
             GDebugEngine::Instance()->gui_debug_msg(GOAL_MIDDLE + CVector(0, 20), "RightBack");
-            _backPos[0] = _backPos[1];
-            _backPos[1] = _backPos[2];
+            _backPos[0] = midPoint;
+            _backPos[1] = rightPoint;
         }
         break;
     default:

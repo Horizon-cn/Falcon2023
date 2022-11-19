@@ -35,7 +35,8 @@ private:
 		PASS,
 		JUSTCHIPPASS,
 		BREAKSHOOT,
-		BREAKPASS
+        PUSHOUT,
+        BREAKPASS
 	};
 	int _lastCycle;
 	int _state;
@@ -113,7 +114,7 @@ private:
 	* Author: Ã∑”Ó∫Í
 	* Created Date: 2022/10/10
 ***********************************************************/
-	int toChipOrToFlat(const CVisionModule* pVision, int vecNumber);
+    int toChipOrToFlat(const CVisionModule* pVision, int vecNumber,CGeoPoint TargetPoint);
 	bool tendToShoot(const CVisionModule* pVision, int vecNumber);
 	int CanSupportKick(const CVisionModule* pVision, int vecNumber);
 	bool isTheLineBlocked(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint);
@@ -139,6 +140,7 @@ private:
     double GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint);
     double GetCPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint);
 
+    double generateNormalPushDir(const CVisionModule* pVision, const int vecNumber);
 protected:
 
 	CPlayerCommand* _directCommand;

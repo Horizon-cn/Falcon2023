@@ -14,7 +14,7 @@
 #include "DecisionModule.h"
 //#include <skill/Factory.h>
 #include <TaskMediator.h>
-
+#include <QDir>
 #include "LuaModule.h"
 namespace {
 	/// 是否状态化的策略库

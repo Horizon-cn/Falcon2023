@@ -31,9 +31,9 @@ gPlayTable.CreatePlay{
     Middle   = task.goCmuRush(SYNT_POS_1),
     Defender = task.goCmuRush(ANTI_POS_1),
     Goalie   = dangerous and task.goalie(),
-    Engine   = task.singleBack(),
+    Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.goCmuRush(ANTI_POS_3),
-    match    = "{A}{DLSM}{EH}"
+    match    = "{A}{DLSME}{H}"
   },
 
 
@@ -52,7 +52,7 @@ gPlayTable.CreatePlay{
     Middle   = task.goCmuRush(ANTI_POS_2),
     Defender = task.goCmuRush(SYNT_POS_2),
     Goalie   = task.goalie(),
-    Engine   = task.singleBack(),
+    Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.goCmuRush(SYNT_POS_3),
     match    = "{ADLSMEH}"
   },
@@ -71,9 +71,9 @@ gPlayTable.CreatePlay{
     Middle   = task.goCmuRush(ANTI_POS_3),
     Defender = task.continue(),
     Goalie   = task.goalie(),
-    Engine   = task.singleBack(),
+    Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.continue(),
-    match    = "{AMDLS}{EH}"
+    match    = "{AMDLSE}{H}"
   },
 
   ["shoot"] = {
@@ -90,9 +90,9 @@ gPlayTable.CreatePlay{
     Middle   = task.shootV2(),
     Defender = task.goLeftSupport(),
     Goalie   = task.goalie(),
-    Engine   = task.singleBack(),
+    Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.goRightSupport(),
-    match    = "{ADL}{SM}{EH}"
+    match    = "{ADL}{SMEH}"
   },
 
   name = "Ref_CornerKickV8",

@@ -14,7 +14,12 @@ local Two = 280
 
 local SwitchBallArea = function()
 	if ball.posX() > 200 and ball.posY() < -120 then
+		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
+		if ballStatus == "OurBall" then
+			return "LeftFront"..ballStatus
+		else 
 			return "LeftFront"
+		end
 	elseif ball.posX() > 200 and ball.posY() < 120 then
 			return "MiddleFront"
 	elseif ball.posX() > 200 then
@@ -37,8 +42,8 @@ local SwitchBallArea = function()
 			return "MiddleBack"
 	elseif true then
 			return "RightBack"
-		end
 	end
+end
 
 -- Leader + Assister + Powerhouse
 -- Special + Defender
@@ -48,6 +53,19 @@ gPlayTable.CreatePlay{
 firstState = "LeftFront",
 
 ["LeftFront"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.goMWPassPos("Leader"),
+	Powerhouse = task.goRWPassPos("Leader"),
+    Special = task.protectBall(), --task.marking("First"),
+    Defender = task.goMMPassPos("Leader"),
+    Hawk = task.leftBack(),
+	Middle = task.rightBack(),
+	Goalie = task.goalieNew(),
+    match = "[SL][APD][HM]"
+},
+
+["LeftFrontOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.goMWPassPos("Leader"),
