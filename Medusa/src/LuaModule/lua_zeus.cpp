@@ -7181,39 +7181,71 @@ static int tolua_zeus_CKickStatus_isForceClosed00(lua_State* tolua_S)
 static int tolua_zeus_CKickStatus_getAdvancerPassTo00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
-	tolua_Error tolua_err;
-	if (
-		!tolua_isusertype(tolua_S, 1, "const CKickStatus", 0, &tolua_err) ||
-		!tolua_isnoobj(tolua_S, 2, &tolua_err)
-		)
-		goto tolua_lerror;
-	else
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CKickStatus",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
 #endif
-	{
-		const CKickStatus* self = (const CKickStatus*)tolua_tousertype(tolua_S, 1, 0);
+ {
+  const CKickStatus* self = (const CKickStatus*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-		if (!self) tolua_error(tolua_S, "invalid 'self' in function 'getAdvancerPassTo'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getAdvancerPassTo'", NULL);
 #endif
-		{
-			CGeoPoint tolua_ret = (CGeoPoint)self->getAdvancerPassTo();
-			{
+  {
+   CGeoPoint tolua_ret = (CGeoPoint)  self->getAdvancerPassTo();
+   {
 #ifdef __cplusplus
-				void* tolua_obj = Mtolua_new((CGeoPoint)(tolua_ret));
-				tolua_pushusertype(tolua_S, tolua_obj, "CGeoPoint");
-				tolua_register_gc(tolua_S, lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((CGeoPoint)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"CGeoPoint");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-				void* tolua_obj = tolua_copy(tolua_S, (void*)&tolua_ret, sizeof(CGeoPoint));
-				tolua_pushusertype(tolua_S, tolua_obj, "CGeoPoint");
-				tolua_register_gc(tolua_S, lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(CGeoPoint));
+     tolua_pushusertype(tolua_S,tolua_obj,"CGeoPoint");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
-			}
-		}
-	}
-	return 1;
+   }
+  }
+ }
+ return 1;
 #ifndef TOLUA_RELEASE
-	tolua_lerror :
-				 tolua_error(tolua_S, "#ferror in function 'getAdvancerPassTo'.", &tolua_err);
-				 return 0;
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getAdvancerPassTo'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getNextAdvancer of class  CKickStatus */
+#ifndef TOLUA_DISABLE_tolua_zeus_CKickStatus_getNextAdvancer00
+static int tolua_zeus_CKickStatus_getNextAdvancer00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CKickStatus",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const CKickStatus* self = (const CKickStatus*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getNextAdvancer'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->getNextAdvancer();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getNextAdvancer'.",&tolua_err);
+ return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -7223,30 +7255,30 @@ static int tolua_zeus_CKickStatus_getAdvancerPassTo00(lua_State* tolua_S)
 static int tolua_zeus_CKickStatus_setAdvancerPassTo00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
-	tolua_Error tolua_err;
-	if (
-		!tolua_isusertype(tolua_S, 1, "CKickStatus", 0, &tolua_err) ||
-		(tolua_isvaluenil(tolua_S, 2, &tolua_err) || !tolua_isusertype(tolua_S, 2, "CGeoPoint", 0, &tolua_err)) ||
-		!tolua_isnoobj(tolua_S, 3, &tolua_err)
-		)
-		goto tolua_lerror;
-	else
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CKickStatus",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"CGeoPoint",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
 #endif
-	{
-		CKickStatus* self = (CKickStatus*)tolua_tousertype(tolua_S, 1, 0);
-		CGeoPoint pos = *((CGeoPoint*)tolua_tousertype(tolua_S, 2, 0));
+ {
+  CKickStatus* self = (CKickStatus*)  tolua_tousertype(tolua_S,1,0);
+  CGeoPoint pos = *((CGeoPoint*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-		if (!self) tolua_error(tolua_S, "invalid 'self' in function 'setAdvancerPassTo'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setAdvancerPassTo'", NULL);
 #endif
-		{
-			self->setAdvancerPassTo(pos);
-		}
-	}
-	return 0;
+  {
+   self->setAdvancerPassTo(pos);
+  }
+ }
+ return 0;
 #ifndef TOLUA_RELEASE
-	tolua_lerror :
-				 tolua_error(tolua_S, "#ferror in function 'setAdvancerPassTo'.", &tolua_err);
-				 return 0;
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setAdvancerPassTo'.",&tolua_err);
+ return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -7256,28 +7288,28 @@ static int tolua_zeus_CKickStatus_setAdvancerPassTo00(lua_State* tolua_S)
 static int tolua_zeus_CKickStatus_resetAdvancerPassTo00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
-	tolua_Error tolua_err;
-	if (
-		!tolua_isusertype(tolua_S, 1, "CKickStatus", 0, &tolua_err) ||
-		!tolua_isnoobj(tolua_S, 2, &tolua_err)
-		)
-		goto tolua_lerror;
-	else
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CKickStatus",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
 #endif
-	{
-		CKickStatus* self = (CKickStatus*)tolua_tousertype(tolua_S, 1, 0);
+ {
+  CKickStatus* self = (CKickStatus*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-		if (!self) tolua_error(tolua_S, "invalid 'self' in function 'resetAdvancerPassTo'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'resetAdvancerPassTo'", NULL);
 #endif
-		{
-			self->resetAdvancerPassTo();
-		}
-	}
-	return 0;
+  {
+   self->resetAdvancerPassTo();
+  }
+ }
+ return 0;
 #ifndef TOLUA_RELEASE
-	tolua_lerror :
-				 tolua_error(tolua_S, "#ferror in function 'resetAdvancerPassTo'.", &tolua_err);
-				 return 0;
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'resetAdvancerPassTo'.",&tolua_err);
+ return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -14811,10 +14843,11 @@ TOLUA_API int tolua_zeus_open(lua_State* tolua_S)
 	tolua_function(tolua_S, "resetKick2ForceClose", tolua_zeus_CKickStatus_resetKick2ForceClose00);
 	tolua_function(tolua_S, "updateForceClose", tolua_zeus_CKickStatus_updateForceClose00);
 	tolua_function(tolua_S, "isForceClosed", tolua_zeus_CKickStatus_isForceClosed00);
-	tolua_function(tolua_S, "getAdvancerPassTo", tolua_zeus_CKickStatus_getAdvancerPassTo00);
-	tolua_function(tolua_S, "setAdvancerPassTo", tolua_zeus_CKickStatus_setAdvancerPassTo00);
-	tolua_function(tolua_S, "resetAdvancerPassTo", tolua_zeus_CKickStatus_resetAdvancerPassTo00);
-	tolua_endmodule(tolua_S);
+    tolua_function(tolua_S,"getAdvancerPassTo",tolua_zeus_CKickStatus_getAdvancerPassTo00);
+    tolua_function(tolua_S,"getNextAdvancer",tolua_zeus_CKickStatus_getNextAdvancer00);
+    tolua_function(tolua_S,"setAdvancerPassTo",tolua_zeus_CKickStatus_setAdvancerPassTo00);
+    tolua_function(tolua_S,"resetAdvancerPassTo",tolua_zeus_CKickStatus_resetAdvancerPassTo00);
+   tolua_endmodule(tolua_S);
 #ifdef __cplusplus
 	tolua_cclass(tolua_S, "CTaskMediator", "CTaskMediator", "", tolua_collect_CTaskMediator);
 #else

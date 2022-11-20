@@ -823,7 +823,7 @@ end
 ------------------------------------ 防守相关的skill ------------------------------------------
 
 function protectBall()
-	local mexe, mpos = ProtectBall{pos = pos.advance,flag = flag.dodge_ball}
+	local mexe, mpos = ProtectBall{pos = pos.protectBall, flag = flag.dodge_ball}
 	return {mexe, mpos}
 end
 

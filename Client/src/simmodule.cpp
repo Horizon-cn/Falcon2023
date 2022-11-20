@@ -165,6 +165,7 @@ void SimModule::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
         } else {
             double radian = ZSS::Sim::CHIP_ANGLE * ZSS::Sim::PI / 180.0;
             double vx = sqrt(commands.power() * ZSS::Sim::G / 2.0 / tan(radian));
+            vx = vx >= (6.5 * cos(radian))? (6.5 * cos(radian)) : vx;
             double vz = vx * tan(radian);
             grsim_robots[id]->set_kickspeedz(vx);
             grsim_robots[id]->set_kickspeedx(vz);

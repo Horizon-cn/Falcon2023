@@ -18,6 +18,7 @@ class CKickStatus {
 	void updateForceClose(int currentCycle);
 	bool isForceClosed();
 	CGeoPoint getAdvancerPassTo() const;
+	int getNextAdvancer() const;
 	void setAdvancerPassTo(CGeoPoint pos);
 	void resetAdvancerPassTo();
 };

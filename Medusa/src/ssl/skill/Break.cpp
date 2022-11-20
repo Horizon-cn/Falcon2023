@@ -43,7 +43,6 @@ namespace {
 	//视主机性能调节
 	const int MOD_NUM = 1;
 	const int ANGEL_MOD = 6;
-
 	
 	const int RADIUS = Param::Vehicle::V2::PLAYER_SIZE * 2;
 
@@ -200,7 +199,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 		canShoot &&
 		fabs(Utils::Normalize(me.Dir() - finalDir)) < SHOOT_ACCURACY * Param::Math::PI / 180.0 &&
 		vel_vertical_target < 5)
-		|| dribbleDist > 80
+        || dribbleDist > 98.0
 		) {
 
 		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);

@@ -383,7 +383,7 @@ void CWorldModel::SPlayFSMSwitchClearAll(bool clear_flag)
 
 const bool CWorldModel::canProtectBall(int current_cycle, int myNum){
 	static int last_cycle = -1;
-	static bool _canProtectBall;
+    static bool _canProtectBall;
 
 	if (last_cycle < current_cycle) {
 		const BallVisionT ball=_pVision->Ball();
@@ -536,7 +536,7 @@ const string CWorldModel::getBallStatus(int current_cycle,int meNum){
 	static string lastState="None";
 	if (last_cycle < current_cycle) {
 		last_cycle=current_cycle;
-		lastState=BallStatus::Instance()->checkBallState(_pVision,meNum);
+        lastState=BallStatus::Instance()->checkBallState(_pVision,meNum);
 	}
 	return lastState;
 }

@@ -11,6 +11,7 @@
 #include "WorldModel/WorldModel.h"
 #include "BestPlayer.h"
 #include "BallSpeedModel.h"
+#include "TaskMediator.h"
 
 namespace
 {
@@ -167,6 +168,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
             }
             break;
         case Protect_Ball:
+            break;
             if (ballSpeed<30){
                 new_state =Slow_Ball;
             }else if (canEnterDefendArea){
@@ -204,6 +206,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
     }
 
     TaskT protectTask(task());
+    protectTask.player.flag |= PlayerStatus::AVOID_SHOOTLINE;
 
     double approachBallDir=Utils::Normalize(ourGoaltoBallDir);
     if (ballSpeed>30){
@@ -283,16 +286,34 @@ void CProtectBall::plan(const CVisionModule* pVision)
         }
         break;
     case Protect_Ball:
-        {
-            CGeoPoint ProtectBallPos=ball.Pos()+Utils::Polar2Vector(3*Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER,Utils::Normalize(ProtectBallDir+Param::Math::PI));
-            GDebugEngine::Instance()->gui_debug_x(ProtectBallPos);
-            protectTask.player.pos=ProtectBallPos;
+        { // 3*Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER
+            int advancer = TaskMediator::Instance()->advancer();
+            int oppo = NormalPlayUtils::getTheirMostClosetoPos(pVision, ball.Pos());
+            double oppo2BallDist = vision->TheirPlayer(oppo).Pos().dist(ball.Pos());
+            static CGeoPoint lastProtectBallPos;
+            CGeoPoint protectBallPos;
+            ProtectBallDir=(ball.Pos()-pVision->TheirPlayer(oppo).Pos()).dir();
+            if (vision->TheirPlayer(oppo).Pos().dist(ball.Pos()) < 10*Param::Vehicle::V2::PLAYER_SIZE || oppo == vision->TheirGoalie()) {
+                protectBallPos = ball.Pos()+Utils::Polar2Vector(75 + 2*Param::Vehicle::V2::PLAYER_SIZE, Utils::Normalize(ProtectBallDir));
+                ProtectBallDir = Utils::Normalize(ProtectBallDir + Param::Math::PI);
+            }
+
+            else {
+                double protectDist = 6*Param::Vehicle::V2::PLAYER_SIZE; //std::max(6*Param::Vehicle::V2::PLAYER_SIZE, oppo2BallDist / 2);
+                protectBallPos = ball.Pos()+Utils::Polar2Vector(protectDist, Utils::Normalize(ProtectBallDir+Param::Math::PI));
+            }
+            if (!Utils::InTheirPenaltyArea(protectBallPos, 2*Param::Vehicle::V2::PLAYER_SIZE) &&
+                    !Utils::InOurPenaltyArea(protectBallPos, 2*Param::Vehicle::V2::PLAYER_SIZE) && Utils::IsInField(protectBallPos, 0)
+                    || KickStatus::Instance()->getChipKickDist(advancer) > 0 || KickStatus::Instance()->getKickPower(advancer) > 0)
+                lastProtectBallPos = protectBallPos;
+            protectTask.player.pos=lastProtectBallPos;
             protectTask.player.angle=ProtectBallDir;
             protectTask.player.vel=CVector(0,0);
             protectTask.player.rotvel=0;
             //protectTask.player.max_acceleration=SetAcc;
             //protectTask.player.max_deceleration=1000;
-            setSubTask(TaskFactoryV2::Instance()->GotoPosition(protectTask));
+            setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
+            //setSubTask(TaskFactoryV2::Instance()->GotoPosition(protectTask));
         }
         break;
     case Shoot_Ball:

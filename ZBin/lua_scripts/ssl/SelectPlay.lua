@@ -66,6 +66,7 @@ end
 --选play
 --------------------------------------
 if SelectRefPlay() then
+	print(gCurrentPlay)
 	-- or NeedExit(gCurrentPlay)不添加会出问题！！
 	if gCurrentPlay ~= gLastPlay or NeedExit(gCurrentPlay) then
 		ResetPlay(gCurrentPlay)
@@ -105,7 +106,7 @@ else
 end
 
 gLastPlay = gCurrentPlay
-
+			
 RunPlay(gCurrentPlay)
 
 debugEngine:gui_debug_msg(CGeoPoint:new_local(-50, -param.pitchWidth/2),gCurrentState)

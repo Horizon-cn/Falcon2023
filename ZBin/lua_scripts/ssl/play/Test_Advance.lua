@@ -62,7 +62,7 @@ firstState = "LeftFront",
     Hawk = task.leftBack(),
 	Middle = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[SL][APD][HM]"
+    match = "[LS][APD][HM]"
 },
 
 ["LeftFrontOurBall"] = {

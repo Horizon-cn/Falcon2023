@@ -175,7 +175,7 @@ inline bool CGoalie2022::IsFarFromBack(const CGeoPoint& pos, int x)
 
 CPlayerTask* CGoalie2022::normalTask(const CVisionModule* pVision)
 {
-	MSG("goalie in normal");
+    MSG("goalie in normal");
 
 	int robotNum = task().executor;
 
@@ -199,7 +199,7 @@ CPlayerTask* CGoalie2022::normalTask(const CVisionModule* pVision)
 
 CPlayerTask* CGoalie2022::supportTask(const CVisionModule* pVision)
 {
-	MSG("goalie in support");
+    MSG("goalie in support");
 
 	int robotNum = task().executor;
 	int leaderNum = BestPlayer::Instance()->getOurBestPlayer();
@@ -288,8 +288,8 @@ double CGoalie2022::CalClearBallDir(const CVisionModule * pVision)
 		double ball2leftDir = (DefPos2015::Instance()->getDefPos2015(pVision).getLeftPos() - ball.Pos()).dir();// -0.3;
 		double ball2rightDir = (DefPos2015::Instance()->getDefPos2015(pVision).getRightPos() - ball.Pos()).dir();// +0.3;
 		double goal2ballDir = CVector(ball.Pos() - goalCenter).dir();
-		GDebugEngine::Instance()->gui_debug_line(ball.Pos(), ball.Pos() + Utils::Polar2Vector(200, ball2leftDir), COLOR_BLACK);
-		GDebugEngine::Instance()->gui_debug_line(ball.Pos(), ball.Pos() + Utils::Polar2Vector(200, ball2rightDir), COLOR_BLACK);
+        //GDebugEngine::Instance()->gui_debug_line(ball.Pos(), ball.Pos() + Utils::Polar2Vector(200, ball2leftDir), COLOR_BLACK);
+        //GDebugEngine::Instance()->gui_debug_line(ball.Pos(), ball.Pos() + Utils::Polar2Vector(200, ball2rightDir), COLOR_BLACK);
 		if (goal2ballDir>ball2leftDir && goal2ballDir<ball2rightDir)
 		{
 			if (ball2rightDir - ball2leftDir > Param::Math::PI / 2) {
@@ -348,6 +348,6 @@ double CGoalie2022::CalClearBallDir(const CVisionModule * pVision)
 		clearBallDir = -Param::Math::PI * 80 / 180.0;
 	}
 
-	GDebugEngine::Instance()->gui_debug_line(ball.Pos(), ball.Pos() + Utils::Polar2Vector(600, clearBallDir), COLOR_BLUE);
+    //GDebugEngine::Instance()->gui_debug_line(ball.Pos(), ball.Pos() + Utils::Polar2Vector(600, clearBallDir), COLOR_BLUE);
 	return clearBallDir;
 }
