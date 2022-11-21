@@ -130,6 +130,7 @@ ZBin/core
 ZBin/__pycache__
 ZBin/*.py[cod]
 ZBin/*$py.class
+ZBin/Oppo/*
 
 build*/
 
