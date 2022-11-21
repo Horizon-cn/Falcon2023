@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<DBUSER>
-    <Param Name="SUPPORT_DIST" Value ="1"></Param>
-    <Param Name="PENALTY_AREA_DEPTH" Value ="120"></Param>
-    <Param Name="FIELD_WALL_DIST" Value ="20"></Param>
-</DBUSER>
-<!-- 在NormalPlayUtils.cpp中被使用，其它文件中也有使用，如果想找有哪些文件使用，请在项目中全局搜索"data\\ssl\\params\\params.xml" -->
