@@ -75,7 +75,7 @@ firstState = "getball",
 	Leader   = task.goRWPassPos("Assister"),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "{DM}{AL}[SEH]"
 },	
 
@@ -99,7 +99,7 @@ firstState = "getball",
 	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()), _, ACC, STOP_DSS),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "{DM}{A}{LSEH}"
 },
 
@@ -117,7 +117,7 @@ firstState = "getball",
 	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()),  _, ACC, STOP_DSS),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "{AL}{SMD}"
 },
 

@@ -30,7 +30,7 @@ gPlayTable.CreatePlay{
     Special  = task.leftBack(),
     Middle   = task.goCmuRush(SYNT_POS_1),
     Defender = task.goCmuRush(ANTI_POS_1),
-    Goalie   = dangerous and task.goalie(),
+    Goalie   = dangerous and task.goalieNew(),
     Engine   = task.singleBack(),
     Hawk     = task.goCmuRush(ANTI_POS_3),
     match    = "{A}{DLSM}{EH}"
@@ -51,7 +51,7 @@ gPlayTable.CreatePlay{
     Special  = task.leftBack(),
     Middle   = task.goCmuRush(ANTI_POS_2),
     Defender = task.goCmuRush(SYNT_POS_2),
-    Goalie   = task.goalie(),
+    Goalie   = task.goalieNew(),
     Engine   = task.singleBack(),
     Hawk     = task.goCmuRush(SYNT_POS_3),
     match    = "{ADLSMEH}"
@@ -70,7 +70,7 @@ gPlayTable.CreatePlay{
     Special  = task.leftBack(),
     Middle   = task.goCmuRush(ANTI_POS_3),
     Defender = task.continue(),
-    Goalie   = task.goalie(),
+    Goalie   = task.goalieNew(),
     Engine   = task.singleBack(),
     Hawk     = task.continue(),
     match    = "{AMDLS}{EH}"
@@ -89,7 +89,7 @@ gPlayTable.CreatePlay{
     Special  = task.leftBack(),
     Middle   = task.shootV2(),
     Defender = task.goLeftSupport(),
-    Goalie   = task.goalie(),
+    Goalie   = task.goalieNew(),
     Engine   = task.singleBack(),
     Hawk     = task.goRightSupport(),
     match    = "{ADL}{SM}{EH}"

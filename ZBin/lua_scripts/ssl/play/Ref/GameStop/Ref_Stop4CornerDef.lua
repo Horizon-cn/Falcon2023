@@ -32,7 +32,7 @@ end,
 	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
 	Defender = task.leftBack(),
 	Leader   = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[ADLSM]"
 },
 

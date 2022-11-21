@@ -189,7 +189,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 				}
                 else if (Me2OppTooclose(pVision, _executor)) {
-                    _state = BREAKPASS; break;
+                    _state = PASS; break;
 				}
                 else { _state = JUSTCHIPPASS; break; }
 			}
@@ -395,7 +395,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKSHOOT", COLOR_YELLOW);
 		KickStatus::Instance()->clearAll();
 		ShootPoint = GenerateBreakShootPoint(pVision, _executor);
-		setSubTask(PlayerRole::makeItBreak(_executor, ShootPoint));
+        if(AdJudgeBreakCanDo(pVision, _executor, ShootPoint))setSubTask(PlayerRole::makeItBreak(_executor, ShootPoint));
+        else setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		break;
 
     case BREAKPASS:
@@ -498,7 +499,7 @@ bool CAdvance::checkBallFront(const CVisionModule* pVision, double angle) {
 	bool ballDistFrontOpp = opp2ball.mod() < OPP_HAS_BALL_DIST + 10;
 	//GDebugEngine::Instance()->gui_debug_line(opp.Pos(),opp.Pos() + Utils::Polar2Vector(200 , 0),COLOR_BLACK);
 	bool isBallFrontOpp = ballDirFrontOpp && ballDistFrontOpp;
-    printf("here %d\n",isBallFrontOpp);
+    //printf("here %d\n",isBallFrontOpp);
 	return isBallFrontOpp;
 }
 
@@ -628,7 +629,13 @@ bool CAdvance::JudgePassMeIsBeBlocked(const CVisionModule *pVision, int vecNumbe
     if(fabs(Utils::Normalize((LastPassDirToJudge - BallVelDir))) < Param::Math::PI/2)return false;
     return true;
 }
-
+bool CAdvance::AdJudgeBreakCanDo(const CVisionModule *pVision, int vecNumber, CGeoPoint TargetPoint){
+    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+    double MeDir = me.Dir();
+    double Me2Target = (TargetPoint - me.Pos()).dir();
+    if(fabs(Utils::Normalize(MeDir - Me2Target)) > Param::Math::PI / 2)return false;
+    return true;
+}
 /**********************************************************
 	* Description: 状态切换判定类函数，用于状态转化之间的判断
 	* Author: 谭宇宏
@@ -830,15 +837,23 @@ CGeoPoint CAdvance::GenerateBreakShootPoint(const CVisionModule* pVision, int ve
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
     CGeoPoint ShootPoint = KickDirection::Instance()->GetTheShootPoint(pVision, me.Pos());
     ShootPoint.setY(ShootPoint.y() - me.VelY()*3);
+    if(me.Y() < -120)ShootPoint.setY(ShootPoint.y() + me.VelX()*2 + me.Y()*0.75);
+    else if(me.Y() > 120)ShootPoint.setY(ShootPoint.y() - me.VelX()*2 - me.Y()*0.75);
     //double MeVel = me.VelY()
-    if(ShootPoint.y() > 50)return GOATPoint1;
-    else if(ShootPoint.y() < -50)return GOATPoint2;
+    if(ShootPoint.y() < -80)ShootPoint.setY(-80);
+    if(ShootPoint.y() > 80)ShootPoint.setY(80);
+
     return ShootPoint;
 }
 
 CGeoPoint CAdvance::GenerateBreakPassPoint(const CVisionModule* pVision, int vecNumber) {
 	PassDirOrPos ReturnValue = PassDirInside(pVision, vecNumber);
-	return ReturnValue.pos;
+    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+    CGeoPoint ShootPoint = ReturnValue.pos;
+    ShootPoint.setY(ShootPoint.y() - me.VelY()*0.75);
+    if(me.Y() < -90)ShootPoint.setY(ShootPoint.y() + me.VelX()*0.4);
+    else if(me.Y() > 90)ShootPoint.setY(ShootPoint.y() - me.VelX()*0.4);
+    return ShootPoint;
 }
 
 double CAdvance::GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {

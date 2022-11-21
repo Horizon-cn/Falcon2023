@@ -12,7 +12,7 @@ firstState = "init",
 			return "gotoshort"
 		end
 	end,
-	Goalie = task.goalie(),
+	Goalie = task.goalieNew(),
 	Leader  = task.goLWPassPos(),
 	Assister = task.goRWPassPos(),
 	Middle  = task.leftBack(),
@@ -29,7 +29,7 @@ firstState = "init",
 			return "tempshort"
 		end
 	end,
-	Goalie = task.goalie(),
+	Goalie = task.goalieNew(),
 	Leader  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
 	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
 	Middle  = task.leftBack(),
@@ -46,7 +46,7 @@ firstState = "init",
 			return "shoot"
 		end
 	end,
-	Goalie = task.goalie(),
+	Goalie = task.goalieNew(),
 	Leader  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
 	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
 	Middle  = task.leftBack(),
@@ -63,7 +63,7 @@ firstState = "init",
 			return "forceshoot"
 		end
 	end,
-	Goalie = task.goalie(),
+	Goalie = task.goalieNew(),
 	Leader  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
 	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
 	Middle  = task.leftBack(),
@@ -80,7 +80,7 @@ firstState = "init",
 			return "exit"
 		end
 	end,
-	Goalie = task.goalie(),
+	Goalie = task.goalieNew(),
 	Leader  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
 	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
 	Middle  = task.leftBack(),

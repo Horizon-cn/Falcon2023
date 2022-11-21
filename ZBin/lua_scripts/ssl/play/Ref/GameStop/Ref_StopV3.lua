@@ -29,7 +29,7 @@ firstState = "start",
   Special  = task.goCmuRush(DEF_POS3, _,  ACC, STOP_DSS),
   Leader   = task.leftBack(),
   Assister = task.rightBack(),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "[AMLSD]"
 },
 

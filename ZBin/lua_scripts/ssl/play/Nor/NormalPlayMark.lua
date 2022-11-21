@@ -16,7 +16,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][BC][AD][M][S]"
 },
 
@@ -35,7 +35,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][AD][M][S]"
 },
 ["FrontFieldNoneR"]={
@@ -52,7 +52,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][AD][M][S]"
 },
 
@@ -72,7 +72,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][AD][M][S]"
 },
 ["FrontFieldStandOffR"]={
@@ -89,7 +89,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][AD][M][S]"
 },
 
@@ -109,7 +109,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][AD][S][M]"
 
 },
@@ -127,7 +127,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][AD][S][M]"
 
 },
@@ -147,7 +147,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][DA][S][M]"
 },
 
@@ -165,7 +165,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][AD][S][M]"
 },
 
@@ -185,7 +185,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][D][A][M][S]"
 },
 
@@ -203,7 +203,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][A][D][M][S]"
 },
 
@@ -222,7 +222,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][DA][S][M]"
 
 },
@@ -240,7 +240,7 @@ firstState = "initState",
 	Middle = task.goLeftSupport(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][AD][S][M]"
 
 },

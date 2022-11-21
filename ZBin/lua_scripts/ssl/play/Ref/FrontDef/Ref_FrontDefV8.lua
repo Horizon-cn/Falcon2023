@@ -100,7 +100,7 @@ end,
 	Middle   = task.markingTouch(0,LEFTSIDE_POS1,LEFTSIDE_POS2,"horizal"),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L](MSDA)"
 },
 
@@ -110,7 +110,7 @@ end,
 	Middle   = task.markingTouch(0,LEFTSIDE_POS1,LEFTSIDE_POS2,"horizal"),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L](MSDA)"
 },
 
@@ -121,7 +121,7 @@ end,
 	Middle   = task.markingTouch(0,LEFTSIDE_POS1,LEFTSIDE_POS2,"horizal"),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "{MS}[L][DA]"
 },
 
@@ -132,7 +132,7 @@ end,
 	Middle = task.markingTouch(0,LEFTSIDE_POS1,LEFTSIDE_POS2,"horizal"),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "{M}[DA][L][S]"
 },
 
@@ -142,7 +142,7 @@ end,
 	Middle = task.defendMiddle("Middle"),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "{S}[DA][L][M]"
 },
 

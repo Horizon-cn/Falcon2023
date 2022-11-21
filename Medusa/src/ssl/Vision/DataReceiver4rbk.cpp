@@ -193,6 +193,7 @@ void CDataReceiver4rbk::receiveRefMsgs() {
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         while (referee_socket.state() == QUdpSocket::BoundState && referee_socket.hasPendingDatagrams()) {
+            //qDebug()<<"receive";
             datagram.resize(referee_socket.pendingDatagramSize());
             referee_socket.readDatagram(datagram.data(), datagram.size());
             ssl_referee.ParseFromArray((void*)datagram.data(), datagram.size());

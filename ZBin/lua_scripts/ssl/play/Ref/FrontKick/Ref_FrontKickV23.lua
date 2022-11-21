@@ -1,13 +1,12 @@
 --CYM/FH 20221104
 
-
-local chipPower = 250 --可用距离算
-local ASIS_POS_1 = ball.refAntiYPos(CGeoPoint:new_local(375,70))
-local ASIS_POS_2 = ball.refAntiYPos(CGeoPoint:new_local(385,110))
-local ASIS_POS_3 = ball.refAntiYPos(CGeoPoint:new_local(145,-110))
+local chipPower = 250
+local ASIS_POS_1 = ball.refAntiYPos(CGeoPoint:new_local(400,40))
+local ASIS_POS_2 = ball.refAntiYPos(CGeoPoint:new_local(408,77))
+local ASIS_POS_3 = ball.refAntiYPos(CGeoPoint:new_local(413,34))
 local ASIS_POS_4 = ball.refAntiYPos(CGeoPoint:new_local(145,130))
 
-local SHOOT_ASIS_POS = ball.refAntiYPos(CGeoPoint:new_local(350,-100))
+local SHOOT_ASIS_POS = ball.refAntiYPos(CGeoPoint:new_local(340,-90))
 
 
 local FAKE_POS_1 = ball.refAntiYPos(CGeoPoint:new_local(270,-50))
@@ -18,20 +17,33 @@ local FAKE_POS_22 = ball.refAntiYPos(CGeoPoint:new_local(440,220))
 
 
 local SHOOT_POS = pos.passForTouch(ball.refAntiYPos(CGeoPoint:new_local(310,110)))
-local Pre_SHOOT_POS = ball.refAntiYPos(CGeoPoint:new_local(310,110))
+local Pre_SHOOT_POS = ball.refAntiYPos(CGeoPoint:new_local(350,110))
 local dangerous = true
 
-if ball.refPosY() > -140 and ball.refPosY() < 140 then
-    chipPower=270
+local yy = 0
+if ball.refPosY() >= 0 then
+    yy = ball.refPosY()+110
   else
-    chipPower=350
+    yy = 110-ball.refPosY()
 end
+
+local xx = 0
+if ball.posX() >= 310 then
+    xx = ball.posX()-310
+  else
+    xx = 310-ball.posX()
+end
+
+local k = 0.025
+local len = xx+yy
+local chipPower = k*len
+
 
 gPlayTable.CreatePlay{
 
   firstState = "start",
 
-  ["start"] = {
+--[[  ["start"] = {
     switch = function ()
       if bufcnt(player.toTargetDist("Leader") < 20 , 6, 180) then
         return "pass"
@@ -46,27 +58,27 @@ gPlayTable.CreatePlay{
     Engine   = task.singleBack(),
     Hawk     = task.rightBack(),
     match    = "{A}{DLSMH}{E}"
-  },
+  },--]]
 
- -- ["change"] = {
- --    switch = function ()
- --      if bufcnt(player.toTargetDist("Leader") < 20 , 30, 180) then
- --        return "pass"
- --      end
- --    end,
- --    Assister = task.staticGetBall(SHOOT_POS()),
- --    -- Leader   = task.goCmuRush(ASIS_POS_3),
- --    -- Special  = task.goCmuRush(ASIS_POS_2),
- --    -- Middle   = task.goCmuRush(ASIS_POS_1),
- --    Leader   = task.goCmuRush(SHOOT_POS),
- --    Special  = task.goCmuRush(FAKE_POS_2),
- --    Middle   = task.goCmuRush(FAKE_POS_1),
- --    Defender = task.leftBack(),
- --    Goalie   = task.goalie(),
- --    Engine   = task.singleBack(),
- --    Hawk     = task.rightBack(),
- --    match    = "{A}{DLSMH}{E}"
- --  }, 
+ ["start"] = {
+    switch = function ()
+      if bufcnt(player.toTargetDist("Leader") < 20 , 30, 180) then
+        return "pass"
+      end
+    end,
+    Assister = task.staticGetBall(SHOOT_POS()),
+    -- Leader   = task.goCmuRush(ASIS_POS_3),
+    -- Special  = task.goCmuRush(ASIS_POS_2),
+    -- Middle   = task.goCmuRush(ASIS_POS_1),
+    Leader   = task.goCmuRush(ASIS_POS_1),
+    Special  = task.goCmuRush(ASIS_POS_2),
+    Middle   = task.goCmuRush(ASIS_POS_3),
+    Defender = task.leftBack(),
+    Goalie   = task.goalie(),
+    Engine   = task.singleBack(),
+    Hawk     = task.rightBack(),
+    match    = "{A}{DLSMH}{E}"
+  }, 
 
   
 
@@ -80,7 +92,7 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.chipPass(SHOOT_POS(),chipPower),
-    Leader   = task.goCmuRush(Pre_SHOOT_POS,player.toPlayerDir("Assister")),
+    Leader   = task.goCmuRush(Pre_SHOOT_POS),
     Special  = task.goCmuRush(FAKE_POS_22),
     Middle   = task.goCmuRush(FAKE_POS_11),
     Defender = task.leftBack(),
@@ -90,16 +102,16 @@ gPlayTable.CreatePlay{
     match    = "{ADLSMEH}"
   },
 
-
+        
   ["waitBall"] = {
     switch = function ()
       print("waitBall")
-      if bufcnt(player.toPointDist("Leader", SHOOT_POS) < 10, 3, 60) then
+      if bufcnt(player.toPointDist("Middle",FAKE_POS_11) < 30, 3, 60) then
         return "shoot"
       end
     end,
     Assister = task.goCmuRush(SHOOT_ASIS_POS),
-    Leader   = task.goCmuRush(Pre_SHOOT_POS,player.toPlayerDir("Assister")),
+    Leader   = task.continue(),
     Special  = task.continue(),
     Middle   = task.continue(),
     Defender = task.leftBack(),

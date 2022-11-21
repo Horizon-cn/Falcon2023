@@ -124,7 +124,7 @@ function chipPass(p, c, f, anti)
 	local idir
 	local ipower
 	if type(p) == "string" then
-		idir = ball.toPlayerHeadDir(role)
+		idir = ball.toPlayerHeadDir(p)
 	elseif type(p) == "function" then
 		if f == nil or f == true then
 			idir = p

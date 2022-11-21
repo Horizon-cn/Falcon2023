@@ -21,7 +21,7 @@ firstState = "defence",
 	Middle = task.marking("Third"),
 	Hawk = task.defendKick(),
 	Powerhouse = task.defendHead(),
-	Goalie = task.goalie(),
+	Goalie = task.goalieNew(),
     match = "[LSA][DMPH]"
 },
 

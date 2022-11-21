@@ -66,7 +66,6 @@ end
 --选play
 --------------------------------------
 if SelectRefPlay() then
-	print(gCurrentPlay)
 	-- or NeedExit(gCurrentPlay)不添加会出问题！！
 	if gCurrentPlay ~= gLastPlay or NeedExit(gCurrentPlay) then
 		ResetPlay(gCurrentPlay)

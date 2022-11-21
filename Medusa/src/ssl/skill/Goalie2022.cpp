@@ -86,16 +86,16 @@ int CGoalie2022::evaluate(const CVisionModule* pVision)
 	const BallVisionT& ball = pVision->Ball();
 
 	if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") {
-		DBG("evaluate: game stop");
+        //DBG("evaluate: game stop");
 		return NORMAL;
 	} else if (!ball.Valid()) {
-		DBG("evaluate: invalid ball");
+        //DBG("evaluate: invalid ball");
 		return NORMAL;
 	} else if (IsFarFromBack(ball.Pos())) {
-		DBG("evaluate: far ball");
+        //DBG("evaluate: far ball");
 		return NORMAL;
 	} else if (ShouldAttack(pVision)) {
-		DBG("evaluate: danger, attack enemy");
+        //DBG("evaluate: danger, attack enemy");
 		return ATTACK_ENEMY;
 	} else if (Utils::InOurPenaltyArea(ball.Pos(), PENALTY_BUFFER)) {
 		if (ball.Vel().mod() < SLOW_BALL_SPD) {
@@ -110,15 +110,15 @@ int CGoalie2022::evaluate(const CVisionModule* pVision)
 			}*/
 		} else {//球速较高
 			if (DefendUtils::isBallShotToTheGoal()) {
-				DBG("evaluate: fast ball, to goal, emergency");
+                //DBG("evaluate: fast ball, to goal, emergency");
 				return NORMAL;//实际情况紧急，不确定NORMAL能否应对
 			} else {
-				DBG("evaluate: fast ball, not to goal");
+                //DBG("evaluate: fast ball, not to goal");
 				return NORMAL;
 			}
 		}
 	} else {
-		DBG("evaluate: normal");
+        //DBG("evaluate: normal");
 		return NORMAL;
 	}
 }
@@ -175,7 +175,7 @@ inline bool CGoalie2022::IsFarFromBack(const CGeoPoint& pos, int x)
 
 CPlayerTask* CGoalie2022::normalTask(const CVisionModule* pVision)
 {
-    MSG("goalie in normal");
+    //MSG("goalie in normal");
 
 	int robotNum = task().executor;
 
@@ -199,7 +199,7 @@ CPlayerTask* CGoalie2022::normalTask(const CVisionModule* pVision)
 
 CPlayerTask* CGoalie2022::supportTask(const CVisionModule* pVision)
 {
-    MSG("goalie in support");
+    //MSG("goalie in support");
 
 	int robotNum = task().executor;
 	int leaderNum = BestPlayer::Instance()->getOurBestPlayer();
@@ -225,7 +225,7 @@ CPlayerTask* CGoalie2022::supportTask(const CVisionModule* pVision)
 CPlayerTask* CGoalie2022::clearBallTask(const CVisionModule* pVision)
 {
 	//防乌龙还没写进来
-	MSG("goalie in clear");
+    //MSG("goalie in clear");
 
 	int robotNum = task().executor;
 
@@ -241,7 +241,7 @@ CPlayerTask* CGoalie2022::clearBallTask(const CVisionModule* pVision)
 
 CPlayerTask* CGoalie2022::attackEnemyTask(const CVisionModule* pVision)
 {
-	MSG("goalie in attack");
+    //MSG("goalie in attack");
 
 	int robotNum = task().executor;
 	const PlayerVisionT& me = pVision->OurPlayer(robotNum);

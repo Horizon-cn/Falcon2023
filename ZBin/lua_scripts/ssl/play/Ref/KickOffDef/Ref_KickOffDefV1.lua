@@ -15,13 +15,15 @@ firstState = "start",
 			return "exit"
 		end
 	end,
-	Leader   = task.goSpeciPos(KICKOFF_DEF_POS("left")),
-	Special  = task.goSpeciPos(KICKOFF_DEF_POS("right")),
+	Leader   = task.goSpeciPos(CGeoPoint:new_local(-100, -30)), --task.goSpeciPos(KICKOFF_DEF_POS("left")),
+	Special  = task.goSpeciPos(CGeoPoint:new_local(-100, 30)), --task.goSpeciPos(KICKOFF_DEF_POS("right")),
 	Assister = task.goSpeciPos(CGeoPoint:new_local(-100, 0)),
 	Middle   = task.rightBack(),
 	Defender = task.leftBack(),
-	Goalie   = task.goalie(),
-	match    = "[ADMLS]"
+	Hawk     = task.marking("First"),
+	Powerhouse = task.marking("Second"),
+	Goalie   = task.goalieNew(),
+	match    = "[ADMLSHP]"
 },
 
 name = "Ref_KickOffDefV1",

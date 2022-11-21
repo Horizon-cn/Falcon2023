@@ -210,7 +210,6 @@ function defendBackClear()
 			angle_left = -math.pi/2
 			angle_right = math.pi*2/3
 		end
-		--debugEngine:gui_debug_line(ball.pos(),ball.pos()+Utils.Polar2Vector(150,(angle_left+angle_right)/2))
 		return (angle_left+angle_right)/2
 	end
 end
