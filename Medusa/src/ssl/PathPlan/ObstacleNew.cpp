@@ -621,7 +621,7 @@ void ObstaclesNew::drawObstacles() {
             drawRect(obst.getStart(), obst.getEnd());
         }
         else {
-            //drawLongCircle(obst.getStart(), obst.getEnd(), obst.getRadius());
+            drawLongCircle(obst.getStart(), obst.getEnd(), obst.getRadius());
         }
     }
 }

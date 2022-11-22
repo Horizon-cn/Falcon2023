@@ -60,7 +60,10 @@ void CProtectBall::plan(const CVisionModule* pVision)
     CGeoPoint projMePos = ballMovingLine.projection(self.Pos());
     double me2ballMovingLineDist = projMePos.dist(self.Pos());
 
-    const int theirBestPlayer=BestPlayer::Instance()->getTheirBestPlayer();
+    const int advancer = TaskMediator::Instance()->advancer();
+    const int theirBestPlayer = NormalPlayUtils::getTheirMostClosetoPos(pVision, ball.Pos()); //BestPlayer::Instance()->getTheirBestPlayer();
+    double oppo2BallDist = vision->TheirPlayer(theirBestPlayer).Pos().dist(ball.Pos());
+    double advancer2BallDist = vision->OurPlayer(advancer).Pos().dist(ball.Pos());
 
     CGeoPoint ourGoalPos=CGeoPoint(-Param::Field::PITCH_LENGTH/2,0);
     double ourGoaltoBallDir=(ball.Pos()-ourGoalPos).dir();
@@ -118,38 +121,52 @@ void CProtectBall::plan(const CVisionModule* pVision)
     int new_state = state(), old_state = state();
     do {
         old_state = new_state;
+
+        if (balltoSelfDist > 100)
+            new_state = Approach_Ball;
+        else if (oppo2BallDist + 60 < advancer2BallDist)
+            new_state = Slow_Ball;
+        else if (old_state == Slow_Ball && advancer2BallDist < 20)
+            new_state = Protect_Ball;
+        else
+            new_state = Protect_Ball;
+
+        //new_state = Protect_Ball;
+        break;
         switch (old_state){
         case BEGINNING:
             {
-                new_state = Protect_Ball;
-                break;
                 if (ballSpeed<30){
                     new_state =Slow_Ball;
-                }else if(canEnterShoot){
-                    new_state=Shoot_Ball;
-                }else if (canEnterDefendArea){
-                    new_state=Enter_DefendArea;
+                //}else if(canEnterShoot){
+                //    new_state=Shoot_Ball;
+                //}else if (canEnterDefendArea){
+                //    new_state=Enter_DefendArea;
                 }
                 else if(!isBallCross){
                     if(verBos) cout<<"BEGINNING-->Approach_Ball"<<endl;
                     new_state = Approach_Ball;
                 }else{
-                    if (!isBallEntireCross){
-                        new_state=Transit_State;
-                    }else{
+                    //if (!isBallEntireCross){
+                    //    new_state=Transit_State;
+                    //}else{
                         if(verBos) cout<<"BEGINNING-->Protect_Ball"<<endl;
                         new_state = Protect_Ball;
-                    }
+                    //}
                 }
                 break;
             }
+        case Slow_Ball:
+            if (oppo2BallDist + 100 > advancer2BallDist)
+                new_state = Protect_Ball;
+            break;
         case Approach_Ball:
             if (ballSpeed<30){
                 new_state =Slow_Ball;
-            }else if (canEnterDefendArea){
-                new_state=Enter_DefendArea;
-            }else if(canJumpTransit){
-                new_state=Transit_State;
+            //}else if (canEnterDefendArea){
+            //    new_state=Enter_DefendArea;
+            //}else if(canJumpTransit){
+            //    new_state=Transit_State;
             }else if(isBallEntireCross){
                 if(verBos) cout<<"Approach-->Protect"<<endl;
                 new_state = Protect_Ball;
@@ -168,11 +185,10 @@ void CProtectBall::plan(const CVisionModule* pVision)
             }
             break;
         case Protect_Ball:
-            break;
             if (ballSpeed<30){
                 new_state =Slow_Ball;
-            }else if (canEnterDefendArea){
-                new_state=Enter_DefendArea;
+            //}else if (canEnterDefendArea){
+            //    new_state=Enter_DefendArea;
             }else if(!isBallCross){
                 if(verBos) cout<<"Protect-->Approach"<<endl;
                 new_state = Approach_Ball;
@@ -206,7 +222,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
     }
 
     TaskT protectTask(task());
-    protectTask.player.flag |= PlayerStatus::AVOID_SHOOTLINE;
+    //protectTask.player.flag |= PlayerStatus::AVOID_SHOOTLINE;
 
     double approachBallDir=Utils::Normalize(ourGoaltoBallDir);
     if (ballSpeed>30){
@@ -238,6 +254,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
             protectTask.player.vel=CVector(0,0);
             protectTask.player.rotvel=0;
             setSubTask(TaskFactoryV2::Instance()->GotoPosition(protectTask));
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,200), "Slow Ball");
         }
         break;
     case Approach_Ball:
@@ -265,8 +282,10 @@ void CProtectBall::plan(const CVisionModule* pVision)
             protectTask.player.max_acceleration=SetAcc;
             protectTask.player.max_deceleration=1000;
 
-            setSubTask(TaskFactoryV2::Instance()->GotoPosition(protectTask));
+            setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
+            //setSubTask(TaskFactoryV2::Instance()->GotoPosition(protectTask));
             //setSubTask(PlayerRole::makeItGoto(runner,approachBallPos,approachBallDir,CVector(0,0),0,flags));
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,200), "Approach Ball");
         }
         break;
     case Transit_State:
@@ -287,24 +306,21 @@ void CProtectBall::plan(const CVisionModule* pVision)
         break;
     case Protect_Ball:
         { // 3*Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER
-            int advancer = TaskMediator::Instance()->advancer();
-            int oppo = NormalPlayUtils::getTheirMostClosetoPos(pVision, ball.Pos());
-            double oppo2BallDist = vision->TheirPlayer(oppo).Pos().dist(ball.Pos());
             static CGeoPoint lastProtectBallPos;
             CGeoPoint protectBallPos;
-            ProtectBallDir=(ball.Pos()-pVision->TheirPlayer(oppo).Pos()).dir();
-            if (vision->TheirPlayer(oppo).Pos().dist(ball.Pos()) < 10*Param::Vehicle::V2::PLAYER_SIZE || oppo == vision->TheirGoalie()) {
+            if (oppo2BallDist < 5*Param::Vehicle::V2::PLAYER_SIZE || theirBestPlayer == vision->TheirGoalie()) {
                 protectBallPos = ball.Pos()+Utils::Polar2Vector(75 + 2*Param::Vehicle::V2::PLAYER_SIZE, Utils::Normalize(ProtectBallDir));
                 ProtectBallDir = Utils::Normalize(ProtectBallDir + Param::Math::PI);
             }
-
             else {
                 double protectDist = 6*Param::Vehicle::V2::PLAYER_SIZE; //std::max(6*Param::Vehicle::V2::PLAYER_SIZE, oppo2BallDist / 2);
                 protectBallPos = ball.Pos()+Utils::Polar2Vector(protectDist, Utils::Normalize(ProtectBallDir+Param::Math::PI));
             }
-            if (!Utils::InTheirPenaltyArea(protectBallPos, 2*Param::Vehicle::V2::PLAYER_SIZE) &&
-                    !Utils::InOurPenaltyArea(protectBallPos, 2*Param::Vehicle::V2::PLAYER_SIZE) && Utils::IsInField(protectBallPos, 0)
-                    || KickStatus::Instance()->getChipKickDist(advancer) > 0 || KickStatus::Instance()->getKickPower(advancer) > 0)
+            if (Utils::InTheirPenaltyArea(protectBallPos, 2*Param::Vehicle::V2::PLAYER_SIZE) ||
+                    Utils::InOurPenaltyArea(protectBallPos, 2*Param::Vehicle::V2::PLAYER_SIZE) || !Utils::IsInField(protectBallPos, 0)) {
+                protectBallPos = ball.Pos()+Utils::Polar2Vector(75 + 2*Param::Vehicle::V2::PLAYER_SIZE, Utils::Normalize(ourGoaltoBallDir+Param::Math::PI));
+            }
+            if (KickStatus::Instance()->getChipKickDist(advancer) == 0 && KickStatus::Instance()->getKickPower(advancer) == 0)
                 lastProtectBallPos = protectBallPos;
             protectTask.player.pos=lastProtectBallPos;
             protectTask.player.angle=ProtectBallDir;
@@ -314,6 +330,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
             //protectTask.player.max_deceleration=1000;
             setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
             //setSubTask(TaskFactoryV2::Instance()->GotoPosition(protectTask));
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,200), "Protect Ball");
         }
         break;
     case Shoot_Ball:
@@ -329,6 +346,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
     default:
         break;
     }
+    //GDebugEngine::Instance()->gui_debug_x(protectTask.player.pos, COLOR_BLUE);
     //if(self2ball.mod()>100 && me2ballMovingLineDist>100){
     //	setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, approachBallDir, CVector(0,0), 0, 10));
     //}

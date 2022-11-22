@@ -25,11 +25,12 @@ namespace {
     bool CheckBackPos = true;
     int dangerVel = 15;
     int dangerDist = 50;
+    CGeoPoint DebugPoint(-650, -470);
 }
 
 CGuardPos::CGuardPos()
 {
-    std::fill_n(_backNum, Param::Field::MAX_PLAYER, 0);
+    std::fill_n(_backNum, Param::Field::MAX_PLAYER, TaskMediator::Instance()->goalie());
     std::fill_n(_backCycle, Param::Field::MAX_PLAYER, 0);
     std::fill_n(_readyBack, Param::Field::MAX_PLAYER, true);
     CheckBackPos = ParamManager::Instance()->CheckBackPos;
@@ -102,8 +103,9 @@ CGeoPoint CGuardPos::backPos(int guardNum, int index)
     // ????????????
     // guardNum = std::min(Param::Field::MAX_PLAYER, std::max(1, guardNum));
     index = std::min(guardNum, std::max(1, index));
-    generatePos(guardNum);
     checkBackPos(guardNum);
+    generatePos(guardNum);
+    adjustBackPos(guardNum);
     return _backPos[index - 1];
 }
 
@@ -111,9 +113,8 @@ void CGuardPos::checkBackPos(int guardNum)
 {
     // 2020???§Û???????????????????????????????????????????????????
     // ???????????????
+    ready_cnt = 0;
     if (!CheckBackPos || (guardNum != 3 && guardNum != 2)) return;
-    int ready_cnt = 0;
-    int ready_index = 0;
     for (int i = 0; i < guardNum; i++) {
         if (vision->OurPlayer(_backNum[i]).Pos().dist(_backPos[i]) > dangerDist ||
             abs(_backCycle[i] - vision->Cycle()) > 10 || _backNum[i] == TaskMediator::Instance()->goalie())
@@ -124,6 +125,11 @@ void CGuardPos::checkBackPos(int guardNum)
             ready_index = i;
         }
     }
+}
+
+void CGuardPos::adjustBackPos(int guardNum)
+{
+    if (!CheckBackPos || (guardNum != 3 && guardNum != 2)) return;
     const BallVisionT& Ball = vision->Ball();
     int bestenemy = BestPlayer::Instance()->getTheirBestPlayer();
     double defendTargetPosX = Ball.Valid() ? Ball.X() : vision->TheirPlayer(bestenemy).X();
@@ -139,7 +145,7 @@ void CGuardPos::checkBackPos(int guardNum)
     CGeoPoint midPoint = _backPos[1], rightPoint = _backPos[2], leftPoint = _backPos[0];
     switch (ready_cnt) {
     case 1:
-        GDebugEngine::Instance()->gui_debug_msg(GOAL_MIDDLE, "SingleBack");
+        GDebugEngine::Instance()->gui_debug_msg(DebugPoint, "SingleBack");
         if (guardNum == 2) {
             midPoint = _backPos[0].midPoint(_backPos[1]);
             rightPoint = _backPos[1];
@@ -154,23 +160,23 @@ void CGuardPos::checkBackPos(int guardNum)
     case 2:
         if (guardNum == 2) break;
         if (!_readyBack[1]) { // ?§Ü????????????¦Ë??????left/rightBack
-            GDebugEngine::Instance()->gui_debug_msg(GOAL_MIDDLE, "MiddleBack");
-            _backPos[0] = midPoint + CVector(0, Param::Field::BALL_SIZE);
-            _backPos[2] = midPoint + CVector(0, -Param::Field::BALL_SIZE);
+            GDebugEngine::Instance()->gui_debug_msg(DebugPoint, "MiddleBack");
+            _backPos[0] = midPoint.midPoint(leftPoint);
+            _backPos[2] = midPoint.midPoint(rightPoint);
         }
         else if (!_readyBack[0] && leftDanger) { // ??????????????????????
-            GDebugEngine::Instance()->gui_debug_msg(GOAL_MIDDLE + CVector(0, -20), "LeftBack");
+            GDebugEngine::Instance()->gui_debug_msg(DebugPoint, "LeftBack");
             _backPos[2] = midPoint;
             _backPos[1] = leftPoint;
         }
         else if (!_readyBack[2] && rightDanger) { // ?????????????????????
-            GDebugEngine::Instance()->gui_debug_msg(GOAL_MIDDLE + CVector(0, 20), "RightBack");
+            GDebugEngine::Instance()->gui_debug_msg(DebugPoint, "RightBack");
             _backPos[0] = midPoint;
             _backPos[1] = rightPoint;
         }
         break;
     default:
-        GDebugEngine::Instance()->gui_debug_msg(GOAL_MIDDLE, "NoneBack");
+        GDebugEngine::Instance()->gui_debug_msg(DebugPoint, "NoneBack");
         break;
     }
 }
@@ -183,7 +189,7 @@ void CGuardPos::setBackNum(int realNum, int index)
     }
     _backCycle[index - 1] = vision->Cycle();
     _backNum[index - 1] = realNum;
-    qDebug() << "backNum" << realNum << index;
+    //qDebug() << "backNum" << realNum << index;
 }
 
 int CGuardPos::checkValidNum(int guardNum)

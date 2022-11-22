@@ -112,6 +112,9 @@ struct PlayerStatus{
 	// BallPlacement 的flags
 	static const int THEIR_BALL_PLACEMENT           = 0x01000000;
 	static const int OUR_BALL_PLACEMENT             = 0x02000000;
+
+    // Break的 flags
+    static const int PENALTY_KICK                   = 0x04000000; // 大点球状态
 };
 
 /// 球状态结构

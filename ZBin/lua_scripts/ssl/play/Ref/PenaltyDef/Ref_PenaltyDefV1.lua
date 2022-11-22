@@ -1,5 +1,25 @@
 gPlayTable.CreatePlay{
-firstState = "start",
+firstState = "init",
+
+["init"] = {
+	switch = function ()
+		if bufcnt(ball.refPosX()>400) then
+			return "startlong"
+		else
+			return "startshort"
+		end
+	end,
+	Goalie = task.penaltyGoalie(),
+	Leader  = task.goLWPassPos(),
+	Assister = task.goRWPassPos(),
+	Middle  = task.leftBack(),
+	Defender = task.rightBack(),
+	Kicker  = task.goCmuRush(CGeoPoint:new_local(450,0),player.toBallDir),
+	Engine   = task.goLMPassPos(),
+    Hawk     = task.goRMPassPos(),
+	match = "{L}{ADM}{EH}"
+},
+
 
 ["start"] = {
 	switch = function ()
