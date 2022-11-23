@@ -61,7 +61,12 @@ namespace {
 	int fraredOff = 0;
 	double GETBALL_BIAS = -2.5;
 	double BALL_NEAR_ROBOT = 20;
-	double HEAD_LIMIT = 3;
+
+    double roll_acc = 200;
+    double slide_acc = 500;
+    double transition_speed = 400;
+
+    double HEAD_LIMIT = 3;
 }
 
 CGetBallV3::CGetBallV3()
@@ -71,6 +76,11 @@ CGetBallV3::CGetBallV3()
     HEAD_LIMIT = ParamManager::Instance()->HEAD_LIMIT;
     DEBUG_ENGINE = ParamManager::Instance()->GetBall_Debug;
     IS_DRIBBLE = ParamManager::Instance()->IS_DRIBBLE;
+
+    roll_acc = ParamManager::Instance()->roll_acc;
+    slide_acc = ParamManager::Instance()->slide_acc;
+    transition_speed = ParamManager::Instance()->transition_speed;
+
 	_lastCycle = 0;
 }
 
@@ -129,37 +139,38 @@ void CGetBallV3::plan(const CVisionModule* pVision)
 	}
 	
 	CVector ballVel = ball.Vel();
-	// 如果球速过大并且背向拿球，加大预测
-	if (ball.Vel().mod() > SpeedLimitForPredictTime && fabs(dAngle_finalDir2ballVel) > Param::Math::PI * 2 / 3) {
-		BallPosWithVelFactorTmp += 0.2;
-	}
+//	// 如果球速过大并且背向拿球，加大预测
+//	if (ball.Vel().mod() > SpeedLimitForPredictTime && fabs(dAngle_finalDir2ballVel) > Param::Math::PI * 2 / 3) {
+//		BallPosWithVelFactorTmp += 0.2;
+//	}
 
-	if (fabs(dAngle_self2ball_medir) < Param::Vehicle::V2::KICK_ANGLE) {
-		if (fabs(dAngle_ball2myhead_ballvel) < Param::Math::PI / 6.0) {                      // 球朝车头滚过来,预测时间减小
-			BallPosWithVelFactorTmp *= sin(fabs(dAngle_ball2myhead_ballvel));
-		}
-		else if (fabs(dAngle_ball2myhead_ballvel) > Param::Math::PI * 5 / 6.0 &&
-			fabs(Utils::Normalize(ball.Vel().dir() - finalDir)) < Param::Math::PI / 6.0)               // 车追球，预测时间增大
-		{
-			if (fraredOn < 20)
-			{
-				BallPosWithVelFactorTmp += 0.2;
-				BallPosWithVelFactorTmp *= cos(fabs(dAngle_ball2myhead_ballvel)) * -1;
-			}
-			else {
-				//红外出现时特殊处理：将球速大小预测值改为0
-				ballVel = Utils::Polar2Vector(0.01, ball.Vel().dir());
-			}
-		}
-	}
+//	if (fabs(dAngle_self2ball_medir) < Param::Vehicle::V2::KICK_ANGLE) {
+//		if (fabs(dAngle_ball2myhead_ballvel) < Param::Math::PI / 6.0) {                      // 球朝车头滚过来,预测时间减小
+//			BallPosWithVelFactorTmp *= sin(fabs(dAngle_ball2myhead_ballvel));
+//		}
+//		else if (fabs(dAngle_ball2myhead_ballvel) > Param::Math::PI * 5 / 6.0 &&
+//			fabs(Utils::Normalize(ball.Vel().dir() - finalDir)) < Param::Math::PI / 6.0)               // 车追球，预测时间增大
+//		{
+//			if (fraredOn < 20)
+//			{
+//				BallPosWithVelFactorTmp += 0.2;
+//				BallPosWithVelFactorTmp *= cos(fabs(dAngle_ball2myhead_ballvel)) * -1;
+//			}
+//			else {
+//				//红外出现时特殊处理：将球速大小预测值改为0
+//				ballVel = Utils::Polar2Vector(0.01, ball.Vel().dir());
+//			}
+//		}
+//	}
 
 	/********************************************************************/
 	/* 预测BallPosWithVelFactorTmp时间之后的球位置  by lsp */
 	/********************************************************************/
 	CGeoPoint ballPosWithVel = CGeoPoint(0, 0);
-	if (me.Pos().dist(ball.Pos()) < BALL_NEAR_ROBOT) {
+    if (me.Pos().dist(ball.Pos()) < BALL_NEAR_ROBOT || ballVel.mod() < 100) {
 		//if (ballVel.mod() < 20) {
 		ballPosWithVel = ball.Pos();
+        GDebugEngine::Instance()->gui_debug_msg(ballPosWithVel, "too slow ball");
 		/*}
 		else {
 			CGeoSegment medir = CGeoSegment(me.Pos(), me.Pos() + me.Vel());
@@ -168,12 +179,57 @@ void CGetBallV3::plan(const CVisionModule* pVision)
 	}
 	else {
 		// 粗略计算预测球的位置
-		ballPosWithVel = ball.Pos() + ballVel * BallPosWithVelFactorTmp;  
-		//小球速预测
-		if (ball.Vel().mod() < 20.0 && ball.Vel().mod() * sin(fabs(Utils::Normalize(ball.Vel().dir() - finalDir))) > 10)
-		{
-			ballPosWithVel = ball.Pos() + Utils::Polar2Vector(Param::Field::BALL_SIZE * 1.2, ball.Vel().dir());
-		}
+        // 修改了拿球的预测时间，从三个角度考虑，车到球运动轨迹的距离，车的朝向，车的运动速度
+        CGeoLine ball_line(ball.Pos(), ball.Pos() + ballVel);
+        CGeoPoint projection_point = ball_line.projection(me.Pos());
+        double projection2me_dist = projection_point.dist(me.Pos());
+        double angle_diff = Param::Math::PI - abs(abs(me.Dir()) - abs(ballVel.dir()));
+        if (me.Vel().mod() > 20) {
+            double vel_dir = me.Vel().dir();
+            double vel_dir_diff = abs(vel_dir - (projection_point - me.Pos()).dir());
+            BallPosWithVelFactorTmp += (vel_dir_diff - Param::Math::PI/2) / 5;
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), QString("vel dir diff time:%5").arg((vel_dir_diff - Param::Math::PI/2) / 5).toStdString().c_str());
+        }
+
+        BallPosWithVelFactorTmp += projection2me_dist / 500;
+        BallPosWithVelFactorTmp += angle_diff / 15;
+
+        // 粗略计算预测球的位置
+        if (ballVel.mod() < transition_speed) {
+            if (ballVel.mod() / roll_acc < BallPosWithVelFactorTmp) {
+                ballPosWithVel = ball.Pos() + ballVel.unit() * (ballVel.mod() * BallPosWithVelFactorTmp  - 0.5 * roll_acc * BallPosWithVelFactorTmp * BallPosWithVelFactorTmp);
+                GDebugEngine::Instance()->gui_debug_msg(ballPosWithVel, QString("short roll ball, time:%5").arg(BallPosWithVelFactorTmp).toStdString().c_str());
+            }
+            else {
+                ballPosWithVel = ball.Pos() + ballVel.unit() * (ballVel.mod2() / roll_acc * 0.5);
+                GDebugEngine::Instance()->gui_debug_msg(ballPosWithVel, QString("long roll ball, time:%5").arg(BallPosWithVelFactorTmp).toStdString().c_str());
+            }
+        }
+        else {
+            float time2roll = (ballVel.mod() - transition_speed) / slide_acc;
+            float timeslide = transition_speed / roll_acc;
+            if (BallPosWithVelFactorTmp < time2roll) {
+                ballPosWithVel = ball.Pos() + ballVel.unit() * (ballVel.mod() * BallPosWithVelFactorTmp - 0.5 * slide_acc * BallPosWithVelFactorTmp * BallPosWithVelFactorTmp);
+            }
+            else if (BallPosWithVelFactorTmp < time2roll + timeslide) {
+                float slide_dist = (ballVel.mod2() - transition_speed * transition_speed) / slide_acc * 0.5;
+                float roll_time = BallPosWithVelFactorTmp - time2roll;
+                float roll_dist = transition_speed * roll_time - 0.5 * roll_acc * roll_time * roll_time;
+                ballPosWithVel = ball.Pos() + ballVel.unit() * (roll_dist + slide_dist);
+            }
+            else {
+                float slide_dist = (ballVel.mod2() - transition_speed * transition_speed) / slide_acc * 0.5;
+                float roll_dist = transition_speed * transition_speed / roll_acc * 2;
+                ballPosWithVel = ball.Pos() + ballVel.unit() * (roll_dist + slide_dist);
+            }
+            GDebugEngine::Instance()->gui_debug_msg(ballPosWithVel, "slide ball");
+        }
+//		ballPosWithVel = ball.Pos() + ballVel * BallPosWithVelFactorTmp;
+//		//小球速预测
+//		if (ball.Vel().mod() < 20.0 && ball.Vel().mod() * sin(fabs(Utils::Normalize(ball.Vel().dir() - finalDir))) > 10)
+//		{
+//			ballPosWithVel = ball.Pos() + Utils::Polar2Vector(Param::Field::BALL_SIZE * 1.2, ball.Vel().dir());
+//		}
 	}
 	if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_arc(ballPosWithVel, 20, 0, 360, COLOR_YELLOW);
 

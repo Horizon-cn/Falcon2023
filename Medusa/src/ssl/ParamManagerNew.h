@@ -144,6 +144,9 @@ class CParamManagerSkill : public CParamManagerNew {
             loadParam(IS_DRIBBLE, "GetBall/IS_DRIBBLE", 1);
             loadParam(BALL_NEAR_ROBOT, "GetBall/BALL_NEAR_ROBOT", 20);
             loadParam(GetBall_Debug, "GetBall/Debug", 1);
+            loadParam(roll_acc, "GetBall/roll_acc", 200);
+            loadParam(slide_acc, "GetBall/slide_acc", 500);
+            loadParam(transition_speed, "GetBall/transition_speed", 400);
 
             loadParam(CATEGORY, "PENALTY_DEFENCE/CATEGORY", 3);
             loadParam(FRAME, "PENALTY_DEFENCE/FRAME", 0);
@@ -291,6 +294,9 @@ class CParamManagerSkill : public CParamManagerNew {
         bool IS_DRIBBLE;
         int BALL_NEAR_ROBOT;
         bool GetBall_Debug;
+        double roll_acc;
+        double slide_acc;
+        double transition_speed;
         // PENALTY_DEFENCE
         int CATEGORY;
         int FRAME;

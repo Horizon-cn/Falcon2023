@@ -15,7 +15,7 @@ const double FRAME_PERIOD = 1.0 / Param::Vision::FRAME_RATE;
 const double MIN_AVOID_DIST = Param::Vehicle::V2::PLAYER_SIZE + 2.0;
 const double LOWER_BOUND_AVOID_SPEED = 50;
 const double UPPER_BOUND_AVOID_SPEED = 250;
-double FREE_KICK_BUF = 0;
+double FREE_KICK_BUF = 25;
 double stopBallAvoidDist = 50;
 
 inline float minObs(float a, float b) {
@@ -382,16 +382,18 @@ void ObstaclesNew::addObs(const CVisionModule * pVision, const TaskT & task, boo
 	if (!((WorldModel::Instance()->CurrentRefereeMsg() == "ourBallPlacement") || (flags & PlayerStatus::OUR_BALL_PLACEMENT)))
 	{
         // 躲避敌方禁区
-		if (WorldModel::Instance()->CurrentRefereeMsg() == "ourIndirectKick") {
+        bool needFurther = WorldModel::Instance()->CurrentRefereeMsg() == "ourIndirectKick" || WorldModel::Instance()->CurrentRefereeMsg() == "theirIndirectKick"
+                || WorldModel::Instance()->CurrentRefereeMsg() == "gameStop";
+        if (needFurther) {
 			if (!(flags & PlayerStatus::NOT_DODGE_PENALTY)) {
 				addRectangle(
                     CGeoPoint(
                         Param::Field::PITCH_LENGTH / 2, 
-                        -Param::Field::PENALTY_AREA_WIDTH / 2 /*+ robotRadius - Param::Vehicle::V2::PLAYER_SIZE*/ - FREE_KICK_BUF
+                        -Param::Field::PENALTY_AREA_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE - FREE_KICK_BUF
                     ),
 					CGeoPoint(
-                        Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH /*+ robotRadius - Param::Vehicle::V2::PLAYER_SIZE*/ - FREE_KICK_BUF, 
-                        Param::Field::PENALTY_AREA_WIDTH / 2 /*- robotRadius + Param::Vehicle::V2::PLAYER_SIZE*/ + FREE_KICK_BUF
+                        Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH + robotRadius - Param::Vehicle::V2::PLAYER_SIZE - FREE_KICK_BUF,
+                        Param::Field::PENALTY_AREA_WIDTH / 2 + Param::Vehicle::V2::PLAYER_SIZE + FREE_KICK_BUF
                     ),
 					0);
 			}

@@ -178,7 +178,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     if (avoidTheirBallPlacementArea || (avoidOurBallPlacementArea && vecNumber != leaderNumber)) {
         CGeoPoint segP1 = pVision->Ball().Pos(), segP2(pVision->getBallPlacementPosition().x(), pVision->getBallPlacementPosition().y());
         bool addObs = false;
-        finalTargetPos = finalPointBallPlacement(myPos, finalTargetPos, segP1, segP2, avoidLength, obsNew, addObs);
+        finalTargetPos = finalPointBallPlacement(myPos, finalTargetPos, segP1, segP2, avoidLength * 2.0, obsNew, addObs);
         if (addObs) obsNew.addLongCircle(segP1, segP2, CVector(0.0, 0.0), ballPlacementDist, OBS_LONG_CIRCLE_NEW, false, true);
         if (DRAW_BALLPLACE_AREA) obsNew.drawLongCircle(segP1, segP2, ballPlacementDist);
     }

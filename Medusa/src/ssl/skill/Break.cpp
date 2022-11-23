@@ -107,8 +107,11 @@ void CBreak::plan(const CVisionModule* pVision) {
     double precision = task().player.kickprecision > 0 ? task().player.kickprecision : SHOOT_ACCURACY;
 
     //踢球相关向量和方向
-    const CVector me2Ball = ball.Pos() - me.Pos();
-    const CVector me2enemy = enemy.Pos() - me.Pos();
+    CVector me2Ball = ball.Pos() - me.Pos();
+    CVector me2Enemy=enemy.Pos()-me.Pos();
+    double me2enemy_dist = me2Enemy.mod();
+    double alphaangle=fabs(Utils::Normalize(me2Ball.dir() - me2Enemy.dir())) ;
+    bool criterion=Utils::Normalize(me2Ball.dir() - me2Enemy.dir())>0;
     const CVector me2target = passTarget - me.Pos();
     double finalDir = me2target.dir();
 
@@ -128,29 +131,6 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("frared Status:" + to_string(fraredOn)).c_str(), COLOR_YELLOW);
 
-
-    //if (!frared) {
-    //
-    //	//if (CVector(lastFrameposition - CGeoPoint(-9999, -9999)).mod() < 10)
-    //	//{
-    //	//	lastFrameposition = me.Pos();
-    //	//	dribblePoint = me.Pos();
-    //	//}
-    //	//else
-    //	//{
-    //	//	double dist = CVector(me.Pos() - lastFrameposition).mod();
-    //	//	dribbleDist += dist;
-    //	//	lastFrameposition = me.Pos();
-    //	//
-    //	//}
-
-    //
-    //}
-    //else
-    //{
-    //	dribblePoint =me.Pos();
-    //}
-    //
     if (!frared)
     {
         dribblePoint = me.Pos();
@@ -163,15 +143,35 @@ void CBreak::plan(const CVisionModule* pVision) {
 
 
     TaskT grabTask(task());
+    cout<<me2enemy_dist<<endl;
+    if(me2enemy_dist<40 && alphaangle<120 * Param::Math::PI / 180.0)
+//    if(true)
+    {
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Spin" + to_string(0)).c_str(), COLOR_YELLOW);
+        cout<<"SPIN!"<<endl;
+        grabTask.player.speed_x = 0;
+        grabTask.player.speed_y = 0;
+        DribbleStatus::Instance()->setDribbleCommand(task().executor, 3);
+        if(criterion)
+        {
 
 
-    GDebugEngine::Instance()->gui_debug_x(task().player.pos, COLOR_RED);
+            grabTask.player.rotate_speed = 5;
 
-    /*********************** set subTask ********************/
+        }
+        else{grabTask.player.rotate_speed=-5;}
 
-    if (DEBUG) GDebugEngine::Instance()->gui_debug_msg(me.Pos() + Utils::Polar2Vector(DEBUG_TEXT_HIGH, -Param::Math::PI / 1.5), "Side Move", COLOR_CYAN);
+        setSubTask(TaskFactoryV2::Instance()->Speed(grabTask));
+    }
+//    {
+//        setSubTask(makeI);
+//    }
 
-    if (pVision->Cycle() % 75 == 0) {
+
+    else{
+    //cout<<"DRIBBLE!"<<endl;
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
+    if (pVision->Cycle() % 40 == 0) {
         move_point = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     }
     else {
@@ -215,6 +215,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
 
     DribbleStatus::Instance()->setDribbleCommand(vecNumber, 3);
+    }
 
 
     _lastCycle = pVision->Cycle();
