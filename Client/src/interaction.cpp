@@ -11,6 +11,7 @@
 #include "networkinterfaces.h"
 #include <QProcess>
 #include <QDir>
+#include "remotesim.h"
 namespace {
 QProcess *medusaProcess = nullptr;
 QProcess *medusaProcess2 = nullptr;
@@ -68,6 +69,9 @@ void Interaction::updateInterfaces(){
 QStringList Interaction::getInterfaces(){
     return ZNetworkInterfaces::instance()->getInterfaces();
 }
+QStringList Interaction::getGrsimInterfaces(){
+    return ZNetworkInterfaces::instance()->getGrsimInterfaces();
+}
 void Interaction::changeVisionInterface(int index){
 //    if(portNum < ports.size() && portNum >= 0){
 //        serial.setPortName(ports[portNum]);
@@ -78,6 +82,9 @@ void Interaction::changeVisionInterface(int index){
 }
 void Interaction::changeRadioInterface(bool ifBlue,bool ifSender,int index){
 //    qDebug() << "radio  interface : " << ifBlue << ifSender << index;
+}
+void Interaction::changeGrsimInterface(int index){
+    ZCommunicator::instance()->setGrsimInterfaceIndex(index);
 }
 void Interaction::setIfEdgeTest(bool ifEdgeTest) {
     VisionModule::instance()->setIfEdgeTest(ifEdgeTest);
@@ -122,7 +129,11 @@ bool Interaction::connectSim(bool sw, int id, bool color) {
         ZCommunicator::instance()->disconnectMedusa(id);
         ZCommunicator::instance()->connectMedusa(id);
         ZSS::ZSimModule::instance()->disconnectSim(color);
-        return ZSS::ZSimModule::instance()->connectSim(color);
+        ZSS::ZRemoteSimModule::instance()->disconnectSim(color);
+        if (ZCommunicator::instance()->getGrsimInterfaceIndex() == 0)
+            return ZSS::ZSimModule::instance()->connectSim(color);
+        else
+            return ZSS::ZRemoteSimModule::instance()->connectSim(color);
     } else {
 //        return ZSS::ZSimModule::instance()->disconnectSim(color); //fix a bug for Medusa out of Athena
     }

@@ -55,9 +55,11 @@ void CGuardPos::generatePos(int guardNum)
     CGeoLine targetToMiddle(defendTarget, GOAL_MIDDLE); // ???????????????
     CGeoLine targetToLeft(defendTarget, GOAL_LEFT);
     CGeoLine targetToRight(defendTarget, GOAL_RIGHT);
-
+    CGeoLine EnemyDir(defendTarget, vision->TheirPlayer(bestenemy).Dir());
     // ??????????????????????????????????????????????¦Ë
     CGeoLineRectangleIntersection intersecMiddle(targetToMiddle, guardMoveRec);
+    if (vision->TheirPlayer(bestenemy).Pos().dist(defendTarget) < 20 && defendTarget.x() < -250)
+        intersecMiddle = CGeoLineRectangleIntersection(EnemyDir, guardMoveRec);
     if (intersecMiddle.intersectant()) {
         // ?§Ü???
         bool leftValid = true, rightValid = true;

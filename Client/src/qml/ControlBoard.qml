@@ -123,6 +123,19 @@ Page{
                             interaction.getInterfaces();
                         }
                     }
+                    ZComboBox{
+                        id:grsimInterface;
+                        model:interaction.getGrsimInterfaces();
+                        onActivated: interaction.changeGrsimInterface(currentIndex);
+                        function updateModel(){
+                            model = interaction.getGrsimInterfaces();
+                            if(currentIndex >= 0)
+                                interaction.changeGrsimInterface(currentIndex);
+                            }
+                            Component.onCompleted: {
+                                interaction.getGrsimInterfaces();
+                            }
+                    }
                     ZSwitch{
                         id:simulation;
                         width:parent.itemWidth;
@@ -600,7 +613,7 @@ Page{
                        }
                    }
                }
-           }
+           }/**
            ZSS.Display{
                type:1;
                width:parent.width - 2*parent.padding;
@@ -611,7 +624,7 @@ Page{
                onHeightChanged: {
                    resetSize(width,height);
                }
-           }
+           }**/
 
         //    ZGroupBox{
         //        title: qsTr("Log")

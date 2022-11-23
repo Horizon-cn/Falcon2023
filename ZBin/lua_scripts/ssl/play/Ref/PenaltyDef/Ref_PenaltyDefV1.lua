@@ -1,9 +1,10 @@
+
 gPlayTable.CreatePlay{
 firstState = "init",
 
 ["init"] = {
 	switch = function ()
-		if bufcnt(ball.refPosX()>400) then
+		if bufcnt(ball.refPosX()>0) then
 			return "startlong"
 		else
 			return "startshort"
@@ -21,12 +22,20 @@ firstState = "init",
 },
 
 
-["start"] = {
+["startlong"] = {
 	switch = function ()
 		if cond.isNormalStart() then
-			return "kick"
-		elseif cond.isGameOn() then
-			return "exit"
+			return "kicklong"
+		end
+	end,
+	Goalie   = task.goalieNew(),
+	match    = "{LACDM}"
+},
+
+["startshort"] = {
+	switch = function ()
+		if cond.isNormalStart() then
+			return "kickshort"
 		end
 	end,
 	Leader  = task.goCmuRush(CGeoPoint:new_local(430, 180)),
@@ -38,7 +47,17 @@ firstState = "init",
 	match    = "{LACDM}"
 },
 
-["kick"] = {
+["kicklong"] = {
+	switch = function ()
+		if ball.posX() < -400 then
+			return "exit"
+		end
+	end,
+	Goalie  = task.goalieNew(),
+	match = "{LACDM}"
+},
+
+["kickshort"] = {
 	switch = function ()
 		if ball.posX() < -400 then
 			return "exit"

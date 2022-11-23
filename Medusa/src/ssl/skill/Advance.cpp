@@ -543,7 +543,7 @@ bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber)
 	const BallVisionT& ball = pVision->Ball();
 	CVector me2Ball = ball.Pos() - me.Pos();
 	CVector me2Opp = opp.Pos() - me.Pos();
-	if ((abs(me2Ball.mod()) < 80 && abs(me2Opp.mod()) < 80) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI /  3)) {
+    if ((abs(me2Ball.mod()) < 40 && abs(me2Opp.mod()) < 40) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI /  3)) {
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(450, 450), "TOO CLOSE with ball", COLOR_ORANGE);
 		return true;
 	}
@@ -560,7 +560,7 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 	double myDir = me.Dir();
 	CVector opp2ball = ball.Pos() - opp.Pos();
 	CVector ball2goal = theirCenter - ball.Pos();
-    if (!ShootOrPass) ShootPrecision = ShootPrecision * 0.8;
+    //if (!ShootOrPass) ShootPrecision = ShootPrecision * 0.8;
     /*if (myDir - targetDir > 0)targetDir -= offset;
     else targetDir += offset;
             是峪狍镝  妄荇租咛
@@ -579,7 +579,7 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 	}
 	if (Me2OppTooclose(pVision, vecNumber)) {
 		/*太近了 快射*/
-        if (abs(myDir - targetDir) < 0.45 * Param::Math::PI / SHOOT_PRECISION) {
+        if (abs(myDir - targetDir) < 0.3 * Param::Math::PI / SHOOT_PRECISION) {
 			last_dir_deviation = 100;
 			return true;
 		}
@@ -587,7 +587,7 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 	if ((ShootOrPass && ball2goal.mod() < 250) || (opp2ball.mod() < 200)) {
 		/*如果现在是射门且距离球门足够近 不需要过多的调整
 		  如果敌人离我比较近了 再调整就无法出球了*/
-        if (abs(myDir - targetDir) < 0.3 * Param::Math::PI / SHOOT_PRECISION) {
+        if (abs(myDir - targetDir) < 0.25 * Param::Math::PI / SHOOT_PRECISION) {
 			last_dir_deviation = 100;
 			return true;
 		}
@@ -836,12 +836,12 @@ double CAdvance::TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision,
 CGeoPoint CAdvance::GenerateBreakShootPoint(const CVisionModule* pVision, int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
     CGeoPoint ShootPoint = KickDirection::Instance()->GetTheShootPoint(pVision, me.Pos());
-    ShootPoint.setY(ShootPoint.y() - me.VelY()*3);
-    if(me.Y() < -120)ShootPoint.setY(ShootPoint.y() + me.VelX()*2 + me.Y()*0.75);
-    else if(me.Y() > 120)ShootPoint.setY(ShootPoint.y() - me.VelX()*2 - me.Y()*0.75);
+    ShootPoint.setY(ShootPoint.y() - me.VelY()*1.5);
+    if(me.Y() < -120)ShootPoint.setY(ShootPoint.y() + me.VelX()*1 - me.Y()*0.25);
+    else if(me.Y() > 120)ShootPoint.setY(ShootPoint.y() - me.VelX()*1 - me.Y()*0.25);
     //double MeVel = me.VelY()
-    if(ShootPoint.y() < -80)ShootPoint.setY(-80);
-    if(ShootPoint.y() > 80)ShootPoint.setY(80);
+    if(ShootPoint.y() < -60)ShootPoint.setY(-60);
+    if(ShootPoint.y() > 60)ShootPoint.setY(60);
 
     return ShootPoint;
 }
@@ -861,7 +861,7 @@ double CAdvance::GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
     return max(min(650.0, ADV_FPASSPOWER_Alpha* dist ), 200.0);
 }
 double CAdvance::GetCPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
-    double dist = (StartPoint - targetPoint).mod() - 10.0 * Param::Vehicle::V2::PLAYER_SIZE;
+    double dist = (StartPoint - targetPoint).mod() - 8.0 * Param::Vehicle::V2::PLAYER_SIZE;
     return min(460.0, ADV_CPASSPOWER_Alpha * dist);
 }
 

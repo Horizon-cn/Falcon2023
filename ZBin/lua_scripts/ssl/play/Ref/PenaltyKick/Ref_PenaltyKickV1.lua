@@ -1,4 +1,3 @@
-local DSS = flag.not_dodge_penalty
 
 gPlayTable.CreatePlay{
 
@@ -12,7 +11,7 @@ firstState = "init",
 			return "gotoshort"
 		end
 	end,
-	Goalie = task.goalieNew(),
+	Goalie = task.goalie(),
 	Leader  = task.goLWPassPos(),
 	Assister = task.goRWPassPos(),
 	Middle  = task.leftBack(),
@@ -29,12 +28,12 @@ firstState = "init",
 			return "tempshort"
 		end
 	end,
-	Goalie = task.goalieNew(),
-	Leader  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
+	Goalie = task.goalie(),
+	Kicker  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
 	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
 	Middle  = task.leftBack(),
 	Defender = task.rightBack(),
-	Kicker  = task.goCmuRush(CGeoPoint:new_local(450,0),player.toBallDir),
+	Leader  = task.goCmuRush(CGeoPoint:new_local(450,0),player.toBallDir),
 	Engine   = task.goCmuRush(CGeoPoint:new_local(440,-150)),
     Hawk     = task.goCmuRush(CGeoPoint:new_local(440,150)),
 	match = "{L}{ADM}{EH}"
@@ -43,19 +42,71 @@ firstState = "init",
 ["tempshort"] = {
 	switch = function ()
 		if bufcnt(cond.isNormalStart()) then
-			return "shoot"
+			return "rotate1"
 		end
 	end,
-	Goalie = task.goalieNew(),
-	Leader  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
+	Goalie = task.goalie(),
+	Kicker  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
 	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
 	Middle  = task.leftBack(),
 	Defender = task.rightBack(),
-	Kicker  = task.goCmuRush(CGeoPoint:new_local(450,0),player.toBallDir),
+	Leader  = task.goCmuRush(CGeoPoint:new_local(450,0),0.33),
 	Engine   = task.goCmuRush(CGeoPoint:new_local(440,-150)),
     Hawk     = task.goCmuRush(CGeoPoint:new_local(440,150)),
 	match = "{L}{ADM}{EH}"
 },
+
+["rotate1"] = {
+	switch = function ()
+		if bufcnt(1,50,50) then
+			return "rotate2"
+		end
+	end,
+	Goalie = task.goalie(),
+	Kicker  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
+	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
+	Middle  = task.leftBack(),
+	Defender = task.rightBack(),
+	Leader  = task.goCmuRush(CGeoPoint:new_local(456,10),player.toBallDir),
+	Engine   = task.goCmuRush(CGeoPoint:new_local(440,-150)),
+    Hawk     = task.goCmuRush(CGeoPoint:new_local(440,150)),
+	match = "{L}{ADM}{EH}"
+},
+
+["rotate2"] = {
+	switch = function ()
+		if bufcnt(1,80,80) then
+			return "rotate3"
+		end
+	end,
+	Goalie = task.goalie(),
+	Kicker  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
+	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
+	Middle  = task.leftBack(),
+	Defender = task.rightBack(),
+	Leader  = task.goCmuRush(CGeoPoint:new_local(462,-10),player.toBallDir),
+	Engine   = task.goCmuRush(CGeoPoint:new_local(440,-150)),
+    Hawk     = task.goCmuRush(CGeoPoint:new_local(440,150)),
+	match = "{L}{ADM}{EH}"
+},
+
+["rotate3"] = {
+	switch = function ()
+		if bufcnt(1,80,80) then
+			return "shoot"
+		end
+	end,
+	Goalie = task.goalie(),
+	Kicker  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
+	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
+	Middle  = task.leftBack(),
+	Defender = task.rightBack(),
+	Leader  = task.goCmuRush(CGeoPoint:new_local(440,3),-0.33),
+	Engine   = task.goCmuRush(CGeoPoint:new_local(440,-150)),
+    Hawk     = task.goCmuRush(CGeoPoint:new_local(440,150)),
+	match = "{L}{ADM}{EH}"
+},
+
 
 ["shoot"] = {
 	switch = function ()
@@ -63,12 +114,12 @@ firstState = "init",
 			return "forceshoot"
 		end
 	end,
-	Goalie = task.goalieNew(),
-	Leader  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
+	Goalie = task.goalie(),
+	Kicker  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
 	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
 	Middle  = task.leftBack(),
 	Defender = task.rightBack(),
-	Kicker  = task.chaseNew(),
+	Leader  = task.chaseNew(CGeoPoint:new_local(605,30)),
 	Engine   = task.goCmuRush(CGeoPoint:new_local(440,-150)),
     Hawk     = task.goCmuRush(CGeoPoint:new_local(440,150)),
 	match = "{LADM}{EH}"
@@ -80,12 +131,12 @@ firstState = "init",
 			return "exit"
 		end
 	end,
-	Goalie = task.goalieNew(),
-	Leader  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
+	Goalie = task.goalie(),
+	Kicker  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
 	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
 	Middle  = task.leftBack(),
 	Defender = task.rightBack(),
-	Kicker  = task.shootV2(CGeoPoint:new_local(605,55)),
+	Leader  = task.shootV2(CGeoPoint:new_local(605,55)),--
 	Engine   = task.goCmuRush(CGeoPoint:new_local(440,-150)),
     Hawk     = task.goCmuRush(CGeoPoint:new_local(440,150)),
 	match = "{LADM}{EH}"
@@ -113,7 +164,7 @@ firstState = "init",
 
 ["kick"] = {
 	switch = function ()
-		if ball.posX() > 400 then
+		if ball.posX() > 500 then
 			return "exit"
 		end
 	end,

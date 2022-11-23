@@ -54,20 +54,35 @@ bool CVisionModule::showIfEdgeTest() {
     return IF_EDGE_TEST;
 }
 void CVisionModule::udpSocketConnect(bool real) {
-    real ? zpm->loadParam(vision_port, "AlertPorts/Vision4Real", 10005) : zpm->loadParam(vision_port, "AlertPorts/Vision4Sim", 10020);
+    //real ? zpm->loadParam(vision_port, "AlertPorts/Vision4Real", 10005) : zpm->loadParam(vision_port, "AlertPorts/Vision4Sim", 10020);
+    int grsimInterface = ZCommunicator::instance()->getGrsimInterfaceIndex();
+    if (real) {
+        zpm->loadParam(vision_port, "AlertPorts/Vision4Real", 10005);
+    }
+    else if(grsimInterface != 0) {
+        zpm->loadParam(vision_port, "AlertPorts/Vision4Remote", 10066);
+    }
+    else {
+        zpm->loadParam(vision_port, "AlertPorts/Vision4Sim", 10020);
+    }
     zpm->loadParam(saoAction, "Alert/SaoAction", 0);
     GlobalData::instance()->setCameraMatrix(real);
-    if(real){
+    //if(real){
+    if(real || grsimInterface != 0){
         qDebug() << "VisionPort : " << vision_port;
         udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress);
         udpReceiveSocket.joinMulticastGroup(QHostAddress(ZSS::SSL_ADDRESS),ZNetworkInterfaces::instance()->getFromIndex(_interface));
         connect(&udpReceiveSocket, SIGNAL(readyRead()), this, SLOT(storeData()), Qt::DirectConnection);
     }
     else{
+        int desired = 65;
+        ZSS::SParamManager::instance()->loadParam(desired,"worldp_vars/DesiredFPS");
+        if(desired > 500) desired = 500;
         connect(&sim_timer,SIGNAL(timeout()),this,SLOT(oneStepSimData()),Qt::DirectConnection);
         dealThread = new std::thread([ = ] {readSimData();});
         dealThread->detach();
-        sim_timer.start(14);
+        sim_timer.start(int(1000/desired));
+        //sim_timer.start(14);
     }
     ReceiveVisionMessage temp;
     for (int i = 0; i < PARAM::CAMERA; i++) {
@@ -162,6 +177,10 @@ void CVisionModule::readSimData(){
         receive("ssl_vision",datagram);
         parse((void*)datagram.data(), datagram.size());
     }
+}
+
+void CVisionModule::readRemoteSimData(){
+
 }
 /**
  * @brief process data

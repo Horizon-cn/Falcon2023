@@ -52,12 +52,12 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.goMWPassPos("Leader"),
 	Powerhouse = task.goRWPassPos("Leader"),
-    Special = task.protectBall(),
+    Special = task.markingFront("First"), --task.protectBall(),
     Defender = task.goMMPassPos("Leader"),
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.multiBack(3, 3), --task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][SAPD][HM]"
+    match = "[L][HM][SAPD]"
 },
 
 ["MiddleFront"] = {
@@ -65,12 +65,12 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.goLWPassPos("Leader"),
 	Powerhouse = task.goRWPassPos("Leader"),
-    Special = task.protectBall(),
+    Special = task.markingFront("First"), --task.protectBall(),
     Defender = task.goMWPassPos("Leader"),
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.multiBack(3, 3), --task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][SAPD][HM]"
+    match = "[L][HM][SAPD]"
 },
 
 ["RightFront"] = {
@@ -78,12 +78,12 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.goLWPassPos("Leader"),
 	Powerhouse = task.goMWPassPos("Leader"),
-    Special = task.protectBall(),
+    Special = task.markingFront("First"), --task.protectBall(),
     Defender = task.goMMPassPos("Leader"),
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.multiBack(3, 3), --task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][SAPD][HM]"
+    match = "[L][HM][SAPD]"
 },
 
 ["LeftMiddleFront"] = {
@@ -92,11 +92,11 @@ firstState = "LeftFront",
 	Assister = task.goLWPassPos("Leader"),
 	Powerhouse = task.goMWPassPos("Leader"),
     Special = task.goMMPassPos("Leader"),
-    Defender = task.protectBall(),
+    Defender = task.markingFront("First"), --task.protectBall(),
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.multiBack(3, 3), --task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DAPS][HM]"
+    match = "[L][HM][DAPS]"
 },
 
 ["MiddleMiddleFront"] = {
@@ -105,11 +105,11 @@ firstState = "LeftFront",
 	Assister = task.goLWPassPos("Leader"),
 	Powerhouse = task.goMWPassPos("Leader"),
     Special = task.goRWPassPos("Leader"),
-    Defender = task.protectBall(),
+    Defender = task.markingFront("First"), --task.protectBall(),
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.multiBack(3, 3), --task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DAPS][HM]"
+    match = "[L][HM][DAPS]"
 },
 
 
@@ -118,12 +118,12 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.goMWPassPos("Leader"),
 	Powerhouse = task.goRWPassPos("Leader"),
-    Special = task.protectBall(),
+    Special = task.markingFront("First"), --task.protectBall(),
     Defender = task.goMMPassPos("Leader"),
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.multiBack(3, 3), --task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][SAPD][HM]"
+    match = "[L][HM][SAPD]"
 },
 
 ["LeftMiddleBack"] = {
@@ -132,7 +132,7 @@ firstState = "LeftFront",
 	Assister = task.goMWPassPos("Leader"),
 	Powerhouse = task.markingFront("First"),
     Special = task.markingFront("Second"),
-    Defender = task.protectBall(),
+    Defender = task.markingFront("Third"), --task.protectBall(),
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.multiBack(3, 3), --task.rightBack(),
 	Goalie = task.goalieNew(),
@@ -144,7 +144,7 @@ firstState = "LeftFront",
 	Assister = task.goMWPassPos("Leader"),
 	Powerhouse = task.markingFront("Second"),
     Special = task.markingFront("First"),
-    Defender = task.protectBall(),
+    Defender = task.markingFront("Third"), --task.protectBall(),
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.multiBack(3, 3), --task.rightBack(),
 	Goalie = task.goalieNew(),
@@ -156,7 +156,7 @@ firstState = "LeftFront",
 	Assister = task.goMWPassPos("Leader"),
 	Powerhouse = task.markingFront("First"),
     Special = task.markingFront("Second"),
-    Defender = task.protectBall(),
+    Defender = task.markingFront("Third"), --task.protectBall(),
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.multiBack(3, 3), --task.rightBack(),
 	Goalie = task.goalieNew(),
@@ -173,7 +173,7 @@ firstState = "LeftFront",
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.goMWPassPos("Leader"),
 	Goalie = task.goalieNew(),
-    match = "[L][AM][SH][PD]"
+    match = "[L][SH][AM][PD]"
 },
 ["MiddleBack"] = {
 	switch = SwitchBallArea,
@@ -185,7 +185,7 @@ firstState = "LeftFront",
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.goMWPassPos("Leader"),
 	Goalie = task.goalieNew(),
-    match = "[L][AM][SH][PD]"
+    match = "[L][SH][AM][PD]"
 },
 ["RightBack"] = {
 	switch = SwitchBallArea,
@@ -197,7 +197,7 @@ firstState = "LeftFront",
     Hawk = task.multiBack(3, 1), --task.leftBack(),
 	Middle = task.goMWPassPos("Leader"),
 	Goalie = task.goalieNew(),
-    match = "[L][AM][SH][PD]"
+    match = "[L][SH][AM][PD]"
 },
 name = "Test_NormalAttack",
 applicable ={

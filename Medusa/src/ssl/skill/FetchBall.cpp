@@ -224,24 +224,24 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		//setSubTask(PlayerRole::makeItSlowGetBall(vecNumber, faceDir, PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS | PlayerStatus::NOT_DODGE_PENALTY));
 	}
 	else if (S_GOTOBALL_1 == state()) {
-		setSubTask(PlayerRole::makeItNoneTrajGetBall(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DODGE_BALL, stopDist));
+        setSubTask(PlayerRole::makeItNoneTrajGetBall(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DODGE_BALL | PlayerStatus::NOT_DODGE_PENALTY, stopDist));
 	}
 	else if (S_GETBALL == state()) {
 		//setSubTask(PlayerRole::makeItSimpleGoto(vecNumber, me.Pos(), finalDir, CVector(0, 0), 3.5, PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS | PlayerStatus::NOT_DODGE_PENALTY));
 		//setSubTask(PlayerRole::makeItNoneTrajGetBall(vecNumber, faceDir, CVector(0, 0), flags, stopDist));
 		//setSubTask(PlayerRole::makeItGoto(vecNumber,ball.Pos(),faceDir , PlayerStatus::DRIBBLING));
-		setSubTask(PlayerRole::makeItSlowGetBall(vecNumber, faceDir, flags | PlayerStatus::DRIBBLING));
+        setSubTask(PlayerRole::makeItSlowGetBall(vecNumber, faceDir, flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
 	}
 	else if (S_TURN == state()) {//TODO：吸球后退
-		setSubTask(PlayerRole::makeItSimpleGoto(vecNumber, targetPos + me2ball.unit() * (-Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER), faceDir, CVector(0, 0), 0.0, PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS));
+        setSubTask(PlayerRole::makeItSimpleGoto(vecNumber, targetPos + me2ball.unit() * (-Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER), faceDir, CVector(0, 0), 0.0, PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS | PlayerStatus::NOT_DODGE_PENALTY));
 	}
 	else if (S_CHECK == state()) {
 		if (cnt >= WAIT_BUFFER / 2)
 			DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
-		setSubTask(PlayerRole::makeItRun(vecNumber, 0.0, 0.0, 0.0, flags));
+        setSubTask(PlayerRole::makeItRun(vecNumber, 0.0, 0.0, 0.0, flags | PlayerStatus::NOT_DODGE_PENALTY));
 	}
 	else if (S_BACK == state()) {
-		setSubTask(PlayerRole::makeItRun(vecNumber, -100 * cos(me.Dir()), -100 * sin(me.Dir()), 0.0, flags));
+        setSubTask(PlayerRole::makeItRun(vecNumber, -100 * cos(me.Dir()), -100 * sin(me.Dir()), 0.0, flags | PlayerStatus::NOT_DODGE_PENALTY));
 		// if (ball.Pos().y() >= 0) {
 		// 	if (me.Dir()>=0 &&me.Dir()<=Param::Math::PI / 2.0) {
 		// 		setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(50, Utils::Normalize(ball2ourGoal.dir() + Param::Math::PI * 120 / 180)), me2ball.dir(), CVector(0, 0), 0, flags));
@@ -281,10 +281,10 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	else if (S_END == state()) {
 		//setSubTask(PlayerRole::makeItRun(vecNumber, 0.0, 0.0, 0.0, flags));
 		if (ball.Pos().y() >= 0) {
-			setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(70, Utils::Normalize(ball2ourGoal.dir() + Param::Math::PI * 120 / 180)), me2ball.dir(), CVector(0, 0), 0, flags));
+            setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(70, Utils::Normalize(ball2ourGoal.dir() + Param::Math::PI * 120 / 180)), me2ball.dir(), CVector(0, 0), 0, flags | PlayerStatus::NOT_DODGE_PENALTY));
 		}
 		else {
-			setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(70, Utils::Normalize(ball2ourGoal.dir() - Param::Math::PI * 120 / 180)), me2ball.dir(), CVector(0, 0), 0, flags));
+            setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(70, Utils::Normalize(ball2ourGoal.dir() - Param::Math::PI * 120 / 180)), me2ball.dir(), CVector(0, 0), 0, flags | PlayerStatus::NOT_DODGE_PENALTY));
 		}
 
 		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球

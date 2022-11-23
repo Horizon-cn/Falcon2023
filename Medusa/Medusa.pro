@@ -422,7 +422,7 @@ HEADERS += \
     src/ssl/skill/AdvanceBallV2.h \
     src/ssl/skill/AdvanceBallV3.h \
     src/ssl/skill/AdvanceBallV4.h \
-    src/ssl/skill/break.h \
+    src/ssl/skill/Break.h \
     src/ssl/skill/ChaseKickV1.h \
     src/ssl/skill/ChaseKickV2.h \
     src/ssl/skill/CircleAndPass.h \

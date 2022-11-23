@@ -20,7 +20,7 @@ Copyright (C) 2011, Parsian Robotic Center (eew.aut.ac.ir/~parsian/grsim)
 
 #include <QtGlobal>
 #include <QtNetwork>
-
+#include <QTime>
 #include <QDebug>
 
 #include "grSim_Packet.pb.h"
@@ -327,8 +327,12 @@ void SSLWorld::run(){
     std::cout << "SSLWorld plugin start!" << std::endl;
     std::thread rec([=]{recvActions();});
     double time = this->cfg->DeltaTime();
+    //QTime t;
+    //t = QTime::currentTime();
     while(true){
         ode_mutex.lock();
+        //qDebug()<<std::fabs(t.msecsTo(QTime::currentTime()));
+        //t = QTime::currentTime();
         this->step(time);
         ode_mutex.unlock();
         receive("sim_signal");

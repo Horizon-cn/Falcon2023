@@ -65,6 +65,7 @@ CGeoPoint CGoaliePosV1::GetPenaltyShootPos(const CVisionModule *pVision)
 	{
 		pen_sht_pos = CGeoPoint(pen_sht_pos.x(), Param::Field::GOAL_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE + GOAL_BUFFER);
 	}
+    pen_sht_pos.setX(pen_sht_pos.x() - 5);
 	return pen_sht_pos;
 }
 CGeoPoint CGoaliePosV1::GetPenaltyShootPosV2(const CVisionModule *pVision)

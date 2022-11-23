@@ -57,7 +57,7 @@ firstState = "LeftFront",
     Hawk = task.leftBack(),
 	Middle = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][SAPD][HM]"
+    match = "[L][HM][SAPD]"
 },
 
 ["MiddleFront"] = {
@@ -70,7 +70,7 @@ firstState = "LeftFront",
     Hawk = task.leftBack(),
 	Middle = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][SAPD][HM]"
+    match = "[L][HM][SAPD]"
 },
 
 ["RightFront"] = {
@@ -83,7 +83,7 @@ firstState = "LeftFront",
     Hawk = task.leftBack(),
 	Middle = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][SAPD][HM]"
+    match = "[L][HM][SAPD]"
 },
 
 ["LeftMiddleFront"] = {
@@ -96,7 +96,7 @@ firstState = "LeftFront",
     Hawk = task.leftBack(),
 	Middle = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DAPS][HM]"
+    match = "[L][HM][DAPS]"
 },
 
 ["MiddleMiddleFront"] = {
@@ -109,7 +109,7 @@ firstState = "LeftFront",
     Hawk = task.leftBack(),
 	Middle = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DAPS][HM]"
+    match = "[L][HM][DAPS]"
 },
 
 
@@ -123,7 +123,7 @@ firstState = "LeftFront",
     Hawk = task.leftBack(),
 	Middle = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][SAPD][HM]"
+    match = "[L][HM][SAPD]"
 },
 
 ["LeftMiddleBack"] = {

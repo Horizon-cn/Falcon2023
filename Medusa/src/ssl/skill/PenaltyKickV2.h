@@ -23,6 +23,7 @@ private:
         BEGIN = 0,
         GET,
         KICK,
+        CHIP,
         NORMAL_PUSH,
         BREAKSHOOT,
         LIGHT_KICK

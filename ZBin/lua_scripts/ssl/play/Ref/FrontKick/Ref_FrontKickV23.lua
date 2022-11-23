@@ -1,7 +1,7 @@
 --CYM/FH 20221104
 
-local chipPower = 250
-local ASIS_POS_1 = ball.refAntiYPos(CGeoPoint:new_local(400,40))
+local k = 0.025
+local ASIS_POS_1 = ball.refAntiYPos(CGeoPoint:new_local(260,110))
 local ASIS_POS_2 = ball.refAntiYPos(CGeoPoint:new_local(408,77))
 local ASIS_POS_3 = ball.refAntiYPos(CGeoPoint:new_local(413,34))
 local ASIS_POS_4 = ball.refAntiYPos(CGeoPoint:new_local(145,130))
@@ -16,27 +16,41 @@ local FAKE_POS_22 = ball.refAntiYPos(CGeoPoint:new_local(440,220))
 --local SYNT_POS_3 = ball.refSyntYPos(CGeoPoint:new_local(300,180))
 
 
-local SHOOT_POS = pos.passForTouch(ball.refAntiYPos(CGeoPoint:new_local(310,110)))
-local Pre_SHOOT_POS = ball.refAntiYPos(CGeoPoint:new_local(350,110))
+local SHOOT_POS = pos.passForTouch(ball.refAntiYPos(CGeoPoint:new_local(310,100)))
+local Pre_SHOOT_POS = ball.refAntiYPos(CGeoPoint:new_local(350,120))
 local dangerous = true
 
-local yy = 0
-if ball.refPosY() >= 0 then
+--[[local chipPower = function()
+  local yy = 0
+  if ball.refPosY() >= 0 then
     yy = ball.refPosY()+110
   else
     yy = 110-ball.refPosY()
-end
+  end
 
-local xx = 0
-if ball.posX() >= 310 then
+  local xx = 0
+  if ball.posX() >= 310 then
     xx = ball.posX()-310
   else
     xx = 310-ball.posX()
-end
+  end
 
-local k = 0.025
-local len = xx+yy
-local chipPower = k*len
+  local k = 0.025
+  local len = xx+yy
+  return k*len
+end--]]
+
+
+local chipPower = function(p)
+  local pos
+  local k = 0.025
+  if type(p) == "function" then
+    pos = p()
+  else
+    pos = p
+  end
+  return k*ball.toPointDist(pos)
+end
 
 
 gPlayTable.CreatePlay{
@@ -86,12 +100,15 @@ gPlayTable.CreatePlay{
     switch = function ()
       if player.kickBall("Assister") or player.toBallDist("Assister") > 30 then
         print("wait")
-        return "waitBall"
+        print("chipPower",chipPower(SHOOT_POS()))
+        return "shoot"
       else
         print("exit")
       end
+      
     end,
-    Assister = task.chipPass(SHOOT_POS(),chipPower),
+    
+    Assister = task.chipPass(SHOOT_POS()),
     Leader   = task.goCmuRush(Pre_SHOOT_POS),
     Special  = task.goCmuRush(FAKE_POS_22),
     Middle   = task.goCmuRush(FAKE_POS_11),
@@ -106,7 +123,7 @@ gPlayTable.CreatePlay{
   ["waitBall"] = {
     switch = function ()
       print("waitBall")
-      if bufcnt(player.toPointDist("Middle",FAKE_POS_11) < 30, 3, 60) then
+      if bufcnt(player.toPointDist("Special",FAKE_POS_22) < 30, 3, 60) then
         return "shoot"
       end
     end,
