@@ -152,14 +152,14 @@ void CBreak::plan(const CVisionModule* pVision) {
         grabTask.player.speed_x = 0;
         grabTask.player.speed_y = 0;
         DribbleStatus::Instance()->setDribbleCommand(task().executor, 3);
-        if(criterion)
+        if(!criterion)
         {
 
 
-            grabTask.player.rotate_speed = 5;
+            grabTask.player.rotate_speed = 20;
 
         }
-        else{grabTask.player.rotate_speed=-5;}
+        else{grabTask.player.rotate_speed=-20;}
 
         setSubTask(TaskFactoryV2::Instance()->Speed(grabTask));
     }

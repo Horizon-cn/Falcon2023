@@ -39,7 +39,7 @@ firstState = "getball",
 			end
 		end,
 		Receiver = task.stop(),
-		Goalie = task.getBall(),
+		Goalie = task.advance(),
 		match    = ""
 },
 

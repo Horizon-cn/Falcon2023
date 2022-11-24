@@ -508,6 +508,10 @@ bool CAdvance::isPassBalltoMe(const CVisionModule* pVision, int vecNumber) {
 	const BallVisionT& ball = pVision->Ball();
 	CVector ball2me = me.Pos() - ball.Pos();
 	double diff_ballMoving2Me = Utils::Normalize(ball2me.dir() - ball.Vel().dir());
+    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+    CVector opp2me = me.Pos() - opp.Pos();
+    if((opp.Pos() - me.Pos()).mod() < 25 && Utils::Normalize(ball2me.dir() - opp2me.dir()) < Param::Math::PI / 7) return false;
+
     if (ball.Valid() && abs(diff_ballMoving2Me) < Param::Math::PI / 7.5 && (ball2me.mod() / ball.Vel().mod() < BalltoMeVelTime)) {//
 		return true;
 	}
@@ -861,7 +865,7 @@ double CAdvance::GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
     return max(min(650.0, ADV_FPASSPOWER_Alpha* dist ), 200.0);
 }
 double CAdvance::GetCPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
-    double dist = (StartPoint - targetPoint).mod() - 8.0 * Param::Vehicle::V2::PLAYER_SIZE;
+    double dist = (StartPoint - targetPoint).mod() - 9.0 * Param::Vehicle::V2::PLAYER_SIZE;
     return min(460.0, ADV_CPASSPOWER_Alpha * dist);
 }
 

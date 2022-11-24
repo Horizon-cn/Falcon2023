@@ -167,18 +167,18 @@ void CGetBallV3::plan(const CVisionModule* pVision)
 	/* 预测BallPosWithVelFactorTmp时间之后的球位置  by lsp */
 	/********************************************************************/
 	CGeoPoint ballPosWithVel = CGeoPoint(0, 0);
-    if (me.Pos().dist(ball.Pos()) < BALL_NEAR_ROBOT || ballVel.mod() < 100) {
-		//if (ballVel.mod() < 20) {
-		ballPosWithVel = ball.Pos();
+    if (me.Pos().dist(ball.Pos()) < BALL_NEAR_ROBOT || ballVel.mod() < 70) {
+        //if (ballVel.mod() < 20) {
+        ballPosWithVel = ball.Pos();
         GDebugEngine::Instance()->gui_debug_msg(ballPosWithVel, "too slow ball");
-		/*}
-		else {
-			CGeoSegment medir = CGeoSegment(me.Pos(), me.Pos() + me.Vel());
-			ballPosWithVel = medir.projection(ball.Pos() + ballVel);
-		}*/
-	}
-	else {
-		// 粗略计算预测球的位置
+        /*}
+        else {
+            CGeoSegment medir = CGeoSegment(me.Pos(), me.Pos() + me.Vel());
+            ballPosWithVel = medir.projection(ball.Pos() + ballVel);
+        }*/
+    }
+    else {
+        // 粗略计算预测球的位置
         // 修改了拿球的预测时间，从三个角度考虑，车到球运动轨迹的距离，车的朝向，车的运动速度
         CGeoLine ball_line(ball.Pos(), ball.Pos() + ballVel);
         CGeoPoint projection_point = ball_line.projection(me.Pos());
@@ -230,7 +230,7 @@ void CGetBallV3::plan(const CVisionModule* pVision)
 //		{
 //			ballPosWithVel = ball.Pos() + Utils::Polar2Vector(Param::Field::BALL_SIZE * 1.2, ball.Vel().dir());
 //		}
-	}
+    }
 	if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_arc(ballPosWithVel, 20, 0, 360, COLOR_YELLOW);
 
 	/********************************************************************/
