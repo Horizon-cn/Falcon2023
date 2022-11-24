@@ -10,13 +10,41 @@ firstState = "touch",
 
 ["touch"] = {
 	switch = function ()
-		if true then
+		if bufcnt(true,200) then
+			return "touch1";
+		end
+	end,
+	Leader = task.dribbleTurn(0,5),
+	match = "[LSM]"
+},
+["touch1"] = {
+	switch = function ()
+		if bufcnt(true,200) then
+			return "touch2";
+		end
+	end,
+	Leader = task.dribbleTurn(90,5),
+	match = "[LSM]"
+},
+["touch2"] = {
+	switch = function ()
+		if bufcnt(true,200) then
+			return "touch3";
+		end
+	end,
+	Leader = task.dribbleTurn(180,5),
+	match = "[LSM]"
+},
+["touch3"] = {
+	switch = function ()
+		if bufcnt(true,200) then
 			return "touch";
 		end
 	end,
-	Leader = task.touch(),
+	Leader = task.dribbleTurn(270,5),
 	match = "[LSM]"
 },
+
 
 name = "Test_TouchKick",
 applicable ={

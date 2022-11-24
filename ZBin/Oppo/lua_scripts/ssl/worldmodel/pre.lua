@@ -43,10 +43,6 @@ function fieldDefender()
 			angle_left = -math.pi/3
 			angle_right = math.pi*2/3
 		end
-		--local middledir = (angle_left+angle_right)/2
-		--local middlepre = Utils.Normalize((angle_right - angle_left)/2)
-		--debugEngine:gui_debug_line(ball.pos(),ball.pos()+Utils.Polar2Vector(150,Utils.Normalize(middledir+middlepre)),2)
-		--debugEngine:gui_debug_line(ball.pos(),ball.pos()+Utils.Polar2Vector(150,Utils.Normalize(middledir-middlepre)),2)
 		return Utils.Normalize((angle_right - angle_left)/2)
 	end
 end

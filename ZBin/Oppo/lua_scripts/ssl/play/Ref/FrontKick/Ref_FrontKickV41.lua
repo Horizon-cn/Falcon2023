@@ -46,7 +46,7 @@ firstState = "getready",
 	Special  = task.leftBack(),
 	Leader 	 = task.goCmuRush(MAKE_POS, player.toBallDir, _, flag.avoid_stop_ball_circle),
 	Defender = task.goCmuRush(READY_POS),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "{AD}[LSM]"
 },
 
@@ -62,7 +62,7 @@ firstState = "getready",
 	Special  = task.leftBack(),
 	Leader 	 = task.goCmuRush(MAKE_POS, player.toBallDir, _, flag.avoid_stop_ball_circle),
 	Defender = task.goCmuRush(READY_POS),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "{AD}{LSM}"
 },
 
@@ -77,7 +77,7 @@ firstState = "getready",
     Special  = task.leftBack(),
     Middle   = task.rightBack(),
     Defender = task.goCmuRush(READY_POS),
-    Goalie   = task.goalie(),
+    Goalie   = task.goalieNew(),
     match    = "{AD}{LSM}"
   },
 
@@ -94,7 +94,7 @@ firstState = "getready",
 	Defender  = task.chaseNew(),
 	Special   = task.leftBack(),
 	Assister = task.goCmuRush(LEFT_BACK_POS),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "{AD}{LSM}"
 },
 

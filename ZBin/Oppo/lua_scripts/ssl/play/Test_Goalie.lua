@@ -8,8 +8,8 @@ firstState = "goalie",
 			return "goalie";
 		end
 	end,
-	Defender = task.leftBack(),
-    Assister = task.advanceV4(),
+	--Defender = task.leftBack(),
+    --Assister = task.rightBack(),
     Goalie = task.goalieNew(),
     match=""
     --match = "[AD]"

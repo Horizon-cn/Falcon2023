@@ -149,12 +149,12 @@ end
 function toPointDir(p, role)
 	if role == nil then
 		if type(p) == "function" then
-			return function ( role )
-				return (p() - player.pos(role)):dir()
+			return function ( role1 )
+				return (p() - player.pos(role1)):dir()
 			end
 		else
-			return function ( role )
-				return (p - player.pos(role)):dir()
+			return function ( role1 )
+				return (p - player.pos(role1)):dir()
 			end
 		end
 

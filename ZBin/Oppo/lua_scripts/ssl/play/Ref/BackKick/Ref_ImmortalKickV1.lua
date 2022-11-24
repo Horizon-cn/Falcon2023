@@ -1,4 +1,14 @@
-local chipPower = 300
+local function def_chipPower()
+	if math.abs(ball.posX()) > 350 then
+		return 380
+	elseif math.abs(ball.posX()) > 280 then
+		return 320
+	else
+		return 80
+	end
+end
+
+
 local TAR_POS = CGeoPoint:new_local(0, 0)
 local FreeKick_ImmortalStart_Pos = function ()
 	local pos
@@ -75,8 +85,8 @@ firstState = "getball",
 	Leader   = task.goRWPassPos("Assister"),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
-	Goalie   = task.goalie(),
-	match    = "{DM}{AL}[SEH]"
+	Goalie   = task.goalieNew(),
+	match    = "{DM}{AS}[LEH]"
 },	
 
 ["chipball"] = {
@@ -91,7 +101,7 @@ firstState = "getball",
 		end
 	end,
 	--Assister = task.chipPass(ball.LMPassPos(), chipPower, false),
-	Assister = task.chipPass(TAR_POS, chipPower),
+	Assister = task.chipPass(TAR_POS, def_chipPower()),
 	--Special  = task.goLMPassPos("Assister"),
 	Special  = task.goCmuRush(TAR_POS, _, ACC, STOP_DSS),
 	Engine   = task.goLeftSupport(),
@@ -99,8 +109,8 @@ firstState = "getball",
 	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()), _, ACC, STOP_DSS),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
-	Goalie   = task.goalie(),
-	match    = "{DM}{A}{LSEH}"
+	Goalie   = task.goalieNew(),
+	match    = "{DM}{AS}{LEH}"
 },
 
 ["waitball"] = {
@@ -117,8 +127,8 @@ firstState = "getball",
 	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()),  _, ACC, STOP_DSS),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
-	Goalie   = task.goalie(),
-	match    = "{AL}{SMD}"
+	Goalie   = task.goalieNew(),
+	match    = "{DM}{AS}{LEH}"
 },
 
 name = "Ref_ImmortalKickV1",

@@ -52,6 +52,14 @@ local standFunc = function(num)
   end
 end
 
+local FRONT_POS = function()
+  if ball.posY() > 0 then
+    return ball.LWPassPos()()
+  else
+    return ball.RWPassPos()()
+  end
+end
+ 
 gPlayTable.CreatePlay{
 
 firstState = "beginning",
@@ -88,10 +96,10 @@ end,
     Leader   = task.goCmuRush(PointC, dir.playerToBall, ACC, BALL_PLACE_FLAG),
     Defender = task.leftBack(),
     Middle   = task.rightBack(),
-    -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
-    -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
-    Goalie   = task.goalie(),
-    match    = "[AMDLS]"
+    Hawk     = task.goCmuRush(ball.antiYPos(standFunc(6)), dir.playerToBall, ACC, STOP_DSS),
+    Powerhouse = task.goCmuRush(FRONT_POS, dir.playerToBall, ACC, STOP_DSS),
+    Goalie   = task.goalieNew(),
+    match    = "[AMDLSHP]"
 },
 
 ["attacker1"] = {
@@ -100,10 +108,10 @@ end,
     Leader   = task.goCmuRush(PointC, dir.playerToBall, ACC, BALL_PLACE_FLAG),
     Defender = task.leftBack(),
     Middle   = task.rightBack(),
-    -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
-    -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
-    Goalie   = task.goalie(),
-    match    = "[AMDLS]"
+    Hawk     = task.goCmuRush(ball.antiYPos(standFunc(6)), dir.playerToBall, ACC, STOP_DSS),
+    Powerhouse = task.goCmuRush(FRONT_POS, dir.playerToBall, ACC, STOP_DSS),
+    Goalie   = task.goalieNew(),
+    match    = "[AMDLSHP]"
 },
 
 ["attacker2"] = {
@@ -112,10 +120,10 @@ end,
     Leader   = task.goCmuRush(PointC, dir.playerToBall, ACC, BALL_PLACE_FLAG),
     Defender = task.leftBack(),
     Middle   = task.rightBack(),
-    -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
-    -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
-    Goalie   = task.goalie(),
-    match    = "[AMDLS]"
+    Hawk     = task.goCmuRush(ball.antiYPos(standFunc(6)), dir.playerToBall, ACC, STOP_DSS),
+    Powerhouse = task.goCmuRush(FRONT_POS, dir.playerToBall, ACC, STOP_DSS),
+    Goalie   = task.goalieNew(),
+    match    = "[AMDLSHP]"
 },
 
 ["attacker3"] = {
@@ -124,10 +132,10 @@ end,
     Leader   = task.goCmuRush(PointC, dir.playerToBall, ACC, BALL_PLACE_FLAG),
     Defender = task.leftBack(),
     Middle   = task.rightBack(),
-    -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
-    -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
-    Goalie   = task.goalie(),
-    match    = "[AMDLS]"
+    Hawk     = task.goCmuRush(ball.antiYPos(standFunc(6)), dir.playerToBall, ACC, STOP_DSS),
+    Powerhouse = task.goCmuRush(FRONT_POS, dir.playerToBall, ACC, STOP_DSS),
+    Goalie   = task.goalieNew(),
+    match    = "[AMDLSHP]"
 },
 
 ["attacker4"] = {
@@ -136,10 +144,10 @@ end,
     Leader   = task.goCmuRush(PointC, dir.playerToBall, ACC, BALL_PLACE_FLAG),
     Defender = task.leftBack(),
     Middle   = task.rightBack(),
-    -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
-    -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
-    Goalie   = task.goalie(),
-    match    = "[AMDLS]"
+    Hawk     = task.goCmuRush(ball.antiYPos(standFunc(6)), dir.playerToBall, ACC, STOP_DSS),
+    Powerhouse = task.goCmuRush(FRONT_POS, dir.playerToBall, ACC, STOP_DSS),
+    Goalie   = task.goalieNew(),
+    match    = "[AMDLSHP]"
 },
 
 ["attacker5"] = {
@@ -148,10 +156,10 @@ end,
     Leader   = task.goCmuRush(PointC, dir.playerToBall, ACC, BALL_PLACE_FLAG),
     Defender = task.leftBack(),
     Middle   = task.rightBack(),
-    -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
-    -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
-    Goalie   = task.goalie(),
-    match    = "[AMDLS]"
+    Hawk     = task.goCmuRush(ball.antiYPos(standFunc(6)), dir.playerToBall, ACC, STOP_DSS),
+    Powerhouse = task.goCmuRush(FRONT_POS, dir.playerToBall, ACC, STOP_DSS),
+    Goalie   = task.goalieNew(),
+    match    = "[AMDLSHP]"
 },
 
 ["attacker6"] = {
@@ -160,10 +168,10 @@ end,
     Leader   = task.goCmuRush(PointC, dir.playerToBall, ACC, BALL_PLACE_FLAG),
     Defender = task.leftBack(),
     Middle   = task.rightBack(),
-    -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
-    -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
-    Goalie   = task.goalie(),
-    match    = "[AMDLS]"
+    Hawk     = task.goCmuRush(ball.antiYPos(standFunc(6)), dir.playerToBall, ACC, STOP_DSS),
+    Powerhouse = task.goCmuRush(FRONT_POS, dir.playerToBall, ACC, STOP_DSS),
+    Goalie   = task.goalieNew(),
+    match    = "[AMDLSHP]"
 },
 
 ["attacker7"] = {
@@ -172,10 +180,10 @@ end,
     Leader   = task.goCmuRush(PointC, dir.playerToBall, ACC, BALL_PLACE_FLAG),
     Defender = task.leftBack(),
     Middle   = task.rightBack(),
-    -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
-    -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
-    Goalie   = task.goalie(),
-    match    = "[AMDLS]"
+    Hawk     = task.goCmuRush(ball.antiYPos(standFunc(6)), dir.playerToBall, ACC, STOP_DSS),
+    Powerhouse = task.goCmuRush(FRONT_POS, dir.playerToBall, ACC, STOP_DSS),
+    Goalie   = task.goalieNew(),
+    match    = "[AMDLSHP]"
 },
 
 ["attacker8"] = {
@@ -184,10 +192,10 @@ end,
     Leader   = task.goCmuRush(PointC, dir.playerToBall, ACC, BALL_PLACE_FLAG),
     Defender = task.leftBack(),
     Middle   = task.rightBack(),
-    -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
-    -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
-    Goalie   = task.goalie(),
-    match    = "[AMDLS]"
+    Hawk     = task.goCmuRush(ball.antiYPos(standFunc(6)), dir.playerToBall, ACC, STOP_DSS),
+    Powerhouse = task.goCmuRush(FRONT_POS, dir.playerToBall, ACC, STOP_DSS),
+    Goalie   = task.goalieNew(),
+    match    = "[AMDLSHP]"
 },
 
 name = "Ref_TheirBallPlace",

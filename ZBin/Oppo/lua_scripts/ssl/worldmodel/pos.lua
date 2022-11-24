@@ -247,9 +247,15 @@ function advance()
 	local k_v_1=1.35
 	local k_v_2=0.00225
 	local advancePos
-	local advancerPassTo = kickStatus:getAdvancerPassTo()
-	if advancerPassTo:x() > -9999 and ball.velMod() > 70 then -- 指定了接球车并已经踢出
-		advancePos = advancerPassTo
+	--local advancerPassTo = kickStatus:getAdvancerPassTo()
+	--if advancerPassTo:x() > -9999 and ball.velMod() > 70 then -- 指定了接球车并已经踢出
+	--	advancePos = advancerPassTo
+	local nextAdvancer = kickStatus:getNextAdvancer()
+	local ball2NextAdvancerDir = (player.pos(nextAdvancer) - ball.pos()):dir()
+	local angleDiff = math.abs(ball2NextAdvancerDir - ball.velDir())
+	local ball2NextAdvancerDist = ball.pos():dist(player.pos(nextAdvancer))
+	if nextAdvancer > 0 and nextAdvancer < param.maxPlayer and ball.velMod() > 70 and not (angleDiff > math.pi/2 and ball2NextAdvancerDist > 60) then
+		advancePos = player.pos(nextAdvancer)
 	elseif (ball.posX()>=0 and ball.velX()>-300) then
 		--return CGeoPoint(ball.posX()+k_v_1*ball.velX(),ball.posY()+k_v_2*ball.velY())
 		advancePos = CGeoPoint(ball.posX()+k_v_2*math.abs(ball.velX())*ball.velX(),ball.posY()+k_v_2*math.abs(ball.velY())*ball.velY())
@@ -263,6 +269,13 @@ function advance()
 	end
 	debugEngine:gui_debug_x(advancePos, 0)  			
 	return advancePos
+end
+
+function protectBall()
+	local protectBallPos
+	local robotNum = bestPlayer:getTheirBestPlayer()
+	protectBallPos = enemy.pos(robotNum)
+	return protectBallPos
 end
 
 function tandemPos2013()

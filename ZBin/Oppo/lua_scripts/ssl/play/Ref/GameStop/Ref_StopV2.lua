@@ -245,7 +245,7 @@ firstState = "start",
   Leader   = task.goCmuRush(MIDDLE_POS, dir.playerToBall, ACC, STOP_DSS),
   Defender = task.rightBack(),--task.defendMiddle4Stop(),--TODO
   Middle   = task.leftBack(),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "[ASLDM]"
 },
 
@@ -306,7 +306,7 @@ firstState = "start",
   Middle   = task.goCmuRush(standFunc(5), dir.playerToBall, ACC, STOP_DSS),
   -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
   -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "[AMDLS]"
 },
 
@@ -357,7 +357,7 @@ firstState = "start",
   --Center   = task.stop(),
   --Fronter = task.stop(),
   Middle   = task.leftBack(),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "[AMDLS]"
 },
 
@@ -375,7 +375,7 @@ firstState = "start",
   Middle   = task.goCmuRush(CGeoPoint:new_local(-290, 130), dir.playerToBall, ACC, STOP_DSS),
   --Fronter  = task.goCmuRush(CGeoPoint:new_local(-290,260),dir.playerToBall,ACC,STOP_DSS),
   --Center   = task.goCmuRush(CGeoPoint:new_local(-290,-260),dir.playerToBall,ACC,STOP_DSS),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "[AMDLS]"
 },
 

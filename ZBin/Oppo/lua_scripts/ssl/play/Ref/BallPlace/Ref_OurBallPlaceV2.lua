@@ -101,7 +101,7 @@ switch = function()
 
 ["place1"] ={
 switch = function()
-  if cond.isGameOn() and cond.TheirBallPlace() then
+  if cond.isGameOn() and cond.theirBallPlace() then
       return "exit"
    end
  end,
@@ -138,7 +138,7 @@ switch = function()
 
 ["place2"] = {
 switch = function()
-  if cond.isGameOn() and cond.TheirBallPlace() then
+  if cond.isGameOn() and cond.theirBallPlace() then
    return "exit"
   end
 end,

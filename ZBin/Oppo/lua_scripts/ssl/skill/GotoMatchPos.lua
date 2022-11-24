@@ -19,7 +19,12 @@ function GotoMatchPos(task)
 	execute = function(runner)
 		if runner>=0 and runner < param.maxPlayer then
 			if mrole ~= "" then
-				CRegisterRole(runner, mrole)
+				if mrole == "multiBack" then -- multiBack不注册
+					guardPos:setBackNum(runner, task.sender)
+					msender = 0 -- 只是借用task.sender把index传进来，用完后清零
+				else
+					CRegisterRole(runner, mrole)
+				end
 			end
 		else
 			print("Error runner in GotoMatchPos", runner)

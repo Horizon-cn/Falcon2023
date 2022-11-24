@@ -273,7 +273,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case KICK:   // 射门
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "KICK", COLOR_YELLOW);
 		KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
-		KickStatus::Instance()->clearAll();
+        KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		if (Utils::InTheirPenaltyArea(ball.Pos(), 0)) {
 			/*如果球在对方禁区*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "ball in their PEN", COLOR_ORANGE);
@@ -297,7 +297,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		break;
 	case PASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "PASS", COLOR_YELLOW);
-		KickStatus::Instance()->clearAll();
+        KickStatus::Instance()->setBothKick(_executor, 0, 0);
         TMP = PassDirInside(pVision, _executor);
         KickorPassDir = TMP.dir;
         PassPos = TMP.pos;
@@ -374,7 +374,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 	case JUSTCHIPPASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "CHIP", COLOR_YELLOW);
-		KickStatus::Instance()->clearAll();
+        KickStatus::Instance()->setBothKick(_executor, 0, 0);
         TMP = PassDirInside(pVision, _executor);
         KickorPassDir = TMP.dir;
         PassPos = TMP.pos;
@@ -393,15 +393,15 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 	case BREAKSHOOT:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKSHOOT", COLOR_YELLOW);
-		KickStatus::Instance()->clearAll();
+        KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		ShootPoint = GenerateBreakShootPoint(pVision, _executor);
-        if(AdJudgeBreakCanDo(pVision, _executor, ShootPoint))setSubTask(PlayerRole::makeItBreak(_executor, ShootPoint));
+        if(AdJudgeBreakCanDo(pVision, _executor, ShootPoint)||true)setSubTask(PlayerRole::makeItBreak(_executor, ShootPoint));
         else setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		break;
 
     case BREAKPASS:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS", COLOR_YELLOW);
-        KickStatus::Instance()->clearAll();
+        KickStatus::Instance()->setBothKick(_executor, 0, 0);
         PassPoint = GenerateBreakPassPoint(pVision, _executor);
         //KickStatus::Instance()->setAdvancerPassTo(PassPos);  //breakpass具有连续性 不适合采用setpass的技术
         setSubTask(PlayerRole::makeItBreak(_executor, PassPoint));
@@ -409,7 +409,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 
     case PUSHOUT:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "PUSHOUT", COLOR_YELLOW);
-        KickStatus::Instance()->clearAll();
+        KickStatus::Instance()->setBothKick(_executor, 0, 0);
         //setSubTask(PlayerRole::makeItProtectBall(_executor));
         //break;
         KickorPassDir = generateNormalPushDir(pVision, _executor);
@@ -420,7 +420,7 @@ void CAdvance::plan(const CVisionModule* pVision)
             if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "PUSHOUT isDirOK", COLOR_ORANGE);
         }
         else {
-            KickStatus::Instance()->clearAll();
+            KickStatus::Instance()->setBothKick(_executor, 0, 0);
             setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
             if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "PUSHOUT is NOT DirOK", COLOR_ORANGE);
         }
@@ -510,10 +510,9 @@ bool CAdvance::isPassBalltoMe(const CVisionModule* pVision, int vecNumber) {
 	double diff_ballMoving2Me = Utils::Normalize(ball2me.dir() - ball.Vel().dir());
     const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
     CVector opp2me = me.Pos() - opp.Pos();
-    printf("%.3f %.3f\n",(opp.Pos() - me.Pos()).mod(), Utils::Normalize(ball2me.dir() - opp2me.dir()));
-
+//    printf("%.3f %.3f\n",(opp.Pos() - me.Pos()).mod(), Utils::Normalize(ball2me.dir() - opp2me.dir()));
     if((opp.Pos() - me.Pos()).mod() < 60 && Utils::Normalize(ball2me.dir() - opp2me.dir()) < Param::Math::PI / 7) return false;
-
+    if(ball.Vel().mod() < 175.0) return false;
     if (ball.Valid() && abs(diff_ballMoving2Me) < Param::Math::PI / 7.5 && (ball2me.mod() / ball.Vel().mod() < BalltoMeVelTime)) {//
 		return true;
 	}

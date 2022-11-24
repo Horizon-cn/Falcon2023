@@ -32,68 +32,104 @@ end,
 	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
 	Defender = task.leftBack(),
 	Leader   = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[ADLSM]"
 },
 
 ["attacker1"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
-	Special  = task.defendHead(),
-	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
-	Defender = task.leftBack(),
-	Leader   = task.rightBack(),
-	Goalie   = task.goalie(),
-	match    = "[ADLSM]"
+	Leader   = task.defendKick(),
+	Special  = task.marking("First"),
+	Assister = task.multiBack(3, 3),
+	Middle   = task.goSpeciPos(COR_DEF_POS1, player.toBallDir),
+	Defender = task.goSpeciPos(COR_DEF_POS2, player.toBallDir),
+	Goalie   = task.goalieNew(),
+	Engine   = task.multiBack(3, 1),
+	Hawk	 = task.multiBack(3, 2),
+	match    = "[L][DSM][AEH]"
 },
 
 ["attacker2"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
-	Special  = task.marking("First"),
-	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
-	Defender = task.defendHead(),
-	Leader   = task.singleBack(),
-	Goalie   = task.goalie(),
-	match    = "[ADLSM]"
+	Leader   = task.defendKick(),
+	Defender = task.defendMiddleHead(),
+	Middle   = task.defendHead(),
+	Assister = task.marking("First"),
+	Special  = task.multiBack(3, 3),
+	Engine   = task.multiBack(3, 1),
+	Hawk	 = task.multiBack(3, 2),
+	Goalie   = task.goalieNew(),
+	match    = "[A][M][D][L][SEH]"
 },
 
 ["attacker3"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
-	Special  = task.marking("First"),
-	Middle   = task.marking("Second"),
-	Defender = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
-	Leader   = task.defendHead(),
-	Goalie   = task.goalie(),
-	match    = "[ADLSM]"
+	Leader   = task.defendKick(),
+	Defender = task.defendMiddleHead(),
+	Middle   = task.sideBack(),
+	Assister = task.marking("First"),
+	Special  = task.marking("Second"),
+	Engine   = task.rightBack(),
+	Hawk	 = task.leftBack(),
+	Goalie   = task.goalieNew(),
+	match    = "[L][MEH][D][AS]"
 },
 
 ["attacker4"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
-	Special  = task.marking("First"),
-	Middle   = task.marking("Second"),
-	Defender = task.marking("Third"),
-	Leader   = task.defendHead(),
-	Goalie   = task.goalie(),
-	match    = "[ADLSM]"
+	Leader   = task.defendKick(),
+	Defender = task.defendMiddleHead(),
+	Middle   = task.sideBack(),
+	Assister = task.marking("First"),
+	Special  = task.marking("Second"),
+	Engine   = task.rightBack(),
+	Hawk	 = task.leftBack(),
+	Goalie   = task.goalieNew(),
+	match    = "[L][MEH][D][AS]"
 },
 
 ["attacker5"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
-	Special  = task.marking("First"),
-	Middle   = task.marking("Second"),
-	Defender = task.marking("Third"),
-	Leader   = task.defendHead(),
-	Goalie   = task.goalie(),
-	match    = "[ADLSM]"
+	Leader   = task.defendKick(),
+	Defender = task.defendMiddleHead(),
+	Middle   = task.sideBack(),
+	Assister = task.marking("First"),
+	Special  = task.marking("Second"),
+	Engine   = task.rightBack(),
+	Hawk	 = task.leftBack(),
+	Goalie   = task.goalieNew(),
+	match    = "[L][MEH][D][AS]"
 },
 
 ["attacker6"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
-	Special  = task.marking("First"),
-	Middle   = task.marking("Second"),
-	Defender = task.marking("Third"),
-	Leader   = task.defendHead(),
-	Goalie   = task.goalie(),
-	match    = "[ADLSM]"
+	Leader   = task.defendKick(),
+	Defender = task.defendMiddleHead(),
+	Middle   = task.sideBack(),
+	Assister = task.marking("First"),
+	Special  = task.marking("Second"),
+	Engine   = task.rightBack(),
+	Hawk	 = task.leftBack(),
+	Goalie   = task.goalieNew(),
+	match    = "[L][MEH][D][AS]"
+},
+
+["attacker7"] = {
+	Leader   = task.defendKick(),
+	Defender = task.goMMPassPos("Leader"),
+	Middle   = task.sideBack(),
+	Assister = task.marking("First"),
+	Special  = task.marking("Second"),
+	Engine   = task.rightBack(),
+	Hawk	 = task.leftBack(),
+	Goalie   = task.goalieNew(),
+	match    = "[L][MEH][D][AS]"
+},
+
+["attacker8"] = {
+	Leader   = task.defendKick(),
+	Defender = task.goMMPassPos("Leader"),
+	Middle   = task.sideBack(),
+	Assister = task.marking("First"),
+	Special  = task.marking("Second"),
+	Engine   = task.rightBack(),
+	Hawk	 = task.leftBack(),
+	Goalie   = task.goalieNew(),
+	match    = "[L][MEH][D][AS]"
 },
 
 name = "Ref_Stop4CornerDef",

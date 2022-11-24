@@ -83,7 +83,7 @@ gPlayTable.CreatePlay{
     Special  = task.rightBack(),
     Middle   = task.leftBack(), 
     Defender = task.goCmuRush(DEFENDER_POS_1, _, 600, flag.allow_dss),
-    Goalie   = dangerous and task.goalie() or task.goCmuRush(ANTI_POS_1, _, 350),
+    Goalie   = dangerous and task.goalieNew() or task.goCmuRush(ANTI_POS_1, _, 350),
     match    = "{A}{MD}{LS}"
   },
 
@@ -99,7 +99,7 @@ gPlayTable.CreatePlay{
     Special  = task.rightBack(),
     Middle   = task.leftBack(), 
     Defender = task.runMultiPos(TMP_DEFENDER_POS, false, 40),
-    Goalie   = dangerous and task.goalie() or task.goCmuRush(ANTI_POS_1, _, 350),
+    Goalie   = dangerous and task.goalieNew() or task.goCmuRush(ANTI_POS_1, _, 350),
     match    = "{AMDLS}"
   },
 
@@ -115,7 +115,7 @@ gPlayTable.CreatePlay{
     Special  = task.rightBack(),
     Middle   = task.leftBack(), 
     Defender = task.goCmuRush(DEFEND_POS_0),
-    Goalie   = task.goalie(),
+    Goalie   = task.goalieNew(),
     match    = "{AMLDS}"
   },
 
@@ -130,7 +130,7 @@ gPlayTable.CreatePlay{
     Special  = task.rightBack(),
     Middle   = task.leftBack(),
     Defender = task.continue(),
-    Goalie   = task.goalie(),
+    Goalie   = task.goalieNew(),
     match    = "{AMDLS}"
   },
 
@@ -147,7 +147,7 @@ gPlayTable.CreatePlay{
     Middle   = task.leftBack(),
     Defender = task.touch(SHOOT_TARGET),
     --Defender = task.goCmuRush(TMP_LEADER_POS[3], _, 600, flag.allow_dss)
-    Goalie   = task.goalie(),
+    Goalie   = task.goalieNew(),
     match    = "{AMDLS}"
   },
 
@@ -243,7 +243,7 @@ gPlayTable.CreatePlay{
 --     Special  = task.goCmuRush(SPEFCIAL_POS_1, _, 600, flag.allow_dss),
 --     Middle   = task.goCmuRush(MIDDLE_POS_1, _, 600, flag.allow_dss),
 --     Defender = task.goCmuRush(DEFENDER_POS_1, _, 600, flag.allow_dss),
---     Goalie   = dangerous and task.goalie() or task.goCmuRush(ANTI_POS_1, _, 350),
+--     Goalie   = dangerous and task.goalieNew() or task.goCmuRush(ANTI_POS_1, _, 350),
 --     match    = "{A}{DL}{MS}"
 --   },
 
@@ -258,7 +258,7 @@ gPlayTable.CreatePlay{
 --     Special  = task.runMultiPos(TMP_SPECIAL_POS, false, 40),
 --     Middle   = task.goCmuRush(MIDDLE_POS_2, _, 600, flag.allow_dss),
 --     Defender = task.runMultiPos(TMP_DEFENDER_POS, false, 40),
---     Goalie   = dangerous and task.goalie() or task.goCmuRush(ANTI_POS_1, _, 350),
+--     Goalie   = dangerous and task.goalieNew() or task.goCmuRush(ANTI_POS_1, _, 350),
 --     match    = "{ALDMS}"
 --   },
 
@@ -273,7 +273,7 @@ gPlayTable.CreatePlay{
 --     Special  = task.continue(),
 --     Middle   = task.goCmuRush(MIDDLE_POS_3, _, 600, flag.allow_dss), 
 --     Defender = task.continue(),
---     Goalie   = task.goalie(),
+--     Goalie   = task.goalieNew(),
 --     match    = "{ALDMS}"
 --   },
 
@@ -288,7 +288,7 @@ gPlayTable.CreatePlay{
 --     Special  = task.rightBack(),
 --     Middle   = task.leftBack(),
 --     Defender = task.continue(),
---     Goalie   = task.goalie(),
+--     Goalie   = task.goalieNew(),
 --     match    = "{ALDMS}"
 --   },
 
@@ -303,7 +303,7 @@ gPlayTable.CreatePlay{
 --     Special  = task.rightBack(),
 --     Middle   = task.leftBack(),
 --     Defender = task.touch(SHOOT_TARGET),
---     Goalie   = task.goalie(),
+--     Goalie   = task.goalieNew(),
 --     match    = "{ALDMS}"
 --   },
 

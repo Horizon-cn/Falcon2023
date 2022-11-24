@@ -73,8 +73,8 @@ firstState = "getball",
 	Leader   = task.goCmuRush(FREEKICKPOS, _, ACC, STOP_DSS),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
-	Goalie   = task.goalie(),
-	match    = "{DM}{AL}[SEH]"
+	Goalie   = task.goalieNew(),
+	match    = "{A}{DM}{S}[LEH]"
 },	
 
 ["chipball"] = {
@@ -94,8 +94,8 @@ firstState = "getball",
 	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()), _, ACC, STOP_DSS),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
-	Goalie   = task.goalie(),
-	match    = "{DM}{A}{LSEH}"
+	Goalie   = task.goalieNew(),
+	match    = "{DM}{A}{S}{LEH}"
 },
 
 ["waitball"] = {
@@ -111,8 +111,8 @@ firstState = "getball",
 	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()),  _, ACC, STOP_DSS),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
-	Goalie   = task.goalie(),
-	match    = "{AL}{SMD}"
+	Goalie   = task.goalieNew(),
+	match    = "{DM}{S}{L}{AEH}"
 },
 
 name = "Ref_MiddleKickV5",

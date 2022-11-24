@@ -5,7 +5,7 @@ firstState = "init",
 
 ["init"] = {
 	switch = function ()
-		if bufcnt(ball.refPosX()<200) then
+		if bufcnt(ball.posX()<200) then
 			return "gotolong"
 		else
 			return "gotoshort"
@@ -42,7 +42,7 @@ firstState = "init",
 ["tempshort"] = {
 	switch = function ()
 		if bufcnt(cond.isNormalStart()) then
-			return "rotate1"
+			return "shoot"
 		end
 	end,
 	Goalie = task.goalie(),
@@ -110,7 +110,7 @@ firstState = "init",
 
 ["shoot"] = {
 	switch = function ()
-		if bufcnt(ball.refPosX()<550 , 450 , 500) or ball.posX() > 550 then
+		if bufcnt(ball.posX()<550 , 350 , 400) then
 			return "forceshoot"
 		end
 	end,
@@ -119,13 +119,30 @@ firstState = "init",
 	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
 	Middle  = task.leftBack(),
 	Defender = task.rightBack(),
-	Leader  = task.chaseNew(CGeoPoint:new_local(605,30)),
+	Leader  = task.chaseNew(),
 	Engine   = task.goCmuRush(CGeoPoint:new_local(440,-150)),
     Hawk     = task.goCmuRush(CGeoPoint:new_local(440,150)),
 	match = "{LADM}{EH}"
 },
 
 ["forceshoot"] = {
+	switch = function ()
+		if bufcnt(ball.posX()<550 , 250 , 300) then
+			return "forceforceshoot"
+		end
+	end,
+	Goalie = task.goalie(),
+	Kicker  = task.goCmuRush(CGeoPoint:new_local(440,-100)),
+	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
+	Middle  = task.leftBack(),
+	Defender = task.rightBack(),
+	Leader  = task.advanceV4(),
+	Engine   = task.goCmuRush(CGeoPoint:new_local(440,-150)),
+    Hawk     = task.goCmuRush(CGeoPoint:new_local(440,150)),
+	match = "{LADM}{EH}"
+},
+
+["forceforceshoot"] = {
 	switch = function ()
 		if ball.posX() > 550 then
 			return "exit"
@@ -136,7 +153,7 @@ firstState = "init",
 	Assister = task.goCmuRush(CGeoPoint:new_local(440,100)),
 	Middle  = task.leftBack(),
 	Defender = task.rightBack(),
-	Leader  = task.shootV2(CGeoPoint:new_local(605,55)),--
+	Leader  = task.penaltykickshort(),
 	Engine   = task.goCmuRush(CGeoPoint:new_local(440,-150)),
     Hawk     = task.goCmuRush(CGeoPoint:new_local(440,150)),
 	match = "{LADM}{EH}"
@@ -158,13 +175,13 @@ firstState = "init",
 			return "kick"
 		end
 	end,
-	Goalie  = task.goCmuRush(CGeoPoint:new_local(-260,0)),
+	Goalie  = task.goCmuRush(CGeoPoint:new_local(-210,0)),
 	match = ""
 },
 
 ["kick"] = {
 	switch = function ()
-		if bufcnt(ball.refPosX()>500, 5, 10) then
+		if bufcnt(ball.posX()>500, 5) then
 			return "exit"
 		end
 	end,

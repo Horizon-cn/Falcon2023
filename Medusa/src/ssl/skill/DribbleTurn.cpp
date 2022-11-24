@@ -32,7 +32,7 @@ void CDribbleTurn::plan(const CVisionModule* pVision) {
 	}
 	int vecNumber       = task().executor;
 	double finalDir     = task().player.angle;
-	double adjustPre    = task().player.speed_x;     // 精度
+    double adjustPre    = 5*Param::Math::PI/180.0;     // 精度
 
 	//视觉初步处理
 	const BallVisionT& ball = pVision->Ball();

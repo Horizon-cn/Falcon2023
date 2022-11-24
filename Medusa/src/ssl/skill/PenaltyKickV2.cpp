@@ -24,7 +24,7 @@
 
 CPenaltyKickV2::CPenaltyKickV2()
 {
-    KICK_DIST = paramManager->KICK_DIST - 200;  /*射门允许范围 越高越容易射门*/
+    KICK_DIST = paramManager->KICK_DIST - 250;  /*射门允许范围 越高越容易射门*/
     WantToLessShoot = paramManager->WantToLessShoot; /*射门倾向，越低越容易射门 最低为0 最高为5*/
     RELIEF_DIST = paramManager->RELIEF_DIST;  /*GET中紧急状况下的RELIEF判断距离*/
     OPP_HAS_BALL_DIST = paramManager->OPP_HAS_BALL_DIST; /*判断敌方是否有球的距离 需要调整*/
@@ -80,9 +80,9 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
     int GoalieNumber = 0;
     int NumofPlayerInFrontfiled = 0;
     bool isMeHasBall = false;
-    bool isMechHasBall = infraredOn >= 5;
+    bool isMechHasBall = infraredOn >= 2;
     bool visionHasBall = isVisionHasBall(pVision, _executor);
-    isMeHasBall = visionHasBall; //isMechHasBall&&
+    isMeHasBall = isMechHasBall; //isMechHasBall&&
     if (isMeHasBall) {
         meHasBall = meHasBall >= maxMeHasBall ? maxMeHasBall : meHasBall + 1;
         meLoseBall = 0;
@@ -149,7 +149,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
                 }
             }
             else {
-                if (Me2OppTooclose(pVision, _executor)) {
+                if (opp2ball.mod() < 500 || Me2OppTooclose(pVision, _executor)) {
                     _state = BREAKSHOOT; break;
                 }
                 else if (me2goal.mod() > KICK_DIST + 100){

@@ -1,5 +1,16 @@
 
-local chipPower = 250
+local function def_chipPower()
+  if math.abs(ball.posY()) > 450 then 
+    return 550
+  elseif math.abs(ball.posY())>350 then
+    return 420
+  elseif math.abs(ball.posY()) > 270 then 
+    return 350
+  else 
+    return 300
+  end
+end
+
 local ANTI_POS_1 = ball.refAntiYPos(CGeoPoint:new_local(150, 50))
 local ANTI_POS_2 = ball.refAntiYPos(CGeoPoint:new_local(300, 100))
 local ANTI_POS_3 = ball.refAntiYPos(CGeoPoint:new_local(450, 130))
@@ -30,31 +41,29 @@ gPlayTable.CreatePlay{
     Special  = task.leftBack(),
     Middle   = task.goCmuRush(SYNT_POS_1),
     Defender = task.goCmuRush(ANTI_POS_1),
-    Goalie   = dangerous and task.goalie(),
-    Engine   = task.singleBack(),
+    Goalie   = dangerous and task.goalieNew(),
+    Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.goCmuRush(ANTI_POS_3),
-    match    = "{A}{DLSM}{EH}"
+    match    = "{A}{LS}{M}{DEH}"
   },
 
 
   ["passBall"] = {
     switch = function ()
+      --chip_power_func()
       if player.kickBall("Assister") or player.toBallDist("Assister") > 30 then
-        print("wait")
         return "waitBall"
-      else
-        print("exit")
       end
     end,
-    Assister = task.chipPass(SHOOT_POS(),chipPower),
+    Assister = task.chipPass(SHOOT_POS(),def_chipPower()),
     Leader   = task.rightBack(),
     Special  = task.leftBack(),
     Middle   = task.goCmuRush(ANTI_POS_2),
     Defender = task.goCmuRush(SYNT_POS_2),
-    Goalie   = task.goalie(),
-    Engine   = task.singleBack(),
+    Goalie   = task.goalieNew(),
+    Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.goCmuRush(SYNT_POS_3),
-    match    = "{ADLSMEH}"
+    match    = "{A}{LS}{M}{DEH}"
   },
 
 
@@ -70,10 +79,10 @@ gPlayTable.CreatePlay{
     Special  = task.leftBack(),
     Middle   = task.goCmuRush(ANTI_POS_3),
     Defender = task.continue(),
-    Goalie   = task.goalie(),
-    Engine   = task.singleBack(),
+    Goalie   = task.goalieNew(),
+    Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.continue(),
-    match    = "{AMDLS}{EH}"
+    match    = "{A}{LS}{M}{DEH}"
   },
 
   ["shoot"] = {
@@ -89,10 +98,10 @@ gPlayTable.CreatePlay{
     Special  = task.leftBack(),
     Middle   = task.shootV2(),
     Defender = task.goLeftSupport(),
-    Goalie   = task.goalie(),
-    Engine   = task.singleBack(),
+    Goalie   = task.goalieNew(),
+    Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.goRightSupport(),
-    match    = "{ADL}{SM}{EH}"
+    match    = "{A}{LS}{M}{DEH}"
   },
 
   name = "Ref_CornerKickV8",

@@ -217,17 +217,19 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	double minDist2Ball = 50; //Param::Vehicle::V2::PLAYER_SIZE + ball_size + 5; //cm
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
 		if (RobotSensor::Instance()->IsInfoValid(i) && RobotSensor::Instance()->IsInfraredOn(i)) {
+            sensorBall = true;
 			if (Ball().Valid()) {	// 球看到，作红外信号假象检查，因为通讯可能会丢
 				if (Ball().Pos().dist(OurPlayer(i).Pos()) > Param::Vehicle::V2::PLAYER_SIZE + ball_size + 5) {
-					RobotSensor::Instance()->ResetInraredOn(i);
+                    RobotSensor::Instance()->ResetInraredOn(i);
+                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-600, -450), QString("Infrared Reset").arg(i).toLatin1());
 				}
 			}
 			else {	// 球看不到，根据红外信号纠正球的位置，如果有多辆车，选择上一帧最近的，若上一帧球车相距较远，则认为红外故障
 				if (_lastRawBallPos.Pos().dist(OurPlayer(i).Pos()) < minDist2Ball) {
-					sensorBall = true;
 					minDist2Ball = _lastRawBallPos.Pos().dist(OurPlayer(i).Pos());
 					_ballPredictor.setPos(OurPlayer(i).Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_SIZE + ball_size, OurPlayer(i).Dir()));
 					_ballPredictor.setVel(Cycle(), CVector(0, 0)); //OurPlayer(i).Vel()
+                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-600, -450), QString("Infrared Fix").arg(i).toLatin1());
 				}
 			}
 		}

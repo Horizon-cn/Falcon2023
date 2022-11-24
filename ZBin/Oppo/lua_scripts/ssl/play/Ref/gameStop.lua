@@ -15,11 +15,12 @@ if OPPONENT_NAME == "other" then
     elseif math.abs(ball.refPosY()) > 410 then
         gCurrentPlay = "Ref_Stop4SideLine"
     elseif ball.refPosX()>200 then
-        gCurrentPlay = "Ref_Stop4FrontKick" --要改成frontkick
+        gCurrentPlay = "Ref_Stop4FrontKick" 
     elseif ball.refPosX() < 200 and ball.refPosX() > -200 then
-        gCurrentPlay = "Ref_Stop4MiddleKick"        --要改成middlekick
+        gCurrentPlay = "Ref_Stop4MiddleKick"
     else
         gCurrentPlay = "Ref_Stop4BackKick"
+
     end
 else
 --技术挑战赛

@@ -12,15 +12,9 @@ gOppoConfig = {
 -------------------------------Def---------------------------------------------------
 
 	CornerDef   = "Ref_CornerDefV5", -- 可能要用v4，防头球
-	BackDef 	= function()
-		if math.abs(ball.refPosY()) > 100 then
-			return "Ref_BackDefV10"  --保守用v5
-		else
-			return "Ref_BackDefV11"--挑过中场犯规脚本
-		end
-	end,
-	MiddleDef   = "Ref_MiddleDefV10",--横向marktouch用v5，四车markfront用v10,保守打法用V2
-	FrontDef    = "Ref_FrontDefV8", --四车markfront用v9,若挑就用V7，若他们四车全上就用V11,保守打法用Ref_FrontDefV2
+	BackDef 		= "Ref_BackDefV12",
+	MiddleDef   = "Ref_MiddleDefV11",--横向marktouch用v5，四车markfront用v10,保守打法用V2
+	FrontDef    = "Ref_FrontDefV9", --四车markfront用v9,若挑就用V7，若他们四车全上就用V11,保守打法用Ref_FrontDefV2
 	PenaltyKick = "Ref_PenaltyKickV1", --Ref_PenaltyKick2017V5
 	PenaltyDef  = "Ref_PenaltyDefV1", --Ref_PenaltyDefV3
 	KickOff		= "Ref_KickOffV6",

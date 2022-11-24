@@ -155,7 +155,7 @@ firstState = "start",
   Hawk     = task.goRightSupport(),
   Defender = task.rightBack(),--task.defendMiddle4Stop(),--TODO
   Middle   = task.leftBack(),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "{DM}{AL}[SEH]"
 },
 
@@ -216,7 +216,7 @@ firstState = "start",
   Middle   = task.goCmuRush(standFunc(5), dir.playerToBall, ACC, STOP_DSS),
   Engine   = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
   Hawk     = task.goCmuRush(standFunc(7), dir.playerToBall, ACC, STOP_DSS),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "[AMDLSEH]"
 },
 
@@ -267,7 +267,7 @@ firstState = "start",
   Leader   = task.goCmuRush(OTHER_SIDE_POS, dir.playerToBall, ACC, STOP_DSS),
   Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
   Middle   = task.leftBack(),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "{DM}{AL}[SEH]"
 },
 
@@ -285,7 +285,7 @@ firstState = "start",
   Middle   = task.goCmuRush(CGeoPoint:new_local(-290, 130), dir.playerToBall, ACC, STOP_DSS),
   Engine  = task.goCmuRush(CGeoPoint:new_local(-290,260),dir.playerToBall,ACC,STOP_DSS),
   Hawk   = task.goCmuRush(CGeoPoint:new_local(-290,-260),dir.playerToBall,ACC,STOP_DSS),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "[AMDLSEH]"
 },
 

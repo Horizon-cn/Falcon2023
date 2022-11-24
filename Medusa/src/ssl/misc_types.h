@@ -115,6 +115,7 @@ struct PlayerStatus{
 
     // Break的 flags
     static const int PENALTY_KICK                   = 0x04000000; // 大点球状态
+    static const int SPIN                           = 0x04100000; // 吸球轉身
 };
 
 /// 球状态结构

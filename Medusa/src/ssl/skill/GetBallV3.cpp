@@ -14,7 +14,8 @@ namespace {
 	enum get_ball_state {
 		DIRECTGOTO = 1,
 		GETBALL,
-        AVOIDBALL
+        AVOIDBALL,
+        WAITBALL,
 	};
 	// AVOIDBALL状态下的避球状态分布
 	enum avoid_ball_state {
@@ -304,205 +305,242 @@ void CGetBallV3::plan(const CVisionModule* pVision)
 	/********************************************************************/
 	/* 状态跳转管理模块，增加当前状态输出，便于查看状态跳转TODO  by lsp */
 	/********************************************************************/
-	if (BEGINNING == getState())             //当前状态为BEGINNING
-	{
-		if (isCanDirectGetBall)
-		{
-			setState(DIRECTGOTO);
-		}
-		else if (trueNeedAvoidBall)
-		{
-			setState(AVOIDBALL);
-			trueNeedAvoidBall = false;
-			avoidBallCount = 0;
-			if (isBallBehindMe)
-			{
-				ab_state = BALLBEHINDME;
-			}
-			else if (isBallBesideMe)
-			{
-				ab_state = BALLBESIDEME;
-			}
-		}
-		else {
-			setState(GETBALL);
-			gb_state = LARGEANGLE;
-		}
-	}
-	else if (DIRECTGOTO == getState())     //当前状态为DIRECTGOTO
-	{
-		if (RobotSensor::Instance()->IsInfraredOn(robotNum))
-		{ //什么都不做，不跳转状态
-		}
-		else if (trueNeedAvoidBall)
-		{
-			setState(AVOIDBALL);
-			if (DEBUG_ENGINE)
-			{
-				cout << "-->AvoidBall";
-			}
-			trueNeedAvoidBall = false;
-			avoidBallCount = 0;
-			if (isBallBehindMe)
-			{
-				ab_state = BALLBEHINDME;
-			}
-			else if (isBallBesideMe)
-			{
-				ab_state = BALLBESIDEME;
-			}
-		}
-		else if (canNOTDirectGetBall)
-		{
-			setState(GETBALL);
-			gb_state = LARGEANGLE;
-			if (DEBUG_ENGINE)
-			{
-				cout << "-->GetBall";
-			}
-		}
-	}
-	else if (GETBALL == getState())        //当前状态为GETBALL
-	{
-		if (isCanDirectGetBall)
-		{
-			setState(DIRECTGOTO);
-			if (DEBUG_ENGINE)
-			{
-				cout << "-->DirectGoto";
-			}
-		}
-		else if (RobotSensor::Instance()->IsInfraredOn(robotNum))
-		{ //什么都不做，不跳转状态
-		}
-		else if (trueNeedAvoidBall)
-		{
-			setState(AVOIDBALL);
-			if (DEBUG_ENGINE)
-			{
-				cout << "-->AvoidBall";
-			}
-			trueNeedAvoidBall = false;
-			avoidBallCount = 0;
-			if (isBallBehindMe)
-			{
-				ab_state = BALLBEHINDME;
-			}
-			else if (isBallBesideMe)
-			{
-				ab_state = BALLBESIDEME;
-			}
-		}
-	}
-	else if (AVOIDBALL == getState())      //当前状态为AVOIDBALL
-	{
-		if (avoidBallSuccess || isCanDirectGetBall)
-		{
-			setState(GETBALL);
-			gb_state = LARGEANGLE;
-			if (DEBUG_ENGINE)
-			{
-				cout << "-->GetBall";
-			}
-			ab_state = NOAVOID;
-		}
-	}
-	
+    if (BEGINNING == getState())             //当前状态为BEGINNING
+    {
+        if (isCanDirectGetBall)
+        {
+            setState(DIRECTGOTO);
+        }
+        else if (trueNeedAvoidBall)
+        {
+            setState(AVOIDBALL);
+            trueNeedAvoidBall = false;
+            avoidBallCount = 0;
+            if (isBallBehindMe)
+            {
+                ab_state = BALLBEHINDME;
+            }
+            else if (isBallBesideMe)
+            {
+                ab_state = BALLBESIDEME;
+            }
+        }
+        else if (ballVel.mod() > 200) {
+            setState(WAITBALL);
+        }
+        else {
+            setState(GETBALL);
+            gb_state = LARGEANGLE;
+        }
+    }
+    else if (WAITBALL == getState()) {
+        // cout << isBallFrontOfMyhead << "\t" << isInDirectGetBallCircle << "\t" << isGetBallDirReached << "\t";
+        if (isCanDirectGetBall)
+        {
+            setState(DIRECTGOTO);
+            if (DEBUG_ENGINE)
+            {
+                cout << "-->DirectGoto";
+            }
+        }
+        else if (isBallFrontOfMyhead && isInDirectGetBallCircle) {
+            setState(GETBALL);
+            gb_state = LARGEANGLE;
+            if (DEBUG_ENGINE)
+            {
+                cout << "-->GetBall";
+            }
+        }
+    }
+    else if (DIRECTGOTO == getState())     //当前状态为DIRECTGOTO
+    {
+        if (RobotSensor::Instance()->IsInfraredOn(robotNum))
+        { //什么都不做，不跳转状态
+        }
+        else if (trueNeedAvoidBall)
+        {
+            setState(AVOIDBALL);
+            if (DEBUG_ENGINE)
+            {
+                cout << "-->AvoidBall";
+            }
+            trueNeedAvoidBall = false;
+            avoidBallCount = 0;
+            if (isBallBehindMe)
+            {
+                ab_state = BALLBEHINDME;
+            }
+            else if (isBallBesideMe)
+            {
+                ab_state = BALLBESIDEME;
+            }
+        }
+        else if (canNOTDirectGetBall)
+        {
+            setState(GETBALL);
+            gb_state = LARGEANGLE;
+            if (DEBUG_ENGINE)
+            {
+                cout << "-->GetBall";
+            }
+        }
+    }
+    else if (GETBALL == getState())        //当前状态为GETBALL
+    {
+        if (isCanDirectGetBall)
+        {
+            setState(DIRECTGOTO);
+            if (DEBUG_ENGINE)
+            {
+                cout << "-->DirectGoto";
+            }
+        }
+        else if (ballVel.mod() > 200) {
+            setState(WAITBALL);
+            if (DEBUG_ENGINE)
+            {
+                cout << "-->WaitBall";
+            }
+        }
+        else if (RobotSensor::Instance()->IsInfraredOn(robotNum))
+        { //什么都不做，不跳转状态
+        }
+        else if (trueNeedAvoidBall)
+        {
+            setState(AVOIDBALL);
+            if (DEBUG_ENGINE)
+            {
+                cout << "-->AvoidBall";
+            }
+            trueNeedAvoidBall = false;
+            avoidBallCount = 0;
+            if (isBallBehindMe)
+            {
+                ab_state = BALLBEHINDME;
+            }
+            else if (isBallBesideMe)
+            {
+                ab_state = BALLBESIDEME;
+            }
+        }
+    }
+    else if (AVOIDBALL == getState())      //当前状态为AVOIDBALL
+    {
+        if (avoidBallSuccess || isCanDirectGetBall)
+        {
+            setState(GETBALL);
+            gb_state = LARGEANGLE;
+            if (DEBUG_ENGINE)
+            {
+                cout << "-->GetBall";
+            }
+            ab_state = NOAVOID;
+        }
+    }
+
 	/********************************************************************/
 	/* 状态执行管理模块，根据当前状态做出具体动作  by lsp */
 	/********************************************************************/
-	int nowState = getState();
-	switch (nowState)
-	{
-	case DIRECTGOTO: {
-		// 拿球点
-		getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, reverse_finalDir); //  5.85
-		// 是否吸球
-		getball_task.player.needdribble = IS_DRIBBLE;
-		break; }
-	case GETBALL: {
-		getball_task.player.pos = ball.Pos();
-		if (LARGEANGLE == gb_state)
-		{
-			if (fabs(dAngDiff_self2ball_finaldir) <= Param::Math::PI - extremeAngle + Param::Math::PI * 5 / 180)
-			{
-				gb_state = SMALLANGLE;
-			}
-		}
-		else if (SMALLANGLE == gb_state)
-		{
-			if (fabs(dAngDiff_self2ball_finaldir) > Param::Math::PI / 9.0)
-			{
-				gb_state = LARGEANGLE;
-			}
-		}
-		if (SMALLANGLE == gb_state) {
-			double getBallBuffer = -3 + 1 * me.Pos().dist(ballPosWithVel) / 50;  //拿球时设计的余量-2 + 7 * me.Pos().dist(ballPosWithVel)/50;
-			if (getBallBuffer > 2)
-			{
-				getBallBuffer = 2;
-			}
-			double getBallDist = Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + getBallBuffer;
-			if (getBallDist > me.Pos().dist(ballPosWithVel))
-			{
-				getBallDist = Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist - 2.5;
-			}
-			getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(getBallDist, reverse_finalDir); //该距离要小于directGetBallDist
-			// 吸球
-			getball_task.player.needdribble = IS_DRIBBLE;
-		}
-		else if (LARGEANGLE == gb_state)
-		{
-			//角度计算
-			double theta_Dir = ball2self.dir();
-			int sign = Utils::Normalize((theta_Dir - finalDir)) > 0 ? 1 : -1;
-			theta_Dir = Utils::Normalize(theta_Dir + sign * Param::Math::PI * 65 / 180.0); //Param::Math::PI * 75 / 180.0
-			int sign2 = Utils::Normalize((theta_Dir - finalDir)) > 0 ? 1 : -1;
-			if (ball.Vel().mod() * sin(fabs(Utils::Normalize(ball.Vel().dir() - finalDir))) < transverseBallSpeed)//球速相对目标方向较小的时候
-			{
-				if (sign * sign2 < 0 || fabs(Utils::Normalize(theta_Dir - finalDir)) > extremeAngle)
-				{
-					if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(me.Pos() + CVector(0, 50), "extreme angle", COLOR_WHITE);
-					theta_Dir = Utils::Normalize(finalDir + sign * extremeAngle);
-				}
-			}
-			//距离计算
-			//if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000, theta_Dir), COLOR_WHITE);
-			double theta = fabs(Utils::Normalize(theta_Dir - finalDir));
-			double getBallDist = minGetBallDist + (maxGetBallDist - minGetBallDist) * (1 + cos(theta));
-			if (getBallDist > maxGetBallDist)
-			{
-				getBallDist = maxGetBallDist;
-			}
-			getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(getBallDist, theta_Dir);
-		}
-        if (WorldModel::Instance()->CurrentRefereeMsg() == "ourIndirectKick")
-            getball_task.player.flag |= PlayerStatus::DODGE_BALL;
-		break; }
-	case AVOIDBALL: {//TODO 加入球速影响，球在有速度的情况下修正躲避点
-		if (BALLBEHINDME == ab_state)
-		{
-			double theta_Dir = ball2self.dir();
-			double theta = Utils::Normalize(theta_Dir - finalDir);
-			int sign = theta > 0 ? 1 : -1;
-			theta_Dir = Utils::Normalize(theta_Dir + sign * Param::Math::PI * 60 / 180);
-			getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(15, theta_Dir);
-		}
-		else if (BALLBESIDEME == ab_state)
-		{
-			double theta_Dir = reverse_finalDir;
-			getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(15, theta_Dir);
-		}
-		break; }
-	default: break;
-	}
+    int nowState = getState();
+    switch (nowState)
+    {
+    case DIRECTGOTO: {
+        // 拿球点
+        getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, reverse_finalDir); //  5.85
+        // 是否吸球
+        getball_task.player.needdribble = IS_DRIBBLE;
+        break; }
+    case WAITBALL: {
+        // 拿球点
+        getball_task.player.pos = ballPosWithVel;
+        // 是否吸球
+        getball_task.player.needdribble = IS_DRIBBLE;
+        break;  }
+    case GETBALL: {
+        getball_task.player.pos = ball.Pos();
+        if (LARGEANGLE == gb_state)
+        {
+            if (fabs(dAngDiff_self2ball_finaldir) <= Param::Math::PI - extremeAngle + Param::Math::PI * 5 / 180)
+            {
+                gb_state = SMALLANGLE;
+            }
+        }
+        else if (SMALLANGLE == gb_state)
+        {
+            if (fabs(dAngDiff_self2ball_finaldir) > Param::Math::PI / 9.0)
+            {
+                gb_state = LARGEANGLE;
+            }
+        }
+        if (SMALLANGLE == gb_state) {
+            double getBallBuffer = -3 + 1 * me.Pos().dist(ballPosWithVel) / 50;  //拿球时设计的余量-2 + 7 * me.Pos().dist(ballPosWithVel)/50;
+            if (getBallBuffer > 2)
+            {
+                getBallBuffer = 2;
+            }
+            double getBallDist = Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + getBallBuffer;
+            if (getBallDist > me.Pos().dist(ballPosWithVel))
+            {
+                getBallDist = Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist - 2.5;
+            }
+            getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(getBallDist, reverse_finalDir); //该距离要小于directGetBallDist
+            // 吸球
+            getball_task.player.needdribble = IS_DRIBBLE;
+        }
+        else if (LARGEANGLE == gb_state)
+        {
+            //角度计算
+            double theta_Dir = ball2self.dir();
+            int sign = Utils::Normalize((theta_Dir - finalDir)) > 0 ? 1 : -1;
+            theta_Dir = Utils::Normalize(theta_Dir + sign * Param::Math::PI * 65 / 180.0); //Param::Math::PI * 75 / 180.0
+            if (ball.Vel().mod() * sin(fabs(Utils::Normalize(ball.Vel().dir() - finalDir))) < transverseBallSpeed)//球速相对目标方向较小的时候
+            {
+                if (fabs(Utils::Normalize(theta_Dir - finalDir)) > extremeAngle)
+                {
+                    if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(me.Pos() + CVector(0, 50), "extreme angle", COLOR_WHITE);
+                    theta_Dir = Utils::Normalize(finalDir + sign * extremeAngle);
+                }
+            }
+            //距离计算
+            //if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000, theta_Dir), COLOR_WHITE);
+            double theta = fabs(Utils::Normalize(theta_Dir - finalDir));
+            double getBallDist = minGetBallDist + (maxGetBallDist - minGetBallDist) * (1 + cos(theta));
+            if (getBallDist > maxGetBallDist)
+            {
+                getBallDist = maxGetBallDist;
+            }
+            getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(getBallDist, theta_Dir);
+        }
+        break; }
+    case AVOIDBALL: {//TODO 加入球速影响，球在有速度的情况下修正躲避点
+        if (BALLBEHINDME == ab_state)
+        {
+            double theta_Dir = ball2self.dir();
+            double theta = Utils::Normalize(theta_Dir - finalDir);
+            int sign = theta > 0 ? 1 : -1;
+            theta_Dir = Utils::Normalize(theta_Dir + sign * Param::Math::PI * 60 / 180);
+            getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(15, theta_Dir);
+        }
+        else if (BALLBESIDEME == ab_state)
+        {
+            double theta_Dir = reverse_finalDir;
+            getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(15, theta_Dir);
+        }
+        break; }
+    default: break;
+    }
 
-	// 计算给定的朝向，比较远靠近时朝向先取车速的方向，之后再转
-	double diffAngleVel2Final = fabs(dAngDiff_self2ball_finaldir);
-	int sign = diffAngleVel2Final > Param::Math::PI / 2.0 ? 1 : 0;
-	if (ball.Pos().dist(me.Pos()) > AllowFaceToFinalDist) 
-		getball_task.player.angle = Utils::Normalize(self2ball.dir() + sign * Param::Math::PI);
-	else getball_task.player.angle = finalDir;
+    // 计算给定的朝向，比较远靠近时朝向先取车速的方向，之后再转
+    if (WAITBALL == getState()) {
+        getball_task.player.angle = Utils::Normalize(ballVel.dir() + Param::Math::PI);
+    }
+    else {
+        double diffAngleVel2Final = fabs(dAngDiff_self2ball_finaldir);
+        int sign = diffAngleVel2Final > Param::Math::PI / 2.0 ? 1 : 0;
+        if (ball.Pos().dist(me.Pos()) > AllowFaceToFinalDist)
+            getball_task.player.angle = Utils::Normalize(self2ball.dir() + sign * Param::Math::PI);
+        else getball_task.player.angle = finalDir;
+    }
 
 	// 面版图形绘制
 	if (DEBUG_ENGINE) { //叉叉
@@ -524,6 +562,10 @@ void CGetBallV3::plan(const CVisionModule* pVision)
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -160), "AvoidBall", COLOR_CYAN);
 		}
+        else if (WAITBALL == getState())
+        {
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -160), "WaitBall", COLOR_CYAN);
+        }
 
 		//GDebugEngine::Instance()->gui_debug_x(ball.Pos(),COLOR_WHITE);
 		GDebugEngine::Instance()->gui_debug_x(getball_task.player.pos, COLOR_BLACK);

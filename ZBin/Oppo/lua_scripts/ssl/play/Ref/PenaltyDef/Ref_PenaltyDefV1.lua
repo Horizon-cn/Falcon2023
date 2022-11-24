@@ -4,10 +4,8 @@ firstState = "init",
 
 ["init"] = {
 	switch = function ()
-		if bufcnt(ball.refPosX()>0, 40, 50) then
-			return "startlong"
-		else
-			return "startshort"
+		if bufcnt(1,50) then
+			return "start"
 		end
 	end,
 	Leader  = task.goCmuRush(CGeoPoint:new_local(430, 180)),
@@ -22,24 +20,14 @@ firstState = "init",
 },
 
 
-["startlong"] = {
+["start"] = {
 	switch = function ()
-		if bufcnt(cond.isGameOn(),20) then
-			return "exit"
-		elseif cond.isNormalStart() then
-			return "kicklong"
-		end
-	end,
-	Goalie   = task.goalieNew(),
-	match    = ""
-},
-
-["startshort"] = {
-	switch = function ()
-		if bufcnt(cond.isGameOn(),20) then
-			return "exit"
-		elseif cond.isNormalStart() then
-			return "kickshort"
+		if cond.isNormalStart() then
+			if player.toBallDist("Goalie")>400 then
+				return "kicklong"
+			else
+				return "kickshort"
+			end
 		end
 	end,
 	Leader  = task.goCmuRush(CGeoPoint:new_local(430, 180)),
@@ -53,14 +41,16 @@ firstState = "init",
 	match    = "{LACDM}{EH}"
 },
 
+
+
 ["kicklong"] = {
 	switch = function ()
-		if bufcnt(cond.isGameOn(),20) then
+		if false then
 			return "exit"
 		end
 	end,
-	Goalie  = task.goalieNew(),
-	match = ""
+	Goalie  = task.advance(),
+	match = "{LACDM}{EH}"
 },
 
 ["kickshort"] = {

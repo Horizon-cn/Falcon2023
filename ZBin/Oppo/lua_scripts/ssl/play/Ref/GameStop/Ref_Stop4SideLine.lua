@@ -193,7 +193,7 @@ firstState = "start",
   Defender = task.rightBack(),
   Engine   = task.goLeftSupport(),
   Hawk     = task.goRightSupport(),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "[SMDAL][EH]"
 },
 

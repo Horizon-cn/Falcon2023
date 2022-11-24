@@ -105,7 +105,7 @@ else
 end
 
 gLastPlay = gCurrentPlay
-
+			
 RunPlay(gCurrentPlay)
 
 debugEngine:gui_debug_msg(CGeoPoint:new_local(-50, -param.pitchWidth/2),gCurrentState)

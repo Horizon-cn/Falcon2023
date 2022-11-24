@@ -35,7 +35,7 @@ end,
 	Middle   = task.defendHead(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][DASM]"
 },
 
@@ -45,7 +45,7 @@ end,
 	Middle   = task.defendHead(),
 	Defender = task.leftBack(),
 	Assister = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][DASM]"
 },
 
@@ -55,7 +55,7 @@ end,
 	Middle   = task.defendHead(),
 	Defender = task.defendMiddleHead(),
 	Assister = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][S][DA][M]"
 },
 
@@ -65,7 +65,7 @@ end,
 	Middle   = task.defendHead(),
 	Defender = task.defendMiddleHead(),
 	Assister = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][S][DA][M]"
 },
 
@@ -75,7 +75,7 @@ end,
 	Middle   = task.defendHead(),
 	Defender = task.defendMiddleHead(),
 	Assister = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][S][DA][M]"
 },
 
@@ -85,7 +85,7 @@ end,
 	Middle   = task.defendHead(),
 	Defender = task.defendMiddleHead(),
 	Assister = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][S][DA][M]"
 },
 
@@ -95,7 +95,7 @@ end,
 	Middle   = task.defendHead(),
 	Defender = task.defendMiddleHead(),
 	Assister = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][S][DA][M]"
 },
 
@@ -105,7 +105,7 @@ end,
 	Middle   = task.marking("Second"),
 	Defender = task.defendMiddleHead(),
 	Assister = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][S][AD][M]"
 },
 
@@ -115,7 +115,7 @@ end,
 	Middle   = task.marking("Second"),
 	Defender = task.sideBack(),
 	Assister = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[L][S][AD][M]"
 },
 

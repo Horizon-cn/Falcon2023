@@ -124,7 +124,7 @@ function chipPass(p, c, f, anti)
 	local idir
 	local ipower
 	if type(p) == "string" then
-		idir = ball.toPlayerHeadDir(role)
+		idir = ball.toPlayerHeadDir(p)
 	elseif type(p) == "function" then
 		if f == nil or f == true then
 			idir = p
@@ -823,7 +823,7 @@ end
 ------------------------------------ 防守相关的skill ------------------------------------------
 
 function protectBall()
-	local mexe, mpos = ProtectBall{pos = pos.advance,flag = flag.dodge_ball}
+	local mexe, mpos = ProtectBall{pos = pos.protectBall, flag = flag.dodge_ball}
 	return {mexe, mpos}
 end
 
@@ -911,7 +911,7 @@ function multiBack(guardNum, index, p)
 	else
 		ipower = p
 	end
-	local mexe, mpos = GotoMatchPos{ method = 4, acc = 1000, pos = pos.multiBackPos(guardNum, index), dir = dir.backSmartGotoDir, flag = bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
+	local mexe, mpos = GotoMatchPos{ method = 4, sender = index, srole = "multiBack", acc = 1000, pos = pos.multiBackPos(guardNum, index), dir = dir.backSmartGotoDir, flag = bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
 	return {mexe, mpos, kick.chip, dir.defendBackClear(), pre.fieldDefender(), kp.specified(ipower),cp.specified(ipower), bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
 end
 

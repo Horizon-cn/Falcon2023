@@ -14,7 +14,12 @@ local Two = 280
 
 local SwitchBallArea = function()
 	if ball.posX() > 200 and ball.posY() < -120 then
+		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
+		if ballStatus == "OurBall" then
+			return "LeftFront"..ballStatus
+		else 
 			return "LeftFront"
+		end
 	elseif ball.posX() > 200 and ball.posY() < 120 then
 			return "MiddleFront"
 	elseif ball.posX() > 200 then
@@ -37,8 +42,8 @@ local SwitchBallArea = function()
 			return "MiddleBack"
 	elseif true then
 			return "RightBack"
-		end
 	end
+end
 
 -- Leader + Assister + Powerhouse
 -- Special + Defender
@@ -49,7 +54,20 @@ firstState = "LeftFront",
 
 ["LeftFront"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
+	Assister = task.goMWPassPos("Leader"),
+	Powerhouse = task.goRWPassPos("Leader"),
+    Special = task.protectBall(), --task.marking("First"),
+    Defender = task.goMMPassPos("Leader"),
+    Hawk = task.leftBack(),
+	Middle = task.rightBack(),
+	Goalie = task.goalieNew(),
+    match = "[LS][APD][HM]"
+},
+
+["LeftFrontOurBall"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
 	Assister = task.goMWPassPos("Leader"),
 	Powerhouse = task.goRWPassPos("Leader"),
     Special = task.marking("First"),
@@ -62,7 +80,7 @@ firstState = "LeftFront",
 
 ["MiddleFront"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goLWPassPos("Leader"),
 	Powerhouse = task.goRWPassPos("Leader"),
     Special = task.marking("First"),
@@ -75,7 +93,7 @@ firstState = "LeftFront",
 
 ["RightFront"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goLWPassPos("Leader"),
 	Powerhouse = task.goMWPassPos("Leader"),
     Special = task.marking("First"),
@@ -88,7 +106,7 @@ firstState = "LeftFront",
 
 ["LeftMiddleFront"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goLWPassPos("Leader"),
 	Powerhouse = task.goMWPassPos("Leader"),
     Special = task.goMMPassPos("Leader"),
@@ -101,7 +119,7 @@ firstState = "LeftFront",
 
 ["MiddleMiddleFront"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goLWPassPos("Leader"),
 	Powerhouse = task.goMWPassPos("Leader"),
     Special = task.goRWPassPos("Leader"),
@@ -115,7 +133,7 @@ firstState = "LeftFront",
 
 ["RightMiddleFront"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goMWPassPos("Leader"),
 	Powerhouse = task.goRWPassPos("Leader"),
     Special = task.marking("First"),
@@ -128,7 +146,7 @@ firstState = "LeftFront",
 
 ["LeftMiddleBack"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goLWPassPos("Leader"),
 	Powerhouse = task.goMMPassPos("Leader"),
     Special = task.goMWPassPos("Leader"),
@@ -140,7 +158,7 @@ firstState = "LeftFront",
 },
 ["MiddleMiddleBack"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goMWPassPos("Leader"),
 	Powerhouse = task.goMMPassPos("Leader"),
     Special = task.marking("First"),
@@ -152,7 +170,7 @@ firstState = "LeftFront",
 },
 ["RightMiddleBack"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goMMPassPos("Leader"),
 	Powerhouse = task.goRMPassPos("Leader"),
     Special = task.goMWPassPos("Leader"),
@@ -165,7 +183,7 @@ firstState = "LeftFront",
 
 ["LeftBack"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goLMPassPos("Leader"),
 	Powerhouse = task.goMMPassPos("Leader"),
     Special = task.sideBack(),
@@ -177,7 +195,7 @@ firstState = "LeftFront",
 },
 ["MiddleBack"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goMMPassPos("Leader"),
 	Powerhouse = task.marking("Second"),
     Special = task.multiBack(3, 1), --sideBack(),
@@ -189,7 +207,7 @@ firstState = "LeftFront",
 },
 ["RightBack"] = {
 	switch = SwitchBallArea,
-	Leader = task.advanceV4(),
+	Leader = task.advance(),
 	Assister = task.goRMPassPos("Leader"),
 	Powerhouse = task.goMMPassPos("Leader"),
     Special = task.sideBack(),

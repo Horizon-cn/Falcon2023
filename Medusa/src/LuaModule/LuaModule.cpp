@@ -622,6 +622,7 @@ extern "C" int Skill_DribbleTurn(lua_State *L)
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double pre = LuaModule::Instance()->GetNumberArgument(3, NULL);
 	CPlayerTask* pTask = PlayerRole::makeItDribbleTurn(runner, angle, pre);
+
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }

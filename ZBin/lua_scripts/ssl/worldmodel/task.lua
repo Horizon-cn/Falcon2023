@@ -593,7 +593,6 @@ function dribbleTurn(finalDir, adjustPre)
 	else
 		ipre = adjustPre
 	end
-
 	local mexe, mpos = DribbleTurn{ fDir = idir, pre = ipre }
 	return {mexe, mpos}
 end
@@ -1025,6 +1024,17 @@ function penaltykick(role)
 		itandem = role()
 	end
 	local mexe, mpos = PenaltyKickV2{pos = pos.advance, srole = "advancer", tandem = itandem}
+	return {mexe, mpos}
+end
+
+function penaltykickshort(role)
+	local itandem = nil
+	if type(role) == "string" then
+		itandem = role
+	elseif type(role) == "function" then
+		itandem = role()
+	end
+	local mexe, mpos = PenaltyKick{pos = pos.advance, srole = "advancer", tandem = itandem}
 	return {mexe, mpos}
 end
 
