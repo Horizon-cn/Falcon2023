@@ -33,17 +33,15 @@ gPlayTable.CreatePlay{
     Goalie   = dangerous and task.goalieNew(),
     Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.goCmuRush(ANTI_POS_3),
-    match    = "{A}{DLSME}{H}"
+    match    = "{A}{LS}{M}{DEH}"
   },
 
 
   ["passBall"] = {
     switch = function ()
+      --chip_power_func()
       if player.kickBall("Assister") or player.toBallDist("Assister") > 30 then
-        print("wait")
         return "waitBall"
-      else
-        print("exit")
       end
     end,
     Assister = task.chipPass(SHOOT_POS(),chipPower),
@@ -54,7 +52,7 @@ gPlayTable.CreatePlay{
     Goalie   = task.goalieNew(),
     Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.goCmuRush(SYNT_POS_3),
-    match    = "{ADLSMEH}"
+    match    = "{A}{LS}{M}{DEH}"
   },
 
 
@@ -73,7 +71,7 @@ gPlayTable.CreatePlay{
     Goalie   = task.goalieNew(),
     Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.continue(),
-    match    = "{AMDLSE}{H}"
+    match    = "{A}{LS}{M}{DEH}"
   },
 
   ["shoot"] = {
@@ -92,7 +90,7 @@ gPlayTable.CreatePlay{
     Goalie   = task.goalieNew(),
     Engine   = task.goLWPassPos("Assister"),
     Hawk     = task.goRightSupport(),
-    match    = "{ADL}{SMEH}"
+    match    = "{A}{LS}{M}{DEH}"
   },
 
   name = "Ref_CornerKickV8",

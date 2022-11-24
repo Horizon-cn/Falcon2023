@@ -510,7 +510,9 @@ bool CAdvance::isPassBalltoMe(const CVisionModule* pVision, int vecNumber) {
 	double diff_ballMoving2Me = Utils::Normalize(ball2me.dir() - ball.Vel().dir());
     const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
     CVector opp2me = me.Pos() - opp.Pos();
-    if((opp.Pos() - me.Pos()).mod() < 25 && Utils::Normalize(ball2me.dir() - opp2me.dir()) < Param::Math::PI / 7) return false;
+    printf("%.3f %.3f\n",(opp.Pos() - me.Pos()).mod(), Utils::Normalize(ball2me.dir() - opp2me.dir()));
+
+    if((opp.Pos() - me.Pos()).mod() < 60 && Utils::Normalize(ball2me.dir() - opp2me.dir()) < Param::Math::PI / 7) return false;
 
     if (ball.Valid() && abs(diff_ballMoving2Me) < Param::Math::PI / 7.5 && (ball2me.mod() / ball.Vel().mod() < BalltoMeVelTime)) {//
 		return true;

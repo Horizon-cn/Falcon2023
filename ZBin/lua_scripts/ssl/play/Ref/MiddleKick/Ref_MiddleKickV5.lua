@@ -74,7 +74,7 @@ firstState = "getball",
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{DM}{AL}[SEH]"
+	match    = "{A}{DM}{S}[LEH]"
 },	
 
 ["chipball"] = {
@@ -95,7 +95,7 @@ firstState = "getball",
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{DM}{A}{LSEH}"
+	match    = "{DM}{A}{S}{LEH}"
 },
 
 ["waitball"] = {
@@ -112,7 +112,7 @@ firstState = "getball",
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{AL}{SMD}"
+	match    = "{DM}{S}{L}{AEH}"
 },
 
 name = "Ref_MiddleKickV5",

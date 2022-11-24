@@ -12,13 +12,13 @@ firstState = "init",
 		end
 	end,
 	Goalie = task.goalie(),
-	Leader  = task.goLWPassPos(),
-	Assister = task.goRWPassPos(),
+	Leader  = task.goLWPassPos("Kicker"),
+	Assister = task.goRWPassPos("Kicker"),
 	Middle  = task.leftBack(),
 	Defender = task.rightBack(),
 	Kicker  = task.goCmuRush(CGeoPoint:new_local(450,0),player.toBallDir),
-	Engine   = task.goLMPassPos(),
-    Hawk     = task.goRMPassPos(),
+	Engine   = task.goLMPassPos("Kicker"),
+    Hawk     = task.goRMPassPos("Kicker"),
 	match = "{L}{ADM}{EH}"
 },
 
@@ -164,7 +164,7 @@ firstState = "init",
 
 ["kick"] = {
 	switch = function ()
-		if ball.posX() > 500 then
+		if bufcnt(ball.refPosX()>500, 5, 10) then
 			return "exit"
 		end
 	end,

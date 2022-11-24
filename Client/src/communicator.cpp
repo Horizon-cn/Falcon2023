@@ -16,6 +16,7 @@ int fps[2] = {0, 0};
 std::mutex m_fps;
 std::thread* receiveThread[PARAM::TEAMS];
 bool NoVelY = true;
+bool useSim = false;
 }
 int Communicator::getFPS(int t) {
     int res = 0;
@@ -32,6 +33,7 @@ void Communicator::setGrsimInterfaceIndex(const int index) {
 
 Communicator::Communicator(QObject *parent) : QObject(parent) {
     ZSS::ZParamManager::instance()->loadParam(NoVelY, "Lesson/NoVelY", false);
+    ZSS::ZParamManager::instance()->loadParam(useSim, "Simulator/useSim", false);
     //QObject::connect(ZSS::ZSimModule::instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
     //if (grsimInterfaceIndex == 0){
         QObject::connect(ZSS::ZSimModule::instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
@@ -95,7 +97,7 @@ void Communicator::receiveCommand(int t) {
             if(isSimulation) {
 //                qDebug() << "simulation";
                 //ZSS::ZSimModule::instance()->sendSim(t, commands);
-                if (grsimInterfaceIndex==0)
+                if (grsimInterfaceIndex==0 && useSim)
                     ZSS::ZSimModule::instance()->sendSim(t, commands);
                 else
                     ZSS::ZRemoteSimModule::instance()->sendSim(t, commands);

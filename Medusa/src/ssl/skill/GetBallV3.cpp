@@ -7,13 +7,14 @@
 #include "BallSpeedModel.h"
 #include <RobotSensor.h>
 #include <WorldModel/KickStatus.h>
+#include <WorldModel.h>
 
 namespace {
 	// 拿球的主状态机
 	enum get_ball_state {
 		DIRECTGOTO = 1,
 		GETBALL,
-		AVOIDBALL
+        AVOIDBALL
 	};
 	// AVOIDBALL状态下的避球状态分布
 	enum avoid_ball_state {
@@ -475,6 +476,8 @@ void CGetBallV3::plan(const CVisionModule* pVision)
 			}
 			getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(getBallDist, theta_Dir);
 		}
+        if (WorldModel::Instance()->CurrentRefereeMsg() == "ourIndirectKick")
+            getball_task.player.flag |= PlayerStatus::DODGE_BALL;
 		break; }
 	case AVOIDBALL: {//TODO 加入球速影响，球在有速度的情况下修正躲避点
 		if (BALLBEHINDME == ab_state)

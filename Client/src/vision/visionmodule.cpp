@@ -21,6 +21,7 @@ auto zpm = ZSS::ZParamManager::instance();
 auto vpm = ZSS::VParamManager::instance();
 QTimer sim_timer;
 std::thread* dealThread;
+bool useSim = false;
 }
 /**
  * @brief CVisionModule consturctor
@@ -37,11 +38,14 @@ CVisionModule::CVisionModule(QObject *parent)
     std::fill_n(GlobalData::instance()->cameraUpdate, PARAM::CAMERA, false);
     std::fill_n(GlobalData::instance()->cameraControl, PARAM::CAMERA, true);
     std::fill_n(GlobalData::instance()->processControl, 3, true);
-    declare_receive("ssl_vision");
-    declare_publish("sim_signal");
-    SSLWorld::instance()->link(this,"ssl_vision");
-    this->link(SSLWorld::instance(),"sim_signal");
-    SSLWorld::instance()->start();
+    zpm->loadParam(useSim, "Simulator/useSim", false);
+    if (useSim) {
+        declare_receive("ssl_vision");
+        declare_publish("sim_signal");
+        SSLWorld::instance()->link(this,"ssl_vision");
+        this->link(SSLWorld::instance(),"sim_signal");
+        SSLWorld::instance()->start();
+    }
 }
 /**
  * @brief connect UDP for receive vision
@@ -68,7 +72,7 @@ void CVisionModule::udpSocketConnect(bool real) {
     zpm->loadParam(saoAction, "Alert/SaoAction", 0);
     GlobalData::instance()->setCameraMatrix(real);
     //if(real){
-    if(real || grsimInterface != 0){
+    if(real || grsimInterface != 0 || !useSim){
         qDebug() << "VisionPort : " << vision_port;
         udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress);
         udpReceiveSocket.joinMulticastGroup(QHostAddress(ZSS::SSL_ADDRESS),ZNetworkInterfaces::instance()->getFromIndex(_interface));

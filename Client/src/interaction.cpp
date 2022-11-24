@@ -130,7 +130,9 @@ bool Interaction::connectSim(bool sw, int id, bool color) {
         ZCommunicator::instance()->connectMedusa(id);
         ZSS::ZSimModule::instance()->disconnectSim(color);
         ZSS::ZRemoteSimModule::instance()->disconnectSim(color);
-        if (ZCommunicator::instance()->getGrsimInterfaceIndex() == 0)
+        bool useSim = false;
+        ZSS::ZParamManager::instance()->loadParam(useSim, "Simulator/useSim", false);
+        if (ZCommunicator::instance()->getGrsimInterfaceIndex() == 0 && useSim)
             return ZSS::ZSimModule::instance()->connectSim(color);
         else
             return ZSS::ZRemoteSimModule::instance()->connectSim(color);

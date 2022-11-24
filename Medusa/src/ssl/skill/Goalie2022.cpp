@@ -142,8 +142,8 @@ bool CGoalie2022::ShouldAttack(const CVisionModule* pVision)
 		if (robotNum != i)
 		{
 			const PlayerVisionT& helper_i = pVision->OurPlayer(i);
-			if (helper_i.Pos().dist(enemy.Pos()) < CLOSE_DIST
-				|| helper_i.Pos().dist(ball.Pos()) < CLOSE_DIST)//已经有帮手了
+            if (helper_i.Pos().dist(enemy.Pos()) < CLOSE_DIST*3
+                || helper_i.Pos().dist(ball.Pos()) < CLOSE_DIST*3)//已经有帮手了
 				return false;
 		}
 	}
@@ -213,12 +213,13 @@ CPlayerTask* CGoalie2022::supportTask(const CVisionModule* pVision)
 
 	double dir = CVector(leader.Pos()-me.Pos()).dir();
 
+    dir = CVector(CGeoPoint(400,0)-me.Pos()).dir();
 	int flag = task().player.flag;
 	flag |= PlayerStatus::QUICKLY;
 	flag |= PlayerStatus::DRIBBLING;
 
 	double power = 500;
-	KickStatus::Instance()->setKick(robotNum, power);
+    KickStatus::Instance()->setChipKick(robotNum, power);
 	return PlayerRole::makeItNoneTrajGetBall(robotNum, dir, CVector(0, 0), flag);
 }
 

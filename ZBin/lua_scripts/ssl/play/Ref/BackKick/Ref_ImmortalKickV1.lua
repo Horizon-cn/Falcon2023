@@ -1,4 +1,4 @@
-local chipPower = 300
+local chipPower = 350
 local TAR_POS = CGeoPoint:new_local(0, 0)
 local FreeKick_ImmortalStart_Pos = function ()
 	local pos
@@ -76,7 +76,7 @@ firstState = "getball",
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{DM}{AL}[SEH]"
+	match    = "{DM}{AS}[LEH]"
 },	
 
 ["chipball"] = {
@@ -100,7 +100,7 @@ firstState = "getball",
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{DM}{A}{LSEH}"
+	match    = "{DM}{AS}{LEH}"
 },
 
 ["waitball"] = {
@@ -118,7 +118,7 @@ firstState = "getball",
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{AL}{SMD}"
+	match    = "{DM}{AS}{LEH}"
 },
 
 name = "Ref_ImmortalKickV1",

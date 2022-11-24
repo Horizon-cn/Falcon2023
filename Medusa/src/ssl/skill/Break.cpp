@@ -144,7 +144,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     TaskT grabTask(task());
     cout<<me2enemy_dist<<endl;
-    if(me2enemy_dist<40 && alphaangle<120 * Param::Math::PI / 180.0)
+    if(me2enemy_dist<40 && alphaangle<120 * Param::Math::PI / 180.0 && false)
 //    if(true)
     {
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Spin" + to_string(0)).c_str(), COLOR_YELLOW);

@@ -15,7 +15,7 @@ const double FRAME_PERIOD = 1.0 / Param::Vision::FRAME_RATE;
 const double MIN_AVOID_DIST = Param::Vehicle::V2::PLAYER_SIZE + 2.0;
 const double LOWER_BOUND_AVOID_SPEED = 50;
 const double UPPER_BOUND_AVOID_SPEED = 250;
-double FREE_KICK_BUF = 25;
+double FREE_KICK_BUF = 20;
 double stopBallAvoidDist = 50;
 
 inline float minObs(float a, float b) {
@@ -560,7 +560,7 @@ void ObstaclesNew::addObs(const CVisionModule * pVision, const TaskT & task, boo
     // 设置Stop时的障碍
     if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop" || (flags & PlayerStatus::AVOID_STOP_BALL_CIRCLE)) {
         const BallVisionT& ball = pVision->Ball();
-        addCircle(ball.Pos(), CVector(0.0f, 0.0f), stopBallAvoidDist, OBS_CIRCLE_NEW);
+        addCircle(ball.Pos(), CVector(0.0f, 0.0f), stopBallAvoidDist + Param::Vehicle::V2::PLAYER_SIZE, OBS_CIRCLE_NEW);
     }
 
     if (drawObs) drawObstacles();
