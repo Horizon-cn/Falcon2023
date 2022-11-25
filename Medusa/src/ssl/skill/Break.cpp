@@ -43,7 +43,7 @@ namespace {
 
     //视主机性能调节
     const int MOD_NUM = 2;
-    const int ANGEL_MOD = 12;
+    const int ANGEL_MOD = 6;
 
 
     const int RADIUS = Param::Vehicle::V2::PLAYER_SIZE * 2;

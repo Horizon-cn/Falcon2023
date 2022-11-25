@@ -681,42 +681,42 @@ function goPassPos(role, f)
 end
 
 function goFirstPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.LWPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.LWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goSecondPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.RWPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.RWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goLWPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.LWPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.LWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goMWPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.MWPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.MWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goRWPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.RWPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.RWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goLMPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.LMPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.LMPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goMMPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.MMPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.MMPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goRMPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.RMPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.RMPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
@@ -998,7 +998,7 @@ end
 
 -- 用来盯人的skill,其中p为优先级
 function marking(p)
-	local mexe, mpos = Marking{pri = p}
+	local mexe, mpos = Marking{pri = p,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
@@ -1009,7 +1009,7 @@ end
 
 -- 强行绕前盯人
 function markingFront(p)
-	local mexe, mpos = Marking{pri = p, front = true, dir = dir.shoot()}
+	local mexe, mpos = Marking{pri = p, front = true, dir = dir.shoot(),flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 

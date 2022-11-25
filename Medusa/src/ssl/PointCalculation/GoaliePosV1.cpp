@@ -10,10 +10,12 @@
 #include "BestPlayer.h"
 #include <map>
 
+#define DEBUGGING
 #ifdef DEBUGGING
 #define DBG_BOOL(y,var) {if(var)GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,y), #var"=true");else GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,y), #var"=false");}
 #else
 #define DBG_BOOL(y,var) {}
+#define DBG_MSG(msg,)
 #endif
 
 CGoaliePosV1::CGoaliePosV1()
@@ -84,17 +86,18 @@ CGeoPoint CGoaliePosV1::GetPenaltyShootPosV2(const CVisionModule *pVision)
     double Ball2LeftDir = (CGeoPoint(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 + GoalBuffer) - ball.Pos()).dir();
     double Ball2RightDir =( CGeoPoint(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 - GoalBuffer) - ball.Pos()).dir();
     bool BallSpeed = (ball.Vel().mod() >= 30);
-    bool outOfShooter = !(DefenceInfo::Instance()->getBallTaken());
+    bool outOfShooter=true;
+//    bool outOfShooter = !(DefenceInfo::Instance()->getBallTaken());
     bool BallDirLimit = !Utils::InBetween(ball.Vel().dir(), Ball2LeftDir - Param::Math::PI * 10 / 180 , Ball2RightDir + Param::Math::PI * 10 / 180);
     bool BallShot = BallSpeed && outOfShooter && BallDirLimit;
-    bool enemyHasShot =enemy.Pos().dist(ball.Pos()) < 40
-        && Utils::InBetween(Utils::Normalize((ball.Pos() - enemy.Pos()).dir() + Param::Math::PI), Ball2LeftDir - Param::Math::PI * 10 / 180, Ball2RightDir + Param::Math::PI * 10 / 180)
-        && BallSpeed && outOfShooter && ball.VelX() < 0;
-    BallShot = BallShot || enemyHasShot;
+//    bool enemyHasShot =enemy.Pos().dist(ball.Pos()) < 40
+//        && Utils::InBetween(Utils::Normalize((ball.Pos() - enemy.Pos()).dir() + Param::Math::PI), Ball2LeftDir - Param::Math::PI * 10 / 180, Ball2RightDir + Param::Math::PI * 10 / 180)
+//        && BallSpeed && outOfShooter && ball.VelX() < 0;
+//    BallShot = BallShot || enemyHasShot;
     DBG_BOOL(-300,BallSpeed);
     DBG_BOOL(-350, outOfShooter);
     DBG_BOOL(-400, BallDirLimit);
-    DBG_BOOL(-250, enemyHasShot);
+//    DBG_BOOL(-250, enemyHasShot);
 
 
     const double goalie_x = Param::Vehicle::V2::PLAYER_SIZE + 1;
@@ -143,24 +146,26 @@ CGeoPoint CGoaliePosV1::GetPenaltyShootPosV2(const CVisionModule *pVision)
 CGeoPoint CGoaliePosV1::GetPenaltyShootPosV3(const CVisionModule *pVision)
 {
     const BallVisionT ball = pVision->Ball();
+    const PlayerVisionT& me = pVision->OurPlayer(0);
     const PlayerVisionT& enemy = pVision->TheirPlayer(this->GetNearestEnemy(pVision));
     double enemy_dir = enemy.Dir();
 
     int GoalBuffer = 2;
     double Ball2LeftDir = (CGeoPoint(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 + GoalBuffer) - ball.Pos()).dir();
     double Ball2RightDir = (CGeoPoint(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 - GoalBuffer) - ball.Pos()).dir();
-    bool BallSpeed = (ball.Vel().mod() >= 30);
-    bool outOfShooter = !(DefenceInfo::Instance()->getBallTaken());
+    bool BallSpeed = (ball.Vel().mod() >= 10);
+    bool outOfShooter = true;
+//    bool outOfShooter = !(DefenceInfo::Instance()->getBallTaken());
     bool BallDirLimit = !Utils::InBetween(ball.Vel().dir(), Ball2LeftDir - Param::Math::PI * 10 / 180, Ball2RightDir + Param::Math::PI * 10 / 180);
     bool BallShot = BallSpeed && outOfShooter && BallDirLimit;
-    bool enemyHasShot = enemy.Pos().dist(ball.Pos()) < 40
-        && Utils::InBetween(Utils::Normalize((ball.Pos() - enemy.Pos()).dir() + Param::Math::PI), Ball2LeftDir - Param::Math::PI * 10 / 180, Ball2RightDir + Param::Math::PI * 10 / 180)
-        && BallSpeed && outOfShooter && ball.VelX() < 0;
-    BallShot = BallShot || enemyHasShot;
+//    bool enemyHasShot = enemy.Pos().dist(ball.Pos()) < 40
+//        && Utils::InBetween(Utils::Normalize((ball.Pos() - enemy.Pos()).dir() + Param::Math::PI), Ball2LeftDir - Param::Math::PI * 10 / 180, Ball2RightDir + Param::Math::PI * 10 / 180)
+//        && BallSpeed && outOfShooter && ball.VelX() < 0;
+    BallShot = BallShot;
     DBG_BOOL(-300, BallSpeed);
     DBG_BOOL(-350, outOfShooter);
     DBG_BOOL(-400, BallDirLimit);
-    DBG_BOOL(-250, enemyHasShot);
+//    DBG_BOOL(-250, enemyHasShot);
 
 
     const double goalie_x = Param::Vehicle::V2::PLAYER_SIZE + 1;
@@ -178,8 +183,11 @@ CGeoPoint CGoaliePosV1::GetPenaltyShootPosV3(const CVisionModule *pVision)
         {
             pen_sht_pos = lli.IntersectPoint();
         }
+        GDebugEngine::Instance()->gui_debug_x(pen_sht_pos,COLOR_ORANGE);
+        pen_sht_pos=pen_sht_pos+Utils::Polar2Vector(30,(pen_sht_pos-me.Pos()).dir());
+        GDebugEngine::Instance()->gui_debug_x(pen_sht_pos,COLOR_RED);
     } else {
-        int random_num=9;
+        int random_num=5;
         vector<CGeoPoint> random_points;
         for (int i = 1; i <= random_num; i++) {
             double y = Param::Field::GOAL_WIDTH*(0.5-double(i)/double(random_num+1));
@@ -209,7 +217,7 @@ CGeoPoint CGoaliePosV1::GetPenaltyShootPosV3(const CVisionModule *pVision)
         {
             pen_sht_pos = CGeoPoint(pen_sht_pos.x(), Param::Field::GOAL_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE + GOAL_BUFFER);
         }
-
+        GDebugEngine::Instance()->gui_debug_x(pen_sht_pos,COLOR_RED);
         //random
         std::default_random_engine generator{(unsigned int)pVision->Cycle()};
         vector<int> weight_vector;

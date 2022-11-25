@@ -1,15 +1,9 @@
 local function def_chipPower()
-	if math.abs(ball.posX()) > 350 then
-		return 380
-	elseif math.abs(ball.posX()) > 280 then
-		return 320
-	else
-		return 80
-	end
+	return 450
 end
 
 
-local TAR_POS = CGeoPoint:new_local(0, 0)
+local TAR_POS = CGeoPoint:new_local(-100, 0)
 local FreeKick_ImmortalStart_Pos = function ()
 	local pos
 	local ball2goal = CVector:new_local(CGeoPoint:new_local(600, 0) - ball.pos())
@@ -71,7 +65,7 @@ firstState = "getball",
 ["getball"] = {
 	switch = function ()
 		local role = Role2Pass("Assister", "Special", "Engine", "Hawk", "Leader")
-		if bufcnt(player.InfoControlled("Assister") and player.toTargetDist(role) < 30, 10, 120) then
+		if bufcnt(player.InfoControlled("Assister") and player.toTargetDist(role) < 30, 10) then
 			return "chipball"
 		end
 		
@@ -93,7 +87,7 @@ firstState = "getball",
     switch = function ()
 
 		if bufcnt(player.kickBall("Assister") or
-				  player.toBallDist("Assister") > 20 and false, 3, 120) then
+				  player.toBallDist("Assister") > 20 and false, 3) then
 			return "waitball"
 		elseif  bufcnt(false,180) then
 			print("why here?")
