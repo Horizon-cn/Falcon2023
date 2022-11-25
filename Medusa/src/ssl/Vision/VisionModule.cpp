@@ -209,7 +209,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 			}
 		}
     //}
-	
+    /**
 	// 特殊情况二：
 	// 红外有信息，若球没看到，则予以位置修正，球若看到则检查红外信号，用以替换owl2中的处理 zyj
 	bool sensorBall = false;
@@ -225,7 +225,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 				}
 			}
 			else {	// 球看不到，根据红外信号纠正球的位置，如果有多辆车，选择上一帧最近的，若上一帧球车相距较远，则认为红外故障
-				if (_lastRawBallPos.Pos().dist(OurPlayer(i).Pos()) < minDist2Ball) {
+                if (_lastRawBallPos.Pos().dist(OurPlayer(i).Pos()) < minDist2Ball) {
 					minDist2Ball = _lastRawBallPos.Pos().dist(OurPlayer(i).Pos());
 					_ballPredictor.setPos(OurPlayer(i).Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_SIZE + ball_size, OurPlayer(i).Dir()));
 					_ballPredictor.setVel(Cycle(), CVector(0, 0)); //OurPlayer(i).Vel()
@@ -233,8 +233,8 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 				}
 			}
 		}
-	}
-	/**
+    }**/
+    double ball_size = 2.15;
 	bool sensorBall = false;
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i ++) {
 		if (RobotSensor::Instance()->IsInfoValid(i) && RobotSensor::Instance()->IsInfraredOn(i)) {
@@ -244,14 +244,13 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 					RobotSensor::Instance()->ResetInraredOn(i);
 				}
 			} else {				// 球看不到，根据红外信号纠正球的位置
-				//_ballPredictor.setPos(OurPlayer(i).Pos() + Utils::Polar2Vector(8.5,OurPlayer(i).Dir()));
-				//_ballPredictor.setVel(Cycle(), OurPlayer(i).Vel());
+                _ballPredictor.setPos(OurPlayer(i).Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_SIZE + ball_size,OurPlayer(i).Dir()));
+                _ballPredictor.setVel(Cycle(), OurPlayer(i).Vel());
 			}
 
 			break;
 		}
 	}
-	**/
 	/////////////////////////////////////////////////////////////////////////////
 	/// @brief Step 7: 向调试面板中显示一些必要的信息
 	/////////////////////////////////////////////////////////////////////////////

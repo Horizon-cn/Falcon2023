@@ -7,7 +7,7 @@ local function def_chipPower()
   elseif math.abs(ball.posY()) > 270 then 
     return 350
   else 
-    return 300
+    return 280
   end
 end
 

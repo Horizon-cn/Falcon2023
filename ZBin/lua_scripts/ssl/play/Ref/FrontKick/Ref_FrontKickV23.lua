@@ -23,11 +23,14 @@ local dangerous = true
 
 local chipPower = function(p)
   local pos
-  local k = 0.022
+  local k = 0.02
   if type(p) == "function" then
     pos = p()
   else
     pos = p
+  end
+  if math.abs(pos:y()) < 200 then
+    return 210 
   end
   return k*ball.toPointDist(pos)
 end

@@ -8,9 +8,7 @@ function isCorner()
 end
 
 if OPPONENT_NAME == "other" then
-    if isCorner() and ball.refPosX()<0 then
-        gCurrentPlay = "Ref_Stop4CornerDef"
-    elseif isCorner() and ball.refPosX()>=0 then
+    if isCorner() and ball.refPosX()>=0 then
         gCurrentPlay = "Ref_Stop4CornerKick"
     elseif math.abs(ball.refPosY()) > 410 then
         gCurrentPlay = "Ref_Stop4SideLine"

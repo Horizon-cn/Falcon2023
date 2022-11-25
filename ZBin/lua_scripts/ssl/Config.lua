@@ -5,7 +5,7 @@ OPPONENT_NAME = "other"
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
-gTestPlay = "Test_NormalAttack"--"Test_TouchKick""Test_NormalAttack" --"Test_Advance" -- "Test_GoTechChalPos"
+gTestPlay = "Test_NormalDefend" --"Test_NormalAttack""Test_NormalDefend" --"Test_Advance" -- "Test_GoTechChalPos"
 gNormalPlay = "NormalPlayDefend"
 gSwitchNum = {
 	["normal"]  = 6,
@@ -178,5 +178,6 @@ gTestPlayTable = {
 	"Test_TimeDelayTest",
 	"Test_GoTechChalPos",
 	"Test_NormalPlay",
-	"Test_NormalAttack"
+	"Test_NormalAttack",
+	"Test_NormalDefend"
 }

@@ -14,6 +14,7 @@ public:
 	CGeoPoint GetPenaltyShootPos(const CVisionModule *pVision);
 	// 点球的防守点，跟随球-门连线 [7/7/2011 zhanfei]
 	CGeoPoint GetPenaltyShootPosV2(const CVisionModule *pVision);
+    CGeoPoint GetPenaltyShootPosV3(const CVisionModule *pVision);
 	// 取得离球门最近的敌方车 [6/15/2011 zhanfei]
 	int GetNearestEnemy(const CVisionModule *pVision);
 };

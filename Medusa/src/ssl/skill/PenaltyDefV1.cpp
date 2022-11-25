@@ -37,7 +37,7 @@ void CPenaltyDefV1::plan(const CVisionModule* pVision)
 	CGeoPoint pen_sht_pos;
 	if (use_new_method == true)
 	{
-		pen_sht_pos = GoaliePosV1::Instance()->GetPenaltyShootPosV2(pVision);
+        pen_sht_pos = GoaliePosV1::Instance()->GetPenaltyShootPosV3(pVision);
 	}
 	else
 	{

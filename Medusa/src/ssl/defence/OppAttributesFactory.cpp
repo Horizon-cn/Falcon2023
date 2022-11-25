@@ -343,11 +343,22 @@ EVALUATE_ATTRIBUTE(AVelY)
 	setValue(tempValue);
 }
 
-//is goalie,待修改
+//is goalie
 EVALUATE_ATTRIBUTE(AGoalie)
 {
 	double tempValue = 0;
-    tempValue = ( pVision->gameState().gameOn() && num == 0);//vision->TheirGoalie());
+    double dist=1000;
+    int goalieNum=0;
+    for(int i=0;i<Param::Field::MAX_PLAYER;i++)
+    {
+        double d=pVision->TheirPlayer(i).Pos().dist(THEIR_GOAL_CENTER);
+        if(d<dist)
+        {
+            dist=d;
+            goalieNum=i;
+        }
+    }
+    tempValue=(num==goalieNum);
 	setValue(tempValue);
 }
 //  以球为基点的球速矢量的方向，与球到我的方向的，角度差

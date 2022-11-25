@@ -161,7 +161,7 @@ firstState = "init",
 
 ["gotolong"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Kicker") < 30 , 10 , 120) then
+		if bufcnt(player.toTargetDist("Goalie") < 30 , 10 , 120) then
 			return "templong"
 		end
 	end,
@@ -181,7 +181,7 @@ firstState = "init",
 
 ["kick"] = {
 	switch = function ()
-		if bufcnt(ball.posX()>500, 5) then
+		if ball.posX()>500 then
 			return "exit"
 		end
 	end,

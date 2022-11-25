@@ -184,7 +184,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     else{
 
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
-    if (pVision->Cycle() % 5== 0) {
+    if (pVision->Cycle() % 30== 0) {
         move_point = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     }
     else {
@@ -201,11 +201,13 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     if (isPenalty)
     {
+        cout<<"isPenalty"<<endl;
         penaltyX=me.Pos().x()+20.0;
         penaltyY=move_point.y();
         grabTask.player.pos=CGeoPoint(penaltyX,penaltyY);
+        GDebugEngine::Instance()->gui_debug_x(CGeoPoint(penaltyX,penaltyY),COLOR_BLACK);
     }
-    else if(isSpin)
+    else if(isSpin&&false)
     {
         penaltyX=me.Pos().x();
         penaltyY=me.Pos().y();
@@ -312,7 +314,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
 
         //将在参与防守的敌方车入队
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 7; i++) {
             auto test_enemy = pVision->TheirPlayer(i);
             if (test_enemy.Valid() && !Utils::InTheirPenaltyArea(test_enemy.Pos(), 0))
                 enemy_points.push_back(test_enemy.Pos());
@@ -336,7 +338,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             auto to_projection_dist = (projection - test_point).mod();
             auto straight_dist = (test_enemy - test_point).mod();
 
-            if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist/straight_dist < 0.3)) {
+            if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist < 20)) {
 
                 canShoot = false;
                 needBreakThrough = true;
@@ -360,12 +362,12 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             for (int i = -ANGEL_MOD; i < ANGEL_MOD; i++) {
 
                 //生成test_point
-                CVector vec = Utils::Polar2Vector(double((DRIBBLE_DIST-5.0)/6),Utils::Normalize(me2target.dir() + i * Param::Math::PI / ANGEL_MOD));
+                CVector vec = Utils::Polar2Vector(double(DRIBBLE_DIST / MOD_NUM),
+                    Utils::Normalize(me2target.dir() + i * Param::Math::PI / ANGEL_MOD));
 
                 CGeoPoint test_point = me.Pos() + vec;
 
                 test_point = makeInCircle(test_point, dribblePoint, DRIBBLE_DIST);
-                GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_GREEN);
 
                 if (!Utils::IsInField(test_point, 0))
                 {
@@ -403,7 +405,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                         block_score += straight_dist / projection_dist;
 
                     }
-
+                }
                 near_score = -near_score;
                 double overall_score = COEF_BLOCKSCORE * block_score + COEF_DISTSCORE * dist_score + COEF_NEARSCORE * near_score;
                 point_score_list.push_back(overall_score);
@@ -412,10 +414,9 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
 
 
+                //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -350), ("canshoot:" + to_string(canShoot)).c_str(), COLOR_YELLOW);
 
 
-
-            }
             }
             int selected_pos = std::min_element(point_score_list.begin(),point_score_list.end())-point_score_list.begin();
 

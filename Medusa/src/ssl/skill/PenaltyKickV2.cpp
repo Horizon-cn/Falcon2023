@@ -151,7 +151,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             }
             else {
                 if (fabs(opp.VelX()) > 300 || Me2OppTooclose(pVision, _executor)) {
-                    _state = BREAKSHOOT; break;
+                    _state = CHIP; break;
                 }
                 else if (me2goal.mod() > KICK_DIST + 100){
                     _state = NORMAL_PUSH; break;
@@ -276,7 +276,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Chip", COLOR_ORANGE);
         if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
             if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip isDirOK", COLOR_ORANGE);
-            KickStatus::Instance()->setChipKick(_executor, me2goal.mod() + 8);
+            KickStatus::Instance()->setChipKick(_executor, me2goal.mod() - 18);
         }
         else {
             //setSubTask(PlayerRole::makeItGoAndTurnKickV4(_executor, kickDir));
