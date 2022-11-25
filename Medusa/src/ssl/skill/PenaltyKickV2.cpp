@@ -81,6 +81,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
     int NumofPlayerInFrontfiled = 0;
     bool isMeHasBall = false;
     bool isMechHasBall = infraredOn >= 2;
+    printf("%d\n", infraredOn);
     bool visionHasBall = isVisionHasBall(pVision, _executor);
     isMeHasBall = isMechHasBall; //isMechHasBall&&
     if (isMeHasBall) {
@@ -149,7 +150,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
                 }
             }
             else {
-                if (opp2ball.mod() < 500 || Me2OppTooclose(pVision, _executor)) {
+                if (fabs(opp.VelX()) > 300 || Me2OppTooclose(pVision, _executor)) {
                     _state = BREAKSHOOT; break;
                 }
                 else if (me2goal.mod() > KICK_DIST + 100){
@@ -180,7 +181,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             if (Advance_DEBUG_ENGINE) { cout << "normalpush --> get" << endl; }
             _state = GET;
         }
-        else if (me2goal.mod() < KICK_DIST + 100 || Me2OppTooclose(pVision, _executor)) {
+        else if (me2goal.mod() < KICK_DIST || Me2OppTooclose(pVision, _executor)) {
             if (Advance_DEBUG_ENGINE) { cout << "normalpush-> breakshoot" << endl; }
             if (tendToShoot(pVision, _executor)) {
                 _state = KICK;
@@ -204,7 +205,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             //if (DEBUG_ENGINE) { cout << "light kick --> goto" << endl; }
             _state = GET;
         }
-        else if (me2goal.mod() < KICK_DIST + 100 || Me2OppTooclose(pVision, _executor)) {
+        else if (me2goal.mod() < KICK_DIST || Me2OppTooclose(pVision, _executor)) {
             if (Advance_DEBUG_ENGINE) { cout << "light kick -> shoot" << endl; }
             if (tendToShoot(pVision, _executor)) {
                 _state = KICK;
@@ -445,7 +446,7 @@ bool CPenaltyKickV2::Me2OppTooclose(const CVisionModule* pVision, const int vecN
     CVector me2Ball = ball.Pos() - me.Pos();
     CVector me2Opp = opp.Pos() - me.Pos();
     CVector Opp2Ball = ball.Pos() - opp.Pos();
-    if (abs(me2Ball.mod()) < 80 && abs(Opp2Ball.mod()) < 200) {
+    if (abs(me2Ball.mod()) < 80 && abs(Opp2Ball.mod()) < 130) {
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(450, 450), "TOO CLOSE with ball", COLOR_ORANGE);
         return true;
     }

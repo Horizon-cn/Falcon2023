@@ -347,7 +347,7 @@ EVALUATE_ATTRIBUTE(AVelY)
 EVALUATE_ATTRIBUTE(AGoalie)
 {
 	double tempValue = 0;
-	tempValue = ( pVision->gameState().gameOn() && num == vision->TheirGoalie());
+    tempValue = ( pVision->gameState().gameOn() && num == 0);//vision->TheirGoalie());
 	setValue(tempValue);
 }
 //  以球为基点的球速矢量的方向，与球到我的方向的，角度差

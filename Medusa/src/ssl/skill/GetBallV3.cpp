@@ -189,11 +189,11 @@ void CGetBallV3::plan(const CVisionModule* pVision)
         if (me.Vel().mod() > 20) {
             double vel_dir = me.Vel().dir();
             double vel_dir_diff = abs(vel_dir - (projection_point - me.Pos()).dir());
-            BallPosWithVelFactorTmp += (vel_dir_diff - Param::Math::PI/2) / 5;
+            BallPosWithVelFactorTmp += (vel_dir_diff - Param::Math::PI/2) / 8;
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), QString("vel dir diff time:%5").arg((vel_dir_diff - Param::Math::PI/2) / 5).toStdString().c_str());
         }
 
-        BallPosWithVelFactorTmp += projection2me_dist / 500;
+        BallPosWithVelFactorTmp += projection2me_dist / 400;
         BallPosWithVelFactorTmp += angle_diff / 15;
 
         // 粗略计算预测球的位置
@@ -325,9 +325,9 @@ void CGetBallV3::plan(const CVisionModule* pVision)
                 ab_state = BALLBESIDEME;
             }
         }
-        else if (ballVel.mod() > 200) {
-            setState(WAITBALL);
-        }
+//        else if (ballVel.mod() > 200) {
+//            setState(WAITBALL);
+//        }
         else {
             setState(GETBALL);
             gb_state = LARGEANGLE;
@@ -343,7 +343,7 @@ void CGetBallV3::plan(const CVisionModule* pVision)
                 cout << "-->DirectGoto";
             }
         }
-        else if (isBallFrontOfMyhead && isInDirectGetBallCircle) {
+        else if ((isBallFrontOfMyhead && isInDirectGetBallCircle)) {
             setState(GETBALL);
             gb_state = LARGEANGLE;
             if (DEBUG_ENGINE)
@@ -395,13 +395,13 @@ void CGetBallV3::plan(const CVisionModule* pVision)
                 cout << "-->DirectGoto";
             }
         }
-        else if (ballVel.mod() > 200) {
-            setState(WAITBALL);
-            if (DEBUG_ENGINE)
-            {
-                cout << "-->WaitBall";
-            }
-        }
+//        else if (ballVel.mod() > 200) {
+//            setState(WAITBALL);
+//            if (DEBUG_ENGINE)
+//            {
+//                cout << "-->WaitBall";
+//            }
+//        }
         else if (RobotSensor::Instance()->IsInfraredOn(robotNum))
         { //什么都不做，不跳转状态
         }
@@ -510,6 +510,8 @@ void CGetBallV3::plan(const CVisionModule* pVision)
                 getBallDist = maxGetBallDist;
             }
             getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(getBallDist, theta_Dir);
+            if (pVision->GetCurrentRefereeMsg() == "ourIndirectKick" || pVision->GetCurrentRefereeMsg() == "ourDirectKick" || pVision->GetCurrentRefereeMsg() == "ourKickOff")
+                getball_task.player.flag = getball_task.player.flag | (PlayerStatus::DODGE_BALL);
         }
         break; }
     case AVOIDBALL: {//TODO 加入球速影响，球在有速度的情况下修正躲避点

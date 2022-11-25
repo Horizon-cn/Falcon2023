@@ -58,6 +58,7 @@ gSkill = {
 	"ChaseKick",
 	"ChaseKickV2",
 	"AdvanceBall",
+	"AdvanceBallV3",
 	"AdvanceBallV4",
 	--防守
 	"Marking",

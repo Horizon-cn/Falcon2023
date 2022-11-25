@@ -143,7 +143,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 			if (pVision->OurPlayer(i).Pos().x() > Param::Field::PITCH_LENGTH / 10)
 				NumofPlayerInFrontfiled++;
 	}
-
+    cout<<NowIsShoot<<endl;
+    if(Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor))
+        cout<<me.X()<<' '<<me.Y()<<' '<<Me2OppTooclose(pVision, _executor)<<' '<<isInBreakArea(pVision, _executor)<<' '<<"datapram"<<endl;
 	/**********************************************************
 	* Description: 状态分配
 	* Author: 谭宇宏
@@ -167,6 +169,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 					_state = KICK; break;
 				}
 				else if(Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor)) {
+
                     NowIsShoot = 2;
 					_state = BREAKSHOOT; break;
                 }
@@ -180,7 +183,7 @@ void CAdvance::plan(const CVisionModule* pVision)
                 else if(Me2OppTooclose(pVision, _executor)) {
                     _state = BREAKPASS; break;
 				}
-                else { _state = BREAKSHOOT; break; }
+                else { _state = KICK; break; }
 			}
 			else {
 				/*人在后场  此处作为一个框架的TODO*/
@@ -189,7 +192,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 				}
                 else if (Me2OppTooclose(pVision, _executor)) {
-                    _state = PASS; break;
+                    _state = BREAKPASS; break;
 				}
                 else { _state = JUSTCHIPPASS; break; }
 			}

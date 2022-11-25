@@ -311,14 +311,14 @@ void CMarking::plan(const CVisionModule* pVision)
 	}else if ((friendlyAngleOK && friendlyLimit) || !NOT_VOILENCE)
 	{	
 		//不避开对手车
-		MarkingTask.player.flag |= PlayerStatus::NOT_AVOID_THEIR_VEHICLE;
+//		MarkingTask.player.flag |= PlayerStatus::NOT_AVOID_THEIR_VEHICLE;
 		DefenceInfo::Instance()->setMarkMode(vecNumber,enemyNum,false);
 		//cout<<MarkingTask.player.flag<<endl;
 		setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(MarkingTask));	
 	}else {
 		//cout<<MarkingTask.player.flag<<endl;
 		if (ball.Pos().x()<-300){
-			MarkingTask.player.flag |= PlayerStatus::NOT_AVOID_THEIR_VEHICLE;
+//			MarkingTask.player.flag |= PlayerStatus::NOT_AVOID_THEIR_VEHICLE;
 		}
 		DefenceInfo::Instance()->setMarkMode(vecNumber,enemyNum,false);
 		setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(MarkingTask));

@@ -20,30 +20,10 @@ local SHOOT_POS = pos.passForTouch(ball.refAntiYPos(CGeoPoint:new_local(310,100)
 local Pre_SHOOT_POS = ball.refAntiYPos(CGeoPoint:new_local(350,120))
 local dangerous = true
 
---[[local chipPower = function()
-  local yy = 0
-  if ball.refPosY() >= 0 then
-    yy = ball.refPosY()+110
-  else
-    yy = 110-ball.refPosY()
-  end
-
-  local xx = 0
-  if ball.posX() >= 310 then
-    xx = ball.posX()-310
-  else
-    xx = 310-ball.posX()
-  end
-
-  local k = 0.025
-  local len = xx+yy
-  return k*len
-end--]]
-
 
 local chipPower = function(p)
   local pos
-  local k = 0.025
+  local k = 0.022
   if type(p) == "function" then
     pos = p()
   else
@@ -57,23 +37,6 @@ gPlayTable.CreatePlay{
 
   firstState = "start",
 
---[[  ["start"] = {
-    switch = function ()
-      if bufcnt(player.toTargetDist("Leader") < 20 , 6, 180) then
-        return "pass"
-      end
-    end,
-    Assister = task.staticGetBall(SHOOT_POS()),
-    Leader   = task.goCmuRush(Pre_SHOOT_POS),
-    Special  = task.goCmuRush(FAKE_POS_2),
-    Middle   = task.goCmuRush(FAKE_POS_1),
-    Defender = task.leftBack(),
-    Goalie   = dangerous and task.goalie(),
-    Engine   = task.singleBack(),
-    Hawk     = task.rightBack(),
-    match    = "{A}{DLSMH}{E}"
-  },--]]
-
  ["start"] = {
     switch = function ()
       if bufcnt(player.toTargetDist("Leader") < 20 , 30, 180) then
@@ -81,9 +44,6 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.staticGetBall(SHOOT_POS()),
-    -- Leader   = task.goCmuRush(ASIS_POS_3),
-    -- Special  = task.goCmuRush(ASIS_POS_2),
-    -- Middle   = task.goCmuRush(ASIS_POS_1),
     Leader   = task.goCmuRush(ASIS_POS_1),
     Special  = task.goCmuRush(ASIS_POS_2),
     Middle   = task.goCmuRush(ASIS_POS_3),
@@ -108,7 +68,7 @@ gPlayTable.CreatePlay{
       
     end,
     
-    Assister = task.chipPass(SHOOT_POS()),
+    Assister = task.chipPass(SHOOT_POS(),chipPower(SHOOT_POS())),
     Leader   = task.goCmuRush(Pre_SHOOT_POS),
     Special  = task.goCmuRush(FAKE_POS_22),
     Middle   = task.goCmuRush(FAKE_POS_11),

@@ -141,7 +141,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     bool frared = (RobotSensor::Instance()->IsInfraredOn(vecNumber)) || isVisionHasBall(pVision, task().executor);
 
 
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("frared Status:" + to_string(fraredOn)).c_str(), COLOR_YELLOW);
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("frared Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
 
     if (!frared)
     {
@@ -156,17 +156,17 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     TaskT grabTask(task());
     cout<<me2enemy_dist<<endl;
-   if(me2enemy_dist<30 && alphaangle<120 * Param::Math::PI / 180.0 )
+   if(me2enemy_dist<30 && alphaangle<120 * Param::Math::PI / 180.0&&false )
 //    if(true)
     //if(isSpin&& false)
     {
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Spin" + to_string(0)).c_str(), COLOR_YELLOW);
 
         cout<<"SPIN!"<<endl;
-        grabTask.player.speed_x = -deltax*20.0;
-        grabTask.player.speed_y = -deltay*20.0;
-        grabTask.player.max_acceleration=200;
-        grabTask.player.max_deceleration=200;
+        grabTask.player.speed_x = -deltax*40.0;
+        grabTask.player.speed_y = -deltay*40.0;
+        grabTask.player.max_acceleration=180;
+        grabTask.player.max_deceleration=180;
         DribbleStatus::Instance()->setDribbleCommand(task().executor, 3);
         if(criterion)
         {
@@ -184,7 +184,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     else{
 
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
-    if (pVision->Cycle() % 30== 0) {
+    if (pVision->Cycle() % 5== 0) {
         move_point = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     }
     else {
@@ -195,8 +195,8 @@ void CBreak::plan(const CVisionModule* pVision) {
 
 
     if (DEBUG) GDebugEngine::Instance()->gui_debug_line(dribblePoint, move_point, COLOR_GREEN);
-    grabTask.player.max_acceleration=200;
-    grabTask.player.max_deceleration=200;
+    grabTask.player.max_acceleration=180;
+    grabTask.player.max_deceleration=180;
 
 
     if (isPenalty)
@@ -225,7 +225,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     GDebugEngine::Instance()->gui_debug_x(move_point, COLOR_RED);
     GDebugEngine::Instance()->gui_debug_x(passTarget, COLOR_RED);
-    setSubTask(TaskFactoryV2::Instance()->GotoPosition(grabTask));
+    setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(grabTask));
 
 
     if (DEBUG) {
@@ -234,6 +234,8 @@ void CBreak::plan(const CVisionModule* pVision) {
     }
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("Canshoot:" + to_string(canShoot)).c_str(), COLOR_YELLOW);
     auto vel_vertical_target = std::sin(me.Vel().dir() - me2target.dir()) * me.Vel().mod();
+
+    cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
     if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 10
         //vel_vertical_target < 5
         //	)
@@ -358,7 +360,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             for (int i = -ANGEL_MOD; i < ANGEL_MOD; i++) {
 
                 //Éú³Étest_point
-                CVector vec = Utils::Polar2Vector(double((DRIBBLE_DIST-5.0)/1.5),Utils::Normalize(me2target.dir() + i * Param::Math::PI / ANGEL_MOD));
+                CVector vec = Utils::Polar2Vector(double((DRIBBLE_DIST-5.0)/6),Utils::Normalize(me2target.dir() + i * Param::Math::PI / ANGEL_MOD));
 
                 CGeoPoint test_point = me.Pos() + vec;
 
@@ -402,7 +404,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
                     }
 
-                near_score = 1/near_score;
+                near_score = -near_score;
                 double overall_score = COEF_BLOCKSCORE * block_score + COEF_DISTSCORE * dist_score + COEF_NEARSCORE * near_score;
                 point_score_list.push_back(overall_score);
                 point_list.push_back(test_point);

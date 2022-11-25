@@ -993,7 +993,7 @@ end
 
 function penaltyGoalie()
 	local mexe, mpos = PenaltyGoalie{}
-	return {mexe, mpos}
+	return {mexe, mpos, kick.chip ,dir.shoot(), pre.fieldDefender(),  kp.full(), cp.full(),flag.not_avoid_their_vehicle}
 end
 
 -- 用来盯人的skill,其中p为优先级
@@ -1060,6 +1060,17 @@ function advanceV4(role)
 		itandem = role()
 	end
 	local mexe, mpos = AdvanceBallV4{pos = pos.advance, srole = "advancer", tandem = itandem}
+	return {mexe, mpos}
+end
+
+function advanceV3(role)
+	local itandem = nil
+	if type(role) == "string" then
+		itandem = role
+	elseif type(role) == "function" then
+		itandem = role()
+	end
+	local mexe, mpos = AdvanceBallV3{pos = pos.advance, srole = "advancer", tandem = itandem}
 	return {mexe, mpos}
 end
 

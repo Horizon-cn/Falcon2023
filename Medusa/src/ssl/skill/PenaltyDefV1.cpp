@@ -14,7 +14,7 @@
 namespace
 {
 	bool VERBOSE_MODE = false;
-	bool use_new_method = false;
+    bool use_new_method = true;
 }
 CPenaltyDefV1::CPenaltyDefV1()
 {}

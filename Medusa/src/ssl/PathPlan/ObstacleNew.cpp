@@ -360,6 +360,8 @@ void ObstaclesNew::addObs(const CVisionModule * pVision, const TaskT & task, boo
     int rolenum = task.executor;
     int flags = task.player.flag;
     int shootCar = task.ball.Sender;
+    CGeoPoint targetPos = task.player.pos;
+    CVector myVel = pVision->OurPlayer(rolenum).Vel();
     CGeoPoint myPos = pVision->OurPlayer(rolenum).Pos();
     const bool isBack = (rolenum == TaskMediator::Instance()->leftBack()) ||
                         (rolenum == TaskMediator::Instance()->rightBack()) ||
@@ -538,14 +540,38 @@ void ObstaclesNew::addObs(const CVisionModule * pVision, const TaskT & task, boo
             const PlayerVisionT& opp = pVision->TheirPlayer(i);
             if (opp.Valid()) {
                 double factor;
+                double extra_avoid_dist = 0;
                 if(opp.Vel().mod() < LOWER_BOUND_AVOID_SPEED) factor = 0.0;
                 else if(opp.Vel().mod() < UPPER_BOUND_AVOID_SPEED) factor = (opp.Vel().mod() - LOWER_BOUND_AVOID_SPEED) / (UPPER_BOUND_AVOID_SPEED - LOWER_BOUND_AVOID_SPEED);
                 else factor = 1.0;
+                if (targetPos.dist(opp.Pos()) > 30 && myVel.mod() > 150){
+                    // 接下来进行角度的判断
+                    CGeoLine myTraj = CGeoLine(myPos, myPos+myVel);
+                    CGeoPoint projection_point = myTraj.projection(opp.Pos());
+                    CVector me2opp = opp.Pos() - myPos;
+                    // 判断敌方速度，根据敌方速度扩大障碍物
+                    float opp_predict_avoid = opp.Vel().mod() / 250; // 适当增加0～2cm
+                    float me_predict_avoid = myVel.mod() / 250; // 适当增加0～2cm
+                    // 如果我的速度方向和我和敌方连线夹角较小且有可能撞上，则适当增大障碍物半径
+//                    if (abs(me2opp.dir() - myVel.dir()) < 15.0 / 180.0 * Param::Math::PI && opp.Pos().dist(projection_point) < Param::Vehicle::V2::PLAYER_SIZE + 5 + opp_predict_avoid + me_predict_avoid){
+//                        extra_avoid_dist = me_predict_avoid + opp_predict_avoid;
+//                    }
+                    extra_avoid_dist = me_predict_avoid + opp_predict_avoid;
+                }
                 double tempAvoidDist;
-                if(oppAvoidDist < MIN_AVOID_DIST)
+                if(oppAvoidDist < MIN_AVOID_DIST){
                     tempAvoidDist = MIN_AVOID_DIST;
-                else
-                    tempAvoidDist = MIN_AVOID_DIST + factor * (oppAvoidDist - MIN_AVOID_DIST);
+//                    GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 10, 0.0, 360.0, COLOR_RED);
+                }
+                else{
+                    tempAvoidDist = MIN_AVOID_DIST + 2 * factor * (oppAvoidDist - MIN_AVOID_DIST) + 2 * extra_avoid_dist;
+//                    if (extra_avoid_dist > 0){
+//                        GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 2 * extra_avoid_dist, 0.0, 360.0, COLOR_BLUE);
+//                    }
+//                    else{
+//                        GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 10, 0.0, 360.0, COLOR_YELLOW);
+//                    }
+                }
                 addCircle(opp.Pos(), opp.Vel(), tempAvoidDist, OBS_CIRCLE_NEW);
             }
         }

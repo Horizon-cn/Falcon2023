@@ -13,7 +13,7 @@
 #include <TaskMediator.h>
 //#include <atlstr.h>
 
-//#define DEBUGING
+#define DEBUGING
 #ifdef DEBUGING
 #define MSG(x) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,-350), x)
 #define DBG(x) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,-300), x)
@@ -42,7 +42,7 @@ CGoalie2022::CGoalie2022()
     KICKPOWER = paramManager->KICKPOWER_GOALIE;
     HAVE_BALL_DIST = paramManager->HAVE_BALL_DIST;
     CLOSE_DIST = paramManager->CLOSE_DIST;
-    AGGRESSIVE_GOALIE = false ;//paramManager->AGGRESSIVE_GOALIE;
+    AGGRESSIVE_GOALIE = true ;//paramManager->AGGRESSIVE_GOALIE;
     CHALLENGE_BALL_DIST = paramManager->CHALLENGE_BALL_DIST;
     BLOCK_DIST = paramManager->BLOCK_DIST;
 }

@@ -165,10 +165,13 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         buffer = 0;
     }
     double avoidLength = Param::Vehicle::V2::PLAYER_SIZE + buffer;
+    float avoidBallFix = 3;
+    if (pVision->GetCurrentRefereeMsg() == "ourIndirectKick" || pVision->GetCurrentRefereeMsg() == "ourDirectKick" || pVision->GetCurrentRefereeMsg() == "ourKickOff")
+        avoidBallFix = 1.5;
 
     // ???????????
     ObstaclesNew obsNew(avoidLength);
-    obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + 3);
+    obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
 
     /************************************************************************/
     /* ?????????                                                            */
