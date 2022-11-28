@@ -67,10 +67,10 @@ firstState = "getball",
 		
 	end,
 	Assister = task.staticGetBall(TAR_POS),
-	Special  = task.goCmuRush(TAR_POS, _, ACC, STOP_DSS),
-	Engine   = task.goLeftSupport(),
-	Hawk     = task.goRightSupport(),
-	Leader   = task.goCmuRush(FREEKICKPOS, _, ACC, STOP_DSS),
+	Special  = task.goCmuRush(TAR_POS,_,_,flag.allow_dss),
+	Engine   = task.goMWPassPos("Assister"),
+	Hawk     = task.marking("First"),
+	Leader   = task.goCmuRush(FREEKICKPOS,_,_,flag.allow_dss),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
@@ -88,14 +88,14 @@ firstState = "getball",
 		end
 	end,
 	Assister = task.chipPass(TAR_POS, chipPower),
-	Special  = task.goCmuRush(TAR_POS, _, ACC, STOP_DSS),
-	Engine   = task.goLeftSupport(),
-	Hawk     = task.goRightSupport(),
-	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()), _, ACC, STOP_DSS),
+	Special  = task.goCmuRush(TAR_POS,_,_,flag.allow_dss),
+	Engine   = task.goMWPassPos("Assister"),
+	Hawk     = task.marking("First"),
+	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()),_,_,flag.allow_dss),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{DM}{A}{S}{LEH}"
+	match    = "{A}{DM}{S}{LEH}"
 },
 
 ["waitball"] = {
@@ -106,13 +106,13 @@ firstState = "getball",
 	end,
 	Assister = task.stop(),
 	Special  = task.advance(),
-	Engine   = task.goLeftSupport(),
-	Hawk     = task.goRightSupport(),
-	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()),  _, ACC, STOP_DSS),
+	Engine   = task.goMWPassPos("Assister"),
+	Hawk     = task.marking("First"),
+	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()),_,_,flag.allow_dss),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{DM}{S}{L}{AEH}"
+	match    = "{S}{DM}{L}{EHA}"
 },
 
 name = "Ref_MiddleKickV5",

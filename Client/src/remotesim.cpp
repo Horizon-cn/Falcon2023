@@ -146,7 +146,7 @@ void RemoteSim::readYellowData() {
             datagram.resize(yellowReceiveSocket.pendingDatagramSize());
             yellowReceiveSocket.readDatagram(datagram.data(), datagram.size());
             robotsPacket.ParseFromArray(datagram, datagram.size());
-
+            qDebug()<<"receive";
             for (int i = 0; i < robotsPacket.robots_status_size(); ++i) {
                 int id = robotsPacket.robots_status(i).robot_id();
                 bool infrared = robotsPacket.robots_status(i).infrared();

@@ -31,6 +31,7 @@ private:
     bool isVisionHasBall(const CVisionModule* pVision, const int vecNumber);
     CGeoPoint makeInCircle(const CGeoPoint& point, const CGeoPoint& center, double radius);
     CGeoPoint calc_point(const CVisionModule* pVision, const int vecNumber, const CGeoPoint& target, const CGeoPoint& dribblePoint, const bool isChip, bool& canShoot, bool& needBreakThrough);
+    double holdBallDir(const CVisionModule *pVision, int robotNum);
 };
 
 #endif

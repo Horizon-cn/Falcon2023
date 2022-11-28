@@ -347,17 +347,7 @@ EVALUATE_ATTRIBUTE(AVelY)
 EVALUATE_ATTRIBUTE(AGoalie)
 {
 	double tempValue = 0;
-    double dist=1000;
-    int goalieNum=0;
-    for(int i=0;i<Param::Field::MAX_PLAYER;i++)
-    {
-        double d=pVision->TheirPlayer(i).Pos().dist(THEIR_GOAL_CENTER);
-        if(d<dist)
-        {
-            dist=d;
-            goalieNum=i;
-        }
-    }
+    int goalieNum = pVision->TheirGoalie();
     tempValue=(num==goalieNum);
 	setValue(tempValue);
 }

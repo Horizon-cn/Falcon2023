@@ -9,13 +9,16 @@ function GoAndTurnKickV3(task)
 	local numPerCircle = 5
 	local goToPre = math.pi / 6
 	local goToDist = 19
-	local adjustPre = math.pi / 72
+	local adjustPre = math.pi / 30
 
 	execute = function(runner)
-		if type(task.dir) == "function" then
+		--[[if type(task.dir) == "function" then
 			mdir = task.dir(runner)
 		else
 			mdir = task.dir
+		end--]]
+		if mdir==nil then
+			mdir = task.dir(runner)
 		end
 		CSetPassDir(player.dir(runner))
 		local mpre = task.pre()

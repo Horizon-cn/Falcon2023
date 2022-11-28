@@ -11,14 +11,13 @@ gPlayTable.CreatePlay{
     end,
   Leader = task.defendKick(),
   Assister = task.marking("Third"),
-  --Assister = task.goMMPassPos("Leader"),
   Powerhouse = task.marking("Second"),
-  Special = task.multiBack(3, 1), --sideBack(),
+  Special = task.multiBack(3, 1),
   Defender = task.marking("First"),
-  Hawk = task.multiBack(3,2), --leftBack(),
-  Middle = task.multiBack(3, 3), --rightBack(),
+  Hawk = task.multiBack(3,2),
+  Middle = task.multiBack(3, 3),
   Goalie = task.goalieNew(),
-    match = "[L][A][PSDHM]"
+  match = "[L][SH][D][PMA]"
 },
   name = "Ref_BackDefV12",
   applicable = {

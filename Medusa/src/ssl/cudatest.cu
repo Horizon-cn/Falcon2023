@@ -255,10 +255,10 @@ __device__ float evaluate_goal(float* me_pos, float* ball_pos, float* their_play
             }
         }
     }
-    // 过于靠近y=0的线不易进球与接球
-    if (abs(me_pos[1]) < 50) {
-        reverseGoalP += 10;
-    }
+//    // 过于靠近y=0的线不易进球与接球
+//    if (abs(me_pos[1]) < 50) {
+//        reverseGoalP += 10;
+//    }
     return reverseGoalP;
 }
 

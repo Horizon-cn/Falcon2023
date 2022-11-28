@@ -47,14 +47,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.staticGetBall(SHOOT_POS()),
-    Leader   = task.goCmuRush(ASIS_POS_1),
-    Special  = task.goCmuRush(ASIS_POS_2),
-    Middle   = task.goCmuRush(ASIS_POS_3),
+    Leader   = task.goCmuRush(ASIS_POS_1,_,_,flag.allow_dss),
+    Special  = task.goMWPassPos("Assister"),
+    Middle   = task.marking("First"),
     Defender = task.leftBack(),
     Goalie   = task.goalie(),
     Engine   = task.singleBack(),
     Hawk     = task.rightBack(),
-    match    = "{A}{DLSMH}{E}"
+    match    = "{A}{DH}{LSM}{E}"
   }, 
 
   
@@ -62,8 +62,6 @@ gPlayTable.CreatePlay{
   ["pass"] = {
     switch = function ()
       if player.kickBall("Assister") or player.toBallDist("Assister") > 30 then
-        print("wait")
-        print("chipPower",chipPower(SHOOT_POS()))
         return "shoot"
       else
         print("exit")
@@ -72,14 +70,14 @@ gPlayTable.CreatePlay{
     end,
     
     Assister = task.chipPass(SHOOT_POS(),chipPower(SHOOT_POS())),
-    Leader   = task.goCmuRush(Pre_SHOOT_POS),
-    Special  = task.goCmuRush(FAKE_POS_22),
-    Middle   = task.goCmuRush(FAKE_POS_11),
+    Leader   = task.goCmuRush(Pre_SHOOT_POS,_,_,flag.allow_dss),
+    Special  = task.goMWPassPos("Assister"),
+    Middle   = task.marking("First"),
     Defender = task.leftBack(),
     Goalie   = task.goalie(),
     Engine   = task.singleBack(),
     Hawk     = task.rightBack(),
-    match    = "{ADLSMEH}"
+    match    = "{A}{DH}{LSM}{E}"
   },
 
         
@@ -90,15 +88,15 @@ gPlayTable.CreatePlay{
         return "shoot"
       end
     end,
-    Assister = task.goCmuRush(SHOOT_ASIS_POS),
+    Assister = task.goCmuRush(SHOOT_ASIS_POS,_,_,flag.allow_dss),
     Leader   = task.continue(),
-    Special  = task.continue(),
-    Middle   = task.continue(),
+    Special  = task.goMWPassPos("Assister"),
+    Middle   = task.marking("First"),
     Defender = task.leftBack(),
     Goalie   = task.goalie(),
     Engine   = task.singleBack(),
     Hawk     = task.rightBack(),
-    match    = "{ADL}{EH}{SM}"
+    match    = "{A}{DEH}{LSM}"
   },
 
   ["shoot"] = {
@@ -109,15 +107,15 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.goCmuRush(ASIS_POS_4),
+    Assister = task.goCmuRush(ASIS_POS_4,_,_,flag.allow_dss),
     Leader   = task.shootV2(),
-    Special  = task.continue(),
-    Middle   = task.continue(),
+    Special  = task.goMWPassPos("Assister"),
+    Middle   = task.marking("First"),
     Defender = task.leftBack(),
     Goalie   = task.goalie(),
     Engine   = task.singleBack(),
     Hawk     = task.rightBack(),
-    match    = "{ADL}{EH}{SM}"
+    match    = "{L}{DH}{AE}{SM}"
   },
 
   name = "Ref_FrontKickV23",

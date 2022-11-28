@@ -1,11 +1,11 @@
 IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 USE_SWITCH = false
-OPPONENT_NAME = "other"
+OPPONENT_NAME = "Avoidfoul" --"Avoidfoul"
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
-gTestPlay = "Test_NormalAttack" --"Test_NormalDefend" --"Test_Advance" -- "Test_GoTechChalPos"
+gTestPlay = "Test_NormalDefend" -- Test_NormalMiddleDefend --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
 gSwitchNum = {
 	["normal"]  = 6,
@@ -96,36 +96,44 @@ gRefPlayTable = {
 	"Ref/CornerKick/Ref_CornerKickV201",
 	"Ref/CornerKick/Ref_CornerKickV202",
 	"Ref/CornerKick/Ref_CornerKickV300",
+	"Ref/CornerKick/Ref_CornerKickV2",
 	--前场进攻
 	"Ref/FrontKick/Ref_FrontKickV23",
 	"Ref/FrontKick/Ref_FrontKickV41",
+	"Ref/FrontKick/Ref_FrontKickV2",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
 	"Ref/MiddleKick/Ref_MiddleKickV5",
+	"Ref/MiddleKick/Ref_MiddleKickV2",
 
 	--后场进攻
 	"Ref/BackKick/Ref_BackKickV1",
 	"Ref/BackKick/Ref_ImmortalKickV1",
+	"Ref/BackKick/Ref_BackKickV2",
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
 
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDefV5",
+	"Ref/CornerDef/Ref_CornerDefV2",
 
 	--中场防守
 	"Ref/MiddleDef/Ref_MiddleDefV10",
 	"Ref/MiddleDef/Ref_MiddleDefV11",
+	"Ref/MiddleDef/Ref_MiddleDefV2",
 
 	--前场防守
 	"Ref/FrontDef/Ref_FrontDefV8",
 	"Ref/FrontDef/Ref_FrontDefV9",
+	"Ref/FrontDef/Ref_FrontDefV2",
 
 	--后场防守
 	"Ref/BackDef/Ref_BackDefV10",
 	"Ref/BackDef/Ref_BackDefV11",
 	"Ref/BackDef/Ref_BackDefV12",
+	"Ref/BackDef/Ref_BackDefV2",
 
 	--己方放球
 	"Ref/BallPlace/Ref_OurBallPlaceV2",
@@ -179,5 +187,7 @@ gTestPlayTable = {
 	"Test_GoTechChalPos",
 	"Test_NormalPlay",
 	"Test_NormalAttack",
-	"Test_NormalDefend"
+	"Test_NormalDefend",
+	"Test_AvoidFoulDefend",
+	"Test_NormalMiddleDefend"
 }

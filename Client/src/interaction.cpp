@@ -209,8 +209,8 @@ bool Interaction::controlMedusa2(bool control) {
         }
     } else {
         medusaProcess2 = new QProcess();
-        medusaProcess2->setWorkingDirectory("./Oppo");
-        QString name = "./Medusa2";
+        //medusaProcess2->setWorkingDirectory("./Oppo");
+        QString name = "./Medusa";
         medusaProcess2->start(name);
         QTextStream(stdout) << "\n------------------------------------\n" << "running 2 " << name << "\n------------------------------------\n";
     }

@@ -37,7 +37,8 @@ CPlayerSpeedV2::CPlayerSpeedV2(int number, double xspeed, double yspeed, double 
 	} else if (TaskMediator::Instance()->leftBack() != 0 && number == TaskMediator::Instance()->leftBack()
 		|| TaskMediator::Instance()->rightBack() != 0 && number == TaskMediator::Instance()->rightBack()
 		|| TaskMediator::Instance()->singleBack() != 0 && number == TaskMediator::Instance()->singleBack()
-		|| TaskMediator::Instance()->sideBack() != 0 && number == TaskMediator::Instance()->sideBack()) {
+        || TaskMediator::Instance()->sideBack() != 0 && number == TaskMediator::Instance()->sideBack()
+        || TaskMediator::Instance()->isMultiBack(number)) {
 			if (velocity.mod() > robotCap->maxSpeedBack(0))
 				velocity = Utils::Polar2Vector(robotCap->maxSpeedBack(0), velocity.dir());
 	} else {

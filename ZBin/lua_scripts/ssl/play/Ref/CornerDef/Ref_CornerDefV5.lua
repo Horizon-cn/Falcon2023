@@ -36,8 +36,8 @@ end,
 ["beginning"] = {
 	Leader   = task.defendKick(),
 	Special  = task.marking("First"),
-	Middle   = task.goSpeciPos(COR_DEF_POS1, player.toBallDir),
-	Defender = task.goSpeciPos(COR_DEF_POS2, player.toBallDir),
+	Middle   = task.goSpeciPos(COR_DEF_POS1, player.toBallDir,flag.allow_dss),
+	Defender = task.goSpeciPos(COR_DEF_POS2, player.toBallDir,flag.allow_dss),
 	Assister = task.multiBack(3, 3),
 	Goalie   = task.goalieNew(),
 	Engine   = task.multiBack(3, 1),
@@ -49,12 +49,12 @@ end,
 	Leader   = task.defendKick(),
 	Special  = task.marking("First"),
 	Assister = task.multiBack(3, 3),
-	Middle   = task.goSpeciPos(COR_DEF_POS1, player.toBallDir),
-	Defender = task.goSpeciPos(COR_DEF_POS2, player.toBallDir),
+	Middle   = task.goSpeciPos(COR_DEF_POS1, player.toBallDir,flag.allow_dss),
+	Defender = task.goSpeciPos(COR_DEF_POS2, player.toBallDir,flag.allow_dss),
 	Goalie   = task.goalieNew(),
 	Engine   = task.multiBack(3, 1),
 	Hawk	 = task.multiBack(3, 2),
-	match    = "[L][DSM][AEH]"
+	match    = "[L][AEH][DSM]"
 },
 
 ["attacker2"] = {
@@ -66,7 +66,7 @@ end,
 	Engine   = task.multiBack(3, 1),
 	Hawk	 = task.multiBack(3, 2),
 	Goalie   = task.goalieNew(),
-	match    = "[A][M][D][L][SEH]"
+	match    = "[SEH][A][M][D][L]"
 },
 
 ["attacker3"] = {
@@ -75,10 +75,10 @@ end,
 	Middle   = task.sideBack(),
 	Assister = task.marking("First"),
 	Special  = task.marking("Second"),
-	Engine   = task.rightBack(),
-	Hawk	 = task.leftBack(),
+	Engine   = task.singleBack(),
+	Hawk	 = task.defendMiddleHead(),
 	Goalie   = task.goalieNew(),
-	match    = "[L][MEH][D][AS]"
+	match    = "[L][EHM][D][AS]"
 },
 
 ["attacker4"] = {
@@ -87,10 +87,10 @@ end,
 	Middle   = task.sideBack(),
 	Assister = task.marking("First"),
 	Special  = task.marking("Second"),
-	Engine   = task.rightBack(),
-	Hawk	 = task.leftBack(),
+	Engine   = task.singleBack(),
+	Hawk	 = task.defendMiddleHead(),
 	Goalie   = task.goalieNew(),
-	match    = "[L][MEH][D][AS]"
+	match    = "[L][EHM][D][AS]"
 },
 
 ["attacker5"] = {
@@ -99,10 +99,10 @@ end,
 	Middle   = task.sideBack(),
 	Assister = task.marking("First"),
 	Special  = task.marking("Second"),
-	Engine   = task.rightBack(),
-	Hawk	 = task.leftBack(),
+	Engine   = task.singleBack(),
+	Hawk	 = task.defendMiddleHead(),
 	Goalie   = task.goalieNew(),
-	match    = "[L][MEH][D][AS]"
+	match    = "[L][EHM][D][AS]"
 },
 
 ["attacker6"] = {
@@ -111,10 +111,10 @@ end,
 	Middle   = task.sideBack(),
 	Assister = task.marking("First"),
 	Special  = task.marking("Second"),
-	Engine   = task.rightBack(),
-	Hawk	 = task.leftBack(),
+	Engine   = task.singleBack(),
+	Hawk	 = task.defendMiddleHead(),
 	Goalie   = task.goalieNew(),
-	match    = "[L][MEH][D][AS]"
+	match    = "[L][EHM][D][AS]"
 },
 
 ["attacker7"] = {
@@ -123,10 +123,10 @@ end,
 	Middle   = task.sideBack(),
 	Assister = task.marking("First"),
 	Special  = task.marking("Second"),
-	Engine   = task.rightBack(),
-	Hawk	 = task.leftBack(),
+	Engine   = task.singleBack(),
+	Hawk	 = task.defendMiddleHead(),
 	Goalie   = task.goalieNew(),
-	match    = "[L][MEH][D][AS]"
+	match    = "[L][EHM][D][AS]"
 },
 
 ["attacker8"] = {
@@ -135,30 +135,34 @@ end,
 	Middle   = task.sideBack(),
 	Assister = task.marking("First"),
 	Special  = task.marking("Second"),
-	Engine   = task.rightBack(),
-	Hawk	 = task.leftBack(),
+	Engine   = task.singleBack(),
+	Hawk	 = task.defendMiddleHead(),
 	Goalie   = task.goalieNew(),
-	match    = "[L][MEH][D][AS]"
+	match    = "[L][EHM][D][AS]"
 },
 
 ["norPass"] = {
 	Leader   = task.advance(),
-	Special  = task.markingFront("First"),
-	Middle   = task.markingFront("Second"),
+	Special  = task.marking("First"),
+	Middle   = task.marking("Second"),
 	Defender = task.defendMiddleHead(),
 	Assister = task.singleBack(),
+	Engine   = task.rightBack(),
+	Hawk	 = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "[L][S][D][MA]"
+	match    = "[L][EHA][D][SM]"
 },
 
 ["norDef"] = {
 	Leader   = task.advance(),
-	Special  = task.markingFront("First"),
-	Middle   = task.markingFront("Second"),
+	Special  = task.marking("First"),
+	Middle   = task.marking("Second"),
 	Defender = task.defendMiddleHead(),
 	Assister = task.singleBack(),
+	Engine   = task.rightBack(),
+	Hawk	 = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "[L][S][D][MA]"
+	match    = "[L][EHA][D][SM]"
 },
 
 name = "Ref_CornerDefV5",

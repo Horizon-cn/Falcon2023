@@ -415,7 +415,7 @@ function goAndTurnKick(role, power, icircle, a) -- 2014-03-28 added by yys, å¢žå
 	elseif type(role) == "string" then
 		idir = ball.toPlayerHeadDir(role)
 	elseif type(role) == "function" then
-		idir = ball.toFuncDir(role)
+		idir = role()
 	elseif type(role) == "userdata" then
 		idir = player.antiYDir(role)
 	end
@@ -1050,6 +1050,8 @@ function advance(role)
 	local mexe, mpos = AdvanceBall{pos = pos.advance, srole = "advancer", tandem = itandem}
 
 	return {mexe, mpos}
+	-- local mexe, mpos = Stop()
+	-- return {mexe, mpos}
 end
 
 function advanceV4(role)

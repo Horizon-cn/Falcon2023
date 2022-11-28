@@ -132,6 +132,8 @@ CALC_ROLE(RAttacker)
 	double velX = attrSet->getValue("AVelX");
 	double dist2ball = attrSet->getValue("ADist2Ball");
 	double immortalFactor = attrSet->getValue("AImmortalFactor");
+    double isGoalie=attrSet->getValue("AGoalie");
+    if(isGoalie) setSubValue(0);
 	reflectAngle = reflectAngle < 0.7 ? 0.7 : reflectAngle;
 	reflectAngle = reflectAngle > 2.3 ? reflectAngle * 5.0 : reflectAngle;//折射角整定，小于45度时按照45度整定
 	posX = posX + velX * 0.5;

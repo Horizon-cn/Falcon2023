@@ -152,6 +152,10 @@ bool CGoalie2022::ShouldAttack(const CVisionModule* pVision)
     //现行防守框架下，有后卫则无需支援
     if (TaskMediator::Instance()->leftBack() || TaskMediator::Instance()->rightBack() || TaskMediator::Instance()->singleBack())
         return false;
+    for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+        if (TaskMediator::Instance()->isMultiBack(i))
+            return false;
+    }
     //综合判断敌我形势。目前这一段还比较粗糙 by SYLG
     int free_enemy = 0;
     for (int i = 0; i < Param::Field::MAX_PLAYER; i++)

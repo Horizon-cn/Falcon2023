@@ -142,11 +142,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (pVision->OurPlayer(i).Valid() && i != GoalieNumber)
 			if (pVision->OurPlayer(i).Pos().x() > Param::Field::PITCH_LENGTH / 10)
 				NumofPlayerInFrontfiled++;
-	}
-    cout<<NowIsShoot<<endl;
-    if(Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor))
-        cout<<me.X()<<' '<<me.Y()<<' '<<Me2OppTooclose(pVision, _executor)<<' '<<isInBreakArea(pVision, _executor)<<' '<<"datapram"<<endl;
-	/**********************************************************
+    }
+    /**********************************************************
 	* Description: ×´Ì¬·ÖÅä
 	* Author: Ì·Óîºê
 	* Created Date: 2022/10/10

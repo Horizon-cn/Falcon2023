@@ -266,7 +266,7 @@ void CDefenceInfo::updateAttackArray(const CVisionModule* pVision)
 			}
 			//清除守门员于列表中，如果GOALIE_EVALUATE为true
 			if (GOALIE_EVALUATE == true) {
-				if (pVision->gameState().gameOn()) {
+                //if (pVision->gameState().gameOn()) {
 					int goalieNum = vision->TheirGoalie();
 					//int goalieNum = 3;
 					for (AttackerList::iterator tt = attackerTempList.begin(); tt != attackerTempList.end();) {
@@ -276,7 +276,7 @@ void CDefenceInfo::updateAttackArray(const CVisionModule* pVision)
 							tt++;
 						}
 					}
-				}
+                //}
 			}
 
 			checkSteadyAttack(pVision,attackerTempList);

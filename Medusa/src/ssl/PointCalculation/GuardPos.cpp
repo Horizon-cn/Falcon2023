@@ -56,9 +56,10 @@ void CGuardPos::generatePos(int guardNum)
     CGeoLine targetToLeft(defendTarget, GOAL_LEFT);
     CGeoLine targetToRight(defendTarget, GOAL_RIGHT);
     CGeoLine EnemyDir(defendTarget, vision->TheirPlayer(bestenemy).Dir());
+    double diffAngle = vision->TheirPlayer(bestenemy).Dir() - (GOAL_MIDDLE - defendTarget).dir();
     // ??????????????????????????????????????????????¦Ë
     CGeoLineRectangleIntersection intersecMiddle(targetToMiddle, guardMoveRec);
-    if (vision->TheirPlayer(bestenemy).Pos().dist(defendTarget) < 20 && defendTarget.x() < -250)
+    if (vision->TheirPlayer(bestenemy).Pos().dist(defendTarget) < 20 && defendTarget.x() < -250 && fabs(diffAngle) < atan(0.5))
         intersecMiddle = CGeoLineRectangleIntersection(EnemyDir, guardMoveRec);
     if (intersecMiddle.intersectant()) {
         // ?§Ü???
@@ -191,6 +192,7 @@ void CGuardPos::setBackNum(int realNum, int index)
     }
     _backCycle[index - 1] = vision->Cycle();
     _backNum[index - 1] = realNum;
+    TaskMediator::Instance()->setMultiBack(realNum);
     //qDebug() << "backNum" << realNum << index;
 }
 

@@ -117,6 +117,18 @@ public:
                 (vecNumber == defendMiddle()));
     }
 
+    bool isMultiBack(int vecNumber) {
+        if (vision->Cycle() - _multiBack[vecNumber].lastCycle > 10)
+            _multiBack[vecNumber].num = false;
+        return _multiBack[vecNumber].num;
+    }
+
+    void setMultiBack(const int num)
+    {
+        _multiBack[num].num = true;
+        _multiBack[num].lastCycle = vision->Cycle();
+    }
+
     // ????
     void setPlayerTask(const int num, CPlayerTask* pTask, const int priority)
     {
@@ -196,6 +208,7 @@ private:
     SpecialRole _defendMiddle;
     SpecialRole _sideBack;
     SpecialRole _advancer;
+    SpecialRole _multiBack[Param::Field::MAX_PLAYER];
     int _ballHandler; // ???????
     CPlayerTask* _playerTask[Param::Field::MAX_PLAYER]; // ?????????
     int _playerTaskPriority[Param::Field::MAX_PLAYER]; // ??????????????

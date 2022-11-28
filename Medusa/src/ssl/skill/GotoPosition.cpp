@@ -135,7 +135,8 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 		(vecNumber == TaskMediator::Instance()->singleBack()) ||
 		(vecNumber == TaskMediator::Instance()->sideBack()) ||
 		(vecNumber == TaskMediator::Instance()->defendMiddle());
-	
+    const bool isMultiBack = TaskMediator::Instance()->isMultiBack(vecNumber);
+
 	/************************************************************************/
 	/* 修正非法目标点输入                                                     */
 	/************************************************************************/
@@ -188,7 +189,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 
 	// 如果是后卫且距离禁区比较远，需要打开DSS避障，防止刚匹配的后卫发生碰撞
 	// 在禁区边的后卫允许撞车，否则容易被进球!!!
-	if (isBack && !Utils::InOurPenaltyArea(vecPos, 40)) {
+    if ((isBack || isMultiBack) && !Utils::InOurPenaltyArea(vecPos, 40)) {
 		playerFlag |= PlayerStatus::ALLOW_DSS;
 	}
 
@@ -251,6 +252,7 @@ PlayerCapabilityT CGotoPosition::setCapability(const CVisionModule *pVision) {
 		(vecNumber == TaskMediator::Instance()->singleBack()) ||
 		(vecNumber == TaskMediator::Instance()->sideBack()) ||
 		(vecNumber == TaskMediator::Instance()->defendMiddle());
+    const bool isMultiBack = TaskMediator::Instance()->isMultiBack(vecNumber);
 
 	const int playerFlag = task().player.flag;
 	PlayerCapabilityT capability;
@@ -268,7 +270,8 @@ PlayerCapabilityT CGotoPosition::setCapability(const CVisionModule *pVision) {
 	else if (TaskMediator::Instance()->leftBack() != 0 && vecNumber == TaskMediator::Instance()->leftBack()
 		|| TaskMediator::Instance()->rightBack() != 0 && vecNumber == TaskMediator::Instance()->rightBack()
 		|| TaskMediator::Instance()->singleBack() != 0 && vecNumber == TaskMediator::Instance()->singleBack()
-		|| TaskMediator::Instance()->sideBack() != 0 && vecNumber == TaskMediator::Instance()->sideBack()) {
+        || TaskMediator::Instance()->sideBack() != 0 && vecNumber == TaskMediator::Instance()->sideBack()
+        || isMultiBack) {
 		capability.maxSpeed = MAX_TRANSLATION_SPEED_BACK;
 		capability.maxAccel = MAX_TRANSLATION_ACC_BACK;
 		capability.maxDec = MAX_TRANSLATION_DEC_BACK;
@@ -291,7 +294,7 @@ PlayerCapabilityT CGotoPosition::setCapability(const CVisionModule *pVision) {
 
 	if (task().player.max_acceleration > 1e-8) {
 		capability.maxAccel = task().player.max_acceleration > TRANSLATION_ACC_LIMIT ? TRANSLATION_ACC_LIMIT : task().player.max_acceleration;
-		if (isGoalie || isBack)
+        if (isGoalie || isBack || isMultiBack)
 			capability.maxAccel = task().player.max_acceleration;
 		capability.maxDec = capability.maxAccel;
 	}

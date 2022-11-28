@@ -7,7 +7,7 @@ function isCorner()
     end
 end
 
-if OPPONENT_NAME == "other" then
+if OPPONENT_NAME == "other" or OPPONENT_NAME == "Avoidfoul" then
     if isCorner() and ball.refPosX()>=0 then
         gCurrentPlay = "Ref_Stop4CornerKick"
     elseif math.abs(ball.refPosY()) > 410 then

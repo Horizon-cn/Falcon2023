@@ -43,7 +43,7 @@ namespace {
 
     //视主机性能调节
     const int MOD_NUM = 2;
-    const int ANGEL_MOD = 6;
+    const int ANGEL_MOD = 12;
 
 
     const int RADIUS = Param::Vehicle::V2::PLAYER_SIZE * 2;
@@ -138,7 +138,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     //以下是运行逻辑
 
-    bool frared = (RobotSensor::Instance()->IsInfraredOn(vecNumber)) || isVisionHasBall(pVision, task().executor);
+    bool frared = (RobotSensor::Instance()->IsInfraredOn(vecNumber));// || isVisionHasBall(pVision, task().executor);
 
 
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("frared Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
@@ -146,6 +146,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     if (!frared)
     {
         dribblePoint = me.Pos();
+
     }
     GDebugEngine::Instance()->gui_debug_x(dribblePoint, COLOR_RED);
     GDebugEngine::Instance()->gui_debug_arc(dribblePoint, 100, 0, 360, COLOR_RED);
@@ -156,35 +157,24 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     TaskT grabTask(task());
     cout<<me2enemy_dist<<endl;
-   if(me2enemy_dist<30 && alphaangle<120 * Param::Math::PI / 180.0&&false )
+   if(me2enemy_dist<20 && alphaangle<60 * Param::Math::PI / 180.0&&!isPenalty )
 //    if(true)
     //if(isSpin&& false)
     {
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Spin" + to_string(0)).c_str(), COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 100), ("Spin" + to_string(0)).c_str(), COLOR_YELLOW);
 
         cout<<"SPIN!"<<endl;
-        grabTask.player.speed_x = -deltax*40.0;
-        grabTask.player.speed_y = -deltay*40.0;
-        grabTask.player.max_acceleration=180;
-        grabTask.player.max_deceleration=180;
-        DribbleStatus::Instance()->setDribbleCommand(task().executor, 3);
-        if(criterion)
-        {
+        grabTask.player.angle=holdBallDir(pVision,vecNumber);
 
-
-            grabTask.player.rotate_speed = 5;
-
-        }
-        else{grabTask.player.rotate_speed=-5;}
-
-        setSubTask(TaskFactoryV2::Instance()->Speed(grabTask));
     }
 
 
     else{
+       grabTask.player.angle = finalDir;
+   }
 
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
-    if (pVision->Cycle() % 30== 0) {
+    if (pVision->Cycle() % 60== 0 ) {
         move_point = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     }
     else {
@@ -194,31 +184,28 @@ void CBreak::plan(const CVisionModule* pVision) {
 
 
 
-    if (DEBUG) GDebugEngine::Instance()->gui_debug_line(dribblePoint, move_point, COLOR_GREEN);
-    grabTask.player.max_acceleration=180;
-    grabTask.player.max_deceleration=180;
+    if (DEBUG) GDebugEngine::Instance()->gui_debug_line(dribblePoint, move_point, COLOR_PURPLE);
+    grabTask.player.max_acceleration=120;
+    grabTask.player.max_deceleration=120;
 
 
     if (isPenalty)
     {
         cout<<"isPenalty"<<endl;
-        penaltyX=me.Pos().x()+20.0;
-        penaltyY=move_point.y();
+        penaltyX=me.Pos().x()+10.0;
+        penaltyY=move_point.y()/*>0?-DRIBBLE_DIST:DRIBBLE_DIST*/;
         grabTask.player.pos=CGeoPoint(penaltyX,penaltyY);
+        grabTask.player.max_acceleration=100;
+        grabTask.player.max_deceleration=100;
         GDebugEngine::Instance()->gui_debug_x(CGeoPoint(penaltyX,penaltyY),COLOR_BLACK);
     }
-    else if(isSpin&&false)
-    {
-        penaltyX=me.Pos().x();
-        penaltyY=me.Pos().y();
-        grabTask.player.pos=CGeoPoint(penaltyX,penaltyY);
-    }
+
     else
     {
         grabTask.player.pos = move_point;
     }
 
-    grabTask.player.angle = finalDir;
+
 
 
 
@@ -227,6 +214,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     GDebugEngine::Instance()->gui_debug_x(move_point, COLOR_RED);
     GDebugEngine::Instance()->gui_debug_x(passTarget, COLOR_RED);
+    grabTask.player.flag |= PlayerStatus::ALLOW_DSS;
     setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(grabTask));
 
 
@@ -238,7 +226,8 @@ void CBreak::plan(const CVisionModule* pVision) {
     auto vel_vertical_target = std::sin(me.Vel().dir() - me2target.dir()) * me.Vel().mod();
 
     cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
-    if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 10
+
+    if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 50
         //vel_vertical_target < 5
         //	)
         //|| (me.Pos()-dribblePoint).mod()>=100
@@ -252,7 +241,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
 
     DribbleStatus::Instance()->setDribbleCommand(vecNumber, 3);
-    }
+
 
 
     _lastCycle = pVision->Cycle();
@@ -314,7 +303,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
 
         //将在参与防守的敌方车入队
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             auto test_enemy = pVision->TheirPlayer(i);
             if (test_enemy.Valid() && !Utils::InTheirPenaltyArea(test_enemy.Pos(), 0))
                 enemy_points.push_back(test_enemy.Pos());
@@ -338,8 +327,8 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             auto to_projection_dist = (projection - test_point).mod();
             auto straight_dist = (test_enemy - test_point).mod();
 
-            if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist < 20)) {
-
+            //if ((test_seg.IsPointOnLineOnSegment(projection) && (projection_dist/to_projection_dist) < (120/Param::Vehicle::V2::PLAYER_SIZE*2))) {
+            if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {
                 canShoot = false;
                 needBreakThrough = true;
                 break;
@@ -362,12 +351,15 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             for (int i = -ANGEL_MOD; i < ANGEL_MOD; i++) {
 
                 //生成test_point
-                CVector vec = Utils::Polar2Vector(double(DRIBBLE_DIST / MOD_NUM),
+                CVector vec = Utils::Polar2Vector(double(DRIBBLE_DIST),
                     Utils::Normalize(me2target.dir() + i * Param::Math::PI / ANGEL_MOD));
 
                 CGeoPoint test_point = me.Pos() + vec;
 
-                test_point = makeInCircle(test_point, dribblePoint, DRIBBLE_DIST);
+                if((test_point-dribblePoint).mod()>DRIBBLE_DIST){
+                    test_point = makeInCircle(test_point, dribblePoint, DRIBBLE_DIST);
+                }
+                if (DEBUG) GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_YELLOW);
 
                 if (!Utils::IsInField(test_point, 0))
                 {
@@ -378,22 +370,50 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                 if (Utils::InTheirPenaltyArea(test_point, 0))
                 {
                     test_point = Utils::MakeOutOfTheirPenaltyArea(test_point, 0);
-                    if (DEBUG) GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_YELLOW);
-                }
 
-                //if (DEBUG) GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_PURPLE);
+                }
+                bool tempflag=false;
+                auto run_seg = CGeoSegment(test_point, me.Pos());
+
+                for (auto test_enemy : enemy_points) {
+
+
+
+
+                    auto projection = run_seg.projection(test_enemy);
+                    if (run_seg.IsPointOnLineOnSegment(projection)){
+                    double projection_dist = (projection - test_enemy).mod();
+                    double to_projection_dist = (projection - test_point).mod();
+                    double straight_dist = (test_enemy - test_point).mod();
+                    if(projection_dist<40)
+                    {
+                        tempflag=true;
+                        if (DEBUG) GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_PURPLE);
+                        break;
+                    }}
+
+
+                }
+                if(tempflag)continue;
+
+
+
 
                 auto test_seg = CGeoSegment(test_point, target);
 
                 //测试点与目标点的距离
+
                 //该指标与敌方车没有关系，越小越好
-                double dist_score = 1/((test_point - target).mod());
+                double dist_score = (test_point - target).mod();
 
                 //计算测试点处敌方车辆阻挡球路情况得分,越小越好
                 double block_score = 0;
                 //记录离测试点最近的敌方车辆距离得分，越小越好
                 double near_score = 9999;
                 for (auto test_enemy : enemy_points) {
+
+
+
                     auto projection = test_seg.projection(test_enemy);
                     double projection_dist = (projection - test_enemy).mod();
                     double to_projection_dist = (projection - test_point).mod();
@@ -402,30 +422,84 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                     near_score = (straight_dist <  near_score) ? (straight_dist) : near_score;
                     if (test_seg.IsPointOnLineOnSegment(projection)) {//不在连线上的车不考虑
 
-                        block_score += straight_dist / projection_dist;
+                        block_score += projection_dist;
+
 
                     }
                 }
-                near_score = -near_score;
+
+                near_score = 1/(near_score);
+                cout<<"dist_score"<<dist_score;
+                cout<<"  block_score"<<block_score;
+                cout<<"  near_score"<<near_score<<endl;
                 double overall_score = COEF_BLOCKSCORE * block_score + COEF_DISTSCORE * dist_score + COEF_NEARSCORE * near_score;
                 point_score_list.push_back(overall_score);
                 point_list.push_back(test_point);
+                GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_YELLOW);
 
 
 
 
-                //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -350), ("canshoot:" + to_string(canShoot)).c_str(), COLOR_YELLOW);
+
+
 
 
             }
+            if(point_score_list.empty()||point_list.empty())
+            {
+                cout<<"error";
+                return me.Pos();
+            }
+            else
+            {
             int selected_pos = std::min_element(point_score_list.begin(),point_score_list.end())-point_score_list.begin();
 
             move_point = point_list[selected_pos];
 
             return move_point;
+            }
         }
 
 
 
 
 }
+
+
+double CBreak::holdBallDir(const CVisionModule *pVision, int robotNum){
+    static const int DIS_THRESHOLD = 800;
+
+    // 计算多人包夹时的角度
+    double finalAngle = 0;
+    double coeff = 0;
+    const PlayerVisionT& me = pVision->OurPlayer(robotNum);
+    for(int i=0; i<Param::Field::MAX_PLAYER; i++){
+        if(!pVision->TheirPlayer(i).Valid()) continue;
+        if(pVision->TheirPlayer(i).Pos().dist(me.Pos()) > DIS_THRESHOLD) continue;
+        const PlayerVisionT& enemy = pVision->TheirPlayer(i);
+        CVector enemy2me = me.Pos() - enemy.Pos();
+        double targetAngle = enemy2me.dir()/* > 0 ? 2*Param::Math::PI - enemy2me.dir() : -1*enemy2me.dir()*/;
+        finalAngle += targetAngle/enemy2me.mod();
+        coeff += 1/enemy2me.mod();
+    }
+    if(std::fabs(finalAngle) < 1e-4) return 1e8;
+
+    finalAngle /= coeff;
+    // 计算最佳距离
+    double anotherAngle = finalAngle < Param::Math::PI ? finalAngle + Param::Math::PI : finalAngle - Param::Math::PI;
+    double diff1 = 0, diff2 = 0;
+    for(int i=0; i<Param::Field::MAX_PLAYER; i++){
+        if(!pVision->TheirPlayer(i).Valid()) continue;
+        if(pVision->TheirPlayer(i).Pos().dist(me.Pos()) > DIS_THRESHOLD) continue;
+        const PlayerVisionT& enemy = pVision->TheirPlayer(i);
+        CVector enemy2me = me.Pos() - enemy.Pos();
+        double targetAngle = enemy2me.dir()/* > 0 ? 2*Param::Math::PI - enemy2me.dir() : -1*enemy2me.dir()*/;
+        double d_angle1 = fabs(targetAngle-finalAngle) < Param::Math::PI ? fabs(targetAngle-finalAngle) : 2*Param::Math::PI - fabs(targetAngle-finalAngle);
+        diff1 += d_angle1/enemy2me.mod();
+        double d_angle2 = abs(targetAngle-anotherAngle) < Param::Math::PI ? fabs(targetAngle-anotherAngle) : 2*Param::Math::PI - fabs(targetAngle-anotherAngle);
+        diff2 += d_angle2/enemy2me.mod();
+    }
+    if(diff1 > diff2)finalAngle = anotherAngle;
+    return finalAngle;
+}
+

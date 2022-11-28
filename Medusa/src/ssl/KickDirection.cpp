@@ -151,7 +151,9 @@ void CKickDirection::GenerateShootDir(const int player, const CGeoPoint pos)
 		_real_kick_dir = _raw_kick_dir;
 	}
 	//cout<<vision->Cycle()<<" "<<ballspeed<<" "<<rawdir<<" "<<_compensate_value<<endl;
-	return;
+    _real_kick_dir = getPointShootDir(pVision, pVision->OurPlayer(player).Pos());
+    _raw_kick_dir = getPointShootDir(pVision, pVision->OurPlayer(player).Pos());
+    return;
 }
 
 double CKickDirection::calCompensate(double x, double y)

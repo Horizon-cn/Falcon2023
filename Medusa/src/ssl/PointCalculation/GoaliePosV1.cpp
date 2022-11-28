@@ -6,16 +6,19 @@
 #include "ValueRange.h"
 #include <vector>
 #include <random>
+#include <cstring>
 #include <math.h>
 #include "BestPlayer.h"
 #include <map>
-
 #define DEBUGGING
 #ifdef DEBUGGING
-#define DBG_BOOL(y,var) {if(var)GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,y), #var"=true");else GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,y), #var"=false");}
+#define DBG_BOOL(y,var) {if(var)DBG_MSG(y,#var"=true")else DBG_MSG(y,#var"=false")}
+#define DBG_POS(pos) {GDebugEngine::Instance()->gui_debug_x(pos);}
+#define DBG_MSG(y,msg) {GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,y),msg);}
 #else
 #define DBG_BOOL(y,var) {}
-#define DBG_MSG(msg,)
+#define DBG_POS(pos,color) {}
+#define DBG_MSG(y,msg) {}
 #endif
 
 CGoaliePosV1::CGoaliePosV1()
@@ -86,18 +89,17 @@ CGeoPoint CGoaliePosV1::GetPenaltyShootPosV2(const CVisionModule *pVision)
     double Ball2LeftDir = (CGeoPoint(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 + GoalBuffer) - ball.Pos()).dir();
     double Ball2RightDir =( CGeoPoint(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 - GoalBuffer) - ball.Pos()).dir();
     bool BallSpeed = (ball.Vel().mod() >= 30);
-    bool outOfShooter=true;
-//    bool outOfShooter = !(DefenceInfo::Instance()->getBallTaken());
+    bool outOfShooter = !(DefenceInfo::Instance()->getBallTaken());
     bool BallDirLimit = !Utils::InBetween(ball.Vel().dir(), Ball2LeftDir - Param::Math::PI * 10 / 180 , Ball2RightDir + Param::Math::PI * 10 / 180);
     bool BallShot = BallSpeed && outOfShooter && BallDirLimit;
-//    bool enemyHasShot =enemy.Pos().dist(ball.Pos()) < 40
-//        && Utils::InBetween(Utils::Normalize((ball.Pos() - enemy.Pos()).dir() + Param::Math::PI), Ball2LeftDir - Param::Math::PI * 10 / 180, Ball2RightDir + Param::Math::PI * 10 / 180)
-//        && BallSpeed && outOfShooter && ball.VelX() < 0;
-//    BallShot = BallShot || enemyHasShot;
+    bool enemyHasShot =enemy.Pos().dist(ball.Pos()) < 40
+        && Utils::InBetween(Utils::Normalize((ball.Pos() - enemy.Pos()).dir() + Param::Math::PI), Ball2LeftDir - Param::Math::PI * 10 / 180, Ball2RightDir + Param::Math::PI * 10 / 180)
+        && BallSpeed && outOfShooter && ball.VelX() < 0;
+    BallShot = BallShot || enemyHasShot;
     DBG_BOOL(-300,BallSpeed);
     DBG_BOOL(-350, outOfShooter);
     DBG_BOOL(-400, BallDirLimit);
-//    DBG_BOOL(-250, enemyHasShot);
+    DBG_BOOL(-250, enemyHasShot);
 
 
     const double goalie_x = Param::Vehicle::V2::PLAYER_SIZE + 1;
@@ -150,31 +152,23 @@ CGeoPoint CGoaliePosV1::GetPenaltyShootPosV3(const CVisionModule *pVision)
     const PlayerVisionT& enemy = pVision->TheirPlayer(this->GetNearestEnemy(pVision));
     double enemy_dir = enemy.Dir();
 
+    CGeoPoint GOAL_CENTER(-Param::Field::PITCH_LENGTH/2,0);
     int GoalBuffer = 2;
     double Ball2LeftDir = (CGeoPoint(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 + GoalBuffer) - ball.Pos()).dir();
     double Ball2RightDir = (CGeoPoint(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 - GoalBuffer) - ball.Pos()).dir();
-    bool BallSpeed = (ball.Vel().mod() >= 10);
-    bool outOfShooter = true;
-//    bool outOfShooter = !(DefenceInfo::Instance()->getBallTaken());
+    bool BallSpeed = (ball.Vel().mod() >= 5);
     bool BallDirLimit = !Utils::InBetween(ball.Vel().dir(), Ball2LeftDir - Param::Math::PI * 10 / 180, Ball2RightDir + Param::Math::PI * 10 / 180);
-    bool BallShot = BallSpeed && outOfShooter && BallDirLimit;
-//    bool enemyHasShot = enemy.Pos().dist(ball.Pos()) < 40
-//        && Utils::InBetween(Utils::Normalize((ball.Pos() - enemy.Pos()).dir() + Param::Math::PI), Ball2LeftDir - Param::Math::PI * 10 / 180, Ball2RightDir + Param::Math::PI * 10 / 180)
-//        && BallSpeed && outOfShooter && ball.VelX() < 0;
-    BallShot = BallShot;
+    bool BallShot = BallSpeed && BallDirLimit;
     DBG_BOOL(-300, BallSpeed);
-    DBG_BOOL(-350, outOfShooter);
-    DBG_BOOL(-400, BallDirLimit);
-//    DBG_BOOL(-250, enemyHasShot);
+    DBG_BOOL(-350, BallDirLimit);
 
 
-    const double goalie_x = Param::Vehicle::V2::PLAYER_SIZE + 1;
     CGeoPoint pen_sht_pos;
-
+    double goalie_x = 1;
+    const CGeoLine goal_line(CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + goalie_x, Param::Field::GOAL_WIDTH / 2)
+        , CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + goalie_x, -Param::Field::GOAL_WIDTH / 2));
     if (BallShot) {
         CGeoLine ball_line(ball.Pos(), ball.Pos() + Utils::Polar2Vector(10, ball.Vel().dir()));
-        const CGeoLine goal_line(CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + goalie_x, Param::Field::GOAL_WIDTH / 2)
-            , CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + goalie_x, -Param::Field::GOAL_WIDTH / 2));
         const CGeoLineLineIntersection lli(ball_line, goal_line);
         if (lli.Intersectant() == false)
         {
@@ -183,9 +177,15 @@ CGeoPoint CGoaliePosV1::GetPenaltyShootPosV3(const CVisionModule *pVision)
         {
             pen_sht_pos = lli.IntersectPoint();
         }
-        GDebugEngine::Instance()->gui_debug_x(pen_sht_pos,COLOR_ORANGE);
-        pen_sht_pos=pen_sht_pos+Utils::Polar2Vector(30,(pen_sht_pos-me.Pos()).dir());
-        GDebugEngine::Instance()->gui_debug_x(pen_sht_pos,COLOR_RED);
+        //往远处规划一点看看能不能跑快点
+        double danger_factor = 5;
+        if (danger_factor*me.Pos().dist(pen_sht_pos) > ball.Pos().dist(pen_sht_pos))
+        {
+            DBG_POS(pen_sht_pos);
+            pen_sht_pos = pen_sht_pos + Utils::Polar2Vector(20, (pen_sht_pos -me.Pos()).dir());
+        }
+    } else if (Utils::InOurPenaltyArea(ball.Pos(),-20)) {
+        pen_sht_pos=ball.Pos();
     } else {
         int random_num=5;
         vector<CGeoPoint> random_points;
@@ -199,8 +199,6 @@ CGeoPoint CGoaliePosV1::GetPenaltyShootPosV3(const CVisionModule *pVision)
         {
             enemy_sht_line = CGeoLine(ball.Pos(), ball.Pos() + Utils::Polar2Vector(10, Param::Math::PI));
         }
-        const CGeoLine goal_line(CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + goalie_x, Param::Field::GOAL_WIDTH / 2)
-            , CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + goalie_x, -Param::Field::GOAL_WIDTH / 2));
         const CGeoLineLineIntersection lli(enemy_sht_line, goal_line);
         if (lli.Intersectant() == false)
         {
@@ -217,22 +215,36 @@ CGeoPoint CGoaliePosV1::GetPenaltyShootPosV3(const CVisionModule *pVision)
         {
             pen_sht_pos = CGeoPoint(pen_sht_pos.x(), Param::Field::GOAL_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE + GOAL_BUFFER);
         }
-        GDebugEngine::Instance()->gui_debug_x(pen_sht_pos,COLOR_RED);
+
         //random
         std::default_random_engine generator{(unsigned int)pVision->Cycle()};
         vector<int> weight_vector;
         for (auto p : random_points) {
-            weight_vector.push_back(100000 / sqrt(pen_sht_pos.dist(p)));
+            weight_vector.push_back(100000 / sqrt(pen_sht_pos.dist(p))/std::log10(30+p.dist(GOAL_CENTER)));
         }
         std::discrete_distribution<int> weight(weight_vector.begin(),weight_vector.end());
-        int x = weight(generator);
-#ifdef DEBUGGING
-        printf("cycle: %d size of random_points: %d\tsize of weight_vector: %d\nweights: ",pVision->Cycle(),random_points.size(),weight_vector.size());
-        for (auto w : weight_vector)
-            printf("%d ", w);
-        printf("\nx= %d\n", x);
-#endif
+        static int x = weight(generator);
+        static int x_cnt = 0;
+        const int x_cnt_max = 5;
+        x_cnt++;
+        if (x_cnt > x_cnt_max)
+        {
+            x_cnt = 0;
+            x = weight(generator);
+        }
+//        x=2;
         pen_sht_pos = random_points[x];
+        char s[1000];
+        std::sprintf(s, "weight_vector: ");
+        for (auto w:weight_vector)
+            std::sprintf(s + std::strlen(s), "%d ", w);
+        std::sprintf(s + std::strlen(s), "x: %d", x);
+        DBG_MSG(-250, s);
+        for (auto p : random_points)
+            DBG_POS(p);
     }
+#ifdef DEBUGGING
+    GDebugEngine::Instance()->gui_debug_x(pen_sht_pos, COLOR_GREEN);
+#endif
     return pen_sht_pos;
 }

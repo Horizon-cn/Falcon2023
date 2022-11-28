@@ -49,7 +49,7 @@ firstState = "init",
 			return "exit"
 		end
 	end,
-	Goalie  = task.advance(),
+	Goalie  = task.penaltyGoalie(),
 	match = "{LACDM}{EH}"
 },
 

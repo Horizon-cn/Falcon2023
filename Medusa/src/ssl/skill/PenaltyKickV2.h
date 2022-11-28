@@ -24,6 +24,7 @@ private:
         GET,
         KICK,
         CHIP,
+        CHIP1,
         NORMAL_PUSH,
         BREAKSHOOT,
         LIGHT_KICK

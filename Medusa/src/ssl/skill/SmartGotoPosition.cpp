@@ -130,7 +130,8 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         (vecNumber == TaskMediator::Instance()->rightBack())     ||
         (vecNumber == TaskMediator::Instance()->singleBack())    ||
         (vecNumber == TaskMediator::Instance()->sideBack())      ||
-        (vecNumber == TaskMediator::Instance()->defendMiddle())
+        (vecNumber == TaskMediator::Instance()->defendMiddle())  ||
+        (TaskMediator::Instance()->isMultiBack(vecNumber))
     );
     const bool isAdvancer = (vecNumber == TaskMediator::Instance()->advancer());
 
@@ -181,6 +182,9 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     /************************************************************************/
     // ?????????????????????????????????????50cm???
     int leaderNumber = paramManager->PlACEBALL_PLAYER_NUM;
+    // ObstaclesNew obsNewNew(avoidLength);
+    // obsNewNew.addLongCircle(segP1, segP2, CVector(0.0, 0.0), ballPlacementDist, OBS_LONG_CIRCLE_NEW, false, true);
+    //
     if (avoidTheirBallPlacementArea || (avoidOurBallPlacementArea && vecNumber != leaderNumber)) {
         CGeoPoint segP1 = pVision->Ball().Pos(), segP2(pVision->getBallPlacementPosition().x(), pVision->getBallPlacementPosition().y());
         bool addObs = false;
@@ -318,6 +322,7 @@ PlayerCapabilityT CSmartGotoPosition::setCapability(const CVisionModule* pVision
                          (vecNumber == TaskMediator::Instance()->singleBack()) ||
                          (vecNumber == TaskMediator::Instance()->sideBack())   ||
                          (vecNumber == TaskMediator::Instance()->defendMiddle()));
+    const bool isMultiBack = TaskMediator::Instance()->isMultiBack(vecNumber);
     const CGeoPoint mePos = pVision->OurPlayer(vecNumber).Pos();
     const int playerFlag = task().player.flag;
     PlayerCapabilityT capability;
@@ -333,7 +338,7 @@ PlayerCapabilityT CSmartGotoPosition::setCapability(const CVisionModule* pVision
         capability.maxAngularAccel = MAX_ROTATION_ACC_GOALIE;
         capability.maxAngularDec = MAX_ROTATION_ACC_GOALIE;
     }
-    else if (isBack) {
+    else if (isBack || isMultiBack) {
         // Traslation ?????????????
         capability.maxSpeed = MAX_TRANSLATION_SPEED_BACK;
         capability.maxAccel = MAX_TRANSLATION_ACC_BACK;

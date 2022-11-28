@@ -1,3 +1,9 @@
+local function dir__dead()
+	local function dir_dead_inside(runner)
+		return (CGeoPoint:new_local(600,50)-ball.pos()):dir()
+	end
+	return dir_dead_inside
+end
 
 gPlayTable.CreatePlay{
 
@@ -42,7 +48,7 @@ firstState = "init",
 ["tempshort"] = {
 	switch = function ()
 		if bufcnt(cond.isNormalStart()) then
-			return "rotate1"
+			return "forceshoot"
 		end
 	end,
 	Goalie = task.goalie(),
@@ -50,7 +56,7 @@ firstState = "init",
 	Assister = task.goCmuRush(CGeoPoint:new_local(420,100)),
 	Middle  = task.leftBack(),
 	Defender = task.rightBack(),
-	Leader  = task.goCmuRush(CGeoPoint:new_local(450,0),0.33),
+	Leader  = task.goCmuRush(CGeoPoint:new_local(450,0),0.0),
 	Engine   = task.goCmuRush(CGeoPoint:new_local(420,-150)),
     Hawk     = task.goCmuRush(CGeoPoint:new_local(420,150)),
 	match = "{L}{ADM}{EH}"
@@ -111,7 +117,7 @@ firstState = "init",
 ["shoot"] = {
 	switch = function ()
 		if bufcnt(ball.posX()<550 , 350 , 400) then
-			return "forceforceshoot"
+			return "forceshoot"
 		end
 	end,
 	Goalie = task.goalie(),
@@ -136,7 +142,7 @@ firstState = "init",
 	Assister = task.goCmuRush(CGeoPoint:new_local(420,100)),
 	Middle  = task.leftBack(),
 	Defender = task.rightBack(),
-	Leader  = task.advanceV4(),
+	Leader  = task.goAndTurnKick(dir__dead,650),
 	Engine   = task.goCmuRush(CGeoPoint:new_local(420,-150)),
     Hawk     = task.goCmuRush(CGeoPoint:new_local(420,150)),
 	match = "{LADM}{EH}"

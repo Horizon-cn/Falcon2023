@@ -70,17 +70,15 @@ firstState = "getball",
 		end
 		
 	end,
-	--Assister = task.staticGetBall(ball.LMPassPos()),
 	Assister = task.staticGetBall(TAR_POS),
-	--Special  = task.goLMPassPos("Assister"),
-	Special  = task.goCmuRush(TAR_POS, _, ACC, STOP_DSS),
-	Engine   = task.goLeftSupport(),
-	Hawk     = task.goRightSupport(),
-	Leader   = task.goRWPassPos("Assister"),
-	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
+	Special  = task.goCmuRush(TAR_POS, _, ACC, flag.allow_dss),
+	Engine   = task.goMMPassPos("Assister"),
+	Hawk     = task.marking("First"),
+	Leader   = task.goMWPassPos("Assister"),
+	Defender  = task.rightBack(),
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{DM}{AS}[LEH]"
+	match    = "{A}{DM}{S}[LEH]"
 },	
 
 ["chipball"] = {
@@ -89,22 +87,17 @@ firstState = "getball",
 		if bufcnt(player.kickBall("Assister") or
 				  player.toBallDist("Assister") > 20 and false, 3) then
 			return "waitball"
-		elseif  bufcnt(false,180) then
-			print("why here?")
-			return "exit"
 		end
 	end,
-	--Assister = task.chipPass(ball.LMPassPos(), chipPower, false),
 	Assister = task.chipPass(TAR_POS, def_chipPower()),
-	--Special  = task.goLMPassPos("Assister"),
-	Special  = task.goCmuRush(TAR_POS, _, ACC, STOP_DSS),
-	Engine   = task.goLeftSupport(),
-	Hawk     = task.goRightSupport(),
-	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()), _, ACC, STOP_DSS),
-	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
+	Special  = task.goCmuRush(TAR_POS, _, ACC, flag.allow_dss),
+	Engine   = task.goMMPassPos("Assister"),
+	Hawk     = task.marking("First"),
+	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()), _, ACC, flag.allow_dss),
+	Defender  = task.rightBack(),
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{DM}{AS}{LEH}"
+	match    = "{A}{DM}{S}{LEH}"
 },
 
 ["waitball"] = {
@@ -116,13 +109,13 @@ firstState = "getball",
 	end,
 	Assister = task.stop(),
 	Special  = task.advance(),
-	Engine   = task.goLeftSupport(),
-	Hawk     = task.goRightSupport(),
-	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()),  _, ACC, STOP_DSS),
+	Engine   = task.goMMPassPos("Assister"),
+	Hawk     = task.marking("First"),
+	Leader   = task.goCmuRush(ball.refAntiYPos(ball.pos()),  _, ACC, flag.allow_dss),
 	Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
 	Middle   = task.leftBack(),
 	Goalie   = task.goalieNew(),
-	match    = "{DM}{AS}{LEH}"
+	match    = "{S}{DM}{LEH}{A}"
 },
 
 name = "Ref_ImmortalKickV1",

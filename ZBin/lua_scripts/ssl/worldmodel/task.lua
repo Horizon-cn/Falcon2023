@@ -415,7 +415,7 @@ function goAndTurnKick(role, power, icircle, a) -- 2014-03-28 added by yys, å¢žå
 	elseif type(role) == "string" then
 		idir = ball.toPlayerHeadDir(role)
 	elseif type(role) == "function" then
-		idir = ball.toFuncDir(role)
+		idir = role()
 	elseif type(role) == "userdata" then
 		idir = player.antiYDir(role)
 	end
@@ -946,8 +946,8 @@ function defendMiddle(role, f)
 		mflag = mflag--bit:_or(flag.avoid_shoot_line, flag.not_avoid_our_vehicle)
 	end
 	mflag=bit:_or(flag.allow_dss,mflag)
-	local mexe, mpos = GotoMatchPos{ pos = pos.defendMiddlePos,dir = dir.backSmartGotoDir , srole = "defendMiddle", flag = mflag, sender = role}
-	return {mexe, mpos, kick.flat, dir.defendBackClear(), pre.fieldDefender(), kp.full(),cp.full(), mflag}
+	local mexe, mpos = GotoMatchPos{ pos = pos.defendMiddlePos,dir = dir.backSmartGotoDir , srole = "defendMiddle", flag = flag.allow_dss, sender = role}
+	return {mexe, mpos, kick.flat, dir.defendBackClear(), pre.fieldDefender(), kp.full(),cp.full(), flag.allow_dss}
 end
 
 function defendMiddle4Stop(role)

@@ -253,7 +253,7 @@ void CGetBallV3::plan(const CVisionModule* pVision)
 	getball_task.player.flag = getball_task.player.flag & (~PlayerStatus::DODGE_BALL);		//取消避球标签
 	if (!(getball_task.player.flag & PlayerStatus::DRIBBLING))
 		getball_task.player.flag = getball_task.player.flag & (~PlayerStatus::DRIBBLING);	//取消控球标签
-
+    getball_task.player.flag |= PlayerStatus::ALLOW_DSS;
 	/********************************************************************/
 	/* 状态判断模块  by lsp */
 	/********************************************************************/

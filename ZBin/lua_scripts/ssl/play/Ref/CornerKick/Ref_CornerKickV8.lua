@@ -39,11 +39,11 @@ gPlayTable.CreatePlay{
     Assister = task.staticGetBall(SHOOT_POS()),
     Leader   = task.rightBack(),
     Special  = task.leftBack(),
-    Middle   = task.goCmuRush(SYNT_POS_1),
-    Defender = task.goCmuRush(ANTI_POS_1),
+    Middle   = task.goCmuRush(SYNT_POS_1,_,_,flag.allow_dss),
+    Defender = task.goCmuRush(ANTI_POS_1,_,_,flag.allow_dss),
     Goalie   = dangerous and task.goalieNew(),
     Engine   = task.goLWPassPos("Assister"),
-    Hawk     = task.goCmuRush(ANTI_POS_3),
+    Hawk     = task.goCmuRush(ANTI_POS_3,_,_,flag.allow_dss),
     match    = "{A}{LS}{M}{DEH}"
   },
 
@@ -58,11 +58,11 @@ gPlayTable.CreatePlay{
     Assister = task.chipPass(SHOOT_POS(),def_chipPower()),
     Leader   = task.rightBack(),
     Special  = task.leftBack(),
-    Middle   = task.goCmuRush(ANTI_POS_2),
-    Defender = task.goCmuRush(SYNT_POS_2),
+    Middle   = task.goCmuRush(ANTI_POS_2,_,_,flag.allow_dss),
+    Defender = task.goCmuRush(SYNT_POS_2,_,_,flag.allow_dss),
     Goalie   = task.goalieNew(),
     Engine   = task.goLWPassPos("Assister"),
-    Hawk     = task.goCmuRush(SYNT_POS_3),
+    Hawk     = task.goCmuRush(SYNT_POS_3,_,_,flag.allow_dss),
     match    = "{A}{LS}{M}{DEH}"
   },
 
@@ -77,7 +77,7 @@ gPlayTable.CreatePlay{
     Assister = task.stop(),
     Leader   = task.rightBack(),
     Special  = task.leftBack(),
-    Middle   = task.goCmuRush(ANTI_POS_3),
+    Middle   = task.goCmuRush(ANTI_POS_3,_,_,flag.allow_dss),
     Defender = task.continue(),
     Goalie   = task.goalieNew(),
     Engine   = task.goLWPassPos("Assister"),

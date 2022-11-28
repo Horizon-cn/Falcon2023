@@ -46,7 +46,7 @@ namespace {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CVisionModule::CVisionModule() 
-:_timeCycle(0), _lastTimeCycle(0), _ballKicked(false), _ourGoalie(0), _theirGoalie(0), _theirGoalieStrategyNum(0)
+:_timeCycle(0), _lastTimeCycle(0), _ballKicked(false), _ourGoalie(0), _theirGoalie(-1), _theirGoalieStrategyNum(0)
 {	
 	WorldModel::Instance()->registerVision(this);
 	{
@@ -326,6 +326,25 @@ void CVisionModule::CheckBothSidePlayerNum()
 	}
 	_TheirValidNum = _TheirValidNum > Param::Field::MAX_PLAYER ? Param::Field::MAX_PLAYER : _TheirValidNum;
 
+//    if (_theirGoalie >=0 && _theirGoalie < Param::Field::MAX_PLAYER) return;
+//    if (_theirGoalie >=0 && _theirGoalie < Param::Field::MAX_PLAYER && !Utils::InTheirPenaltyArea(TheirPlayer(_theirGoalie).Pos(),0))
+//        return;
+    int dist = 1000;
+    int tempTheirGoalie=_theirGoalie;
+    for(int i=0;i<Param::Field::MAX_PLAYER;i++)
+    {
+        double d = TheirPlayer(i).Pos().dist(CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0));
+        if(d<dist)
+        {
+            dist=d;
+            tempTheirGoalie=i;
+        }
+    }
+    if(Utils::InTheirPenaltyArea(TheirPlayer(tempTheirGoalie).Pos(),0) && !Utils::InTheirPenaltyArea(TheirPlayer(_theirGoalie).Pos(),0))
+    {
+        _theirGoalie = tempTheirGoalie;
+    }
+
 	return;
 }
 
@@ -374,9 +393,9 @@ void CVisionModule::UpdateRefereeMsg()
 			GDebugEngine::Instance()->gui_debug_msg(_ballPlacementPosition, "BP_Point", COLOR_WHITE);
 			GDebugEngine::Instance()->gui_debug_arc(_ballPlacementPosition, 15, 0, 360, COLOR_WHITE);
         } else {
-            if (_next_gameState.theirIndirectKick() || _next_gameState.theirDirectKick())
-                _refereeMsg = "theirIndirectKick";
-            else
+            //if (_next_gameState.theirIndirectKick() || _next_gameState.theirDirectKick())
+            //    _refereeMsg = "theirIndirectKick";
+            //else
                 _refereeMsg = "gameStop";
 		}
 	} else if( _gameState.ourRestart()){
