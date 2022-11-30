@@ -190,7 +190,7 @@ bool Interaction::controlMedusa(bool control) {
         emit GlobalSettings::instance()->clearOutput();
     } else {
         medusaProcess = new QProcess();
-        QString name = "./Medusa";
+        QString name = "./Core";
         connect(medusaProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(medusaPrint()));
         medusaProcess->start(name);
         QTextStream(stdout) << "\n------------------------------------\n" << "running " << name << "\n------------------------------------\n";
@@ -210,7 +210,7 @@ bool Interaction::controlMedusa2(bool control) {
     } else {
         medusaProcess2 = new QProcess();
         //medusaProcess2->setWorkingDirectory("./Oppo");
-        QString name = "./Medusa";
+        QString name = "./Core";
         medusaProcess2->start(name);
         QTextStream(stdout) << "\n------------------------------------\n" << "running 2 " << name << "\n------------------------------------\n";
     }
@@ -273,11 +273,11 @@ void Interaction::kill() {
 #ifdef WIN32
 //    RefereeThread::instance()->disconnectTCP();
     QString athena = "taskkill -im Client.exe -f";
-    QString medusa = "taskkill -im Medusa.exe -f";
+    QString medusa = "taskkill -im Core.exe -f";
     //QString grSim = "taskkill -im grSim.exe -f";
 #else
     QString athena = "pkill Client";
-    QString medusa = "pkill Medusa";
+    QString medusa = "pkill Core";
     //QString grSim = "pkill grsim";
 #endif
     if (monitorProcess != nullptr) {
