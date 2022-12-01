@@ -103,12 +103,12 @@ public:
     virtual void signal(unsigned int c = 1) override {
         std::unique_lock<std::mutex> lock(mutex_);
         count_=c;
-        cv_.notify_one();
+        cv_.notify_one(); // count_置为>0，结束wait阻塞
     }
 
     virtual void wait() override {
         std::unique_lock<std::mutex> lock(mutex_);
-        cv_.wait(lock, [=] { return count_ > 0; });
+        cv_.wait(lock, [=] { return count_ > 0; }); // 有signal count_置为1，不wait
         --count_;
     }
 

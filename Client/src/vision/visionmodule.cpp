@@ -13,6 +13,7 @@
 #include "networkinterfaces.h"
 #include <QtDebug>
 #include <QTimer>
+#include <QTime>
 #include <thread>
 #include "setthreadname.h"
 #include "sim/sslworld.h"
@@ -79,6 +80,7 @@ void CVisionModule::udpSocketConnect(bool real) {
         connect(&udpReceiveSocket, SIGNAL(readyRead()), this, SLOT(storeData()), Qt::DirectConnection);
     }
     else{
+        sim_timer.setTimerType(Qt::PreciseTimer);
         int desired = 65;
         ZSS::SParamManager::instance()->loadParam(desired,"worldp_vars/DesiredFPS");
         if(desired > 500) desired = 500;
@@ -172,6 +174,9 @@ void CVisionModule::storeData() {
     }
 }
 void CVisionModule::oneStepSimData(){
+    static QTime t = QTime::currentTime();
+    qDebug()<<std::fabs(t.msecsTo(QTime::currentTime()));
+    t = QTime::currentTime();
     publish("sim_signal");
 }
 void CVisionModule::readSimData(){

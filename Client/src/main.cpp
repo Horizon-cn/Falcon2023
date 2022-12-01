@@ -17,6 +17,33 @@
 #include "log/log_slider.h"
 #include "log/logeventlabel.h"
 #include "rec_slider.h"
+#ifdef _WIN32
+#include <windows.h>
+#include <stdio.h>
+void debug()
+{
+    // detach from the current console window
+    // if launched from a console window, that will still run waiting for the new console (below) to close
+    // it is useful to detach from Qt Creator's <Application output> panel
+    FreeConsole();
+
+    // create a separate new console window
+    AllocConsole();
+
+    // attach the new console to this application's process
+    AttachConsole(GetCurrentProcessId());
+
+    // reopen the std I/O streams to redirect I/O to the new console
+    freopen("CON", "w", stdout);
+    freopen("CON", "w", stderr);
+    freopen("CON", "r", stdin);
+}
+#else
+void debug()
+{
+    return;
+}
+#endif
 
 namespace ZSS {
 }
@@ -43,6 +70,7 @@ void qmlRegister() {
 }
 
 int main(int argc, char *argv[]) {
+    debug();
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
     app.setOrganizationName("ZJUNLICT");

@@ -326,20 +326,21 @@ void SSLWorld::run(){
     SetThreadName("SimPlugin");
     std::cout << "SSLWorld plugin start!" << std::endl;
     std::thread rec([=]{recvActions();});
-    double time = this->cfg->DeltaTime();
-    //QTime t;
-    //t = QTime::currentTime();
+    double time = 1 / this->cfg->DesiredFPS(); //this->cfg->DeltaTime();
+    QTime t;
     while(true){
+        t = QTime::currentTime();
         ode_mutex.lock();
-        //qDebug()<<std::fabs(t.msecsTo(QTime::currentTime()));
-        //t = QTime::currentTime();
         this->step(time);
         ode_mutex.unlock();
-        receive("sim_signal");
+        //receive("sim_signal");
         ode_mutex.lock();
         sendVisionBuffer();
         ode_mutex.unlock();
-        std::this_thread::sleep_for(std::chrono::microseconds(500));
+        int deltaTime = (0.013 * 1e3 - std::fabs(t.msecsTo(QTime::currentTime()))) * 1e3; // 直接用time会比理想的慢
+        std::this_thread::sleep_for(std::chrono::microseconds(deltaTime));
+        //std::this_thread::sleep_for(std::chrono::microseconds(4500));
+        //std::this_thread::sleep_for(std::chrono::microseconds(500));
     }
 }
 
