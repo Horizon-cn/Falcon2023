@@ -16,7 +16,8 @@ standard_paths(${PROJECT_SOURCE_DIR} ZBin lib)
 
 set(libs)
 
-find_package(Protobuf REQUIRED)
+include(${PROJECT_SOURCE_DIR}/cmake/GetThirdParty.cmake)
+
 function(get_pb_file H CPP)
 	list(APPEND PH ${ARGN})
 	list(APPEND PC ${ARGN})
@@ -37,7 +38,7 @@ FOREACH(FIL ${PROTO_FILES})
 	GET_FILENAME_COMPONENT(ABS_FIL ${FIL} ABSOLUTE)
 	GET_FILENAME_COMPONENT(FIL_WE ${ABS_FIL} NAME_WE)
 	EXECUTE_PROCESS(
-		COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTO_FLAGS} --cpp_out=${PROTO_META_BASE_DIR} ${FIL}
+		COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTO_FLAGS} --cpp_out=${PROTO_META_BASE_DIR} ${FIL}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	)
 ENDFOREACH()
@@ -45,3 +46,5 @@ ENDFOREACH()
 add_subdirectory(Client)
 add_subdirectory(Core)
 # add_subdirectory(Controller)
+
+include(${PROJECT_SOURCE_DIR}/cmake/CopyThirdParty.cmake)

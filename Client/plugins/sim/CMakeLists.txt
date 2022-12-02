@@ -1,47 +1,28 @@
 # Simulator Plugin
 set(libs)
 # OpenGL
-find_package(OpenGL REQUIRED)
 list(APPEND PROJECT_INCLUDE_DIRS ${OPENGL_INCLUDE_DIR})
 list(APPEND libs ${OPENGL_LIBRARIES})
 
-if (WIN32)
-    ## if you have different Qt visions and CMake cannot link the right one
-    #set(CMAKE_PREFIX_PATH D:/App/Qt/5.14.1/msvc2015_64/lib/cmake)
-
-    set(thirdParty ${CMAKE_CURRENT_SOURCE_DIR}/../../../3rdParty)
-endif()
-
 # Qt5
-find_package(Qt5 COMPONENTS Core Network Gui REQUIRED)
 list(APPEND PROJECT_INCLUDE_DIRS
     ${Qt5Core_INCLUDE_DIRS}
     ${Qt5Network_INCLUDE_DIRS}
     ${Qt5Gui_INCLUDE_DIRS}
 )
 list(APPEND libs Qt5::Core Qt5::Network Qt5::Gui)
+IF(WIN32)
+list(APPEND libs Qt5::WinMain)
+ENDIF()
 
 # ODE
-if (WIN32)
-    list(APPEND libs Qt5::WinMain)
-    set(ODE_INCLUDE_DIRS "${thirdParty}/ODE/include")
-    set(ODE_LIBRARIES "${thirdParty}/ODE/lib/ode.lib")
-else()
-find_package(ODE REQUIRED)
-endif()
 list(APPEND PROJECT_INCLUDE_DIRS ${ODE_INCLUDE_DIRS})
 list(APPEND libs ${ODE_LIBRARIES})
 # add_definitions(-DdDOUBLE)
 
 # Protobuf
-if (WIN32)
-    set(PROTOBUF_INCLUDE_DIRS "${thirdParty}/protobuf/include")
-    set(Protobuf_LIBRARIES "${thirdParty}/protobuf/lib/libprotobuf.lib")
-else()
-find_package(Protobuf REQUIRED)
-endif()
-list(APPEND PROJECT_INCLUDE_DIRS ${PROTOBUF_INCLUDE_DIRS})
-list(APPEND libs ${Protobuf_LIBRARIES})
+list(APPEND PROJECT_INCLUDE_DIRS ${Protobuf_INCLUDE_DIR})
+list(APPEND libs ${Protobuf_LIBRARY_RELEASE} ${Protobuf_LITE_LIBRARY_RELEASE} ${Protobuf_PROTOC_LIBRARY_RELEASE})
 
 set(PROTO_LIST
     grSim_Commands

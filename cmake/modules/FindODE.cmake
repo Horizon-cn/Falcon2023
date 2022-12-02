@@ -1,13 +1,7 @@
 IF (WIN32)
-    set(
-      ODE_INCLUDE_DIRS
-      "C:/usr/local/ode/include"
-    )
-
-    set(
-      ODE_LIBRARIES
-      "C:/usr/local/ode/lib/ode_double.lib"
-    )
+    set(ODE_INCLUDE_DIRS "${THIRDPARTY_LIB_DIR}/ODE/include")
+    set(ODE_LIBRARIES "${THIRDPARTY_LIB_DIR}/ODE/lib/ode.lib")
+    list(APPEND CMAKE_PREFIX_PATH ${ODE_INCLUDE_DIRS} ${ODE_LIBRARIES})
 ELSE ()
     find_path(
        ODE_INCLUDE_DIRS

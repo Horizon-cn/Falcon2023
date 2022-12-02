@@ -14,7 +14,6 @@ if (WIN32)
     ## if you have different Qt visions and CMake cannot link the right one
     #set(CMAKE_PREFIX_PATH D:/App/Qt/5.14.1/msvc2015_64/lib/cmake)
 
-    set(thirdParty ${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty)
 endif()
 
 if (NOT UNIX AND NOT APPLE)
@@ -26,32 +25,19 @@ add_subdirectory(plugins)
 set(libs)
 
 # define protobuf generater
-if (WIN32)
-    set(PROTOBUF_INCLUDE_DIRS "${thirdParty}/protobuf/include")
-    set(Protobuf_LIBRARIES "${thirdParty}/protobuf/lib/libprotobuf.lib")
-else()
-    find_package(Protobuf REQUIRED)
-endif()
-
-include_directories(${PROTOBUF_INCLUDE_DIRS})
-list(APPEND libs ${Protobuf_LIBRARIES})
+include_directories(${Protobuf_INCLUDE_DIR})
+list(APPEND libs ${Protobuf_LIBRARY_RELEASE} ${Protobuf_LITE_LIBRARY_RELEASE} ${Protobuf_PROTOC_LIBRARY_RELEASE})
 
 ## find Zlib
-if (WIN32)
-    set(ZLIB_INCLUDE_DIRS "${thirdParty}/zlib/include")
-    set(ZLIB_LIBRARIES "${thirdParty}/zlib/lib/zlib.lib")
-else()
-    find_package(ZLIB)
-endif()
-
 include_directories(${ZLIB_INCLUDE_DIRS})
-list(APPEND libs ${ZLIB_LIBRARIES})
+list(APPEND libs ${ZLIB_LIBRARY})
+
 ## find Qt
-find_package(Qt5 COMPONENTS Core Quick SerialPort Widgets REQUIRED)
 list(APPEND libs Qt5::Core Qt5::Quick Qt5::SerialPort Qt5::Widgets)
 if (WIN32)
     list(APPEND libs Qt5::WinMain)
 endif()
+
 # project files
 ## protobuf files
 set(PROTO_LIST
@@ -91,6 +77,7 @@ set(PROJECT_INCLUDE_DIRS
     ${CMAKE_SOURCE_DIR}/share
 )
 include_directories(${PROJECT_INCLUDE_DIRS})
+
 ## core cpp files
 file(GLOB CPPFILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
@@ -112,8 +99,3 @@ set(zss_libs
 add_executable(${TARGET_NAME} ${SRC} "Client.qrc" "Client.rc")
 target_compile_definitions(${TARGET_NAME} PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(${TARGET_NAME} PRIVATE ${libs} ${zss_libs})
-
-# copy ode dll to ZBin
-IF(WIN32)
-file(COPY ${thirdParty}/ODE/bin/ode_double.dll DESTINATION ${CMAKE_SOURCE_DIR}/ZBin/)
-ENDIF()
