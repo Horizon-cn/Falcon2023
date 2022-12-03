@@ -20,7 +20,7 @@ Copyright (C) 2011, Parsian Robotic Center (eew.aut.ac.ir/~parsian/grsim)
 #define CONFIGWIDGET_H
 
 #include "parammanager.h"
-
+/**
 namespace ZSS{
 class ParamManagerSimulator:public ParamManager{
 public:
@@ -29,7 +29,7 @@ public:
 };
 typedef Singleton<ParamManagerSimulator> pm;
 }
-
+**/
 #define DEF_VALUE(type,Type,name)  \
     type v_##name; \
     inline type name() { return v_##name; }

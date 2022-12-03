@@ -1,12 +1,33 @@
+
 gPlayTable.CreatePlay{
-firstState = "start",
+firstState = "init",
+
+["init"] = {
+	switch = function ()
+		if bufcnt(1,50) then
+			return "start"
+		end
+	end,
+	Leader  = task.goCmuRush(CGeoPoint:new_local(430, 180)),
+	Middle  = task.goCmuRush(CGeoPoint:new_local(430,150)),
+	Crosser = task.goCmuRush(CGeoPoint:new_local(430,-150)),
+	Defender = task.goCmuRush(CGeoPoint:new_local(430,-250)),
+	Assister = task.goCmuRush(CGeoPoint:new_local(430,250)),
+	Engine   = task.goLMPassPos("Leader"),
+    Hawk     = task.goRMPassPos("Leader"),
+	Goalie   = task.penaltyGoalie(),
+	match = "{LACDM}{EH}"
+},
+
 
 ["start"] = {
 	switch = function ()
 		if cond.isNormalStart() then
-			return "kick"
-		elseif cond.isGameOn() then
-			return "exit"
+			if player.toBallDist("Goalie")>400 then
+				return "kicklong"
+			else
+				return "kickshort"
+			end
 		end
 	end,
 	Leader  = task.goCmuRush(CGeoPoint:new_local(430, 180)),
@@ -14,13 +35,27 @@ firstState = "start",
 	Crosser = task.goCmuRush(CGeoPoint:new_local(430,-150)),
 	Defender = task.goCmuRush(CGeoPoint:new_local(430,-250)),
 	Assister = task.goCmuRush(CGeoPoint:new_local(430,250)),
+	Engine   = task.goLMPassPos("Leader"),
+    Hawk     = task.goRMPassPos("Leader"),
 	Goalie   = task.penaltyGoalie(),
-	match    = "{LACDM}"
+	match    = "{LACDM}{EH}"
 },
 
-["kick"] = {
+
+
+["kicklong"] = {
 	switch = function ()
-		if ball.posX() < -400 then
+		if false then
+			return "exit"
+		end
+	end,
+	Goalie  = task.advance(),
+	match = "{LACDM}{EH}"
+},
+
+["kickshort"] = {
+	switch = function ()
+		if bufcnt(cond.isGameOn(),20) then
 			return "exit"
 		end
 	end,
@@ -29,8 +64,10 @@ firstState = "start",
 	Crosser = task.goCmuRush(CGeoPoint:new_local(430,-150)),
 	Defender = task.goCmuRush(CGeoPoint:new_local(430,-250)),
 	Assister = task.goCmuRush(CGeoPoint:new_local(430,250)),
+	Engine   = task.goLMPassPos("Leader"),
+    Hawk     = task.goRMPassPos("Leader"),
 	Goalie  = task.penaltyGoalie(),
-	match = "{LACDM}"
+	match = "{LACDM}{EH}"
 },
 
 name = "Ref_PenaltyDefV1",

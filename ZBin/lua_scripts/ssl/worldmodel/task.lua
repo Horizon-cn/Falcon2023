@@ -415,7 +415,7 @@ function goAndTurnKick(role, power, icircle, a) -- 2014-03-28 added by yys, 增�
 	elseif type(role) == "string" then
 		idir = ball.toPlayerHeadDir(role)
 	elseif type(role) == "function" then
-		idir = ball.toFuncDir(role)
+		idir = role()
 	elseif type(role) == "userdata" then
 		idir = player.antiYDir(role)
 	end
@@ -593,7 +593,6 @@ function dribbleTurn(finalDir, adjustPre)
 	else
 		ipre = adjustPre
 	end
-
 	local mexe, mpos = DribbleTurn{ fDir = idir, pre = ipre }
 	return {mexe, mpos}
 end
@@ -682,42 +681,42 @@ function goPassPos(role, f)
 end
 
 function goFirstPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.LWPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.LWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goSecondPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.RWPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.RWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goLWPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.LWPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.LWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goMWPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.MWPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.MWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goRWPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.RWPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.RWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goLMPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.LMPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.LMPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goMMPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.MMPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.MMPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
 function goRMPassPos(role)
-	local mexe, mpos = GoCmuRush{ pos = ball.RMPassPos(), dir = player.toShootOrRobot(role),sender=role}
+	local mexe, mpos = GoCmuRush{ pos = ball.RMPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
@@ -947,8 +946,8 @@ function defendMiddle(role, f)
 		mflag = mflag--bit:_or(flag.avoid_shoot_line, flag.not_avoid_our_vehicle)
 	end
 	mflag=bit:_or(flag.allow_dss,mflag)
-	local mexe, mpos = GotoMatchPos{ pos = pos.defendMiddlePos,dir = dir.backSmartGotoDir , srole = "defendMiddle", flag = mflag, sender = role}
-	return {mexe, mpos, kick.flat, dir.defendBackClear(), pre.fieldDefender(), kp.full(),cp.full(), mflag}
+	local mexe, mpos = GotoMatchPos{ pos = pos.defendMiddlePos,dir = dir.backSmartGotoDir , srole = "defendMiddle", flag = flag.allow_dss, sender = role}
+	return {mexe, mpos, kick.flat, dir.defendBackClear(), pre.fieldDefender(), kp.full(),cp.full(), flag.allow_dss}
 end
 
 function defendMiddle4Stop(role)
@@ -994,12 +993,12 @@ end
 
 function penaltyGoalie()
 	local mexe, mpos = PenaltyGoalie{}
-	return {mexe, mpos}
+	return {mexe, mpos, kick.chip ,dir.shoot(), pre.fieldDefender(),  kp.full(), cp.full(),flag.not_avoid_their_vehicle}
 end
 
 -- 用来盯人的skill,其中p为优先级
 function marking(p)
-	local mexe, mpos = Marking{pri = p}
+	local mexe, mpos = Marking{pri = p,flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
@@ -1010,7 +1009,7 @@ end
 
 -- 强行绕前盯人
 function markingFront(p)
-	local mexe, mpos = Marking{pri = p, front = true, dir = dir.shoot()}
+	local mexe, mpos = Marking{pri = p, front = true, dir = dir.shoot(),flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
@@ -1025,6 +1024,17 @@ function penaltykick(role)
 		itandem = role()
 	end
 	local mexe, mpos = PenaltyKickV2{pos = pos.advance, srole = "advancer", tandem = itandem}
+	return {mexe, mpos}
+end
+
+function penaltykickshort(role)
+	local itandem = nil
+	if type(role) == "string" then
+		itandem = role
+	elseif type(role) == "function" then
+		itandem = role()
+	end
+	local mexe, mpos = PenaltyKick{pos = pos.advance, srole = "advancer", tandem = itandem}
 	return {mexe, mpos}
 end
 
@@ -1050,6 +1060,17 @@ function advanceV4(role)
 		itandem = role()
 	end
 	local mexe, mpos = AdvanceBallV4{pos = pos.advance, srole = "advancer", tandem = itandem}
+	return {mexe, mpos}
+end
+
+function advanceV3(role)
+	local itandem = nil
+	if type(role) == "string" then
+		itandem = role
+	elseif type(role) == "function" then
+		itandem = role()
+	end
+	local mexe, mpos = AdvanceBallV3{pos = pos.advance, srole = "advancer", tandem = itandem}
 	return {mexe, mpos}
 end
 

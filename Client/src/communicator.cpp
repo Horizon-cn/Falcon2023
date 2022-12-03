@@ -5,6 +5,7 @@
 #include "zss_cmd.pb.h"
 #include "actionmodule.h"
 #include "simmodule.h"
+#include "remotesim.h"
 #include "parammanager.h"
 #include "globaldata.h"
 #include "globalsettings.h"
@@ -15,6 +16,7 @@ int fps[2] = {0, 0};
 std::mutex m_fps;
 std::thread* receiveThread[PARAM::TEAMS];
 bool NoVelY = true;
+bool useSim = false;
 }
 int Communicator::getFPS(int t) {
     int res = 0;
@@ -25,9 +27,20 @@ int Communicator::getFPS(int t) {
     return res;
 }
 
+void Communicator::setGrsimInterfaceIndex(const int index) {
+    grsimInterfaceIndex = index;
+}
+
 Communicator::Communicator(QObject *parent) : QObject(parent) {
     ZSS::ZParamManager::instance()->loadParam(NoVelY, "Lesson/NoVelY", false);
-    QObject::connect(ZSS::ZSimModule::instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
+    ZSS::ZParamManager::instance()->loadParam(useSim, "Simulator/useSim", false);
+    //QObject::connect(ZSS::ZSimModule::instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
+    //if (grsimInterfaceIndex == 0){
+        QObject::connect(ZSS::ZSimModule::instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
+    //}
+    //else {
+        QObject::connect(ZSS::ZRemoteSimModule::instance(), SIGNAL(receiveRemoteInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
+    //}
     QObject::connect(ZSS::NActionModule::instance(), SIGNAL(receiveRobotInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
     for(int i = 0; i < PARAM::TEAMS; i++) {
 //        connect(&receiveSocket[i], &QUdpSocket::readyRead, [ = ]() {
@@ -83,7 +96,11 @@ void Communicator::receiveCommand(int t) {
             }
             if(isSimulation) {
 //                qDebug() << "simulation";
-                ZSS::ZSimModule::instance()->sendSim(t, commands);
+                //ZSS::ZSimModule::instance()->sendSim(t, commands);
+                if (grsimInterfaceIndex==0 && useSim)
+                    ZSS::ZSimModule::instance()->sendSim(t, commands);
+                else
+                    ZSS::ZRemoteSimModule::instance()->sendSim(t, commands);
             } else {
 //                qDebug() << "realreal!";
 //                ZSS::ZActionModule::instance()->sendLegacy(t, commands);
@@ -108,5 +125,6 @@ void Communicator::sendCommand(int team, int id) {
     int size = robot_status.ByteSize();
     QByteArray datagram(size, 0);
     robot_status.SerializeToArray(datagram.data(), size);
+    //qDebug()<<"sendCommands";
     sendSockets.writeDatagram(datagram.data(), size, QHostAddress(ZSS::LOCAL_ADDRESS), ZSS::Athena::CONTROL_BACK_RECEIVE[team]);
 }

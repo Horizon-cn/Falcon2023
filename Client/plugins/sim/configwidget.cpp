@@ -1,6 +1,7 @@
 #include "configwidget.h"
 namespace{
-    auto ppm = ZSS::pm::instance();
+    //auto ppm = ZSS::pm::instance();
+    auto spm = ZSS::SParamManager::instance();
 }
 //#define END_ENUM(parents, name) \
 //    parents->addChild(v_##name);
@@ -13,8 +14,8 @@ namespace{
 //    parent->addChild(v_##name);
 
 #define ADD_VALUE(parent,type,name,defaultvalue,namestring) \
-    ppm->loadParam(v_##name,#parent"/"#name,defaultvalue);
-
+    spm->loadParam(v_##name,#parent"/"#name,defaultvalue);
+    //ppm->loadParam(v_##name,#parent"/"#name,defaultvalue);
 
 ConfigWidget::ConfigWidget()
 {

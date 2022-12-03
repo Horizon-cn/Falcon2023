@@ -16,7 +16,7 @@ gPlayTable.CreatePlay{
   Hawk = task.leftBack(),
   Middle = task.rightBack(),
   Goalie = task.goalieNew(),
-    match = "[L][APSD][HM]"
+    match = "[L][HM][ADSP]"
 },
   name = "Ref_FrontDefV9",
   applicable = {

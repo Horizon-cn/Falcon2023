@@ -17,7 +17,7 @@ gPlayTable.CreatePlay{
   Hawk = task.multiBack(3,2), --leftBack(),
   Middle = task.multiBack(3, 3), --rightBack(),
   Goalie = task.goalieNew(),
-    match = "[L][APSD][HM]"
+    match = "[L][SH][ADP][M]"
 },
   name = "Ref_MiddleDefV11",
   applicable = {

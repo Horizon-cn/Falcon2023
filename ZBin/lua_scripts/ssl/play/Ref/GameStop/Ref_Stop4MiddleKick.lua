@@ -151,12 +151,12 @@ firstState = "start",
   Assister = task.goCmuRush(SIDE_POS, dir.playerToBall, ACC, STOP_DSS),
   Special  = task.goCmuRush(INTER_POS, dir.playerToBall, ACC, STOP_DSS),
   Leader   = task.goCmuRush(MIDDLE_POS, dir.playerToBall, ACC, STOP_DSS),
-  Engine   = task.goLeftSupport(),
-  Hawk     = task.goRightSupport(),
+  Engine   = task.defendKick(),
+  Hawk     = task.defendHead(),
   Defender = task.rightBack(),--task.defendMiddle4Stop(),--TODO
   Middle   = task.leftBack(),
   Goalie   = task.goalieNew(),
-  match    = "{DM}{AL}[SEH]"
+  match    = "{DM}{EAL}[SH]"
 },
 
 ["standByPenalty"] = {

@@ -11,6 +11,7 @@
 #include "networkinterfaces.h"
 #include <QProcess>
 #include <QDir>
+#include "remotesim.h"
 namespace {
 QProcess *medusaProcess = nullptr;
 QProcess *medusaProcess2 = nullptr;
@@ -68,6 +69,9 @@ void Interaction::updateInterfaces(){
 QStringList Interaction::getInterfaces(){
     return ZNetworkInterfaces::instance()->getInterfaces();
 }
+QStringList Interaction::getGrsimInterfaces(){
+    return ZNetworkInterfaces::instance()->getGrsimInterfaces();
+}
 void Interaction::changeVisionInterface(int index){
 //    if(portNum < ports.size() && portNum >= 0){
 //        serial.setPortName(ports[portNum]);
@@ -78,6 +82,9 @@ void Interaction::changeVisionInterface(int index){
 }
 void Interaction::changeRadioInterface(bool ifBlue,bool ifSender,int index){
 //    qDebug() << "radio  interface : " << ifBlue << ifSender << index;
+}
+void Interaction::changeGrsimInterface(int index){
+    ZCommunicator::instance()->setGrsimInterfaceIndex(index);
 }
 void Interaction::setIfEdgeTest(bool ifEdgeTest) {
     VisionModule::instance()->setIfEdgeTest(ifEdgeTest);
@@ -122,7 +129,13 @@ bool Interaction::connectSim(bool sw, int id, bool color) {
         ZCommunicator::instance()->disconnectMedusa(id);
         ZCommunicator::instance()->connectMedusa(id);
         ZSS::ZSimModule::instance()->disconnectSim(color);
-        return ZSS::ZSimModule::instance()->connectSim(color);
+        ZSS::ZRemoteSimModule::instance()->disconnectSim(color);
+        bool useSim = false;
+        ZSS::ZParamManager::instance()->loadParam(useSim, "Simulator/useSim", false);
+        if (ZCommunicator::instance()->getGrsimInterfaceIndex() == 0 && useSim)
+            return ZSS::ZSimModule::instance()->connectSim(color);
+        else
+            return ZSS::ZRemoteSimModule::instance()->connectSim(color);
     } else {
 //        return ZSS::ZSimModule::instance()->disconnectSim(color); //fix a bug for Medusa out of Athena
     }
@@ -177,7 +190,7 @@ bool Interaction::controlMedusa(bool control) {
         emit GlobalSettings::instance()->clearOutput();
     } else {
         medusaProcess = new QProcess();
-        QString name = "./Medusa";
+        QString name = "./Core";
         connect(medusaProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(medusaPrint()));
         medusaProcess->start(name);
         QTextStream(stdout) << "\n------------------------------------\n" << "running " << name << "\n------------------------------------\n";
@@ -196,8 +209,8 @@ bool Interaction::controlMedusa2(bool control) {
         }
     } else {
         medusaProcess2 = new QProcess();
-        medusaProcess2->setWorkingDirectory("./Oppo");
-        QString name = "./Medusa2";
+        //medusaProcess2->setWorkingDirectory("./Oppo");
+        QString name = "./Core";
         medusaProcess2->start(name);
         QTextStream(stdout) << "\n------------------------------------\n" << "running 2 " << name << "\n------------------------------------\n";
     }
@@ -260,11 +273,11 @@ void Interaction::kill() {
 #ifdef WIN32
 //    RefereeThread::instance()->disconnectTCP();
     QString athena = "taskkill -im Client.exe -f";
-    QString medusa = "taskkill -im Medusa.exe -f";
+    QString medusa = "taskkill -im Core.exe -f";
     //QString grSim = "taskkill -im grSim.exe -f";
 #else
     QString athena = "pkill Client";
-    QString medusa = "pkill Medusa";
+    QString medusa = "pkill Core";
     //QString grSim = "pkill grsim";
 #endif
     if (monitorProcess != nullptr) {

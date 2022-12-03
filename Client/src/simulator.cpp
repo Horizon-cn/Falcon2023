@@ -7,13 +7,18 @@ namespace{
 //double yOut[PARAM::ROBOTNUM] = { -5.4, -5.4, -5.4, -5.4, -5.4, -5.4, -5.4, -5.4, -5.4, -5.4, -5.4, -5.4 };
 //double xOut[PARAM::ROBOTNUM] = { 0.4,  0.8,  1.2,  1.6,  2.0,  2.4, 2.8, 3.2, 3.6, 4.0, 4.4, 4.8 };
 //double yIn[PARAM::ROBOTNUM] = { -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0 };
+bool useSim = false;
 }
 CSimulator::CSimulator(QObject *parent) : QObject(parent),ZSPlugin("Simulator")
 {
-//    sendSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, 1);
-    declare_publish("sim_packet");
-    this->link(SSLWorld::instance(),"sim_packet");
-
+    ZSS::ZParamManager::instance()->loadParam(useSim, "Simulator/useSim", false);
+    if (useSim) {
+        declare_publish("sim_packet");
+        this->link(SSLWorld::instance(),"sim_packet");
+    }
+    else {
+        sendSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, 1);
+    }
 }
 void CSimulator::setBall(double x,double y,double vx,double vy){
     grSim_Packet packet;
@@ -64,10 +69,18 @@ void CSimulator::controlRobot(int num,bool team){
     send(&packet);
 }
 void CSimulator::send(grSim_Packet* packet){
-    static ZSData data;
-    int size = packet->ByteSize();
-    data.resize(size);
-    packet->SerializeToArray(data.ptr(), size);
-    publish("sim_packet",data);
-//    sendSocket.writeDatagram(buffer,size, QHostAddress(ZSS::LOCAL_ADDRESS),ZSS::Athena::SIM_SEND);
+    if (useSim) {
+        static ZSData data;
+        int size = packet->ByteSize();
+        data.resize(size);
+        packet->SerializeToArray(data.ptr(), size);
+        publish("sim_packet",data);
+    }
+    else {
+        static QByteArray data;
+        int size = packet->ByteSize();
+        data.resize(size);
+        packet->SerializeToArray(data.data(), size);
+        sendSocket.writeDatagram(data,size, QHostAddress(ZSS::LOCAL_ADDRESS),ZSS::Athena::SIM_SEND);
+    }
 }
