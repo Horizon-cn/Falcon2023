@@ -2,16 +2,16 @@
 set(THIRDPARTY_LIB_DIR ${CMAKE_SOURCE_DIR}/3rdParty)
 
 ## protobuf
-find_package(Protobuf REQUIRED)
+include(${CMAKE_SOURCE_DIR}/cmake/GetProtobuf.cmake)
 
 ## lua
-find_package(Lua REQUIRED)
+include(${CMAKE_SOURCE_DIR}/cmake/GetLua.cmake)
 
 ## tolua++
 find_package(toluapp REQUIRED)
 
 ## zlib
-find_package(ZLIB)
+include(${CMAKE_SOURCE_DIR}/cmake/GetZLIB.cmake)
 
 ## ode
 find_package(ODE REQUIRED)

@@ -1,0 +1,11 @@
+IF (WIN32)
+    set(LIBZLIB_DIR ${THIRDPARTY_LIB_DIR}/zlib)
+    list(APPEND CMAKE_PREFIX_PATH ${LIBZLIB_DIR})
+    message("Find ZLIB : ${LIBZLIB_DIR}")
+    # set(ZLIB_INCLUDE_DIRS "${THIRDPARTY_LIB_DIR}/zlib/include")
+    # set(ZLIB_LIBRARY "${THIRDPARTY_LIB_DIR}/zlib/lib/zlib.lib")
+    # list(APPEND CMAKE_PREFIX_PATH ${ZLIB_INCLUDE_DIRS} ${ZLIB_LIBRARIES})
+    # message("Find ZLIB : ${ZLIB_INCLUDE_DIRS} ${ZLIB_LIBRARIES}") 
+ENDIF ()
+
+find_package(ZLIB)

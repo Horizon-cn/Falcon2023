@@ -8,20 +8,13 @@
 # TOLUAPP_LIBRARIES, the libraries to link against to use pwlib.
 # TOLUAPP_FOUND, If false, don't try to use pwlib.
 
-IF(WIN32)
-# set(LIBTOLUAPP_DIR ${THIRDPARTY_LIB_DIR}/tolua++)
-# list(APPEND CMAKE_PREFIX_PATH ${LIBTOLUAPP_DIR})
-set(TOLUAPP_INCLUDE_DIR ${THIRDPARTY_LIB_DIR}/tolua++/include)
-set(TOLUAPP_LIBRARIES ${THIRDPARTY_LIB_DIR}/tolua++/lib/tolua++.lib)
-set(TOLUAPP_EXECUTABLE ${THIRDPARTY_LIB_DIR}/tolua++/bin/tolua++.exe)
-list(APPEND CMAKE_PREFIX_PATH ${TOLUAPP_INCLUDE_DIR} ${TOLUAPP_LIBRARIES} ${TOLUAPP_EXECUTABLE})
-ELSE()
 FIND_PATH(TOLUAPP_INCLUDE_DIR tolua++.h
   PATHS
     "$ENV{TOLUAPP}/include"
     /usr/local/include
     /usr/include
 	C:/Workspace/Build/tolua++/include
+  "${THIRDPARTY_LIB_DIR}/tolua++/include"
 )
 
 FIND_LIBRARY(TOLUAPP_LIBRARIES toluapp tolua++ tolua++5.1
@@ -32,6 +25,7 @@ FIND_LIBRARY(TOLUAPP_LIBRARIES toluapp tolua++ tolua++5.1
 	C:/Workspace/Build/tolua++/lib
 	C:/Workspace/Build/tolua++/lib/Debug
 	C:/Workspace/Build/tolua++/lib/Release
+  "${THIRDPARTY_LIB_DIR}/tolua++/lib"
 )
 FIND_PROGRAM(TOLUAPP_EXECUTABLE tolua++ toluapp tolua++5.1
   PATHS
@@ -41,6 +35,7 @@ FIND_PROGRAM(TOLUAPP_EXECUTABLE tolua++ toluapp tolua++5.1
   C:/Workspace/Build/tolua++/bin
   C:/Workspace/Build/tolua++/bin/Debug
   C:/Workspace/Build/tolua++/bin/Release
+  "${THIRDPARTY_LIB_DIR}/tolua++/bin"
 )
 SET(TOLUAPP_FOUND 0)
 IF(TOLUAPP_INCLUDE_DIR)
@@ -57,4 +52,3 @@ MARK_AS_ADVANCED(
   TOLUAPP_LIBRARIES
   TOLUAPP_EXECUTABLE
 ) 
-ENDIF()

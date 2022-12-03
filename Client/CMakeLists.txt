@@ -30,7 +30,7 @@ list(APPEND libs ${Protobuf_LIBRARY_RELEASE} ${Protobuf_LITE_LIBRARY_RELEASE} ${
 
 ## find Zlib
 include_directories(${ZLIB_INCLUDE_DIRS})
-list(APPEND libs ${ZLIB_LIBRARY})
+list(APPEND libs ${ZLIB_LIBRARIES})
 
 ## find Qt
 list(APPEND libs Qt5::Core Qt5::Quick Qt5::SerialPort Qt5::Widgets)
