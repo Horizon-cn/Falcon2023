@@ -1,4 +1,15 @@
 set(TARGET_NAME Core)
+
+IF(WIN32)
+    # muti-processors build for VS
+    include(ProcessorCount)
+    ProcessorCount(N)
+    if(NOT N EQUAL 0)
+        SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   /MP${N} ")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP${N} ")
+    endif()
+ENDIF()
+
 set(libs)
 set(incs)
 # Core - Medusa

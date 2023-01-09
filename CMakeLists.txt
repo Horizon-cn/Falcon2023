@@ -1,20 +1,13 @@
 cmake_minimum_required(VERSION 3.12)
-project(rocos LANGUAGES CXX)
+project(Falcon LANGUAGES CXX)
 
-set(VERSION "0.0.2")
-set(VENDOR "ZJUNlict")
-set(MAINTAINER "ZJUNlict <zjunlict.ssl@gmail.com>")
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -pthread")
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+set(VERSION "0.0.1")
+set(VENDOR "SRC")
+set(MAINTAINER "SRC <sjtu_src2020@163.com>")
+
 include(${PROJECT_SOURCE_DIR}/cmake/Utils.cmake)
 standard_config()
-standard_paths(${PROJECT_SOURCE_DIR} ZBin lib)
-
-set(libs)
+standard_paths(${PROJECT_SOURCE_DIR} bin/base lib pdb)
 
 include(${PROJECT_SOURCE_DIR}/cmake/GetThirdParty.cmake)
 

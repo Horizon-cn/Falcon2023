@@ -136,6 +136,8 @@ ZBin/*.py[cod]
 ZBin/*$py.class
 ZBin/Oppo/*
 
+bin/
+
 build*/
 
 grSim/
@@ -170,6 +172,7 @@ eggs/
 .eggs/
 /lib/
 /lib64/
+/pdb/
 parts/
 sdist/
 var/
