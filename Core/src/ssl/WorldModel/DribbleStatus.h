@@ -334,6 +334,6 @@ private:
 	unsigned char _dribbleCommand[Param::Field::MAX_PLAYER];
 };
 
-typedef NormalSingleton< CDribbleStatus > DribbleStatus;
+typedef Falcon::NormalSingleton< CDribbleStatus > DribbleStatus;
 
 #endif // ~_DRIBBLE_STATUS_H_

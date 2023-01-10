@@ -72,6 +72,6 @@ private:
 	vector<int> areaList;
 };
 
-typedef NormalSingleton< CMarkingPosV2 > MarkingPosV2;
+typedef Falcon::NormalSingleton< CMarkingPosV2 > MarkingPosV2;
 
 #endif //_MARKING_POS_H_

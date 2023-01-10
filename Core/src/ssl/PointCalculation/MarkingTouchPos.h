@@ -48,6 +48,6 @@ private:
 
 };
 
-typedef NormalSingleton< CMarkingTouchPos > MarkingTouchPos;
+typedef Falcon::NormalSingleton< CMarkingTouchPos > MarkingTouchPos;
 
 #endif //__SKILL2010_DFIFT_KICK_H__

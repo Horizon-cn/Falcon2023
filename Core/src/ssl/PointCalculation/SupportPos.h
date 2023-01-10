@@ -46,6 +46,6 @@ private:
 	bool _isRoleChanged;
 };
 
-typedef NormalSingleton<CSupportPos> SupportPos;
+typedef Falcon::NormalSingleton<CSupportPos> SupportPos;
 
 #endif 

@@ -88,7 +88,7 @@ private:
 	int _cycle;
 };
 
-typedef NormalSingleton< CMatchState > MatchState;
+typedef Falcon::NormalSingleton< CMatchState > MatchState;
 
 #define MATCH_STATE MatchState::Instance() 
 

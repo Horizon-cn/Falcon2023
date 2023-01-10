@@ -1,9 +1,9 @@
 import QtQuick 2.7
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
-import ZSS 1.0 as ZSS
+import Owl 1.0 as Owl
 Item{
-    ZSS.ParamModel{
+    Owl.ParamModel{
         id:paramModel;
     }
     Shortcut{
@@ -36,15 +36,15 @@ Item{
             delegate:stringDelegate;
         }
 
-        style: TreeViewStyle {
+       style: TreeViewStyle {
             backgroundColor: "#484848";
             alternateBackgroundColor:"#404040";
             textColor:"#ccc";
-//            branchDelegate: Rectangle {
-//                width: 12; height: 12
-//                color: styleData.isExpanded ? "#ccc" : "#aaa"
-//                radius: width/2
-//            }
+            branchDelegate: Rectangle {
+                width: 12; height: 12
+                color: styleData.isExpanded ? "#ccc" : "#aaa"
+                radius: width/2
+            }
 //            frame: Rectangle {border {color: "blue"}}
             headerDelegate: Rectangle {
                 height: headerItem.implicitHeight*1.4

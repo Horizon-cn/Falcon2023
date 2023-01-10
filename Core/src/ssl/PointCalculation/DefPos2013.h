@@ -57,6 +57,6 @@ protected:
 	int _lastCycle;
 };
 
-typedef NormalSingleton< CDefPos2013 > DefPos2013;
+typedef Falcon::NormalSingleton< CDefPos2013 > DefPos2013;
 
 #endif 

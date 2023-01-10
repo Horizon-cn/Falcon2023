@@ -74,5 +74,5 @@ private:
 	int _CNum;            // 预测多少个周期后的事情
 	int _flag;
 };
-typedef NormalSingleton< CDynamicSafetySearch > DynamicSafetySearch;
+typedef Falcon::NormalSingleton< CDynamicSafetySearch > DynamicSafetySearch;
 #endif 

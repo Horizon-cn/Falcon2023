@@ -17,7 +17,7 @@ private:
 	void configuration();
 	OppRoleMap* _oppRoleBackMap;//保存所有role的一个副本，所有参数均为初始化参数
 };
-typedef NormalSingleton<COppRoleFactory> OppRoleFactory;
+typedef Falcon::NormalSingleton<COppRoleFactory> OppRoleFactory;
 
 #define DEFINE_ROLE(role_name,pri,mustIn,canIn,canOut,mustOut)				\
 DEFINE_CLASS_EX_H(role_name,COppRole)														\

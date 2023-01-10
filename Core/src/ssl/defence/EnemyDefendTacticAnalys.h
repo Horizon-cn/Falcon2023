@@ -46,6 +46,6 @@ private:
 	int blockerCounter;
 	int _lastCycle;
 };
-typedef NormalSingleton<CEnemyDefendTacticAnalys> EnemyDefendTacticAnalys;
+typedef Falcon::NormalSingleton<CEnemyDefendTacticAnalys> EnemyDefendTacticAnalys;
 
 #endif

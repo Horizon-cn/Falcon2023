@@ -53,5 +53,5 @@ private:
 
 };
 
-typedef NormalSingleton< CRobotSensor > RobotSensor;			// 全局访问接口
+typedef Falcon::NormalSingleton< CRobotSensor > RobotSensor;			// 全局访问接口
 #endif

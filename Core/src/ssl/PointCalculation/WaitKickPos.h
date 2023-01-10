@@ -15,6 +15,6 @@ public:
 	void reset();
 };
 
-typedef NormalSingleton< CWaitKickPos > WaitKickPos;
+typedef Falcon::NormalSingleton< CWaitKickPos > WaitKickPos;
 
 #endif 

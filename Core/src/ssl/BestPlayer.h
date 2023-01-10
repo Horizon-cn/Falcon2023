@@ -123,7 +123,7 @@ private:
 	int _theirChangeCycle;
 };
 
-typedef NormalSingleton< CBestPlayer > BestPlayer; // singleton pattern
+typedef Falcon::NormalSingleton< CBestPlayer > BestPlayer; // singleton pattern
 
 #define BEST_PLAYER BestPlayer::Instance()
 

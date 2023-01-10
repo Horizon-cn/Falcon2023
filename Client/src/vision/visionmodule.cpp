@@ -1,6 +1,6 @@
-#include "visionmodule.h"
+﻿#include "visionmodule.h"
+#include "communicator.h"
 #include "globaldata.h"
-#include "montage.h"
 #include "maintain.h"
 #include "dealball.h"
 #include "dealrobot.h"
@@ -10,19 +10,17 @@
 #include "globalsettings.h"
 #include "rec_recorder.h"
 #include <QElapsedTimer>
-#include "networkinterfaces.h"
 #include <QtDebug>
-#include <QTimer>
-#include <QTime>
-#include <thread>
-#include "setthreadname.h"
-#include "sim/sslworld.h"
+#include <QFile>
+#include "staticparams.h"
+//#include "sslworld.h"
+
 namespace {
-auto zpm = ZSS::ZParamManager::instance();
-auto vpm = ZSS::VParamManager::instance();
-QTimer sim_timer;
-std::thread* dealThread;
-bool useSim = false;
+    std::thread* visionReceiveThread = nullptr;
+    auto GS = GlobalSettings::Instance();
+    auto opm = Owl::OParamManager::Instance();
+    auto vpm = Owl::VParamManager::Instance();
+    auto cpm = Owl::CParamManager::Instance();
 }
 /**
  * @brief CVisionModule consturctor
@@ -30,79 +28,53 @@ bool useSim = false;
  */
 CVisionModule::CVisionModule(QObject *parent)
     : QObject(parent)
-    , ZSPlugin ("visionmodule")
     , udpReceiveSocket()
-    , udpSendSocket()
+    , udpResendSocket()
     , IF_EDGE_TEST(false)
-    , _interface(0){
-    dealThread = nullptr;
-    std::fill_n(GlobalData::instance()->cameraUpdate, PARAM::CAMERA, false);
-    std::fill_n(GlobalData::instance()->cameraControl, PARAM::CAMERA, true);
-    std::fill_n(GlobalData::instance()->processControl, 3, true);
-    zpm->loadParam(useSim, "Simulator/useSim", false);
-    if (useSim) {
-        declare_receive("ssl_vision");
-        declare_publish("sim_signal");
-        SSLWorld::instance()->link(this,"ssl_vision");
-        this->link(SSLWorld::instance(),"sim_signal");
-        SSLWorld::instance()->start();
+    //, _interface(0)
+    {
+
     }
+
+CVisionModule::~CVisionModule() {
+    udpSocketDisconnect();
 }
-/**
- * @brief connect UDP for receive vision
- * @param real
- */
+
 void CVisionModule::setIfEdgeTest(bool isEdgeTest) {
     IF_EDGE_TEST = isEdgeTest;
 }
-bool CVisionModule::showIfEdgeTest() {
-    return IF_EDGE_TEST;
-}
-void CVisionModule::udpSocketConnect(bool real) {
-    //real ? zpm->loadParam(vision_port, "AlertPorts/Vision4Real", 10005) : zpm->loadParam(vision_port, "AlertPorts/Vision4Sim", 10020);
-    int grsimInterface = ZCommunicator::instance()->getGrsimInterfaceIndex();
-    if (real) {
-        zpm->loadParam(vision_port, "AlertPorts/Vision4Real", 10005);
-    }
-    else if(grsimInterface != 0) {
-        zpm->loadParam(vision_port, "AlertPorts/Vision4Remote", 10066);
+/**
+ * @brief connect UDP for receive vision
+ */
+void CVisionModule::udpSocketConnect() {
+    GlobalData::Instance()->initVision();
+    if(opm->useSimInside && opm->isSimulation) {
+        //World::Instance()->start();
+        visionReceiveThread = new std::thread([=] {readSimData();});
+        visionReceiveThread->detach();
     }
     else {
-        zpm->loadParam(vision_port, "AlertPorts/Vision4Sim", 10020);
-    }
-    zpm->loadParam(saoAction, "Alert/SaoAction", 0);
-    GlobalData::instance()->setCameraMatrix(real);
-    //if(real){
-    if(real || grsimInterface != 0 || !useSim){
-        qDebug() << "VisionPort : " << vision_port;
+        int vision_port = opm->isSimulation ? opm->VisionSim : opm->VisionReal;
+        //qDebug() << "VisionPort : " << vision_port;
         udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress);
-        udpReceiveSocket.joinMulticastGroup(QHostAddress(ZSS::SSL_ADDRESS),ZNetworkInterfaces::instance()->getFromIndex(_interface));
+        udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address));
+        //udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address), NetworkInterfaces::Instance()->getFromIndex(_interface));
         connect(&udpReceiveSocket, SIGNAL(readyRead()), this, SLOT(storeData()), Qt::DirectConnection);
-    }
-    else{
-        sim_timer.setTimerType(Qt::PreciseTimer);
-        int desired = 65;
-        ZSS::SParamManager::instance()->loadParam(desired,"worldp_vars/DesiredFPS");
-        if(desired > 500) desired = 500;
-        connect(&sim_timer,SIGNAL(timeout()),this,SLOT(oneStepSimData()),Qt::DirectConnection);
-        dealThread = new std::thread([ = ] {readSimData();});
-        dealThread->detach();
-        sim_timer.start(int(1000/desired));
-        //sim_timer.start(14);
-    }
-    ReceiveVisionMessage temp;
-    for (int i = 0; i < PARAM::CAMERA; i++) {
-        GlobalData::instance()->camera[i].push(temp);
+        //if(udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)
+        //    && udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address))){
+        //    visionReceiveThread = new std::thread([=] {receiveVision();});
+        //    visionReceiveThread->detach();
+        //}
     }
 }
-void CVisionModule::setInterfaceIndex(const int index){ _interface = index; }
+//void CVisionModule::setInterfaceIndex(const int index) { _interface = index; }
 /**
  * @brief disconnect UDP
  */
 void CVisionModule::udpSocketDisconnect() {
     if (IF_EDGE_TEST) {
-        for (int i = 0; i < PARAM::CAMERA; i++) {
-            SingleCamera& currentCamera = GlobalData::instance()->cameraMatrix[i];
+        for (int i = 0; i < opm->total_cameras; i++) {
+            Owl::SingleCamera& currentCamera = GlobalData::Instance()->cameraMatrix[i];
             vpm->changeParam("Camera" + QString::number(i) + "Leftmin", currentCamera.leftedge.min);
             vpm->changeParam("Camera" + QString::number(i) + "Leftmax", currentCamera.leftedge.max);
             vpm->changeParam("Camera" + QString::number(i) + "Rightmin", currentCamera.rightedge.min);
@@ -115,52 +87,9 @@ void CVisionModule::udpSocketDisconnect() {
     }
     disconnect(&udpReceiveSocket);
     udpReceiveSocket.abort();
-    udpSendSocket.abort();
-    disconnect(&sim_timer);
-    sim_timer.stop();
-    delete dealThread;
-    dealThread = nullptr;
-}
-/**
- * @brief convert between different field size
- * @param originPoint
- * @return
- */
-CGeoPoint CVisionModule::saoConvert(CGeoPoint originPoint) {
-    CGeoPoint result;
-    switch (saoAction) {
-    case 0:
-        //default
-        result.setX(originPoint.x());
-        result.setY(originPoint.y());
-        break;
-    case 1:
-        //convert small field to half big field
-        result.setX(originPoint.y() + 3000);
-        result.setY(-originPoint.x());
-        break;
-    case 2:
-        //convert small field to whole big field
-        result.setX(originPoint.x() * 3 / 2);
-        result.setY(originPoint.y() * 3 / 2);
-        break;
-    default:
-        result.setX(originPoint.x());
-        result.setY(originPoint.y());
-        break;
-    }
-    return result;
-}
-/**
- * @brief convert angle when convert small field to half big field
- * @param direction
- * @return
- */
-double CVisionModule::saoConvert(double direction) {
-    if (saoAction == 1)
-        return (direction - 3.1415926 / 2);
-    else
-        return direction;
+    udpResendSocket.abort();
+    delete visionReceiveThread;
+    visionReceiveThread = nullptr;
 }
 /**
  * @brief CVisionModule::storeData
@@ -170,26 +99,34 @@ void CVisionModule::storeData() {
     while (udpReceiveSocket.hasPendingDatagrams()) {
         datagram.resize(udpReceiveSocket.pendingDatagramSize());
         udpReceiveSocket.readDatagram(datagram.data(), datagram.size());
+        if(GlobalData::Instance()->refereeMode){
+            udpResendSocket.writeDatagram(datagram.data(), datagram.size(), QHostAddress(cpm->ssl_address), cpm->VisionAutoRef);
+            qDebug()<<"resend to autoref";
+        }
         parse((void*)datagram.data(), datagram.size());
     }
 }
-void CVisionModule::oneStepSimData(){
-    static QTime t = QTime::currentTime();
-    qDebug()<<std::fabs(t.msecsTo(QTime::currentTime()));
-    t = QTime::currentTime();
-    publish("sim_signal");
+void CVisionModule::receiveVision(){
+    static QByteArray datagram;
+    while (udpReceiveSocket.state() == QUdpSocket::BoundState) {
+        if(udpReceiveSocket.hasPendingDatagrams()) {
+            datagram.resize(udpReceiveSocket.pendingDatagramSize());
+            udpReceiveSocket.readDatagram(datagram.data(),datagram.size());
+            if(GlobalData::Instance()->refereeMode){
+                udpResendSocket.writeDatagram(datagram.data(), datagram.size(), QHostAddress(cpm->ssl_address), cpm->VisionAutoRef);
+                qDebug()<<"resend to autoref";
+            }
+            parse((void*)datagram.data(), datagram.size());
+        }
+    }
 }
 void CVisionModule::readSimData(){
-    SetThreadName("VisionPluginThread");
-    static ZSData datagram;
-    while(true) {
-        receive("ssl_vision",datagram);
-        parse((void*)datagram.data(), datagram.size());
+    while (true) {
+        if (GlobalData::Instance()->updateSimVision) {
+            GlobalData::Instance()->updateSimVision = false;
+            parse((void*)GlobalData::Instance()->simVision.data(), GlobalData::Instance()->simVision.size());
+        }
     }
-}
-
-void CVisionModule::readRemoteSimData(){
-
 }
 /**
  * @brief process data
@@ -198,9 +135,11 @@ void CVisionModule::readRemoteSimData(){
 bool CVisionModule::dealWithData() {
     counter++;
     if (IF_EDGE_TEST) edgeTest();
-    DealBall::instance()->run();
-    DealRobot::instance()->run();
-    Maintain::instance()->run();
+    DealBall::Instance()->run();
+    //qDebug("dealing after ball");
+    DealRobot::Instance()->run();
+    //qDebug("dealing after robot");
+    Maintain::Instance()->run();
     return true;
 }
 /**
@@ -210,72 +149,101 @@ bool CVisionModule::dealWithData() {
  */
 void CVisionModule::parse(void * ptr, int size) {
     static SSL_WrapperPacket packet;
-    ReceiveVisionMessage message;
-    packet.ParseFromArray(ptr, size);
-    if (packet.has_detection()) {
-        const SSL_DetectionFrame& detection = packet.detection();
-        message.camID = detection.camera_id();
-        if (message.camID >= PARAM::CAMERA || message.camID < 0) {
-//            qDebug() << "get invalid camera id : " << message.camID;
-            message.camID = 0;
+    Owl::ReceiveVisionMessage message;
+    packet.ParseFromArray(ptr, size);  
+    if (packet.has_geometry() && opm->updateGeometry) {
+        const SSL_GeometryFieldSize& field = packet.geometry().field();
+        
+        if (field.field_length() && field.field_width()) {
+            
         }
+    }
+    if (packet.has_detection()) {
+        //t = QTime::currentTime();
+        const SSL_DetectionFrame& detection = packet.detection();
+        if(opm->isSimulation && opm->LoginName != detection.login_name()) return;
+        message.camID = detection.camera_id();
+        if (message.camID >= opm->total_cameras || message.camID < 0 || !GlobalData::Instance()->cameraControl[message.camID]) {
+            qDebug() << "get invalid camera id : " << message.camID;
+            return;
+        }
+        
         int ballSize = detection.balls_size();
         int blueSize = detection.robots_blue_size();
         int yellowSize = detection.robots_yellow_size();
+
         for (int i = 0; i < ballSize; i++) {
             const SSL_DetectionBall& ball = detection.balls(i);
-            if (GlobalSettings::instance()->inChosenArea(saoConvert(CGeoPoint(ball.x(), ball.y())))) {
-                message.addBall(saoConvert(CGeoPoint(ball.x(), ball.y())), ball.z(), message.camID);
+            if (GS->inChosenArea(GS->saoConvert(CGeoPoint(ball.x(), ball.y())))) {
+                //message.addBall(GS->saoConvert(CGeoPoint(ball.x(), ball.y())));
+                //message.addBall(GS->saoConvert(CGeoPoint(ball.x(), ball.y())),GS->saoConvert(CGeoPoint(ball.pixel_x(),ball.pixel_y())));
+                CGeoPoint rawPos(GS->saoConvert(CGeoPoint(ball.pixel_x(), ball.pixel_y())));
+                Owl::RawInfo r(rawPos.x(), rawPos.y(), ball.realvelx(), ball.realvely());
+                message.addBall(GS->saoConvert(CGeoPoint(ball.x(), ball.y())), r, ball.z());
             }
         }
+
         for (int i = 0; i < blueSize; i++) {
             const SSL_DetectionRobot& robot = detection.robots_blue(i);
-            if (GlobalSettings::instance()->inChosenArea(saoConvert(CGeoPoint(robot.x(), robot.y())))
+            if (GS->inChosenArea(GS->saoConvert(CGeoPoint(robot.x(), robot.y())))
                     && robot.robot_id() < PARAM::ROBOTMAXID) {
-                message.addRobot(PARAM::BLUE, robot.robot_id(), saoConvert(CGeoPoint(robot.x(), robot.y())), saoConvert(robot.orientation()));
+                //message.addRobot(PARAM::BLUE, robot.robot_id(), GS->saoConvert(CGeoPoint(robot.x(), robot.y())), GS->saoConvert(robot.orientation()), GS->saoConvert(CGeoPoint(robot.pixel_x(), robot.pixel_y())));
+                CGeoPoint rawPos(GS->saoConvert(CGeoPoint(robot.pixel_x(), robot.pixel_y())));
+                Owl::RawInfo r(rawPos.x(), rawPos.y(), robot.realvelx(), robot.realvely(), GS->saoConvert(robot.pixel_orien()), robot.realvelr() * 0.001);
+                message.addRobot(PARAM::BLUE, robot.robot_id(), GS->saoConvert(CGeoPoint(robot.x(), robot.y())), GS->saoConvert(robot.orientation()), r);
             }
         }
         for (int i = 0; i < yellowSize; i++) {
             const SSL_DetectionRobot& robot = detection.robots_yellow(i);
-            if (GlobalSettings::instance()->inChosenArea(saoConvert(CGeoPoint(robot.x(), robot.y())))
+            if (GS->inChosenArea(GS->saoConvert(CGeoPoint(robot.x(), robot.y())))
                     && robot.robot_id() < PARAM::ROBOTMAXID) {
-                message.addRobot(PARAM::YELLOW, robot.robot_id(), saoConvert(CGeoPoint(robot.x(), robot.y())), saoConvert(robot.orientation()));
+                //message.addRobot(PARAM::YELLOW, robot.robot_id(), GS->saoConvert(CGeoPoint(robot.x(), robot.y())), GS->saoConvert(robot.orientation()), GS->saoConvert(CGeoPoint(robot.pixel_x(), robot.pixel_y())));
+                CGeoPoint rawPos(GS->saoConvert(CGeoPoint(robot.pixel_x(), robot.pixel_y())));
+                Owl::RawInfo r(rawPos.x(), rawPos.y(), robot.realvelx(), robot.realvely(), GS->saoConvert(robot.pixel_orien()), robot.realvelr() * 0.001);
+                message.addRobot(PARAM::YELLOW, robot.robot_id(), GS->saoConvert(CGeoPoint(robot.x(), robot.y())), GS->saoConvert(robot.orientation()), r);
             }
         }
-        GlobalData::instance()->camera[message.camID].push(message);
-        GlobalData::instance()->cameraUpdate[message.camID] = true;
+        GlobalData::Instance()->camera[message.camID].push(message);
+        GlobalData::Instance()->cameraUpdate[message.camID] = true;
+        GlobalData::Instance()->ssl_wrapperPacket.CopyFrom(packet);
+        emit recvPacket();
+        ZRecRecorder::Instance()->storeRaw();
     }
     if (collectNewVision()) {
+        double time = std::clock();
         checkCommand();
         dealWithData();
+        //qDebug("deal done");
         udpSend();
-        ZRecRecorder::instance()->store();
-        std::fill_n(GlobalData::instance()->cameraUpdate, PARAM::CAMERA, false);
+        ZRecRecorder::Instance()->store();
+        std::fill_n(GlobalData::Instance()->cameraUpdate, opm->total_cameras, false);
         emit needDraw();
+        //qDebug()<<std::clock()-time;
     }
 }
 
 void CVisionModule::checkCommand() {
     for (int team = 0; team < PARAM::TEAMS; team++) {
-        auto commands = ZCommunicator::instance()->getCommands(team);
+        auto commands = ZCommunicator::Instance()->getCommands(team);
         if (commands.valid) {
-            GlobalData::instance()->robotCommand[team].push(commands);
-            GlobalData::instance()->commandMissingFrame[team] = 0;
+            GlobalData::Instance()->robotCommand[team].push(commands);
+            GlobalData::Instance()->commandMissingFrame[team] = 0;
         } else {
-            commands = RobotCommands();
-            GlobalData::instance()->robotCommand[team].push(commands);
-            GlobalData::instance()->commandMissingFrame[team] >= 20 ?
-            GlobalData::instance()->commandMissingFrame[team] = 20 :
-                    GlobalData::instance()->commandMissingFrame[team]++;
+            commands = Owl::RobotCommands();
+            GlobalData::Instance()->robotCommand[team].push(commands);
+            GlobalData::Instance()->commandMissingFrame[team] >= 20 ?
+            GlobalData::Instance()->commandMissingFrame[team] = 20 :
+            GlobalData::Instance()->commandMissingFrame[team]++;
         }
     }
-    ZCommunicator::instance()->clearCommands();
+    ZCommunicator::Instance()->clearCommands();
 }
 
 void  CVisionModule::udpSend() {
     //udp start
+    static QUdpSocket udpSendSocket;
     auto detectionBall = detectionFrame.mutable_balls();
-    ReceiveVisionMessage result = GlobalData::instance()->maintain[0];
+    Owl::ReceiveVisionMessage result = GlobalData::Instance()->maintain[0];
     if (result.ballSize > 0) {
         detectionBall->set_x(result.ball[0].pos.x());
         if (result.ball[0].pos.y() == 0) detectionBall->set_y(float(0.1));
@@ -283,20 +251,25 @@ void  CVisionModule::udpSend() {
         CVector TransferVel(result.ball[0].velocity.x(), result.ball[0].velocity.y());
         detectionBall->set_vel_x(TransferVel.x());
         detectionBall->set_vel_y(TransferVel.y());
-        detectionBall->set_valid(DealBall::instance()->getValid());
-        detectionBall->set_last_touch(GlobalData::instance()->lastTouch);
+        detectionBall->set_valid(DealBall::Instance()->getValid());
+        detectionBall->set_last_touch(GlobalData::Instance()->lastTouch);
         detectionBall->set_ball_state(result.ball[0].ball_state_machine.ballState);
-        detectionBall->set_raw_x(GlobalData::instance()->processBall[0].ball[0].pos.x());
-        detectionBall->set_raw_y(GlobalData::instance()->processBall[0].ball[0].pos.y());
-        detectionBall->set_chip_predict_x(GlobalData::instance()->maintain[0].ball[0].predict_pos.x());
-        detectionBall->set_chip_predict_y(GlobalData::instance()->maintain[0].ball[0].predict_pos.y());
+        detectionBall->set_raw_x(GlobalData::Instance()->processBall[0].ball[0].pos.x());
+        detectionBall->set_raw_y(GlobalData::Instance()->processBall[0].ball[0].pos.y());
+        detectionBall->set_chip_predict_x(GlobalData::Instance()->maintain[0].ball[0].predict_pos.x());
+        detectionBall->set_chip_predict_y(GlobalData::Instance()->maintain[0].ball[0].predict_pos.y());
     } else {
         detectionBall->set_valid(false);
         detectionBall->set_x(-32767);
         detectionBall->set_y(-32767);
     }
+    //detectionBall->set_p(Maintain::Instance()->getP().to_str());
+    //detectionBall->set_q(Maintain::Instance()->getQ().to_str());
     for (int team = 0; team < PARAM::TEAMS; team++) {
         for (int i = 0; i < result.robotSize[team]; i++) {
+            if (i >= PARAM::ROBOTMAXID) break; //for sending MAX 11 car possible
+            if (result.robot[team][i].id < 0 || result.robot[team][i].id >= PARAM::ROBOTMAXID)
+                continue;
             Vision_DetectionRobot* robot;
             if (team == 0 )  robot = detectionFrame.add_robots_blue();
             else robot = detectionFrame.add_robots_yellow();
@@ -304,32 +277,41 @@ void  CVisionModule::udpSend() {
             robot->set_y(result.robot[team][i].pos.y());
             robot->set_orientation(result.robot[team][i].angle);
             robot->set_robot_id(result.robot[team][i].id);
-            CVector TransferVel(result.robot[team][i].velocity.x(),
-                                result.robot[team][i].velocity.y());
+            if(result.robot[team][i].id < 0) qDebug()<<result.robot[team][i].id;
+            CVector TransferVel(result.robot[team][i].velocity.vx(),
+                                result.robot[team][i].velocity.vy());
             robot->set_vel_x(TransferVel.x());
             robot->set_vel_y(TransferVel.y());
-            robot->set_rotate_vel(result.robot[team][i].rotateVel);
+            robot->set_rotate_vel(result.robot[team][i].velocity.vr);
+            //robot->set_vel_x(GlobalData::Instance()->processRobot[-1].robot[team][i].raw.vel.vx());
+            //robot->set_vel_y(GlobalData::Instance()->processRobot[-1].robot[team][i].raw.vel.vy());
+            //robot->set_rotate_vel(GlobalData::Instance()->processRobot[-1].robot[team][i].raw.vel.vr);
+            //robot->set_vel_x(GlobalData::Instance()->robotCommand[team][0].robotSpeed[result.robot[team][i].id].vx());
+            //robot->set_vel_y(GlobalData::Instance()->robotCommand[team][0].robotSpeed[result.robot[team][i].id].vy());
+            //robot->set_rotate_vel(GlobalData::Instance()->robotCommand[team][0].robotSpeed[result.robot[team][i].id].vr);
             robot->set_accelerate_x(result.robot[team][i].accelerate.x());
             robot->set_accelerate_y(result.robot[team][i].accelerate.y());
-            robot->set_raw_x(GlobalData::instance()->processRobot[0].robot[team][i].pos.x());
-            robot->set_raw_y(GlobalData::instance()->processRobot[0].robot[team][i].pos.y());
-            robot->set_raw_orientation(GlobalData::instance()->processRobot[0].robot[team][i].angle);
+            robot->set_raw_x(GlobalData::Instance()->processRobot[-1].robot[team][i].pos.x());
+            robot->set_raw_y(GlobalData::Instance()->processRobot[-1].robot[team][i].pos.y());
+            robot->set_raw_orientation(GlobalData::Instance()->processRobot[-1].robot[team][i].angle);
             robot->set_valid(true);
-            robot->set_raw_vel_x(result.robot[team][i].raw_vel.x());
-            robot->set_raw_vel_y(result.robot[team][i].raw_vel.y());
-            robot->set_raw_rotate_vel(result.robot[team][i].rawRotateVel);
+            //robot->set_p(DealRobot::Instance()->getP(team,i).to_str());
+            //robot->set_q(DealRobot::Instance()->getQ(team,i).to_str());
         }
     }
+
     int size = detectionFrame.ByteSize();
     QByteArray buffer(size, 0);
     detectionFrame.SerializeToArray(buffer.data(), buffer.size());
-    GlobalData::instance()->ctrlCMutex.lock();
-    bool sw = GlobalData::instance()->ctrlC;
-    GlobalData::instance()->ctrlCMutex.unlock();
+    GlobalData::Instance()->ctrlCMutex.lock();
+    bool sw = GlobalData::Instance()->ctrlC;
+    GlobalData::Instance()->ctrlCMutex.unlock();
     if(!sw) { //需要发两个端口以供对打
-        udpSendSocket.writeDatagram(buffer.data(), buffer.size(), QHostAddress("127.0.0.1"), ZSS::Athena::VISION_SEND[0]);
-        udpSendSocket.writeDatagram(buffer.data(), buffer.size(), QHostAddress("127.0.0.1"), ZSS::Athena::VISION_SEND[1]);
-        udpSendSocket.writeDatagram(buffer.data(), buffer.size(), QHostAddress("127.0.0.1"), ZSS::Athena::SEND_TO_PYTHON);
+        if(GlobalData::Instance()->processControl[PARAM::BLUE])
+            udpSendSocket.writeDatagram(buffer.data(), buffer.size(), QHostAddress(cpm->local_address), cpm->blue_vision);
+        if(GlobalData::Instance()->processControl[PARAM::YELLOW])
+            udpSendSocket.writeDatagram(buffer.data(), buffer.size(), QHostAddress(cpm->local_address), cpm->yellow_vision);
+        udpSendSocket.abort();
     }
     detectionFrame.clear_robots_blue();
     detectionFrame.clear_robots_yellow();
@@ -340,22 +322,21 @@ void  CVisionModule::udpSend() {
  * @return
  */
 bool CVisionModule::collectNewVision() {
-//    for (int i = 0; i < PARAM::CAMERA; i++) {
-//        qDebug() << "check : " << i << GlobalData::instance()->cameraControl[i];
-//        if (GlobalData::instance()->cameraControl[i] && !GlobalData::instance()->cameraUpdate[i])
-//            return false;
-//    }
-    return GlobalData::instance()->cameraUpdate[0];
-}
+    for (int i = 0; i < opm->total_cameras; i++) {
+        if (GlobalData::Instance()->cameraControl[i] && !GlobalData::Instance()->cameraUpdate[i])
+            return false;
+    }
+    return true;
+} 
 /**
  * @brief filed edgeTest
  */
 void CVisionModule::edgeTest() {
-    for (int i = 0; i < PARAM::CAMERA; i++) {
-        if (GlobalData::instance()->cameraControl[i] == true) {
-            SingleCamera& currentCamera = GlobalData::instance()->cameraMatrix[i];
-            for(int j = 0; j < GlobalData::instance()->camera[i][0].ballSize; j++) {
-                Ball currentball = GlobalData::instance()->camera[i][0].ball[j];
+    for (int i = 0; i < opm->total_cameras; i++) {
+        if (GlobalData::Instance()->cameraControl[i] == true) {
+            Owl::SingleCamera& currentCamera = GlobalData::Instance()->cameraMatrix[i];
+            for(int j = 0; j < GlobalData::Instance()->camera[i][0].ballSize; j++) {
+                Owl::Ball currentball = GlobalData::Instance()->camera[i][0].ball[j];
                 if (currentball.pos.x() < currentCamera.leftedge.min) currentCamera.leftedge.min = currentball.pos.x();
                 if (currentball.pos.x() > currentCamera.rightedge.min) currentCamera.rightedge.min = currentball.pos.x();
                 if (currentball.pos.y() > currentCamera.upedge.min) currentCamera.upedge.min = currentball.pos.y();
@@ -363,16 +344,16 @@ void CVisionModule::edgeTest() {
             }
         }
     }
-    for (int i = 0; i < PARAM::CAMERA; i++) {
-        if (GlobalData::instance()->cameraControl[i] == true) {
-            SingleCamera& currentCamera = GlobalData::instance()->cameraMatrix[i];
+    for (int i = 0; i < opm->total_cameras; i++) {
+        if (GlobalData::Instance()->cameraControl[i] == true) {
+            Owl::SingleCamera& currentCamera = GlobalData::Instance()->cameraMatrix[i];
             currentCamera.leftedge.max = currentCamera.leftedge.min;
             currentCamera.rightedge.max = currentCamera.rightedge.min;
             currentCamera.upedge.max = currentCamera.upedge.min;
             currentCamera.downedge.max = currentCamera.downedge.min;
-            for (int j = 0; j < PARAM::CAMERA; j++)
-                if(GlobalData::instance()->cameraControl[j] == true && i != j) {
-                    SingleCamera otherCamera = GlobalData::instance()->cameraMatrix[j];
+            for (int j = 0; j < opm->total_cameras; j++)
+                if(GlobalData::Instance()->cameraControl[j] == true && i != j) {
+                    Owl::SingleCamera otherCamera = GlobalData::Instance()->cameraMatrix[j];
                     if (currentCamera.leftedge.max < otherCamera.rightedge.min && currentCamera.campos.x() > otherCamera.rightedge.min)
                         currentCamera.leftedge.max = otherCamera.rightedge.min;
                     if (currentCamera.rightedge.max > otherCamera.leftedge.min && currentCamera.campos.x() < otherCamera.leftedge.min)
@@ -390,17 +371,25 @@ void CVisionModule::edgeTest() {
  * @return
  */
 quint16 CVisionModule::getFPS() {
-    static QElapsedTimer timer;
+    //static QElapsedTimer timer;
+    static QTime last_t, t;
+    static double dt = 0;
     static bool ifStart = false;
     static quint64 lastCount;
     static quint16 result;
     if (!ifStart) {
         ifStart = true;
-        timer.start();
+        last_t = QTime::currentTime();
+        //timer.start();
         lastCount = counter;
         return 0;
     }
-    result = (counter - lastCount) * 1000.0 / timer.restart();
+    t = QTime::currentTime();
+    dt = last_t.msecsTo(t);
+    last_t = t;
+    result = (counter - lastCount) * 1000.0 / dt;
+    //result = (counter - lastCount) * 1000.0 / timer.restart();
     lastCount = counter;
+    FPS = int(result);
     return result;
 }

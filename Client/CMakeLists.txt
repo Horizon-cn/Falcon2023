@@ -1,42 +1,55 @@
 set(TARGET_NAME Client)
-# Client
+
 if (WIN32)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-
-    # muti-processors build for VS
-    include(ProcessorCount)
-    ProcessorCount(N)
-    if(NOT N EQUAL 0)
-        SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   /MP${N} ")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP${N} ")
-    endif()
-
-    ## if you have different Qt visions and CMake cannot link the right one
-    #set(CMAKE_PREFIX_PATH D:/App/Qt/5.14.1/msvc2015_64/lib/cmake)
-
+    # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 endif()
 
 if (NOT UNIX AND NOT APPLE)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+    # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
 endif()
 
-add_subdirectory(plugins)
-
+set(incs)
 set(libs)
 
-# define protobuf generater
-include_directories(${Protobuf_INCLUDE_DIR})
-list(APPEND libs ${Protobuf_LIBRARY_RELEASE} ${Protobuf_LITE_LIBRARY_RELEASE} ${Protobuf_PROTOC_LIBRARY_RELEASE})
-
-## find Zlib
-include_directories(${ZLIB_INCLUDE_DIRS})
-list(APPEND libs ${ZLIB_LIBRARIES})
-
 ## find Qt
-list(APPEND libs Qt5::Core Qt5::Quick Qt5::SerialPort Qt5::Widgets)
+set(SRC_QT Core Widgets Quick SerialPort)
+foreach(component ${SRC_QT})
+    list(APPEND incs ${Qt5${component}_INCLUDE_DIRS})
+    list(APPEND libs Qt5::${component})
+endforeach()
 if (WIN32)
     list(APPEND libs Qt5::WinMain)
 endif()
+
+## find kddockwidgets
+# IF(WIN32)
+#     list(APPEND incs ${KDDOCKWIDGETS_INCLUDE_DIRS})
+#     IF(CMAKE_CONFIGURATION_TYPES STREQUAL "Debug")
+#         set(KDDOCKWIDGETS_LIBRARIES ${KDDOCKWIDGETS_LIBRARIES_DEBUG})
+#     ELSE()
+#         set(KDDOCKWIDGETS_LIBRARIES ${KDDOCKWIDGETS_LIBRARIES_RELEASE})
+#     ENDIF()        
+#     list(APPEND libs ${KDDOCKWIDGETS_LIBRARIES})
+#     message("${KDDOCKWIDGETS_INCLUDE_DIRS} ${KDDOCKWIDGETS_LIBRARIES}")
+# ELSE()
+#     list(APPEND libs KDAB::kddockwidgets)
+# ENDIF()
+
+## find boost
+# list(APPEND incs ${Boost_INCLUDE_DIRS})
+# list(APPEND libs ${Boost_LIBRARIES})
+# message("${Boost_LIBRARIES}")
+
+## Protobuf
+list(APPEND incs ${Protobuf_INCLUDE_DIR})
+list(APPEND libs ${Protobuf_LIBRARY_RELEASE} ${Protobuf_LITE_LIBRARY_RELEASE} ${Protobuf_PROTOC_LIBRARY_RELEASE})
+
+## Eigen
+list(APPEND incs ${EIGEN3_INCLUDE_DIR})
+
+## find Zlib
+list(APPEND incs ${ZLIB_INCLUDE_DIRS})
+list(APPEND libs ${ZLIB_LIBRARIES})
 
 # project files
 ## protobuf files
@@ -53,6 +66,7 @@ set(PROTO_LIST
     messages_robocup_ssl_refbox_log
     messages_robocup_ssl_wrapper_legacy
     messages_robocup_ssl_wrapper
+    messages_robocup_ssl_robot_status
     ssl_game_controller_auto_ref
     ssl_game_controller_common
     ssl_game_controller_team
@@ -62,40 +76,129 @@ set(PROTO_LIST
     vision_detection
     zss_cmd
     zss_debug
-    zss_rec_old
+    zss_rec
     src_heatMap
+    src_cmd
+    src_option
 )
 get_pb_file(PROTO_H PROTO_CPP ${PROTO_LIST})
+
+set(QML_DIRS)
+list(APPEND QML_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src/qml)
+set(QML_IMPORT_PATH ${QML_DIRS})
+FILE(GLOB QMLFILES ${QML_DIRS}/*.qml)
 
 set(PROJECT_INCLUDE_DIRS
     ${CMAKE_BINARY_DIR}/proto
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/comm
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interface
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/log
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/log/rec_log
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/log/worldcup
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/other
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/referee
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vision
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/vision/log
-    ${CMAKE_CURRENT_SOURCE_DIR}/plugins
     ${CMAKE_SOURCE_DIR}/share
 )
-include_directories(${PROJECT_INCLUDE_DIRS})
+include_directories(${PROJECT_INCLUDE_DIRS} ${incs})
 
-## core cpp files
-file(GLOB CPPFILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/vision/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/vision/log/*.cpp"
-    "${CMAKE_SOURCE_DIR}/share/*.cpp"
-)
+## cpp files
+aux_source_directory(./src CPPFILES)
+aux_source_directory(./src/comm COMM_CPPFILES)
+aux_source_directory(./src/interface INTERFACE_CPPFILES)
+aux_source_directory(./src/log LOG_CPPFILES)
+aux_source_directory(./src/log/rec_log REC_CPPFILES)
+aux_source_directory(./src/log/worldcup WORLDCUP_CPPFILES)
+aux_source_directory(./src/other OTHER_CPPFILES)
+aux_source_directory(./src/referee REFEREE_CPPFILES)
+aux_source_directory(./src/utils UTILS_CPPFILES)
+aux_source_directory(./src/vision VISION_CPPFILES)
+aux_source_directory(${CMAKE_SOURCE_DIR}/share SHARE_CPPFILES)
+
+## header files
+FILE(GLOB HEADERFILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
+FILE(GLOB COMM_HEADERFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/comm/*.h)
+FILE(GLOB INTERFACE_HEADERFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/interface/*.h)
+FILE(GLOB LOG_HEADERFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/log/*.h)
+FILE(GLOB REC_HEADERFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/log/rec_log/*.h)
+FILE(GLOB WORLDCUP_HEADERFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/log/worldcup/*.h)
+FILE(GLOB OTHER_HEADERFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/other/*.h)
+FILE(GLOB REFEREE_HEADERFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/referee/*.h)
+FILE(GLOB UTILS_HEADERFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.h)
+FILE(GLOB VISION_HEADERFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vision/*.h)
+FILE(GLOB SHARE_HEADERFILES ${CMAKE_SOURCE_DIR}/share/*.h)
+
+## rc files
+FILE(GLOB RCFILES "${CMAKE_CURRENT_SOURCE_DIR}/resource/*.rc")
+
+## qrc files
+FILE(GLOB QRCFILES "${CMAKE_CURRENT_SOURCE_DIR}/*.qrc")
+
+# for VS solution file
+IF(WIN32)
+source_group("include" FILES ${HEADERFILES})
+source_group("include\\comm" FILES ${COMM_HEADERFILES})
+source_group("include\\interface" FILES ${INTERFACE_HEADERFILES})
+source_group("include\\log" FILES ${LOG_HEADERFILES})
+source_group("include\\log\\rec_log" FILES ${REC_HEADERFILES})
+source_group("include\\log\\worldcup" FILES ${WORLDCUP_HEADERFILES})
+source_group("include\\other" FILES ${OTHER_HEADERFILES})
+source_group("include\\referee" FILES ${REFEREE_HEADERFILES})
+source_group("include\\utils" FILES ${UTILS_HEADERFILES})
+source_group("include\\vision" FILES ${VISION_HEADERFILES})
+source_group("include\\share" FILES ${SHARE_HEADERFILES})
+
+source_group("src" FILES ${CPPFILES})
+source_group("src\\comm" FILES ${COMM_CPPFILES})
+source_group("src\\interface" FILES ${INTERFACE_CPPFILES})
+source_group("src\\log" FILES ${LOG_CPPFILES})
+source_group("src\\log\\rec_log" FILES ${REC_CPPFILES})
+source_group("src\\log\\worldcup" FILES ${WORLDCUP_CPPFILES})
+source_group("src\\other" FILES ${OTHER_CPPFILES})
+source_group("src\\referee" FILES ${REFEREE_CPPFILES})
+source_group("src\\utils" FILES ${UTILS_CPPFILES})
+source_group("src\\vision" FILES ${VISION_CPPFILES})
+source_group("src\\share" FILES ${SHARE_CPPFILES})
+
+source_group("rc" FILES ${RCFILES})
+source_group("qrc" FILES ${QRCFILES})
+source_group("qml" FILES ${QMLFILES})
+ENDIF()
+
 set(SRC
-    ${HEADERS}
-    ${SOURCES}
+    ${HEADERFILES}
+    ${COMM_HEADERFILES}
+    ${INTERFACE_HEADERFILES}
+    ${LOG_HEADERFILES}
+    ${REC_HEADERFILES}
+    ${WORLDCUP_HEADERFILES}
+    ${OTHER_HEADERFILES}
+    ${REFEREE_HEADERFILES}
+    ${UTILS_HEADERFILES}
+    ${VISION_HEADERFILES}
+    ${SHARE_HEADERFILES}
+
+    ${CPPFILES}
+    ${COMM_CPPFILES}
+    ${INTERFACE_CPPFILES}
+    ${LOG_CPPFILES}
+    ${REC_CPPFILES}
+    ${WORLDCUP_CPPFILES}
+    ${OTHER_CPPFILES}
+    ${REFEREE_CPPFILES}
+    ${UTILS_CPPFILES}
+    ${VISION_CPPFILES}
+    ${SHARE_CPPFILES}
+
+    ${RCFILES}
+    ${QRCFILES}
+    ${QMLFILES}
     ${PROTO_CPP}
     ${PROTO_H}
-    ${CPPFILES}
 )
-set(zss_libs
-    zss_simulator
-)
-add_executable(${TARGET_NAME} ${SRC} "Client.qrc" "Client.rc")
+
+add_executable(${TARGET_NAME} ${SRC})
 target_compile_definitions(${TARGET_NAME} PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
-target_link_libraries(${TARGET_NAME} PRIVATE ${libs} ${zss_libs})
+target_link_libraries(${TARGET_NAME} PRIVATE ${libs})

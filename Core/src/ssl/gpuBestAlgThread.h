@@ -233,5 +233,5 @@ private:
 	PointValueList pointValueList;
 };
 
-typedef NormalSingleton<CGPUBestAlgThread> GPUBestAlgThread;
+typedef Falcon::NormalSingleton<CGPUBestAlgThread> GPUBestAlgThread;
 #endif

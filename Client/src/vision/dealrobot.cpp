@@ -1,50 +1,63 @@
-﻿#include "dealrobot.h"
+#include "dealrobot.h"
 #include "globaldata.h"
-#include "staticparams.h"
-#include "parammanager.h"
 #include "matrix2d.h"
+#include "field.h"
 #include <iostream>
 #include <qdebug.h>
+#include <functional>
+#include <algorithm>
+#include <cmath>
+#include <QTime>
 namespace {
-auto zpm = ZSS::ZParamManager::instance();
+auto opm = Owl::OParamManager::Instance();
+auto vpm = Owl::VParamManager::Instance();
 int DIFF_VECHILE_MAX_DIFF = 600;//1000
-float MAX_SPEED = 5000;
+float MAX_SPEED[PARAM::ROBOTMAXID] = {6000,6000,6000,6000,6000,6000};
+float MAX_ROTATION_SPEED[PARAM::ROBOTMAXID] = {15,5,5,5,5,5};
+float MAX_ACCELERATE[PARAM::ROBOTMAXID] = {29000,0,-1000,4000,30000,30000};
 // 由于图像的一次事故，帧率和系统延时改变了
-const double TOTAL_MOV_LATED_FRAME = 3.5f; //平移的延时(原来为4.2)
+const double TOTAL_MOV_LATED_FRAME = 4.0f; //平移的延时(原来为4.2)
 const int NUM_MOV_LATENCY_FRAMES = static_cast<int>(TOTAL_MOV_LATED_FRAME);
 const float MOV_LATENCY_FRACTION  = TOTAL_MOV_LATED_FRAME - static_cast<float>(NUM_MOV_LATENCY_FRAMES);
 
 const double TOTAL_DIR_LATED_FRAME = 2.0f; //转动的延时
 const int NUM_DIR_LATENCY_FRAMES = static_cast<int>(TOTAL_DIR_LATED_FRAME);
 const float DIR_LATENCY_FRACTION  = TOTAL_DIR_LATED_FRAME - static_cast<float>(NUM_DIR_LATENCY_FRAMES);
-
 }
 
 CDealRobot::CDealRobot() {
-    zpm->loadParam(fieldWidth, "field/canvasWidth", 13200);
-    zpm->loadParam(fieldHeight, "field/canvasHeight", 9900);
-    zpm->loadParam(minBelieveFrame, "AlertFusion/carMinBelieveFrame", 3);
-    zpm->loadParam(theirMaxLostFrame, "AlertFusion/theirCarMaxLostFrame", 15);
-    zpm->loadParam(ourMaxLostFrame, "AlertFusion/ourCarMaxLostFrame", 150);
     upPossible = 0.1;
-    decidePossible = minBelieveFrame * upPossible;
-    ourDownPossible = (1.0 - decidePossible) / ourMaxLostFrame;
-    theirDownPossible = (1.0 - decidePossible) / theirMaxLostFrame;
+    decidePossible = vpm->carMinBelieveFrame * upPossible;
+    ourDownPossible = (1.0 - decidePossible) / vpm->ourCarMaxLostFrame;
+    theirDownPossible = (1.0 - decidePossible) / vpm->theirCarMaxLostFrame;
+    initPosCov = 100; posMeasErr = 20; posModelErr = 0.2; 
+    for (int id = 0; id < PARAM::ROBOTMAXID; id++) {
+        	posFilter[PARAM::BLUE][id] = PosFilter(initPosCov, posMeasErr, posModelErr);
+        	posFilter[PARAM::YELLOW][id] = PosFilter(initPosCov, posMeasErr, posModelErr);
+            //dirFilter[PARAM::BLUE][id] = PosFilter(initPosCov, posMeasErr, posModelErr);
+            //dirFilter[PARAM::YELLOW][id] = PosFilter(initPosCov, posMeasErr, posModelErr);
+            dirFilter[PARAM::BLUE][id] = DirFilter(initPosCov, posMeasErr, posModelErr);
+            dirFilter[PARAM::YELLOW][id] = DirFilter(initPosCov, posMeasErr, posModelErr);
+            lastValid[PARAM::BLUE][id] = 1 / getFPS();
+            lastValid[PARAM::YELLOW][id] = 1 / getFPS();
+            visionProblem[PARAM::BLUE][id] = false;
+            visionProblem[PARAM::YELLOW][id] = false;
+    }
 }
 
 double CDealRobot::posDist(CGeoPoint pos1, CGeoPoint pos2) {
     return std::sqrt((pos1.x() - pos2.x()) * (pos1.x() - pos2.x()) + (pos1.y() - pos2.y()) * ((pos1.y() - pos2.y())));
 }
 
-bool CDealRobot::isOnField(CGeoPoint p) {
-    if (p.x() < fieldWidth / 2 && p.x() > -fieldWidth / 2 && p.y() < fieldHeight / 2 && p.y() > -fieldHeight / 2)
+bool CDealRobot::isValidInfo(Owl::Robot robot) {
+    if (abs(robot.pos.x()) < opm->field_length / 2 + opm->extendLength && abs(robot.pos.y()) < opm->field_width / 2 + opm->extendLength && fabs(robot.angle) <= 10)
         return true;
     else
         return false;
 }
 
 double CDealRobot::calculateWeight(int camID, CGeoPoint roboPos) {
-    SingleCamera camera = GlobalData::instance()->cameraMatrix[camID];
+    Owl::SingleCamera camera = GlobalData::Instance()->cameraMatrix[camID];
     if (roboPos.x() > camera.leftedge.max && roboPos.x() < camera.rightedge.max &&
             roboPos.y() > camera.downedge.max && roboPos.y() < camera.upedge.max)
         return 1;
@@ -60,27 +73,27 @@ double CDealRobot::calculateWeight(int camID, CGeoPoint roboPos) {
 }
 
 void CDealRobot::init() {
-    zpm->loadParam(filteDir, "Vision/FilteDirection", false);
     result.init();
-    for (int roboId = 0; roboId < PARAM::ROBOTMAXID; roboId++)
-        for (int camId = 0; camId < PARAM::CAMERA; camId++) {
-            robotSeqence[PARAM::BLUE][roboId][camId].fill(-1, -32767, -32767, 0);
-            robotSeqence[PARAM::YELLOW][roboId][camId].fill(-1, -32767, -32767, 0);
-        }
+    FPS = getFPS();
 
-    for (int i = 0; i < PARAM::CAMERA; i++) {
-        if(GlobalData::instance()->cameraUpdate[i]) {
-            for (int j = 0; j < GlobalData::instance()->camera[i][0].robotSize[PARAM::BLUE]; j++) {
-                Robot robot = GlobalData::instance()->camera[i][0].robot[PARAM::BLUE][j];
-                if ( GlobalData::instance()->robotPossible[PARAM::BLUE][robot.id] < decidePossible)
-                    //当这是新车的时候
+    for (int roboId = 0; roboId < PARAM::ROBOTMAXID; roboId++)
+        for (int camId = 0; camId < opm->total_cameras; camId++) {
+            robotSeqence[PARAM::BLUE][roboId][camId].fill(-1, -1, -32767, -32767, 0);
+            robotSeqence[PARAM::YELLOW][roboId][camId].fill(-1, -1, -32767, -32767, 0);
+        }         
+    for (int i = 0; i < opm->total_cameras; i++) {
+        if(GlobalData::Instance()->cameraUpdate[i]) {
+            for (int j = 0; j < GlobalData::Instance()->camera[i][0].robotSize[PARAM::BLUE]; j++) {
+                Owl::Robot robot = GlobalData::Instance()->camera[i][0].robot[PARAM::BLUE][j];
+                if (GlobalData::Instance()->robotPossible[PARAM::BLUE][robot.id] < decidePossible)
+                    //当这是新车的时候//
                     robotSeqence[PARAM::BLUE][robot.id][i] = robot;
                 else if  (lastRobot[PARAM::BLUE][robot.id].pos.dist(robot.pos) < DIFF_VECHILE_MAX_DIFF)
                     robotSeqence[PARAM::BLUE][robot.id][i] = robot;
             }
-            for (int j = 0; j < GlobalData::instance()->camera[i][0].robotSize[PARAM::YELLOW]; j++) {
-                Robot robot = GlobalData::instance()->camera[i][0].robot[PARAM::YELLOW][j];
-                if ( GlobalData::instance()->robotPossible[PARAM::YELLOW][robot.id] < decidePossible)
+            for (int j = 0; j < GlobalData::Instance()->camera[i][0].robotSize[PARAM::YELLOW]; j++) {
+                Owl::Robot robot = GlobalData::Instance()->camera[i][0].robot[PARAM::YELLOW][j];
+                if (GlobalData::Instance()->robotPossible[PARAM::YELLOW][robot.id] < decidePossible)
                     robotSeqence[PARAM::YELLOW][robot.id][i] = robot;
                 else if  (lastRobot[PARAM::YELLOW][robot.id].pos.dist(robot.pos) < DIFF_VECHILE_MAX_DIFF)
                     robotSeqence[PARAM::YELLOW][robot.id][i] = robot;
@@ -88,7 +101,7 @@ void CDealRobot::init() {
         }
     }
     for (int i = 0; i < PARAM::ROBOTMAXID - 1; i++) {
-        Robot temp(-32767, -32767, 0, -1);
+        Owl::Robot temp(-1, -32767, -32767, 0, -1);
         sortTemp[PARAM::BLUE][i] = temp;
         sortTemp[PARAM::YELLOW][i] = temp;
     }
@@ -99,154 +112,99 @@ void CDealRobot::mergeRobot() {
         bool foundBlue = false, foundYellow = false;
         double blueWeight = 0, yellowWeight = 0;
         CGeoPoint blueAverage(0, 0), yellowAverage(0, 0);
+        Owl::RawInfo br, yr;
         double blueAngle = 0, yellowAngle = 0;
-        for (int camId = 0; camId < PARAM::CAMERA; camId++) {
+        for (int camId = 0; camId < opm->total_cameras; camId++) {
             double _weight = 0;
             if(robotSeqence[PARAM::BLUE][roboId][camId].pos.x() > -30000 && robotSeqence[PARAM::BLUE][roboId][camId].pos.y() > -30000) {
                 foundBlue = true;
                 _weight = calculateWeight(camId, robotSeqence[PARAM::BLUE][roboId][camId].pos);
                 blueWeight += _weight;
                 blueAverage.setX(blueAverage.x() + robotSeqence[PARAM::BLUE][roboId][camId].pos.x() * _weight);
+                
                 blueAverage.setY(blueAverage.y() + robotSeqence[PARAM::BLUE][roboId][camId].pos.y() * _weight);
+                br.fill(robotSeqence[PARAM::BLUE][roboId][camId].raw);
                 blueAngle = robotSeqence[PARAM::BLUE][roboId][camId].angle;
-                break;
+                //blueAngle += robotSeqence[PARAM::BLUE][roboId][camId].angle * _weight;
             }
-        }
-        for (int camId = 0; camId < PARAM::CAMERA; camId++) {
-            double _weight = 0;
+            _weight = 0;
             if(robotSeqence[PARAM::YELLOW][roboId][camId].pos.x() > -30000 && robotSeqence[PARAM::YELLOW][roboId][camId].pos.y() > -30000) {
                 foundYellow = true;
                 _weight = calculateWeight(camId, robotSeqence[PARAM::YELLOW][roboId][camId].pos);
                 yellowWeight += _weight;
                 yellowAverage.setX(yellowAverage.x() + robotSeqence[PARAM::YELLOW][roboId][camId].pos.x() * _weight);
                 yellowAverage.setY(yellowAverage.y() + robotSeqence[PARAM::YELLOW][roboId][camId].pos.y() * _weight);
+                yr.fill(robotSeqence[PARAM::YELLOW][roboId][camId].raw);
                 yellowAngle = robotSeqence[PARAM::YELLOW][roboId][camId].angle;
-                break;
+                //yellowAngle += robotSeqence[PARAM::YELLOW][roboId][camId].angle * _weight;
             }
         }
-        if (foundBlue) {
-            Robot ave(blueAverage.x() / blueWeight, blueAverage.y() / blueWeight, blueAngle, roboId);
-            result.addRobot(PARAM::BLUE, ave);
+        if (foundBlue) { 
+            Owl::Robot ave(PARAM::BLUE, blueAverage.x() / blueWeight, blueAverage.y() / blueWeight, blueAngle, roboId, br);
+            result.addRobot(ave);
         }
         if (foundYellow) {
-            Robot ave(yellowAverage.x() / yellowWeight, yellowAverage.y() / yellowWeight, yellowAngle, roboId);
-            result.addRobot(PARAM::YELLOW, ave);
+            Owl::Robot ave(PARAM::YELLOW, yellowAverage.x() / yellowWeight, yellowAverage.y() / yellowWeight, yellowAngle, roboId, yr);
+            result.addRobot(ave);
         }
     }
-    if (PARAM::DEBUG) std::cout << "have found " << result.robotSize[PARAM::BLUE] << "blue car.\t" << result.robotSize[PARAM::YELLOW] << std::endl;
 }
-
-
 
 void CDealRobot::sortRobot(int color) {
     for (int id = 0; id < PARAM::ROBOTMAXID; id++) {
         bool found = false;
         for (int i = 0; i < result.robotSize[color]; i++)
             if (result.robot[color][i].id == id ) {
-                if ((isOnField(result.robot[color][i].pos)) &&
-                        (GlobalData::instance()->robotPossible[color][id] < decidePossible
+                if ((isValidInfo(result.robot[color][i])) &&
+                        (GlobalData::Instance()->robotPossible[color][id] < decidePossible
                          || result.robot[color][i].pos.dist(lastRobot[color][id].pos) < DIFF_VECHILE_MAX_DIFF)) {
-                    lastRobot[color][id] = result.robot[color][i];
+                    currentRobot[color][id] = result.robot[color][i];
+                    if (lastValid[color][id] == 0) lastValid[color][id] = 1 / FPS;
                     found = true;
                 }
             }
-        if (found)  GlobalData::instance()->robotPossible[color][id] += upPossible;
-        else { // 没看到车，猜测一个原始位置
-            lastRobot[color][id].setPos(lastRobot[color][id].pos + lastRobot[color][id].velocity / ZSS::Athena::FRAME_RATE);
-            lastRobot[color][id].angle = lastRobot[color][id].angle + lastRobot[color][id].rotateVel / ZSS::Athena::FRAME_RATE;
-            if (GlobalData::instance()->robotPossible[color][id] >= decidePossible)
-                if (GlobalData::instance()->commandMissingFrame[color] >= 20)
-                    GlobalData::instance()->robotPossible[color][id] -= theirDownPossible;
+        currentRobot[color][id].accelerate = lastRobot[color][id].accelerate;
+        currentRobot[color][id].velocity.vxy = lastRobot[color][id].velocity.vxy + lastRobot[color][id].accelerate * lastValid[color][id];
+        currentRobot[color][id].velocity.vr = lastRobot[color][id].velocity.vr;
+        if (found)  GlobalData::Instance()->robotPossible[color][id] += upPossible;
+        else { // 没看到车，猜测一个原始位置//
+            currentRobot[color][id].pos = lastRobot[color][id].pos + lastRobot[color][id].velocity.vxy * lastValid[color][id] + lastRobot[color][id].accelerate * pow(lastValid[color][id], 2) / 2;
+            currentRobot[color][id].angle = lastRobot[color][id].angle + lastRobot[color][id].velocity.vr * lastValid[color][id];
+            currentRobot[color][id].raw = result.robot[color][id].raw; //upadte the raw vision
+            if (GlobalData::Instance()->robotPossible[color][id] >= decidePossible)
+                if (GlobalData::Instance()->commandMissingFrame[color] >= 20)
+                    GlobalData::Instance()->robotPossible[color][id] -= theirDownPossible;
                 else
-                    GlobalData::instance()->robotPossible[color][id] -= ourDownPossible;
-            else GlobalData::instance()->robotPossible[color][id] -= decidePossible;
+                    GlobalData::Instance()->robotPossible[color][id] -= ourDownPossible;
+            else GlobalData::Instance()->robotPossible[color][id] -= decidePossible;
         }
-
-        if (GlobalData::instance()->robotPossible[color][id] > 1.0) GlobalData::instance()->robotPossible[color][id] = 1.0;
-        if(GlobalData::instance()->robotPossible[color][id] < 0.0)  GlobalData::instance()->robotPossible[color][id] = 0.0;
+        if (GlobalData::Instance()->robotPossible[color][id] > 1.0) GlobalData::Instance()->robotPossible[color][id] = 1.0;
+        if(GlobalData::Instance()->robotPossible[color][id] < 0.0)  GlobalData::Instance()->robotPossible[color][id] = 0.0;
     }
     validNum[color] = 0;
-    for (int id = 0; id < PARAM::ROBOTMAXID; id++)
-        if(GlobalData::instance()->robotPossible[color][id] >= decidePossible) sortTemp[color][validNum[color]++] = lastRobot[color][id];
-
+    for (int id = 0; id < PARAM::ROBOTMAXID; id++) {
+        if(GlobalData::Instance()->robotPossible[color][id] >= decidePossible) {
+            sortTemp[color][validNum[color]++] = currentRobot[color][id];
+        }
+        else if (lastValid[color][id] != 0) lastValid[color][id] += 1 / FPS;
+        if (lastValid[color][id] * FPS > vpm->maxLostFrame) {
+            lastValid[color][id] = 0;
+        }
+        if (lastValid[color][id] * FPS > vpm->ourCarMaxLostFrame) visionProblem[color][id] = true;
+        else visionProblem[color][id] = false;
+    }
     //sort
     for (int i = 0; i < validNum[color] - 1; i++) {
         int maxj = i;
         for (int j = i + 1; j < validNum[color]; j++)
-            if (GlobalData::instance()->robotPossible[color][sortTemp[color][maxj].id] <
-                    GlobalData::instance()->robotPossible[color][sortTemp[color][j].id]) maxj = j;
+            if (GlobalData::Instance()->robotPossible[color][sortTemp[color][maxj].id] <
+                    GlobalData::Instance()->robotPossible[color][sortTemp[color][j].id]) maxj = j;
         if (maxj != i) {
-            Robot temp;
+            Owl::Robot temp;
             temp = sortTemp[color][maxj];
             sortTemp[color][maxj] = sortTemp[color][i];
             sortTemp[color][i] = temp;
         }
-    }
-}
-
-void CDealRobot::updateVel(int team, ReceiveVisionMessage& result) {
-    for (int i = 0; i < validNum[team]; i++) {
-        Robot & robot = result.robot[team][i];
-        //位置滤波
-        auto & playerPosVel = _kalmanFilter[team][robot.id].update(robot.pos.x(), robot.pos.y());
-        CGeoPoint filtPoint (playerPosVel(0, 0), playerPosVel(1, 0));
-        CVector PlayVel(playerPosVel(2, 0), playerPosVel(3, 0));
-
-        bool side;
-        //朝向滤波
-        auto &playerRotVel = _dirFilter[team][robot.id].update(std::cos(robot.angle), std::sin(robot.angle));
-        double filterDir = std::atan2(playerRotVel(1, 0), playerRotVel(0, 0));
-        double rotVel = playerRotVel(2, 0) * std::cos(90 * 3.1416 / 180 + filterDir)
-                        + playerRotVel(3, 0) * std::sin(90 * 3.1416 / 180 + filterDir);
-
-        robot.angle = filterDir;
-        robot.rotateVel = rotVel * ZSS::Athena::FRAME_RATE;
-        ZSS::ZParamManager::instance()->loadParam(side, "ZAlert/IsRight");
-        robot.pos = filtPoint;
-        robot.velocity = PlayVel * ZSS::Athena::FRAME_RATE;
-        robot.raw_vel = robot.velocity;
-        robot.rawRotateVel = robot.rotateVel;
-
-        //我方位置朝向修正，根据medusa回传的速度信息
-        if (GlobalData::instance()->commandMissingFrame[team] < 20) {
-            //小数部分
-            auto command = GlobalData::instance()->robotCommand[team][0 - NUM_MOV_LATENCY_FRAMES].robotSpeed[robot.id];
-            CVector robot_travel = CVector(command.vx, command.vy) * MOV_LATENCY_FRACTION / double(ZSS::Athena::FRAME_RATE);
-
-            robot.angle += command.vr * DIR_LATENCY_FRACTION / ZSS::Athena::FRAME_RATE ;
-            //整数部分
-            for (int frame = NUM_MOV_LATENCY_FRAMES - 1; frame >= 0; frame--) {
-                command = GlobalData::instance()->robotCommand[team][0 - frame].robotSpeed[robot.id];
-                robot_travel = robot_travel + CVector(command.vx, command.vy) / ZSS::Athena::FRAME_RATE;
-//                qDebug() << "after" << robot.pos.x() << " " << robot.pos.y();
-            }
-            for (int frame = NUM_DIR_LATENCY_FRAMES - 1; frame >= 0 ; frame--) {
-                command = GlobalData::instance()->robotCommand[team][0 - frame].robotSpeed[robot.id];
-                robot.angle += command.vr  / ZSS::Athena::FRAME_RATE ;
-//                qDebug() << "after" << robot.pos.x() << " " << robot.pos.y();
-            }
-
-            robot_travel = robot_travel.rotate(robot.angle);
-            robot.pos = robot.pos + robot_travel;
-
-            robot.rotateVel = command.vr;
-            robot.velocity = CVector( GlobalData::instance()->robotCommand[team][0].robotSpeed[robot.id].vx,
-                                      GlobalData::instance()->robotCommand[team][0].robotSpeed[robot.id].vy);
-            robot.velocity = robot.velocity.rotate(robot.angle);
-            if (robot.velocity.mod() > 10000)
-                qDebug() << "fuck!!!" << robot.velocity.mod();
-            //FIX IT
-
-        }
-        for (int j = 0; j < PARAM::ROBOTNUM; j++) {
-            if (robot.id == GlobalData::instance()->maintain[0].robot[team][j].id ) {
-
-                robot.accelerate = (robot.velocity - GlobalData::instance()->maintain[-2].robot[team][j].velocity) / 3 * ZSS::Athena::FRAME_RATE ;
-//                if (abs(robot.accelerate.mod()) > 600) robot.accelerate = CVector(0, 0);
-            }
-        }
-        lastRobot[team][robot.id].velocity = robot.velocity;
-        lastRobot[team][robot.id].rotateVel = robot.rotateVel;
     }
 }
 
@@ -258,11 +216,137 @@ void CDealRobot::run() {
     result.init();
     //重新加入概率排序后的车
     for (int i = 0; i < validNum[PARAM::BLUE]; i++)
-        result.addRobot(PARAM::BLUE, sortTemp[PARAM::BLUE][i]);
+        result.addRobot(sortTemp[PARAM::BLUE][i]);
     for (int i = 0; i < validNum[PARAM::YELLOW]; i++)
-        result.addRobot(PARAM::YELLOW, sortTemp[PARAM::YELLOW][i]);
-
-    GlobalData::instance()->processRobot.push(result);
+        result.addRobot(sortTemp[PARAM::YELLOW][i]);
+    //qDebug("try to push robot");
+    GlobalData::Instance()->processRobot.push(result);
+    //t1 = QTime::currentTime();
+    //double dt = VisionModule::Instance()->t.msecsTo(t1);
+    //qDebug()<<"camera to proccess"<<dt;
 }
 
+void CDealRobot::updateVel(int team, Owl::ReceiveVisionMessage& result) {
+    
+    for (int i = 0; i < validNum[team]; i++) {
+        Owl::Robot & robot = result.robot[team][i];
+        //朝向滤波
+        auto &playerRotVel = dirFilter[team][robot.id];
+        if(!playerRotVel.isInit()) {
+            playerRotVel.initState(robot.angle, robot.velocity.vr);
+        }
 
+        playerRotVel.setTransitionMat(lastValid[team][robot.id]);
+        //playerPosVel.predict2(lastRobot[team][robot.id].accelerate);
+        double dir = playerRotVel.postEstimatedDir();
+        playerRotVel.predict();
+        playerRotVel.set(0, dir);
+        playerRotVel.update2(robot.angle);
+
+        double filterDir = playerRotVel.postEstimatedDir();
+        double rotVel = playerRotVel.postEstimatedVel();
+
+        robot.angle = filterDir;
+        //robot.angle = playerRotVel.normalize(robot.angle);
+        //playerRotVel.set(0, robot.angle);
+        robot.velocity.vr = rotVel;
+        if(abs(robot.velocity.vr) > MAX_ROTATION_SPEED[robot.id]) {
+            robot.velocity.vr = robot.velocity.vr > 0? MAX_ROTATION_SPEED[robot.id] : MAX_ROTATION_SPEED[robot.id] * (-1);
+            playerRotVel.set(1, robot.velocity.vr);
+        }
+
+        //位置滤波
+        auto & playerPosVel = posFilter[team][robot.id];
+        if(!playerPosVel.isInit()) {
+            playerPosVel.initState(robot.pos, robot.velocity.vxy);
+        }
+        
+        playerPosVel.setTransitionMat(lastValid[team][robot.id]);
+        if(lastValid[team][robot.id] != 1 / FPS) lastValid[team][robot.id] = 1 / FPS;
+
+        //robot.velocity.vxy = (robot.pos - GlobalData::Instance()->maintain[0].robot[team][robot.id].pos) / lastValid[team][robot.id];
+        robot.velocity.vxy = GlobalData::Instance()->robotCommand[team][0].robotSpeed[robot.id].vxy;
+        robot.accelerate = (robot.velocity.vxy - lastRobot[team][robot.id].velocity.vxy) / lastValid[team][robot.id];
+        /**if(robot.velocity.vxy.mod() + vpm->thresholdToDec < lastRobot[team][robot.id].velocity.vxy.mod()) {
+            if(robot.accelerate.mod() > vpm->deceleration) {
+                double sin = robot.accelerate.x() / robot.accelerate.mod(), cos = robot.accelerate.y() / robot.accelerate.mod();
+                robot.accelerate = CVector(sin, cos) * vpm->deceleration;
+            }
+        }
+        else {**/
+            //robot.velocity.vxy = (robot.pos - GlobalData::Instance()->maintain[0].robot[team][robot.id].pos) / lastValid[team][robot.id];
+            //robot.accelerate = (robot.velocity.vxy - lastRobot[team][robot.id].velocity.vxy) / lastValid[team][robot.id];
+            if(robot.accelerate.mod() > vpm->acceleration) {
+                double sin = robot.accelerate.x() / robot.accelerate.mod(), cos = robot.accelerate.y() / robot.accelerate.mod();
+                robot.accelerate = CVector(sin, cos) * vpm->acceleration;
+            }
+        //}
+            /**if(robot.velocity.vxy.mod() > lastRobot[team][robot.id].velocity.vxy.mod() + vpm->thresholdToAcc) {
+                if(robot.accelerate.mod() > vpm->acceleration) {
+                    double sin = robot.accelerate.x() / robot.accelerate.mod(), cos = robot.accelerate.y() / robot.accelerate.mod();
+                    robot.accelerate = CVector(sin, cos) * vpm->acceleration;
+                }
+            }
+        else robot.accelerate = CVector(0, 0);**/
+
+        //playerPosVel.predict2(lastRobot[team][robot.id].accelerate);
+        playerPosVel.predict2(robot.accelerate);
+        //playerPosVel.predict();
+        playerPosVel.update2(robot.pos);
+        
+        CGeoPoint filtPoint = playerPosVel.postEstimatedPos();
+        CVector PlayVel = playerPosVel.postEstimatedVel();
+
+        robot.pos = filtPoint;
+        robot.velocity.vxy = PlayVel;
+        if(robot.velocity.vxy.mod() > MAX_SPEED[robot.id]) {
+            double sin = robot.velocity.vx() / robot.velocity.vxy.mod(), cos = robot.velocity.vy() / robot.velocity.vxy.mod();
+            robot.velocity.vxy = CVector(sin, cos) * MAX_SPEED[robot.id];
+            playerPosVel.set(2, (robot.velocity.vx()+GlobalData::Instance()->robotCommand[team][0].robotSpeed[robot.id].vx())/2);
+            playerPosVel.set(3, (robot.velocity.vy()+GlobalData::Instance()->robotCommand[team][0].robotSpeed[robot.id].vy())/2);
+        }
+
+        historyVel[team][robot.id].push(PlayVel);
+
+        const int size = 5;
+        double v[size], v_angle[size];
+        int ii = 0;
+        for (ii = 0; ii < size; ii++) {
+            //if (GlobalData::Instance()->maintain.size() < ii) break;
+            CVector vxy = historyVel[team][robot.id][-ii];
+            v[ii] = vxy.mod();
+            v_angle[ii] = atan2(vxy.y(), vxy.x());
+        }
+        sort(v,v+ii,std::greater<double>());
+        robot.velocity.vxy = CVector(v[ii/2]*std::cos(v_angle[0]), v[ii/2]*std::sin(v_angle[0]));
+
+        /**if (fabs(robot.angle) > 10) {
+            playerRotVel = DirFilter(initPosCov, posMeasErr, posModelErr);
+            robot.angle = 0;
+            robot.velocity.vr = 0;
+            //lastValid[team][robot.id] += 1 / FPS;
+        }
+        if (abs(robot.pos.x()) > opm->field_length / 2 + opm->extendLength && abs(robot.pos.y()) > opm->field_width / 2 + opm->extendLength) {
+            playerPosVel = PosFilter(initPosCov, posMeasErr, posModelErr);
+            robot.pos = CGeoPoint(-32767, -32767);
+            lastRobot[team][robot.id].pos = CGeoPoint(0, 0);
+            robot.velocity.vxy = CVector(0,0);
+            robot.accelerate = CVector(0,0);
+            //lastValid[team][robot.id] += 1 / FPS;
+        }
+        else {
+            lastRobot[team][robot.id].pos = robot.pos;
+        }
+        lastRobot[team][robot.id].angle = robot.angle;
+        lastRobot[team][robot.id].velocity = robot.velocity;
+        lastRobot[team][robot.id].accelerate = robot.accelerate;**/
+        if (!isValidInfo(robot)) {
+            playerRotVel = DirFilter(initPosCov, posMeasErr, posModelErr);
+            playerPosVel = PosFilter(initPosCov, posMeasErr, posModelErr);
+            robot.fill(-1, -1, -32767, -32767, 0, robot.raw);
+            lastRobot[team][robot.id].fill(-1, -1, 0, 0, 0);
+        }
+        else lastRobot[team][robot.id] = robot;
+        //lastRobot[team][robot.id].accelerate = (GlobalData::Instance()->robotCommand[team][0].robotSpeed[robot.id].vxy - lastRobot[team][robot.id].velocity.vxy) / lastValid[team][robot.id];
+    }
+}

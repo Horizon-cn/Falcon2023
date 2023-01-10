@@ -42,6 +42,6 @@ private:
 	int _lastCycle;
 };
 
-typedef NormalSingleton< CSupportPos2022 > SupportPos2022;
+typedef Falcon::NormalSingleton< CSupportPos2022 > SupportPos2022;
 
 #endif //_SUPPORT_POS_2022_H_

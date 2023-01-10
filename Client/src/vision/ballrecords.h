@@ -2,7 +2,6 @@
 #define BALLRECORDS_H
 #include "messageformat.h"
 #include "geometry.h"
-#include "staticparams.h"
 #include "parammanager.h"
 #include <iostream>
 #include <chrono>

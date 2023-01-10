@@ -98,7 +98,7 @@ protected:
 	template < class CTaskType >
 	CPlayerTask* MakeTask(const TaskT& task);
 };
-typedef NormalSingleton<CTaskFactoryV2> TaskFactoryV2;
+typedef Falcon::NormalSingleton<CTaskFactoryV2> TaskFactoryV2;
 /************************************************************************/
 /*                 一些包裹(wrap)函数, 方便调用tasks                    */
 /************************************************************************/

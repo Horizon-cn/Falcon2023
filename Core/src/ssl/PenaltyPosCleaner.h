@@ -80,6 +80,6 @@ private:
 	GroupStatus* _groupStatus;
 };
 
-typedef NormalSingleton<CPenaltyPosCleaner> PenaltyPosCleaner;
+typedef Falcon::NormalSingleton<CPenaltyPosCleaner> PenaltyPosCleaner;
 
 #endif

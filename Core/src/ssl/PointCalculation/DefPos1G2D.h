@@ -54,6 +54,6 @@ public:
 	virtual CGeoPoint generatePos(const CVisionModule* pVision);
 };
 
-typedef NormalSingleton< CDefPos1G2D > DefPos1G2D;
+typedef Falcon::NormalSingleton< CDefPos1G2D > DefPos1G2D;
 
 #endif //_DEFPOS_1G_2D_H_

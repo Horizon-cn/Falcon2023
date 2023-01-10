@@ -49,6 +49,6 @@ private:
 };
 
 // singleton class
-typedef NormalSingleton< CBayesReader > BayesReader; 
+typedef Falcon::NormalSingleton< CBayesReader > BayesReader; 
 
 #endif // ~BAYESREADER_H_

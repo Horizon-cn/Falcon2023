@@ -64,6 +64,6 @@ class CDefPos2015 {
     double _RrightmostDir;
 };
 
-typedef NormalSingleton<CDefPos2015> DefPos2015;
+typedef Falcon::NormalSingleton<CDefPos2015> DefPos2015;
 
 #endif 

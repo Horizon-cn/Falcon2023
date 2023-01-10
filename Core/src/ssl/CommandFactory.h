@@ -20,5 +20,5 @@ public:
 		return pCmds[cmd.number()];
 	}
 };
-typedef NormalSingleton< CCommandFactory > CmdFactory;
+typedef Falcon::NormalSingleton< CCommandFactory > CmdFactory;
 #endif

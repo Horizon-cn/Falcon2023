@@ -1,13 +1,10 @@
 #ifndef MAINTAIN_H
 #define MAINTAIN_H
-#include "singleton.hpp"
-#include "vision_detection.pb.h"
+#include "singleton.h"
+//#include "vision_detection.pb.h"
 #include "kalmanfilter.h"
+#include "chipsolver.h"
 #include <messageformat.h>
-#include <QUdpSocket>
-#include <QtCore/QTextStream>
-#include <QtCore/QFile>
-#include <QtCore/QIODevice>
 /**
  * @brief Maintain and combine the result of dealrobot and dealball
  */
@@ -21,14 +18,14 @@ class CMaintain {
     void StateMachine();
     double getpredict_x();
     double getpredict_y();
-    int robotIndex[PARAM::TEAMS][PARAM::ROBOTMAXID];
+    //Matrix2d& getP(){return ballKalmanFilter.getP();}
+    //Matrix2d& getQ(){return ballKalmanFilter.getQ();}
 
   private:
-    QFile file;
-    QTextStream out;
-    ReceiveVisionMessage result;
-    KalmanFilter ballKalmanFilter;
+    Owl::ReceiveVisionMessage result;
+    BallRecord ballrecord;
+
 };
-typedef Singleton<CMaintain> Maintain;
+typedef Falcon::MeyersSingleton<CMaintain> Maintain;
 
 #endif // MAINTAIN_H

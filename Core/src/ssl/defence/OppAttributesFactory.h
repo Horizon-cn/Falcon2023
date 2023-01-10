@@ -15,7 +15,7 @@ private:
 	void configuration();
 	CAttributeSet* _attrSet;
 };
-typedef NormalSingleton<CAttributeFactory> AttributeFactory;
+typedef Falcon::NormalSingleton<CAttributeFactory> AttributeFactory;
 
 #define DEFINE_ATTRIBUTE(attr_class)	\
 DEFINE_CLASS_EX_H(attr_class,CAttribute)	\

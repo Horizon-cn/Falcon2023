@@ -1,19 +1,29 @@
 import QtQuick 2.10
 import QtQuick.Controls 2.3
 import QtQuick.Controls.Styles 1.4
-import ZSS 1.0 as Client
+import QtQuick.Layouts 1.3
+import Owl 1.0 as Client
 ScrollView {
     Client.RefereeBox { id : refereeBox; }
+    Client.Interaction4Field { id : interaction4; }
     Timer {
         id:refBoxTimer;
         interval:16;
         running:false;
         repeat:true;
         onTriggered: {
-            refereeBox.multicastCommand();
+            if(refBoxModeSwitch.refereeAutoMode!=2)
+                refereeBox.multicastCommand();
         }
     }
     id : root;
+    clip : true;
+    contentWidth: parent.width;
+    contentHeight: parent.height * 2;
+    ScrollBar.horizontal.policy: ScrollBar.AlwaysOn;
+    ScrollBar.vertical.policy: ScrollBar.AlwaysOn;
+    ScrollBar.horizontal.interactive: true;
+    ScrollBar.vertical.interactive: true;
     property var color : ["#ddd","#79a6ea","#fbeb9c"];
     property int state : Client.GameState.HALTED;
     property bool haltGame : false;
@@ -47,6 +57,9 @@ ScrollView {
         case Client.RefBoxCommand.PENALTY_YELLOW:
         case Client.RefBoxCommand.PENALTY_BLUE:
             state = Client.GameState.PREPARE_PENALTY;break;
+        case Client.RefBoxCommand.GOAL_YELLOW:
+        case Client.RefBoxCommand.GOAL_BLUE:
+            state = Client.GameState.STOPPED;break;
         default:
             console.log("RefBox Command ERROR!!!!!!");
             return;
@@ -121,11 +134,22 @@ ScrollView {
                     }
                     Component.onCompleted: run();
                 }
+                Button{
+                    id:refBoxModeSwitch;
+                    text:(refBoxModeSwitch.refereeAutoMode ? qsTr("Auto") : qsTr("Manual"));
+                    width:parent.itemWidth;
+                    property int refereeAutoMode: 0;
+                    visible:refBoxSwitch.refereeSwitch;
+                    onClicked: {
+                        refereeAutoMode = (refereeAutoMode+1)%3;
+                        refereeBox.changeRefereeMode(refereeAutoMode);
+                    }
+                }
             }
         }
     }
     Grid {
-        id : control;
+        id : manualControl;
         anchors.top: refereeSetting.bottom;
         width:parent.width;
         columnSpacing: 0;
@@ -137,7 +161,8 @@ ScrollView {
         verticalItemAlignment: Grid.AlignVCenter;
         anchors.horizontalCenter: parent.horizontalCenter;
         property int itemWidth : width - 2*padding;
-        enabled: refBoxSwitch.refereeSwitch;
+        visible: refBoxModeSwitch.refereeAutoMode!=2;
+        enabled: (refBoxModeSwitch.refereeAutoMode!=2)&&refBoxSwitch.refereeSwitch;
         ZGroupBox{
             title:qsTr("Control Command");
             Grid{
@@ -196,10 +221,12 @@ ScrollView {
                             {cmd_type:2,cmd_num:Client.RefBoxCommand.INDIRECT_KICK_YELLOW,cmd_str:"Indirect Kick"},
                             {cmd_type:2,cmd_num:Client.RefBoxCommand.TIMEOUT_YELLOW,cmd_str:"Timeout"},
                             {cmd_type:2,cmd_num:Client.RefBoxCommand.BALL_PLACEMENT_YELLOW,cmd_str:"Ball Placement"},
+                            {cmd_type:2,cmd_num:Client.RefBoxCommand.GOAL_YELLOW,cmd_str:"Goal"}
                         ]
                         ZRefButton{
                             property int index : modelData.cmd_num;
                             text:qsTr(modelData.cmd_str);
+                            highlighted:next_command == index;
                             onClicked:getButtonsCommand(index);
                             Component.onCompleted: {
                                 color = root.color[modelData.cmd_type];
@@ -231,10 +258,12 @@ ScrollView {
                             {cmd_type:1,cmd_num:Client.RefBoxCommand.INDIRECT_KICK_BLUE,cmd_str:"Indirect Kick"},
                             {cmd_type:1,cmd_num:Client.RefBoxCommand.TIMEOUT_BLUE,cmd_str:"Timeout"},
                             {cmd_type:1,cmd_num:Client.RefBoxCommand.BALL_PLACEMENT_BLUE,cmd_str:"Ball Placement"},
+                            {cmd_type:1,cmd_num:Client.RefBoxCommand.GOAL_BLUE,cmd_str:"Goal"}
                         ]
                         ZRefButton{
                             property int index : modelData.cmd_num;
                             text:qsTr(modelData.cmd_str);
+                            highlighted:next_command == index;
                             onClicked:getButtonsCommand(index);
                             Component.onCompleted: {
                                 color = root.color[modelData.cmd_type];
@@ -244,6 +273,7 @@ ScrollView {
                 }
             }
         }
+        /**
         ZGroupBox{
             title:qsTr("Next Command");
             Grid{
@@ -278,5 +308,6 @@ ScrollView {
                 }
             }
         }
+        **/
     }
 }

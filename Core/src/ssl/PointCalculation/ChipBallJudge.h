@@ -24,5 +24,5 @@ private:
 	bool goKickAlrealdy;
 	int count ;
 };
-typedef NormalSingleton< CChipBallJudge > ChipBallJudge;
+typedef Falcon::NormalSingleton< CChipBallJudge > ChipBallJudge;
 #endif

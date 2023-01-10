@@ -43,7 +43,7 @@ CDataReceiver4rbk::CDataReceiver4rbk():referee_socket(){
     delete pOption;
     int vision_port = ZSS::Athena::VISION_SEND[isYellow == TEAM_YELLOW ? PARAM::YELLOW : PARAM::BLUE];
     int referee_port;
-    ZSS::ZParamManager::instance()->loadParam(referee_port, "AlertPorts/ZSS_RefereePort", 39991);
+    ZSS::ZParamManager::Instance()->loadParam(referee_port, "AlertPorts/ZSS_RefereePort", 39991);
     if (IS_SIMULATION && isYellow == TEAM_YELLOW) referee_port += 1;
     referee_socket.setProxy(QNetworkProxy::NoProxy);
     referee_socket.bind(QHostAddress::AnyIPv4, referee_port, QUdpSocket::ShareAddress);
@@ -172,7 +172,7 @@ void CDataReceiver4rbk::receiveVision() {
 }
 
 bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameInfoT& info){
-	/** GameInfo包括视觉信息和裁判信息，之后要� 上方差等信息,player的信息全部� 载进来，用于robot predictor **/
+	/** GameInfo包括视觉信息和裁判信息，之后要�?上方差等信息,player的信息全部�?载进来，用于robot predictor **/
     static int last_cycle = 0;
     bool receive_new_vision = false;
     receive_vision_mutex.lock();
@@ -210,7 +210,7 @@ void CDataReceiver4rbk::receiveRefMsgs() {
             }
             unsigned long command_counter = ssl_referee.command_counter();
             if (command_counter == former_cmd_index) continue;
-            former_cmd_index = command_counter;	// ������һ��ָ��ñ�־ֵ
+            former_cmd_index = command_counter;	// ������һ��ָ��ñ�־�?
             //update refereemsg
             unsigned long long packet_timestamp = ssl_referee.packet_timestamp();
             Referee_Stage stage = ssl_referee.stage();
@@ -271,7 +271,7 @@ PlayMode CDataReceiver4rbk::translateRefMsgs(Referee_Command command){
     PlayMode play_mode = PMNone;
     for( int pm = PMStop; pm <= PMNone; ++pm ) {
         if( playModePair[pm].ch == cmd ) {
-            // Ѱ��ƥ���ָ������
+            // Ѱ��ƥ���ָ������?
             play_mode = playModePair[pm].mode;
             break;
         }

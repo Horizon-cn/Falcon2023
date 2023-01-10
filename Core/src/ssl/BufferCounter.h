@@ -28,6 +28,6 @@ private:
 	bool _cleared;
 };
 
-typedef NormalSingleton<CBufferCounter> BufferCounter;
+typedef Falcon::NormalSingleton<CBufferCounter> BufferCounter;
 
 #endif // _BUFFER_COUNTER_H_

@@ -198,12 +198,12 @@ private:
 ///
 /// <remarks>	cliffyin, 2011/7/25. </remarks>
 
-typedef NormalSingleton< CKickStatus > KickStatus;
+typedef Falcon::NormalSingleton< CKickStatus > KickStatus;
 
 /// <summary>	Defines an alias representing their kick status. . </summary>
 ///
 /// <remarks>	cliffyin, 2011/7/25. </remarks>
 
-typedef NormalSingleton< CKickStatus > TheirKickStatus;
+typedef Falcon::NormalSingleton< CKickStatus > TheirKickStatus;
 
 #endif // ~_KICK_STATUS_H_

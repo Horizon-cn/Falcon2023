@@ -29,6 +29,6 @@ private:
     COppRole * _role[Param::Field::MAX_PLAYER];//1~6 ∂‘”¶1~6∫≈≥µ
 };
 
-typedef NormalSingleton<COppRoleMatcher> OppRoleMatcher;
+typedef Falcon::NormalSingleton<COppRoleMatcher> OppRoleMatcher;
 
 #endif

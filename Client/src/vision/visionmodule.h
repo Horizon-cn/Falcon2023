@@ -3,46 +3,42 @@
 
 #include <QObject>
 #include <QUdpSocket>
-#include "singleton.hpp"
+#include <QTime>
+#include "singleton.h"
 #include "vision_detection.pb.h"
-#include "staticparams.h"
 #include "messageformat.h"
-#include "zsplugin.hpp"
-class CVisionModule : public QObject,public ZSPlugin  {
+class CVisionModule : public QObject {
     Q_OBJECT
   public:
     CVisionModule(QObject *parent = 0);
-    void udpSocketConnect(bool);
+    ~CVisionModule();
+    void udpSocketConnect();
     void udpSocketDisconnect();
     void parse(void *, int);
     void setIfEdgeTest(bool);
-    bool showIfEdgeTest();
-    void run(){};
     quint16 getFPS();
     bool dealWithData();
-    void setInterfaceIndex(const int);
+    int FPS;
+    QTime t;
+    //void setInterfaceIndex(const int);
   signals:
     void needDraw();
+    void recvPacket();
   public slots:
     void storeData();
-    void oneStepSimData();
   private:
+    void receiveVision();
     void readSimData();
-    void readRemoteSimData();
-    CGeoPoint saoConvert(CGeoPoint);
-    double saoConvert(double);
     void edgeTest();
     void udpSend();
     void checkCommand();
-    QUdpSocket udpReceiveSocket, udpSendSocket;
+    bool collectNewVision();
+    QUdpSocket udpReceiveSocket, udpResendSocket;
     QHostAddress groupAddress;
     quint64 counter;
-    int _interface;
-    int vision_port;
-    int saoAction;
-    bool collectNewVision();
+    //int _interface;
     bool IF_EDGE_TEST;
     Vision_DetectionFrame detectionFrame;
 };
-typedef Singleton <CVisionModule> VisionModule;
+typedef Falcon::MeyersSingleton <CVisionModule> VisionModule;
 #endif // __VISIONMODULE_H__

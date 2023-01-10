@@ -19,6 +19,6 @@ private:
 	double cal_acc;
 	double _last_dist;
 };
-typedef NormalSingleton< CBallSpeedModel > BallSpeedModel;
+typedef Falcon::NormalSingleton< CBallSpeedModel > BallSpeedModel;
 #endif // _BALL_SPEED_MODEL_H_
 

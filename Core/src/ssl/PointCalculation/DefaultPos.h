@@ -38,6 +38,6 @@ private:
 	int _lastCycle;
 };
 
-typedef NormalSingleton< CDefaultPos > DefaultPos;
+typedef Falcon::NormalSingleton< CDefaultPos > DefaultPos;
 
 #endif

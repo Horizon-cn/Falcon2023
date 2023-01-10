@@ -34,7 +34,7 @@ protected:
 };
 class CParamManagerSkill : public CParamManagerNew {
     public:
-        CParamManagerSkill() : CParamManagerNew("skill.ini") {update();}
+        CParamManagerSkill() : CParamManagerNew("../data/skill.ini") {update();}
         ~CParamManagerSkill() {}
         void update()
         {
@@ -331,6 +331,6 @@ class CParamManagerSkill : public CParamManagerNew {
         // General
         bool PENALTY_FIGHT;
 };
-typedef NormalSingleton< CParamManagerSkill > ParamManager;
+typedef Falcon::NormalSingleton< CParamManagerSkill > ParamManager;
 
 #endif // PARAMMANAGERNEW_H

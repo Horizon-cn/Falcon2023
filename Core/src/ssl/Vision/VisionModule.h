@@ -333,7 +333,7 @@ private:
 
 };
 
-typedef NormalSingleton<CVisionModule> VisionModule;
+typedef Falcon::NormalSingleton<CVisionModule> VisionModule;
 #define VISION_MODULE VisionModule::Instance()
 
 #endif // _VISION_MODULE_H_

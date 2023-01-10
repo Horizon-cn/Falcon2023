@@ -47,7 +47,7 @@ private:
 	int _lastCycle;
 };
 
-typedef NormalSingleton< CDefendDribble > DefendDribble;
+typedef Falcon::NormalSingleton< CDefendDribble > DefendDribble;
 
 #endif //_DEFEND_DRIBBLE_H
 

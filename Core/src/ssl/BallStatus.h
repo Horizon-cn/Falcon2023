@@ -138,6 +138,6 @@ private:
     int _ballStateCouter;
 };
 
-typedef NormalSingleton< CBallStatus > BallStatus;
+typedef Falcon::NormalSingleton< CBallStatus > BallStatus;
 
 #endif

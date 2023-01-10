@@ -30,6 +30,6 @@ private:
 	TandemState _stateNum;
 };
 
-typedef NormalSingleton< CTandemPos > TandemPos;
+typedef Falcon::NormalSingleton< CTandemPos > TandemPos;
 
 #endif 

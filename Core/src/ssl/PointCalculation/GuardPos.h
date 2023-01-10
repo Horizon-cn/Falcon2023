@@ -28,5 +28,5 @@ private:
     int _backCycle[Param::Field::MAX_PLAYER];
 };
 
-typedef NormalSingleton<CGuardPos> GuardPos;
+typedef Falcon::NormalSingleton<CGuardPos> GuardPos;
 #endif // GUARDPOS_H

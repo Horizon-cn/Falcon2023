@@ -125,6 +125,6 @@ private:
 
 };
 
-typedef NormalSingleton<CDefenceInfo> DefenceInfo;
+typedef Falcon::NormalSingleton<CDefenceInfo> DefenceInfo;
 
 #endif

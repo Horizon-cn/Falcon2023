@@ -1,15 +1,15 @@
 syntax = "proto3";
 
-
-enum TeamColor {
-  TeamYELLOW = 0;
-  TeamBLUE = 1;
+enum COLOR_Team {
+  YELLOW_TEAM = 0;
+  BLUE_TEAM = 1;
+  UNKNOWN_TEAM= 2;
 }
 
 message DribblingLabel {
   bool is_dribbling = 1;
   uint32 robot_id = 2;
-  TeamColor team = 3;
+  COLOR_Team team = 3;
 }
 
 message BallPossessionLabel {
@@ -28,7 +28,7 @@ message PassingLabel {
   uint64 end_frame = 2;
   bool successful = 3;
   uint32 passer_id = 4;
-  TeamColor passer_team = 5;
+  COLOR_Team passer_team = 5;
   uint32 receiver_id = 6;
 }
 
@@ -37,7 +37,7 @@ message GoalShotLabel {
   uint64 end_frame = 2;
   bool successful = 3;
   uint32 shooter_id = 4;
-  TeamColor shooter_team = 5;
+  COLOR_Team shooter_team = 5;
 }
 
 message Labels {

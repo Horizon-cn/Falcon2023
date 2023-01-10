@@ -44,6 +44,6 @@ private:
 	double _compensate_factor;  // 根据速度调整的补偿因子,预留讨论
 };
 
-typedef NormalSingleton< CKickDirection > KickDirection;
+typedef Falcon::NormalSingleton< CKickDirection > KickDirection;
 
 #endif // _KICK_DIRECTION_

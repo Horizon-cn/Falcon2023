@@ -19,6 +19,6 @@ public:
 	int GetNearestEnemy(const CVisionModule *pVision);
 };
 
-typedef NormalSingleton< CGoaliePosV1 > GoaliePosV1;
+typedef Falcon::NormalSingleton< CGoaliePosV1 > GoaliePosV1;
 
 #endif // _GOALIE_POS_V1_

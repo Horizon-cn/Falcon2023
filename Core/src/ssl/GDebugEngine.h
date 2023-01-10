@@ -33,6 +33,6 @@ private:
 	void gui_debug_add(const net_gdebug& new_debug);
     QUdpSocket debug_socket;
 };
-typedef NormalSingleton< CGDebugEngine > GDebugEngine;
+typedef Falcon::NormalSingleton< CGDebugEngine > GDebugEngine;
 
 #endif

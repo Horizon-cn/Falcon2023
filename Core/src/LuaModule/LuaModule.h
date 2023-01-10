@@ -42,6 +42,6 @@ private:
 
 };
 
-typedef NormalSingleton<CLuaModule> LuaModule;
+typedef Falcon::NormalSingleton<CLuaModule> LuaModule;
 
 #endif

@@ -30,7 +30,7 @@ bool VERBOSE_MODE = false;
 // handle _vision_event;
 
 void run(){
-    ZSS::ZParamManager::instance()->loadParam(IS_SIMULATION, "Alert/IsSimulation", 1);
+    ZSS::ZParamManager::Instance()->loadParam(IS_SIMULATION, "Alert/IsSimulation", 1);
     //_vision_event = CreateEvent(NULL, true, false, NULL);
     initializeSingleton(); // init parammanager first
     CCtrlBreakHandler breakHandler;

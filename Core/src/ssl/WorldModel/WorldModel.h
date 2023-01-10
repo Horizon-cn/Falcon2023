@@ -157,7 +157,7 @@ public:
 	const CGeoPoint getReflectTouchPos(int myNum, double y);
 };
 
-typedef NormalSingleton< CWorldModel > WorldModel;
+typedef Falcon::NormalSingleton< CWorldModel > WorldModel;
 
 #define WORLD_MODEL WorldModel::Instance()
 

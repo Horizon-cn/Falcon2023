@@ -17,6 +17,7 @@ public:
     int validSize(){ return _validSize; }
     int cycle(){ return _cycle; }
     void push(const T& t);
+    void pop();
     void clear();
     void renew();
 private:
@@ -50,6 +51,14 @@ void DataQueue<T>::push(const T& t){
     if(_validSize < _size) _validSize++;
     _cycle++;
     pointer[_currentIndex] = t;
+}
+template<typename T>
+void DataQueue<T>::pop(){
+    if(_startIndex >= 1 || _validSize <= 0) return;
+    _currentIndex =(_currentIndex-1+_size)%_size;
+    _startIndex++;
+    _validSize--;
+    _cycle--;
 }
 template<typename T>
 void DataQueue<T>::clear(){

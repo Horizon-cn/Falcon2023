@@ -213,6 +213,6 @@ private:
     CPlayerTask* _playerTask[Param::Field::MAX_PLAYER]; // ?????????
     int _playerTaskPriority[Param::Field::MAX_PLAYER]; // ??????????????
 };
-typedef NormalSingleton< CTaskMediator > TaskMediator;
+typedef Falcon::NormalSingleton< CTaskMediator > TaskMediator;
 
 #endif // _TASK_MEDIATOR_H_

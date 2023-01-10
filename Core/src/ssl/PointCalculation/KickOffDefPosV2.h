@@ -19,6 +19,6 @@ private:
 	bool VERBOSE_MODE;
 };
 
-typedef NormalSingleton< CKickOffDefPosV2 > KickOffDefPosV2;
+typedef Falcon::NormalSingleton< CKickOffDefPosV2 > KickOffDefPosV2;
 
 #endif // _KICKOFF_DEF_POS_V2_

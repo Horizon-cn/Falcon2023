@@ -16,6 +16,6 @@ private:
 	double compensatevalue[15][100][50];
 };
 
-typedef NormalSingleton< CCompensate > Compensate;
+typedef Falcon::NormalSingleton< CCompensate > Compensate;
 
 #endif 

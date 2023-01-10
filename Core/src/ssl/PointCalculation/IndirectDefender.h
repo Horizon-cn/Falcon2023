@@ -80,6 +80,6 @@ private:
 	KickOffArea _anotherArea;
 };
 
-typedef NormalSingleton< CIndirectDefender > IndirectDefender;
+typedef Falcon::NormalSingleton< CIndirectDefender > IndirectDefender;
 
 #endif //_INDIRECT_DEFENDER_H_

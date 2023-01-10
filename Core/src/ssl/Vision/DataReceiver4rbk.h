@@ -22,6 +22,6 @@ private:
 	PlayMode m_play_mode;
     QUdpSocket referee_socket;
 };
-typedef NormalSingleton<CDataReceiver4rbk> DataReceiver4rbk;
+typedef Falcon::NormalSingleton<CDataReceiver4rbk> DataReceiver4rbk;
 
 #endif

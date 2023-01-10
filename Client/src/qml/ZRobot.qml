@@ -1,4 +1,4 @@
-import QtQuick 2.10
+﻿import QtQuick 2.10
 
 Grid{
     id:root;
@@ -9,18 +9,19 @@ Grid{
     topPadding: 5;
     spacing: 3;
     columns: 3;
-    property alias battery : battery.value;
-    property alias capacity : capacity.value;
+    //property alias battery : battery.value;
+    //property alias capacity : capacity.value;
     property bool infrared: false;
     property bool team : true;
     property int number : 0;
+    property bool valid : false;
     Rectangle{
         id:icon;
         width:parent.height;
         height:parent.height - parent.topPadding;
         radius: height/4;
-        color : root.team ? "#f0ad4e" : "#337ab7";
-//        source:number == -1 ? "/robot/z.png" : ("/robot/" + root.color + root.number + ".png");
+        color : root.valid ? (root.team ? "#f0ad4e" : "#337ab7") : "grey";
+        //source:number == -1 ? "/resource/robot/z.png" : ("/resource/robot/" + color + root.number + ".png");
         Text{
             anchors.verticalCenter: parent.verticalCenter;
             anchors.horizontalCenter: parent.horizontalCenter;
@@ -50,11 +51,11 @@ Grid{
         property int itemHeight : (height - (rows-1) * spacing - 2*padding)/rows;
         property int itemWidth : width;
 
-        ZValue{
-            id : battery;
-        }
-        ZValue{
-            id : capacity
-        }
+        //ZValue{
+        //    id : battery;
+        //}
+        //ZValue{
+        //    id : capacity
+        //}
     }
 }

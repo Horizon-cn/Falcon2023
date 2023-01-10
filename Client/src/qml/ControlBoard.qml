@@ -3,23 +3,26 @@ import QtQuick.Controls 2.3
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.3
-import ZSS 1.0 as ZSS
+import Owl 1.0 as Owl
+
 Page{
     id:control;
-    property bool socketConnect : false;
     property bool radioConnect : false;
-    property bool medusaConnect : false;
-    property bool medusaConnect2 : false;
+    property bool blueRBKConnect : false;
+    property bool yellowRBKConnect : false;
     property bool simConnect : false;
-    property bool crazyConnect : false;
+    property bool crayConnect : false;
+    property bool isSimulation : true;
+    property bool kill : false;
     property bool ifEdgeTest : false;
+    property bool isTesting: false;
     property bool isRecoring: false;
-    property bool monitorConnect : false;
     property bool isLogPlay: false;
     property bool isRecFile: false;
     property bool isReplaying: false;
     property bool isCutting: true;
-    property int playspeed: 1
+    property bool isCuttingLog: true;
+    property bool isLabeling: false;
 
     Timer{
         id:oneSecond;
@@ -27,39 +30,25 @@ Page{
         running:true;
         repeat:true;
         onTriggered: {
-            interaction.updateInterfaces();
-            interfaces4vision.updateModel();
+            //interaction.updateInterfaces();
+            //interfaces4vision.updateModel();
             radioComboBox.updateModel();
-//            interfaces4BlueSender.updateModel();
-//            interfaces4BlueReceiver.updateModel();
-//            interfaces4YellowSender.updateModel();
-//            interfaces4YellowReceiver.updateModel();
         }
     }
 
-    ZSS.LogSlider{
+    Owl.LogSlider{
         id: log
     }
-    ZSS.LogEventLabel{
+    Owl.LogEventLabel{
         id: eventlabel
     }
 
-    ZSS.Interaction{
+    Owl.Interaction{
         id:interaction;
     }
-    ZSS.Interaction4Field{
-        id:interaction4field
-    }
 
-    property variant shortCutString:["`","1","2","3","4","5","6","7","8","9","0","-","=","i","o","p","[",
-        "Ctrl+`","Ctrl+1","Ctrl+2","Ctrl+3","Ctrl+4","Ctrl+5","Ctrl+6","Ctrl+7","Ctrl+8","Ctrl+9","Ctrl+0","Ctrl+-","Ctrl+=","Ctrl+i","Ctrl+o","Ctrl+p","Ctrl+["];
-    property variant recplayerShortCut: ["m", "Left", "Right", "Up", "Down"];
-    function robotControl(index){
+    Owl.Option{id:myOption}
 
-        var team = (index > 16 ? 1 : 0);
-        var id = index%17;
-        interaction.robotControl(id,team)
-    }
     header:TabBar {
         id: bar
         width:parent.width;
@@ -67,19 +56,19 @@ Page{
         height:contentHeight;
         position: TabBar.Header;
         TabButton {
-            icon.source:"/source/camera.png";
+            icon.source:"/resource/camera.png";
         }
         TabButton {
-            icon.source:"/source/referee.png";
+            icon.source:"/resource/referee.png";
         }
-//        TabButton {
-//            icon.source:"/source/viewer.png";
-//        }
-       TabButton {
-           icon.source:"/source/joy3.png";
-       }
         TabButton {
-            icon.source:"/source/settings.png";
+            icon.source:"/resource/viewer.png";
+        }
+        TabButton {
+            icon.source:"/resource/joy3.png";
+        }
+        TabButton {
+            icon.source:"/resource/settings.png";
         }
     }
 
@@ -88,995 +77,954 @@ Page{
         width: parent.width;
         height:parent.height; //fix display bug at low resolution.2019.3.29 wz
         currentIndex: bar.currentIndex;
-        Grid{
-            padding: 5;
-            topPadding: 15;
-            width:controlLayout.width;
-            //height:controlLayout.height;
-            columns: 1;
-            horizontalItemAlignment: Grid.AlignHCenter;
-            verticalItemAlignment: Grid.AlignVCenter;
-            id:vision
-            columnSpacing: 0;
-            rowSpacing: 0;
-            property int itemWidth : width - padding*2;
-            ZGroupBox{
-                title: qsTr("Vision")
-                Column{
-                    id:visionControls;
-                    width:parent.width;
-                    height:parent.height;
-                    spacing: 0;
-                    padding:0;
-                    property int itemWidth : width - 2*padding;
-                    property bool ifConnected : false;
-                    ZComboBox{
-                        id:interfaces4vision;
-                        model:interaction.getInterfaces();
-                        onActivated: interaction.changeVisionInterface(currentIndex);
-                        function updateModel(){
-                            model = interaction.getInterfaces();
-                            if(currentIndex >= 0)
-                                interaction.changeVisionInterface(currentIndex);
-                        }
-                        Component.onCompleted: {
-                            interaction.getInterfaces();
-                        }
-                    }
-                    ZComboBox{
-                        id:grsimInterface;
-                        model:interaction.getGrsimInterfaces();
-                        onActivated: interaction.changeGrsimInterface(currentIndex);
-                        function updateModel(){
-                            model = interaction.getGrsimInterfaces();
-                            if(currentIndex >= 0)
-                                interaction.changeGrsimInterface(currentIndex);
+        ScrollView {
+            clip: true;
+            contentWidth: parent.width;
+            contentHeight: parent.height * 2;
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOn;
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn;
+            ScrollBar.horizontal.interactive: true;
+            ScrollBar.vertical.interactive: true;
+            Grid{
+                padding: 5;
+                topPadding: 15;
+                width:controlLayout.width;
+                //height:controlLayout.height;
+                columns: 1;
+                horizontalItemAlignment: Grid.AlignHCenter;
+                verticalItemAlignment: Grid.AlignVCenter;
+                id:vision
+                columnSpacing: 0;
+                rowSpacing: 0;
+                property int itemWidth : width - padding*2;
+                ZGroupBox{
+                    title: qsTr("Vision")
+                    Column{
+                        id:visionControls;
+                        width:parent.width;
+                        height:parent.height;
+                        spacing: 0;
+                        padding:0;
+                        property int itemWidth : width - 2*padding;
+                        property bool ifConnected : false;
+                        /**
+                        ZComboBox{
+                            id:interfaces4vision;
+                            enabled:!visionControls.ifConnected;
+                            model:interaction.getInterfaces();
+                            onActivated: interaction.changeVisionInterface(currentIndex);
+                            function updateModel(){
+                                model = interaction.getInterfaces();
+                                if(currentIndex >= 0)
+                                    interaction.changeVisionInterface(currentIndex);
                             }
                             Component.onCompleted: {
-                                interaction.getGrsimInterfaces();
+                                interaction.getInterfaces();
                             }
+                        }
+                        **/
+                        ZSwitch{
+                            id:simulation;
+                            enabled:!visionControls.ifConnected;
+                            width:parent.itemWidth;
+                            leftText:qsTr("Simulation");
+                            rightText:qsTr("Real");
+                            checked: false;
+                            onCheckedChanged: {
+                                control.isSimulation = !control.isSimulation;
+                            }
+                        }
+                        Grid{
+                            id:cameraControls;
+                            enabled:!visionControls.ifConnected;
+                            width:parent.itemWidth - 10;
+                            columns:8;
+                            columnSpacing: 0;
+                            rowSpacing: 0;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            anchors.horizontalCenter: parent.horizontalCenter;
+                            property int itemWidth : (width - (columns-1) * columnSpacing - 2*padding)/columns;
+                            Repeater{
+                                model:parent.columns;
+                                CheckBox{
+                                    property int itemIndex : index;
+                                    checked: index < interaction.getCameraNumber();
+                                    width:cameraControls.itemWidth;
+                                    height:40;
+                                    // anchors.fill: parent;
+                                    onCheckStateChanged: {
+                                        interaction.controlCamera(itemIndex,checked);
+                                    }
+                                }
+                            } 
+                        }
+                        Button{
+                            width:parent.itemWidth;
+                            icon.source:visionControls.ifConnected ? "/resource/connect.png" : "/resource/disconnect.png";
+                            onClicked: {
+                                visionControls.ifConnected = !visionControls.ifConnected;
+                                interaction.setVision(visionControls.ifConnected,simulation.checked);
+                            }
+                        }
                     }
-                    ZSwitch{
-                        id:simulation;
-                        width:parent.itemWidth;
-                        leftText:qsTr("Simulation");
-                        rightText:qsTr("Real");
-                    }
+                }
+                ZGroupBox{
+                    title: qsTr("Simulator")
+                    visible: control.isSimulation;
                     Grid{
-                        id:cameraControls;
-                        width:parent.itemWidth - 10;
-                        columns:8;
-                        columnSpacing: 0;
-                        rowSpacing: 0;
-                        horizontalItemAlignment: Grid.AlignHCenter;
+                        width:parent.width;
                         verticalItemAlignment: Grid.AlignVCenter;
-                        anchors.horizontalCenter: parent.horizontalCenter;
-                        property int itemWidth : (width - (columns-1) * columnSpacing - 2*padding)/columns;
-                        Repeater{
-                            model:interaction.getCameraNumber();
-                            CheckBox{
-                                property int itemIndex : index;
-                                checked: itemIndex == 0;
-                                width:cameraControls.itemWidth;
-                                height:40;
-                                //anchors.fill: parent;
-                                onCheckStateChanged: {
-                                    interaction.controlCamera(itemIndex,checked);
+                        horizontalItemAlignment: Grid.AlignHCenter;
+                        spacing: 0;
+                        rowSpacing: 0;
+                        columns:3;
+                        columnSpacing: 5
+                        property int itemWidth :width - 2*padding;
+                        Grid {
+                            property int buttonWidth: 60;
+                            ZButton{
+                                id: simCtrlBtn;
+                                icon.source:control.simConnect ? "/resource/stop.png" : "/resource/start.png";
+                                onClicked: {
+                                    control.simConnect = !control.simConnect;
+                                    interaction.controlSim(control.simConnect, simModeBtn.text == "Show");
+                                    interaction.controlProcess(2, control.simConnect);
+                                }
+                            }
+                        }
+                        Grid {
+                            property int buttonWidth: 70;
+                            ZButton{
+                                id: simModeBtn;
+                                enabled:!control.simConnect;
+                                text: "Hide";
+                                onClicked: {
+                                    simModeBtn.text = simModeBtn.text == "Hide" ? "Show": "Hide";
+                                }
+                            }
+                        }
+                        Grid {
+                            property int buttonWidth: (parent.width - simCtrlBtn.parent.buttonWidth - simModeBtn.parent.buttonWidth-10);
+                            ZButton{
+                                id:simPathBtn;
+                                enabled:!control.simConnect;
+                                text: interaction.getSIMpath();
+                                onClicked: {
+                                    interaction.chooseSIMpath();
+                                    simPathBtn.text= interaction.getSIMpath();
+                                }
+                                contentItem: Label {
+                                    text: simPathBtn.text
+                                    font: simPathBtn.font
+                                    elide: Text.ElideMiddle
                                 }
                             }
                         }
                     }
-                    Button{
-                        width:parent.itemWidth;
-                        icon.source:visionControls.ifConnected ? "/source/connect.png" : "/source/disconnect.png";
-                        onClicked: {
-                            visionControls.ifConnected = !visionControls.ifConnected;
-                            interaction.setVision(visionControls.ifConnected,simulation.checked);
-                        }
-                    }
                 }
-            }
-            ZGroupBox{
-                title: qsTr("Radio")
-                Grid{
-                    width:parent.width;
-                    verticalItemAlignment: Grid.AlignVCenter;
-                    horizontalItemAlignment: Grid.AlignHCenter;
-                    spacing: 0;
-                    columns:1;
-                    property int itemWidth : width - 2*padding;
-                    SpinBox{
-                        width:parent.itemWidth;
-                        from:0;to:15;
-                        wrap:true;
-                        value:interaction.getFrequency();
-                        onValueModified: {
-                            if(!interaction.changeSerialFrequency(value))
-                                value:interaction.getFrequency();
+                ZGroupBox{
+                    title: qsTr("Radio")
+                    visible: !control.isSimulation;
+                    Grid{
+                        width:parent.width;
+                        verticalItemAlignment: Grid.AlignVCenter;
+                        horizontalItemAlignment: Grid.AlignHCenter;
+                        spacing: 0;
+                        columns:1;
+                        property int itemWidth : width - 2*padding;
+                        SpinBox{
+                            id:medusaFrq;
+                            enabled: !control.radioConnect;
+                            width:parent.itemWidth;
+                            from:0;to:interaction.getMaxFrequency();
+                            wrap:true;
+                            value:interaction.getFrequency();
+                            onValueModified: {
+                                if(!interaction.changeSerialFrequency(value))
+                                    value:interaction.getFrequency();
+                            }
                         }
-                    }
-                    ComboBox{
-                        id:radioComboBox;
-                        enabled: !control.radioConnect;
-                        model:interaction.getSerialPortsList();
-                        onActivated: interaction.changeSerialPort(currentIndex);
-                        width:parent.itemWidth;
-                        function updateModel(){
-                            model = interaction.getSerialPortsList();
-                            if(currentIndex >= 0)
-                                interaction.changeSerialPort(currentIndex);
+                        ComboBox{
+                            id:radioComboBox;
+                            enabled: !control.radioConnect;
+                            model:interaction.getSerialPortsList();
+                            onActivated: interaction.changeSerialPort(currentIndex);
+                            width:parent.itemWidth;
+                            function updateModel(){
+                                model = interaction.getSerialPortsList();
+                                if(currentIndex >= 0)
+                                    interaction.changeSerialPort(currentIndex);
+                            }
+                            Component.onCompleted: updateModel();
                         }
-                        Component.onCompleted: updateModel();
-                    }
-                    Button{
-                        width:parent.itemWidth;
-                        icon.source:control.radioConnect ? "/source/connect.png" : "/source/disconnect.png";
-                        onClicked: {
-                            control.radioConnect = !control.radioConnect;
-                            if(!interaction.connectSerialPort(control.radioConnect)){
+                        Button{
+                            width:parent.itemWidth;
+                            icon.source:control.radioConnect ? "/resource/connect.png" : "/resource/disconnect.png";
+                            onClicked: {
                                 control.radioConnect = !control.radioConnect;
+                                interaction.connectSerialPort(control.radioConnect);
                             }
                         }
                     }
                 }
-            }
-            ZGroupBox{
-                title: qsTr("Medusa")
-                Grid{
-                    width:parent.width;
-                    verticalItemAlignment: Grid.AlignVCenter;
-                    horizontalItemAlignment: Grid.AlignHCenter;
-                    spacing: 0;
-                    rowSpacing: 5;
-                    columns:1;
-                    property int itemWidth : (width - (columns-1) * columnSpacing - 2*padding)/columns;
-                    ZButton{
-                        icon.source:control.monitorConnect ? "/source/stop.png" : "/source/start.png";
-                        onClicked: {
-                            control.monitorConnect = !control.monitorConnect;
-                            interaction.controlMonitor(control.monitorConnect)
+                ZGroupBox{
+                    title: qsTr("Cray")
+                    visible: !control.isSimulation;
+                    Grid{
+                        width:parent.width;
+                        verticalItemAlignment: Grid.AlignVCenter;
+                        horizontalItemAlignment: Grid.AlignHCenter;
+                        spacing: 0;
+                        rowSpacing: 0;
+                        columns:2;
+                        columnSpacing: 5
+                        property int itemWidth :width - 2*padding;
+                        Grid {
+                            property int buttonWidth: 60;
+                            ZButton{
+                                id: crayCtrlBtn;
+                                icon.source:control.crayConnect ? "/resource/stop.png" : "/resource/start.png";
+                                onClicked: {
+                                    control.crayConnect = !control.crayConnect;
+                                    interaction.controlCray(control.crayConnect);
+                                    interaction.controlProcess(3, control.crayConnect);
+                                }
+                            }
+                        }
+                        Grid {
+                            property int buttonWidth: (parent.width - crayCtrlBtn.parent.buttonWidth - 5);
+                            ZButton{
+                                id:crayPathBtn;
+                                text: interaction.getCraypath()
+                                onClicked: {
+                                    interaction.chooseCraypath();
+                                    crayPathBtn.text= interaction.getCraypath();
+                                }
+                                contentItem: Label {
+                                    text: crayPathBtn.text
+                                    font: crayPathBtn.font
+                                    elide: Text.ElideMiddle
+                                }
+                            }
                         }
                     }
+                }
+                ZGroupBox{
+                    title: qsTr("Controller")
+                    Grid{
+                        width:parent.width;
+                        verticalItemAlignment: Grid.AlignVCenter;
+                        horizontalItemAlignment: Grid.AlignHCenter;
+                        spacing: 0;
+                        rowSpacing: -5;
+                        columnSpacing: 5
+                        columns:1;
+                        property int itemWidth : (width - (columns-1) * columnSpacing - 2*padding)/columns;
+                        Grid {
+                            width:parent.width;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            spacing: 0;
+                            rowSpacing: -5;
+                            columnSpacing: 5;
+                            columns:3;
+                            Grid {
+                                property int buttonWidth : 60;
+                                ZButton{
+                                    id: bluerbk;
+                                    icon.source:control.blueRBKConnect ? "/resource/stop.png" : "/resource/start.png";
+                                    icon.color: "#2976ca";
+                                    onClicked: {
+                                        control.blueRBKConnect = !control.blueRBKConnect;
+                                        interaction.changeRBKSettings(false, blueSideBtn.text == "RIGHT"); // false: blue
+                                        if(!simulation.checked){
+                                            interaction.connectSim(control.blueRBKConnect,0);
+                                        }else{
+                                            interaction.connectRadio(control.blueRBKConnect,0,medusaFrq.value);
+                                        }
+                                        while(myOption.processIsRunning());
+                                        interaction.controlBlueRBK(control.blueRBKConnect);
+                                        if(control.blueRBKConnect){
+                                            myOption.start();
+                                        }
+                                        interaction.controlProcess(0, control.blueRBKConnect);
+                                    }
+                                }
+                            }
+                            Grid{
+                                property int buttonWidth : 70;
+                                ZButton{
+                                    id: blueSideBtn;
+                                    enabled:!control.blueRBKConnect;
+                                    text: "LEFT";
+                                    onClicked: {
+                                        blueSideBtn.text = blueSideBtn.text == "LEFT" ? "RIGHT": "LEFT";
+                                    }
+                                }
+                            }
+                            Grid{
+                                property int buttonWidth : parent.width - bluerbk.parent.buttonWidth - blueSideBtn.parent.buttonWidth - 10;
+                                ZButton{
+                                    id:bluePathBtn;
+                                    enabled:!control.blueRBKConnect;
+                                    text: interaction.getRBKpath(0);
+                                    onClicked: {
+                                        interaction.chooseRBKpath(0);
+                                        bluePathBtn.text= interaction.getRBKpath(0);
+                                    }
+                                    contentItem: Label {
+                                        text: bluePathBtn.text;
+                                        font: bluePathBtn.font;
+                                        elide: Text.ElideMiddle;
+                                    }
+                                }
+                            }
+                            Grid{
+                                property int buttonWidth : 60;
+                                ZButton{
+                                    id: yellowrbk;
+                                    icon.source:control.yellowRBKConnect ? "/resource/stop.png" : "/resource/start.png";
+                                    icon.color: "#ebdb7c";
+                                    onClicked: {
+                                        control.yellowRBKConnect = !control.yellowRBKConnect;
+                                        interaction.changeRBKSettings(true, yellowSideBtn.text == "RIGHT"); // true: yellow
+                                        if(!simulation.checked){
+                                            interaction.connectSim(control.yellowRBKConnect,1);
+                                        }else{
+                                            interaction.connectRadio(control.yellowRBKConnect,1,medusaFrq.value);
+                                        }
+                                        while(myOption.processIsRunning());
+                                        interaction.controlYellowRBK(control.yellowRBKConnect);
+                                        if(control.yellowRBKConnect){
+                                            myOption.start();
+                                        }
+                                        interaction.controlProcess(1, control.yellowRBKConnect);
+                                    }
+                                }
+                            }
+                            Grid{
+                                property int buttonWidth : 70;
+                                ZButton{
+                                    id: yellowSideBtn;
+                                    enabled:!control.yellowRBKConnect;
+                                    text: "RIGHT";
+                                    onClicked: {
+                                        yellowSideBtn.text = yellowSideBtn.text == "LEFT" ? "RIGHT": "LEFT";
+                                    }
+                                }
+                            }
+                            Grid{
+                                property int buttonWidth : parent.width - yellowrbk.parent.buttonWidth - yellowSideBtn.parent.buttonWidth - 10;;
+                                ZButton{
+                                    id:yellowPathBtn;
+                                    enabled:!control.yellowRBKConnect;
+                                    text: interaction.getRBKpath(1);
+                                    onClicked: {
+                                        interaction.chooseRBKpath(1);
+                                        yellowPathBtn.text= interaction.getRBKpath(1);
+                                    }
+                                    contentItem: Label {
+                                        text: yellowPathBtn.text;
+                                        font: yellowPathBtn.font;
+                                        elide: Text.ElideMiddle;
+                                    }
+                                }
+                            } 
+                        }
+                    }
+                }
+                ZGroupBox{
+                    title: qsTr("Kill")
                     Grid{
                         width:parent.width;
                         verticalItemAlignment: Grid.AlignVCenter;
                         horizontalItemAlignment: Grid.AlignHCenter;
                         spacing: 0;
                         rowSpacing: 5;
-                        columns:2;
-                        property int itemWidth : (width - (columns-1) * columnSpacing - 2*padding)/columns;
-                        ZSwitch{
-                            id:medusaSide;
-                            width:parent.itemWidth * 2;
-                            leftText:qsTr("Left");
-                            rightText:qsTr("Right");
-                            checked: false;
-                            onCheckedChanged: {
-                                interaction.changeMedusaSettings(false,medusaSide.checked)
+                        columns:1;
+                        property int itemWidth : width - 2*padding;
+                        ZButton {
+                            icon.source:control.kill ? "/resource/stop.png" : "/resource/start.png";
+                            onClicked: {
+                                control.kill = !control.kill;
+                                interaction.kill(control.kill);
+                                if(control.kill) {
+                                    interaction.controlProcess(0, false);
+                                    interaction.controlProcess(1, false);
+                                    interaction.controlProcess(2, false);
+                                    interaction.controlProcess(3, false);
+                                }
                             }
                         }
                     }
+                }
+            }
+        }
+        RefereeBox{}
+        Viewer{}
+        /*****************************************/
+        /*                  UDP                  */
+        /*****************************************/
+        ScrollView {
+            clip: true;
+            contentWidth: parent.width;
+            contentHeight: parent.height * 2;
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOn;
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn;
+            ScrollBar.horizontal.interactive: true;
+            ScrollBar.vertical.interactive: true;
+            Grid {
+                id: radio;
+                width: controlLayout.width;
+                padding:10;
+                verticalItemAlignment: Grid.AlignVCenter;
+                horizontalItemAlignment: Grid.AlignHCenter;
+                spacing: 5;
+                columns:1;
+                property int itemWidth : width - 2*padding;
+                ZGroupBox{
+                    title: qsTr("Rec")
+                    Grid{
+                        id:rec;
+                        width:parent.width;
+                        property int itemWidth : width - 2*padding;
+                        property bool recordRawVision: true;
+                        columns: 1;
+                        CheckBox{
+                            width:parent.itemWidth;
+                            checked: true;
+                            text: "Contain Raw Vision(Suggest)"
+                            onCheckedChanged: {
+                                parent.recordRawVision = !parent.recordRawVision;
+                                interaction.setRecordRawVision(parent.recordRawVision);
+                            }
+                        }
+                        Grid{
+                            width:parent.width;
+                            property int itemWidth : (width - 2*padding) / 2;
+                            columns: 2;
+                            columnSpacing: 10
+                            Button{
+                                width:parent.itemWidth;
+                                icon.source: control.isRecoring ? "/resource/stop.png" : "/resource/start.png";
+                                onClicked: {
+                                    control.isRecoring = !control.isRecoring;
+                                    control.isCutting = !control.isRecoring;
+                                    interaction.setRecorder(control.isRecoring);
+                                }
+                            }
+                            ZButton{ //isCutting:not recording
+                                width:parent.itemWidth;
+                                icon.source:control.isCutting ? "/resource/scissors1.png" : "/resource/scissors2.png";
+                                enabled: control.isRecoring;
+                                onClicked: {
+                                    control.isCutting = !control.isCutting;
+                                    interaction.setRecorderCut(control.isCutting);
+                                }
+                            }
+                        }
+                    }
+                }
+                ZGroupBox{
+                    title: qsTr("RecReplay")
+                    Column{
+                        width:parent.width;
+                        height:parent.height;
+                        spacing: 0;
+                        padding:0;
+                        Grid{
+                            width:parent.width;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            spacing: 5;
+                            rowSpacing: 5;
+                            columns: 1;
+                            property int itemWidth : width - 2*padding;
+                            property bool playRawVision : true;
+                            CheckBox{
+                                width:parent.itemWidth;
+                                checked: true;
+                                text: "If Play Raw Vision(Suggest But Must Contain)"
+                                onCheckedChanged: {
+                                    interaction.setPlayerRawVision(parent.playRawVision);
+                                }
+                            }
+                        }
+                        Grid{
+                            width:parent.width;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            spacing: 5;
+                            rowSpacing: 5;
+                            columns: 8;
+                            ZButton {
+                                id:openBtnr
+                                width: 35;
+                                icon.source:"/resource/openfile.png";
+                                anchors.leftMargin: 10
+                                onClicked: {
+                                    fdrs.open();
+                                    //parent.openLogToPlay();
+                                    interaction.setRecorder(control.isRecoring);
+                                }
+                            }
+                            Label {
+                                id: labelsr
+                                text: qsTr("")
+                                height: 25
+                                anchors.left:openBtnr.right
+                                anchors.leftMargin: 10
+                            }
+                            /**
+                            function openLogToPlay() {
+                                if (interaction.chooseLogToPlay()) {
+                                    if (control.isReplaying) Owl.RecSlider.toggleStopped();
+                                    control.isReplaying = false;
+                                    rectimer.running = false;
+                                    //console.log("You chose: " + fdrs.fileUrl);
+                                    //Owl.RecSlider.loadFile(fdrs.fileUrl);
+                                    recslider.to = Owl.RecSlider.maximumValue;
+                                    recslider.stepSize = Owl.RecSlider.stepSize;
+                                    recslider.value = 0;
+                                    control.isRecFile = true;
+                                    control.isRecoring = false;
+                                    if (Owl.RecSlider.currentFrame > Owl.RecSlider.getMaxFrame()){
+                                        Owl.RecSlider.recName = "Import Error File";
+                                        control.isRecFile = false;
+                                    }
+                                }
+                                else {
+                                    labelsr.text = "";
+                                    console.log("Canceled");
+                                }
+                            }
+                            **/
+                            FileDialog {
+                                id:fdrs
+                                title: "Please select"
+                                selectExisting: true
+                                selectFolder: false
+                                selectMultiple: false
+                                nameFilters: ["Rec files (*.log)"]
+                                onAccepted: {
+                                    if (control.isReplaying) Owl.RecSlider.toggleStopped();
+                                    control.isReplaying = false;
+                                    rectimer.running = false;
+                                    console.log("You chose: " + fdrs.fileUrl);
+                                    Owl.RecSlider.loadFile(fdrs.fileUrl);
+                                    recslider.to = Owl.RecSlider.maximumValue;
+                                    recslider.stepSize = Owl.RecSlider.stepSize;
+                                    recslider.value = 0;
+                                    control.isRecFile = true;
+                                    control.isRecoring = false;
+                                    if (Owl.RecSlider.currentFrame > Owl.RecSlider.getMaxFrame()){
+                                        Owl.RecSlider.recName = "Import Error File";
+                                        control.isRecFile = false;
+                                    }
+                                }
+                                onRejected: {
+                                    labelsr.text = "";
+                                    console.log("Canceled");
+                                }
+                            }
+                            
+                            ZButton{
+                                id: recPlayerPlay;
+                                width: 35;
+                                enabled: control.isRecFile;
+                                icon.source:control.isReplaying ? "/resource/pause.png" : "/resource/start.png";
+                                onClicked: {
+                                    control.isReplaying  = !control.isReplaying;
+                                    rectimer.running = control.isReplaying;
+                                    Owl.RecSlider.toggleStopped();
+                                }
+                            }
+                            ZButton{
+                                width: 35;
+                                icon.source:"/resource/stop.png";
+                                enabled: control.isRecFile;
+                                onClicked: {
+                                    control.isReplaying = false;
+                                    rectimer.running = false;
+                                    control.isRecFile = false;
+                                    Owl.RecSlider.setStopped(true);
+                                    recslider.value = 0;
+                                }
+                            }
+                            ZButton{
+                                id: recPlayerForward
+                                width: 35;
+                                enabled: control.isRecFile /*&& !control.isReplaying*/;
+                                icon.source:"/resource/last.png";
+                                onClicked: {
+                                    recslider.value = recslider.value - recPlaySpinBox.value * recslider.stepSize;
+                                }
+                            }
+                            ZButton{
+                                id: recPlayerBack
+                                width: 35;
+                                enabled: control.isRecFile /*&& !control.isReplaying*/;
+                                icon.source:"/resource/next.png";
+                                onClicked: {
+                                    recslider.value = recslider.value + recPlaySpinBox.value * recslider.stepSize;
+                                }
+                            }
+                            Text{
+                                text: "Steps:";
+                                color: "white";
+                            }
+                            SpinBox {
+                                id:recPlaySpinBox;
+                                height: 46
+                                width: 120
+                                from: 1
+                                to:10000
+                                font.pixelSize: 16
+                                onValueModified: {
+                                    Owl.RecSlider.setPlayerRate(value);
+                                }
+                            }
+                        }
+                        Grid{
+                            width:parent.width;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            spacing: 5;
+                            rowSpacing: 5;
+                            columns: 4;
+                            Slider{
+                                id: recslider
+                                width: parent.width - timeTextr.width;
+//                              value: Owl.RecSlider.currentFrame;
+                                onValueChanged: {
+                                    if (recslider.value != Owl.RecSlider.currentFrame){
+                                        Owl.RecSlider.seekFrame(recslider.value);
+                                    }
+                                    if (Owl.RecSlider.currentFrame == Owl.RecSlider.getMaxFrame()){
+                                        control.isReplaying  = false;
+                                        rectimer.running = false;
+                                        Owl.RecSlider.setStopped(true);
+                                        Owl.RecSlider.recName = "Done";
+                                    }
+                                    else
+                                        Owl.RecSlider.recName = Owl.RecSlider.getFilename();
+                                }
+                            }
+                            Text{
+                                id: timeTextr;
+                                text: Owl.RecSlider.durTime + " / " + Owl.RecSlider.maxTime;
+                                color: "white";
+                            }
+                            Timer{
+                                id: rectimer;
+                                interval: 1;
+                                repeat: true;
+                                running: false;
+                                onTriggered: {
+                                    recslider.value = Owl.RecSlider.currentFrame;
+                                }
+                            }
+                        }
+                        Grid{
+                            width:parent.width;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            spacing: 5;
+                            rowSpacing: 5;
+                            columns: 6;
+                            Text{
+                                id:recname
+                                width: parent.width - 180;
+                                text: Owl.RecSlider.recName;
+                                color: "white";
+                            }
+                        }
+                    }
+                }
+                ZGroupBox{
+                    title: qsTr("WorldCupLog")
+                    Column{
+                        width:parent.width;
+                        height:parent.height;
+                        spacing: 0;
+                        padding:0;
+                        Grid{
+                            width:parent.width;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            spacing: 5;
+                            rowSpacing: 5;
+                            columns: 6;
+                            ZButton {
+                                id:openBtn
+                                width: 35;
+                                icon.source:"/resource/openfile.png";
+                                anchors.leftMargin: 10
+                                onClicked: {
+                                    fds.open();
+                                }
+                            }
+                            Label {
+                                id: labels
+                                text: qsTr("")
+                                height: 25
+                                anchors.left:openBtn.right
+                                anchors.leftMargin: 10
+                            }
+
+                            FileDialog {
+                                id:fds
+                                title: "Please select"
+                                //folder: shortcuts.desktop
+                                selectExisting: true
+                                selectFolder: false
+                                selectMultiple: false
+                                nameFilters: ["Log files (*.log *.log.gz)"]
+                                onAccepted: {
+                                    console.log("You chose: " + fds.fileUrl + " "+fds.folder);
+                                    log.loadFile(fds.fileUrl);
+                                    logslider.to = log.maximumValue;
+                                    logslider.stepSize = log.stepSize;
+                                    logslider.value = 0;
+                                }
+                                onRejected: {
+                                    labels.text = "";
+                                    console.log("Canceled");
+                                }
+                            }
+                            ZButton{
+                                width: 35;
+                                icon.source:control.isLogPlay ? "/resource/pause.png" : "/resource/start.png";
+                                onClicked: {
+                                    control.isLogPlay = !control.isLogPlay;
+                                    logtimer.running = !logtimer.running;
+                                    log.toggleStopped();
+                                }
+                            } 
+                            ZButton{
+                                width: 35;
+                                icon.source:"/resource/last.png";
+                                onClicked: {
+                                    logslider.value = logslider.value - 3 * logslider.stepSize;
+                                }
+                            }
+                            ZButton{
+                                width: 35;
+                                icon.source:"/resource/next.png";
+                                onClicked: {
+                                    logslider.value = logslider.value + 3 * logslider.stepSize;
+                                }
+                            }
+                            ZButton{
+                                width: 35;
+                                icon.source:control.isCuttingLog ? "/resource/scissors1.png" : "/resource/scissors2.png";
+                                onClicked: {
+                                    if (control.isCuttingLog) {
+                                        log.setStartPoint(fds.fileUrl, logslider.value);
+                                    } else {
+                                        log.setStopPoint(fds.fileUrl, logslider.value);
+                                    }
+                                    control.isCuttingLog = !control.isCuttingLog;
+                                }
+                            }
+                        }
+                        Grid{
+                            width:parent.width;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            spacing: 5;
+                            rowSpacing: 5;
+                            columns: 4;
+
+                            Slider{
+                                id: logslider
+                                width: parent.width - timeText.width;
+                                onValueChanged: log.seekFrame(logslider.value);
+                            }
+                            Text{
+                                id: timeText;
+                                text: log.durTime + " / " + log.maxTime;
+                                color: "white";
+                            }
+                            Timer{
+                                id: logtimer;
+                                repeat: true;
+                                running: false;
+                                onTriggered: {
+                                    logslider.value = logslider.value + logslider.stepSize;
+                                }
+                            }
+                        }
+                        Grid{
+                            width:parent.width;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            spacing: 5;
+                            rowSpacing: 5;
+                            columns: 6;
+                            Text{
+                                id:logname
+                                width: parent.width - 180;
+                                text: log.logName;
+                                color: "white";
+                            }
+                        }
+                    }
+                }
+                ZGroupBox{
+                    title: qsTr("RecEventLabel")
+                    Column{
+                        width:parent.width;
+                        height:parent.height;
+                        spacing: 0;
+                        padding:0;
+                        Grid{
+                            width:parent.width;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            spacing: 5;
+                            rowSpacing: 5;
+                            columns: 6;
+                            ZButton {
+                                id:openLogBtn
+                                width: 35;
+                                icon.source:"/resource/openfile.png";
+                                anchors.leftMargin: 10
+                                onClicked: {
+                                    openLog.open();
+                                }
+                            }
+                            Label {
+                                id: labelstart
+                                text: qsTr("")
+                                height: 25
+                                anchors.left:openLogBtn.right
+                                anchors.leftMargin: 10
+                            }
+                            FileDialog {
+                                id:openLog
+                                title: "Please select"
+                                selectExisting: true
+                                selectFolder: false
+                                selectMultiple: false
+                                nameFilters: ["Rec files (*.log)"]
+                                onAccepted: {
+                                    console.log("You chose: " + openLog.fileUrl);
+                                    Owl.RecEventLabel.loadFile(openLog.fileUrl);
+                                }
+                                onRejected: {
+                                    labelstart.text = "";
+                                    console.log("Canceled");
+                                }
+                            }
+                            /**FileDialog {
+                                id:labelfilestart
+                                title: "Please select"
+                                folder: shortcuts.desktop
+                                selectExisting: true
+                                selectFolder: false
+                                selectMultiple: false
+                                nameFilters: ["SSL Label files (*.labeler)"]
+                                onAccepted: {
+                                    console.log("You chose: " + labelfilestart.fileUrl + " "+labelfilestart.folder);
+                                    eventlabel.loadFile(labelfilestart.fileUrl);
+                                    logslider.to = log.maximumValue;
+                                    logslider.stepSize = log.stepSize;
+                                    logslider.value = 0;
+                                }
+                                onRejected: {
+                                    labelstart.text = "";
+                                    console.log("Canceled");
+                                }
+                            }**/
+                            ZButton{
+                                width: 35;
+                                icon.source:control.isLabeling ? "/resource/pause.png" : "/resource/start.png";
+                                onClicked: {
+                                    control.isLabeling = !control.isLabeling;
+                                    control.isLabeling = Owl.RecEventLabel.processLabel();
+                                }
+                            }
+                            //设置事件是否标注，确定标注的时间段，也可以添加其他事件
+                            /**ZButton{
+                                width: 70;
+                                icon.source:control.isLabeling ? "/resource/pause.png" : "/resource/start.png";
+                                onClicked: {
+                                    
+                                }
+                            }**/
+                        }
+                        Grid{
+                            width:parent.width;
+                            verticalItemAlignment: Grid.AlignVCenter;
+                            horizontalItemAlignment: Grid.AlignHCenter;
+                            spacing: 5;
+                            rowSpacing: 5;
+                            columns: 6;
+                            Text{
+                                id:labelname
+                                width: parent.width - 180;
+                                text: Owl.RecEventLabel.logName;
+                                color: "white";
+                            }
+                        }
+                    }
+                }
+                ZGroupBox{
+                    title: qsTr("Camera Edge Test")
                     Grid{
                         width:parent.width;
                         verticalItemAlignment: Grid.AlignVCenter;
                         horizontalItemAlignment: Grid.AlignHCenter;
                         spacing: 0;
-                        rowSpacing: 0;
-                        columns:2;
-                        property int itemWidth : (width - (columns-1) * columnSpacing - 2*padding)/columns;
-//                        SpinBox{
-//                            id:medusaFrq1;
-//                            width:parent.itemWidth;
-//                            from:0;to:15;
-//                            wrap:true;
-//                            value:8
-//                        }
-//                        SpinBox{
-//                            id:medusaFrq2;
-//                            width:parent.itemWidth;
-//                            from:0;to:15;
-//                            wrap:true;
-//                            value:6
-//                        }
-                        ZButton{
-                            icon.source:control.medusaConnect ? "/source/stop.png" : "/source/start.png";
-                            icon.color: "#2976ca";
+                        rowSpacing: 5;
+                        columns:1;
+                        property int itemWidth : width - 2*padding;
+                        Button{
+                            width:parent.itemWidth;
+                            icon.source:control.ifEdgeTest ? "/resource/stop.png" : "/resource/start.png";
                             onClicked: {
-                                control.medusaConnect = !control.medusaConnect;
-                                interaction.changeMedusaSettings(false,medusaSide.checked)
-                                if(!simulation.checked){
-                                    interaction.connectSim(control.medusaConnect,0,false);
-                                }else{
-//                                    interaction.connectRadio(control.medusaConnect,0,medusaFrq1.value);
-                                }
-                                interaction.controlMedusa(control.medusaConnect)
+                                control.ifEdgeTest = !control.ifEdgeTest;
+                                interaction.setIfEdgeTest(control.ifEdgeTest);
                             }
                         }
-                        ZButton{
-                            icon.source:control.medusaConnect2 ? "/source/stop.png" : "/source/start.png";
-                            icon.color: "#ebdb7c";
+                    }
+                }
+                ZGroupBox{
+                    title: qsTr("State Estimation Test")
+                    Grid{
+                        width:parent.width;
+                        property int itemWidth : width - 2*padding;
+                        property bool runTestingScripts: true;
+                        columns: 1;
+                        CheckBox{
+                            width:parent.itemWidth;
+                            text: "Record BallSpeed" //"Run Texting Scripts"
+                            checked: true;
+                            onCheckedChanged: {
+                                parent.runTestingScripts = !parent.runTestingScripts;
+                            }
+                        }
+                        Button{
+                            width:parent.itemWidth;
+                            icon.source: isTesting ?  "/resource/stop.png" : "/resource/start.png";
                             onClicked: {
-                                control.medusaConnect2 = !control.medusaConnect2;
-                                interaction.changeMedusaSettings(true,!medusaSide.checked)
-                                if(!simulation.checked){
-                                    interaction.connectSim(control.medusaConnect2,1,true);
-                                }else{
-//                                    interaction.connectRadio(control.medusaConnect2,1,medusaFrq2.value);
-                                }
-                                interaction.controlMedusa2(control.medusaConnect2)
+                                control.isTesting = !control.isTesting;
+                                if(parent.runTestingScripts)
+                                    interaction.setTestMode(control.isTesting,parent.runTestingScripts);
+                                else
+                                    interaction.startRecordCommands(control.isTesting);
                             }
                         }
                     }
                 }
             }
+        }
+        Settings{}
+    }
+    property variant recplayerShortCut: ["m", "Left", "Right", "Up", "Down"];
 
-//            ZGroupBox{
-//                title: qsTr("ZSimulator")
-//                Grid{
-//                    width:parent.width;
-//                    verticalItemAlignment: Grid.AlignVCenter;
-//                    horizontalItemAlignment: Grid.AlignHCenter;
-//                    spacing: 0;
-//                    rowSpacing: 5;
-//                    columns:1;
-//                    property int itemWidth : width - 2*padding;
-//                    ZSwitch{
-//                        id:simGui;
-//                        width:parent.itemWidth;
-//                        leftText:qsTr("Hide");
-//                        rightText:qsTr("Show");
-//                        checked: false;
-//                    }
-//                    ZButton{
-//                        icon.source:control.simConnect ? "/source/stop.png" : "/source/start.png";
-//                        onClicked: {
-//                            control.simConnect = !control.simConnect;
-//                            interaction.controlSim(control.simConnect,simGui.checked);
-//                        }
-//                    }
-//                }
-//            }
-            ZGroupBox{
-                title: qsTr("Kill")
-                Grid{
-                    width:parent.width;
-                    verticalItemAlignment: Grid.AlignVCenter;
-                    horizontalItemAlignment: Grid.AlignHCenter;
-                    spacing: 0;
-                    rowSpacing: 5;
-                    columns:1;
-                    property int itemWidth : width - 2*padding;
-                    ZButton {
-                        icon.source:"/source/stop.png";
-                        onClicked: {
-                            interaction.kill();
-                        }
-                    }
-                }
-            }
-        }
-        RefereeBox{
-        }
-//        Viewer{}
-        /*****************************************/
-        /*                  UDP                  */
-        /*****************************************/
-       Grid {
-           id: radio;
-           width: parent.itemWidth;
-           padding:10;
-           verticalItemAlignment: Grid.AlignVCenter;
-           horizontalItemAlignment: Grid.AlignHCenter;
-           spacing: 5;
-           columns:1;
-           property int itemWidth : width - 2*padding;
-        //    ZGroupBox{
-        //        title: qsTr("Crazy")
-        //        Grid{
-        //            width:parent.width;
-        //            verticalItemAlignment: Grid.AlignVCenter;
-        //            horizontalItemAlignment: Grid.AlignHCenter;
-        //            spacing: 0;
-        //            rowSpacing: 5;
-        //            columns:1;
-        //            property int itemWidth : width - 2*padding;
-        //            Button{
-        //                width:parent.itemWidth;
-        //                icon.source:control.crazyConnect ? "/source/stop.png" : "/source/start.png";
-        //                onClicked: {
-        //                    control.crazyConnect = !control.crazyConnect;
-        //                    interaction.controlCrazy(control.crazyConnect)
-        //                }
-        //            }
-        //        }
-        //    }
-        //    ZGroupBox{
-        //        title: qsTr("Camera Edge Test")
-        //        Grid{
-        //            width:parent.width;
-        //            verticalItemAlignment: Grid.AlignVCenter;
-        //            horizontalItemAlignment: Grid.AlignHCenter;
-        //            spacing: 0;
-        //            rowSpacing: 5;
-        //            columns:1;
-        //            property int itemWidth : width - 2*padding;
-        //            Button{
-        //                width:parent.itemWidth;
-        //                icon.source:control.ifEdgeTest ? "/source/stop.png" : "/source/start.png";
-        //                onClicked: {
-        //                    control.ifEdgeTest = !control.ifEdgeTest;
-        //                    interaction.setIfEdgeTest(control.ifEdgeTest);
-        //                }
-        //            }
-        //        }
-        //    }
-           ZGroupBox{
-               title: qsTr("Rec")
-               Grid{
-                   width:parent.width;
-                   property int itemWidth : width - 2*padding;
-                   Button{
-                       width:parent.itemWidth;
-                       icon.source: isRecoring ?  "/source/stop.png" : "/source/start.png";
-                       onClicked: {
-                           control.isRecoring = !control.isRecoring;
-                           interaction4field.setRecorder(control.isRecoring);
-                       }
-                   }
-               }
-           }
-           ZGroupBox{
-               title: qsTr("RecReplay")
-               Column{
-                   width:parent.width;
-                   height:parent.height;
-                   spacing: 0;
-                   padding:0;
-                   Grid{
-                       width:parent.width;
-                       verticalItemAlignment: Grid.AlignVCenter;
-                       horizontalItemAlignment: Grid.AlignHCenter;
-                       spacing: 5;
-                       rowSpacing: 5;
-                       columns: 7;
-                       ZButton {
-                               id:openBtnr
-                               width: 35;
-                               icon.source:"/source/openfile.png";
-                               anchors.leftMargin: 10
-                               onClicked: {
-                                   fdrs.open();
-                                   interaction4field.setRecorder(false);
-                               }
-                           }
-                           Label {
-                               id: labelsr
-                               text: qsTr("")
-                               height: 25
-                               anchors.left:openBtnr.right
-                               anchors.leftMargin: 10
-                           }
-
-                           FileDialog {
-                               id:fdrs
-                               title: "Please select"
-                               selectExisting: true
-                               selectFolder: false
-                               selectMultiple: false
-                               nameFilters: ["Rec files (*.log)"]
-                               onAccepted: {
-                                   if (control.isReplaying) ZSS.RecSlider.toggleStopped();
-                                   control.isReplaying = false;
-                                   rectimer.running = false;
-                                   console.log("You chose: " + fdrs.fileUrl);
-                                   ZSS.RecSlider.loadFile(fdrs.fileUrl);
-                                   recslider.to = ZSS.RecSlider.maximumValue;
-                                   recslider.stepSize = ZSS.RecSlider.stepSize;
-                                   recslider.value = 0;
-                                   control.isRecFile = true;
-                                   control.isRecoring = false;
-                               }
-                               onRejected: {
-                                   labelsr.text = "";
-                                   console.log("Canceled");
-                               }
-                           }
-                       ZButton{
-                           id: recPlayerPlay;
-                           width: 35;
-                           enabled: control.isRecFile;
-                           icon.source:control.isReplaying ? "/source/pause.png" : "/source/start.png";
-                           onClicked: {
-                               control.isReplaying  = !control.isReplaying;
-                               rectimer.running = control.isReplaying;
-                               ZSS.RecSlider.toggleStopped();
-                           }
-                       }
-                       ZButton{
-                           width: 35;
-                           icon.source:"/source/stop.png";
-                           enabled: control.isRecFile;
-                           onClicked: {
-                               control.isReplaying = false;
-                               rectimer.running = false;
-                               control.isRecFile = false;
-                               ZSS.RecSlider.setStopped(true);
-                               recslider.value = 0;
-                           }
-                       }
-                       ZButton{
-                           id: recPlayerForward
-                           width: 35;
-                           enabled: control.isRecFile /*&& !control.isReplaying*/;
-                           icon.source:"/source/last.png";
-                           onClicked: {
-                               recslider.value = recslider.value - recPlaySpinBox.value * recslider.stepSize;
-                           }
-                       }
-                       ZButton{
-                           id: recPlayerBack
-                           width: 35;
-                           enabled: control.isRecFile /*&& !control.isReplaying*/;
-                           icon.source:"/source/next.png";
-                           onClicked: {
-                               recslider.value = recslider.value + recPlaySpinBox.value * recslider.stepSize;
-                           }
-                       }
-                       Text{
-                           text: "Steps:";
-                           color: "white";
-                       }
-//                        TextField {
-//                            id:input;
-//                            height: 46
-//                            width:36
-//                            text: control.playspeed
-//                            color:"white";
-//                            font.pixelSize: 16;
-//                            font.family:"Arial";
-//                            leftPadding: 12;
-////                            verticalAlignment: Text.AlignVCenter
-//                            selectByMouse: true;
-//                            onAccepted:{
-//                                control.playspeed = text;
-//                                focus = false;
-//                                width= text.length*8 + 24
-//                                console.log(text.length)
-//                            }
-//                        }
-                       SpinBox {
-                           id:recPlaySpinBox;
-                           height: 46
-                           width: 120
-                           from: 1
-                           to:10000
-                           font.pixelSize: 16
-                       }
-                   }
-                   Grid{
-                       width:parent.width;
-                       verticalItemAlignment: Grid.AlignVCenter;
-                       horizontalItemAlignment: Grid.AlignHCenter;
-                       spacing: 5;
-                       rowSpacing: 5;
-                       columns: 4;
-
-                       Slider{
-                           id: recslider
-                           width: parent.width - timeTextr.width;
-//                            value: ZSS.RecSlider.currentFrame;
-                           onValueChanged: {
-                               if (recslider.value != ZSS.RecSlider.currentFrame)
-                                   ZSS.RecSlider.seekFrame(recslider.value);
-                           }
-
-//                            MouseArea {
-//                                property int pos
-//                                anchors.fill: parent
-//                                onClicked: {
-//                                    pos = ZSS.RecSlider.maximumValue * mouse.x/parent.width;
-//                                    recslider.value = pos;
-//                                }
-//                                onPressAndHold:  {
-//                                    pos = ZSS.RecSlider.maximumValue * mouse.x/parent.width;
-//                                    recslider.value = pos;
-//                                }
-//                            }
-                       }
-                       Text{
-                           id: timeTextr;
-                           text: ZSS.RecSlider.durTime + " / " + ZSS.RecSlider.maxTime;
-                           color: "white";
-                       }
-                       Timer{
-                           id: rectimer;
-                           interval: 1;
-                           repeat: true;
-                           running: false;
-                           onTriggered: {
-                               recslider.value = ZSS.RecSlider.currentFrame;
-                           }
-                       }
-                   }
-                   Grid{
-                       width:parent.width;
-                       verticalItemAlignment: Grid.AlignVCenter;
-                       horizontalItemAlignment: Grid.AlignHCenter;
-                       spacing: 5;
-                       rowSpacing: 5;
-                       columns: 6;
-                       Text{
-                           id:recname
-                           width: parent.width - 180;
-                           text: ZSS.RecSlider.recName;
-                           color: "white";
-                       }
-                   }
-               }
-           }/**
-           ZSS.Display{
-               type:1;
-               width:parent.width - 2*parent.padding;
-               height:300;
-               onWidthChanged: {
-                   resetSize(width,height);
-               }
-               onHeightChanged: {
-                   resetSize(width,height);
-               }
-           }**/
-
-        //    ZGroupBox{
-        //        title: qsTr("Log")
-        //        Column{
-        //            width:parent.width;
-        //            height:parent.height;
-        //            spacing: 0;
-        //            padding:0;
-        //            Grid{
-        //                width:parent.width;
-        //                verticalItemAlignment: Grid.AlignVCenter;
-        //                horizontalItemAlignment: Grid.AlignHCenter;
-        //                spacing: 5;
-        //                rowSpacing: 5;
-        //                columns: 6;
-        //                ZButton {
-        //                        id:openBtn
-        //                        width: 35;
-        //                        icon.source:"/source/openfile.png";
-        //                        anchors.leftMargin: 10
-        //                        onClicked: {
-        //                            fds.open();
-        //                        }
-        //                    }
-        //                    Label {
-        //                        id: labels
-        //                        text: qsTr("")
-        //                        height: 25
-        //                        anchors.left:openBtn.right
-        //                        anchors.leftMargin: 10
-        //                    }
-
-        //                    FileDialog {
-        //                        id:fds
-        //                        title: "Please select"
-        //                        folder: shortcuts.desktop
-        //                        selectExisting: true
-        //                        selectFolder: false
-        //                        selectMultiple: false
-        //                        nameFilters: ["Log files (*.log *.log.gz)"]
-        //                        onAccepted: {
-        //                            console.log("You chose: " + fds.fileUrl + " "+fds.folder);
-        //                            log.loadFile(fds.fileUrl);
-        //                            logslider.to = log.maximumValue;
-        //                            logslider.stepSize = log.stepSize;
-        //                            logslider.value = 0;
-        //                        }
-        //                        onRejected: {
-        //                            labels.text = "";
-        //                            console.log("Canceled");
-        //                        }
-        //                    }
-        //                ZButton{
-        //                    width: 35;
-        //                    icon.source:control.isLogPlay ? "/source/pause.png" : "/source/start.png";
-        //                    onClicked: {
-        //                        control.isLogPlay = !control.isLogPlay;
-        //                        logtimer.running = !logtimer.running;
-        //                        log.toggleStopped();
-        //                    }
-        //                }
-        //                ZButton{
-        //                    width: 35;
-        //                    icon.source:"/source/last.png";
-        //                    onClicked: {
-        //                        logslider.value = logslider.value - 3 * logslider.stepSize;
-        //                    }
-        //                }
-        //                ZButton{
-        //                    width: 35;
-        //                    icon.source:"/source/next.png";
-        //                    onClicked: {
-        //                        logslider.value = logslider.value + 3 * logslider.stepSize;
-        //                    }
-        //                }
-        //                ZButton{
-        //                    width: 35;
-        //                    icon.source:control.isCutting ? "/source/scissors1.png" : "/source/scissors2.png";
-        //                    onClicked: {
-        //                        if (control.isCutting) {
-        //                            log.setStartPoint(fds.fileUrl, logslider.value);
-        //                        } else {
-        //                            log.setStopPoint(fds.fileUrl, logslider.value);
-        //                        }
-        //                        control.isCutting = !control.isCutting;
-        //                    }
-        //                }
-        //            }
-        //            Grid{
-        //                width:parent.width;
-        //                verticalItemAlignment: Grid.AlignVCenter;
-        //                horizontalItemAlignment: Grid.AlignHCenter;
-        //                spacing: 5;
-        //                rowSpacing: 5;
-        //                columns: 4;
-
-        //                Slider{
-        //                    id: logslider
-        //                    width: parent.width - timeText.width;
-        //                    onValueChanged: log.seekFrame(logslider.value);
-        //                }
-        //                Text{
-        //                    id: timeText;
-        //                    text: log.durTime + " / " + log.maxTime;
-        //                    color: "white";
-        //                }
-        //                Timer{
-        //                    id: logtimer;
-        //                    repeat: true;
-        //                    running: false;
-        //                    onTriggered: {
-        //                        logslider.value = logslider.value + logslider.stepSize;
-        //                    }
-        //                }
-        //            }
-        //            Grid{
-        //                width:parent.width;
-        //                verticalItemAlignment: Grid.AlignVCenter;
-        //                horizontalItemAlignment: Grid.AlignHCenter;
-        //                spacing: 5;
-        //                rowSpacing: 5;
-        //                columns: 6;
-        //                Text{
-        //                    id:logname
-        //                    width: parent.width - 180;
-        //                    text: log.logName;
-        //                    color: "white";
-        //                }
-        //            }
-        //        }
-        //    }
-//            ZGroupBox{
-//                title: qsTr("Techinal Challenge2")
-//                Column{
-//                    width:parent.width;
-//                    height:parent.height;
-//                    spacing: 0;
-//                    padding:0;
-//                    Grid{
-//                        width:parent.width;
-//                        verticalItemAlignment: Grid.AlignVCenter;
-//                        horizontalItemAlignment: Grid.AlignHCenter;
-//                        spacing: 5;
-//                        rowSpacing: 5;
-//                        columns: 6;
-//                        ZButton {
-//                                id:openLabelBtn
-//                                width: 35;
-//                                icon.source:"/source/openfile.png";
-//                                anchors.leftMargin: 10
-//                                onClicked: {
-//                                    labelfilestart.open();
-//                                }
-//                            }
-// //                            Label {
-// //                                id: labelstart
-// //                                text: qsTr("")
-// //                                height: 25
-// //                                anchors.left:openBtn.right
-// //                                anchors.leftMargin: 10
-// //                            }
-
-//                            FileDialog {
-//                                id:labelfilestart
-//                                title: "Please select"
-//                                folder: shortcuts.desktop
-//                                selectExisting: true
-//                                selectFolder: false
-//                                selectMultiple: false
-//                                nameFilters: ["SSL Label files (*.labeler)"]
-//                                onAccepted: {
-//                                    console.log("You chose: " + labelfilestart.fileUrl + " "+labelfilestart.folder);
-//                                    eventlabel.loadFile(labelfilestart.fileUrl);
-//                                    logslider.to = log.maximumValue;
-//                                    logslider.stepSize = log.stepSize;
-//                                    logslider.value = 0;
-//                                }
-//                                onRejected: {
-//                                    labels.text = "";
-//                                    console.log("Canceled");
-//                                }
-//                            }
-//                        ZButton{
-//                            width: 35;
-//                            icon.source:control.isLogPlay ? "/source/pause.png" : "/source/start.png";
-//                            onClicked: {
-//                                control.isLogPlay = !control.isLogPlay;
-//                                logtimer.running = !logtimer.running;
-//                                eventlabel.processLabel();
-//                            }
-//                        }
-//                    }
-//                    Grid{
-//                        width:parent.width;
-//                        verticalItemAlignment: Grid.AlignVCenter;
-//                        horizontalItemAlignment: Grid.AlignHCenter;
-//                        spacing: 5;
-//                        rowSpacing: 5;
-//                        columns: 6;
-//                        Text{
-//                            id:labelname
-//                            width: parent.width - 180;
-//                            text: eventlabel.logName;
-//                            color: "white";
-//                        }
-//                    }
-//                }
-//            }
-       }
-
-        Settings{
-        }
-
-    }
-    Shortcut{
-        property int index : 0;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 1;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 2;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 3;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 4;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 5;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 6;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 7;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 8;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 9;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 10;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 11;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 12;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 13;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 14;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 15;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 16;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 17;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 18;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 19;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 20;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 21;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 22;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 23;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 24;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 25;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 26;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 27;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 28;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 29;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 30;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 31;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 32;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
-    Shortcut{
-        property int index : 33;
-        sequence:shortCutString[index];
-        onActivated: {
-            control.robotControl(index)
-        }
-    }
     Shortcut{
         sequence: recplayerShortCut[0];
         onActivated: {

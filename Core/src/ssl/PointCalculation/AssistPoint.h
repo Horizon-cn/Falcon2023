@@ -38,5 +38,5 @@
 //};
 
 
-//typedef NormalSingleton<CAssistPoint> AssistPoint;
+//typedef Falcon::NormalSingleton<CAssistPoint> AssistPoint;
 //#endif

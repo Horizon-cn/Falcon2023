@@ -19,8 +19,8 @@ COptionModule::~COptionModule(void)
 //too many couplings, can't use
 void COptionModule::update() {
     bool isRightSide, isYellowTeam;
-    ZSS::ZParamManager::instance()->loadParam(isRightSide, "ZAlert/IsRight", 0);
-    ZSS::ZParamManager::instance()->loadParam(isYellowTeam, "ZAlert/IsYellow", 0);
+    ZSS::ZParamManager::Instance()->loadParam(isRightSide, "ZAlert/IsRight", 0);
+    ZSS::ZParamManager::Instance()->loadParam(isYellowTeam, "ZAlert/IsYellow", 0);
 
 	if (!isRightSide) {
 		_side = Param::Field::POS_SIDE_LEFT;

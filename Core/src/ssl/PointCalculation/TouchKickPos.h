@@ -36,6 +36,6 @@ private:
 	double _ball_invalid_pass_dir; // Lua注册的开球时传球的朝向
 };
 
-typedef NormalSingleton< CTouchKickPos > TouchKickPos;
+typedef Falcon::NormalSingleton< CTouchKickPos > TouchKickPos;
 
 #endif // ~_TOUCH_KICK_POS_

@@ -57,5 +57,5 @@ private:
 	int LeftRobotType[Param::Field::MAX_PLAYER];
 	int RightRobotType[Param::Field::MAX_PLAYER];
 };
-typedef NormalSingleton< CRobotCapFactory > RobotCapFactory; // 声明为Singleton
+typedef Falcon::NormalSingleton< CRobotCapFactory > RobotCapFactory; // 声明为Singleton
 #endif // _ROBOT_CAPABILITY_H_

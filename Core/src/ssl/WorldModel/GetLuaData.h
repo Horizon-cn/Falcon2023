@@ -32,6 +32,6 @@
 //	int kickParamPower;
 //};
 
-//typedef NormalSingleton<CGetLuaData> GetLuaData;
+//typedef Falcon::NormalSingleton<CGetLuaData> GetLuaData;
 	
 //#endif

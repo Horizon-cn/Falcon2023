@@ -1,0 +1,57 @@
+syntax = "proto2";
+//syntax = "proto3";
+//package rbk.protocol;
+
+message Src_Vision_DetectionBall {
+  required bool   ball_found     =  1;
+  required float  x              =  2;
+  required float  y              =  3;
+  optional bool   image_valid    =  4;
+  optional float  image_x        =  5;
+  optional float  image_y        =  6;
+  required float  vel_x          =  7;
+  required float  vel_y          =  8;
+  required float  chip_predict_x =  9;
+  required float  chip_predict_y = 10;
+  optional float  raw_x          = 11;
+  optional float  raw_y          = 12;
+  optional string P              = 13;
+  optional string Q              = 14;
+
+  //required float  x          =  1;
+  //required float  y          =  2;
+  //required float  height     =  3;
+  //required bool   valid      =  4;
+}
+
+message Src_Vision_DetectionRobot {
+  required uint32 robot_id     =  1;
+  required float  x            =  2;
+  required float  y            =  3;
+  required float  orientation  =  4;
+  required bool   robot_found  =  5;
+  required float  vel_x        =  6;
+  required float  vel_y        =  7; 
+  required float  accelerate_x =  8;
+  required float  accelerate_y =  9;
+  optional string P            = 10;
+  optional string Q            = 11;
+
+  //required uint32 robot_id    =  1;
+  //required float  x           =  2;
+  //required float  y           =  3;
+  //required float  orientation =  4;
+}
+
+message Src_Vision_DetectionFrame {
+  optional uint32 frame_number                     = 1;
+  optional uint32 mode                             = 2;
+  repeated Src_Vision_DetectionRobot robots_yellow = 3;
+  repeated Src_Vision_DetectionRobot robots_blue   = 4;
+  required Src_Vision_DetectionBall  ball          = 5;
+
+  //required Src_Vision_DetectionBall  balls         = 1;
+  //repeated Src_Vision_DetectionRobot robots_yellow = 2;
+  //repeated Src_Vision_DetectionRobot robots_blue   = 3;
+  //optional uint32 frame_number                 = 4;
+}

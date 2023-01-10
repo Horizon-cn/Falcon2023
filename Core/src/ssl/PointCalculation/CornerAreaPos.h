@@ -70,7 +70,7 @@ private:
 //	bool _dealWithHit;		 ///<ture为即将自我队员碰撞
 };
 
-typedef NormalSingleton< CCornerAreaPos > CornerAreaPos;
+typedef Falcon::NormalSingleton< CCornerAreaPos > CornerAreaPos;
 
 class CMiddleAreaPos :public CDefPos1G2D
 {
@@ -94,6 +94,6 @@ private:
 	//	bool _dealWithHit;		 ///<ture为即将自我队员碰撞
 };
 
-typedef NormalSingleton< CMiddleAreaPos > MiddleAreaPos;
+typedef Falcon::NormalSingleton< CMiddleAreaPos > MiddleAreaPos;
 
 #endif //_CORNER_AREA_POS_H_
