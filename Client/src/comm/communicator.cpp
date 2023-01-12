@@ -2,6 +2,7 @@
 #include <QNetworkInterface>
 #include "actionmodule.h"
 #include "simmodule.h"
+#include "remotesim.h"
 #include "parammanager.h"
 #include "globaldata.h"
 #include "globalsettings.h"
@@ -16,7 +17,7 @@ int fps[PARAM::TEAMS] = {0, 0};
 std::mutex m_fps;
 std::thread* receiveThread[PARAM::TEAMS];
 auto opm = Owl::OParamManager::Instance(); 
-auto cpm = Owl::CParamManager::Instance(); 
+auto cpm = Owl::CParamManager::Instance();
 }
 int Communicator::getFPS(int t) {
     int res = 0;
@@ -27,8 +28,13 @@ int Communicator::getFPS(int t) {
     return res;
 }
 
+void Communicator::setGrsimInterfaceIndex(const int index) {
+    grsimInterfaceIndex = index;
+}
+
 Communicator::Communicator(QObject *parent) : QObject(parent) {
     QObject::connect(Owl::ZSimModule::Instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)));
+    QObject::connect(ZSS::ZRemoteSimModule::Instance(), SIGNAL(receiveRemoteInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
     QObject::connect(Owl::ZActionModule::Instance(), SIGNAL(receiveRobotInfo(int, int)), this, SLOT(sendCommand(int, int)));
     for(int i = 0; i < PARAM::TEAMS; i++) {
         /** connect(&receiveSocket[i], &QUdpSocket::readyRead, [ = ]() {
@@ -64,15 +70,15 @@ bool Communicator::disconnectMedusa(int team) {
 void Communicator::receiveCommand(int t) {
     QByteArray datagram;
     while(true) {
-        std::this_thread::sleep_for(std::chrono::microseconds(5));
+        std::this_thread::sleep_for(std::chrono::microseconds(500));
         while (receiveSocket[t].state() == QUdpSocket::BoundState && receiveSocket[t].hasPendingDatagrams()) {
             m_fps.lock();
             fps[t]++;
             m_fps.unlock();
             datagram.resize(receiveSocket[t].pendingDatagramSize());
             receiveSocket[t].readDatagram(datagram.data(), datagram.size());
-            //Owl::Protocol::Robots_Command commands;
-            rbk::protocol::SRC_Cmd commands;
+            //rbk::protocol::SRC_Cmd commands;
+            ZSS::Protocol::Robots_Command commands;
             commands.ParseFromArray(datagram, datagram.size());
             commandBuffer[t].valid = true;
             for(int i = 0; i < commands.command_size(); i++) {
@@ -83,28 +89,32 @@ void Communicator::receiveCommand(int t) {
             }
             if (startRecord) recordCommands(commands);
             //qDebug()<<"isSimulation"<<opm->isSimulation;
-            /**if(opm->isSimulation) {
-                qDebug()<<"sendSim";
-                Owl::ZSimModule::Instance()->sendSim(t, commands);
+            if(opm->isSimulation) {
+                //qDebug()<<"sendSim";
+                if (grsimInterfaceIndex==0 && opm->useSimInside)
+                    Owl::ZSimModule::Instance()->sendSim(t, commands);
+                else
+                    ZSS::ZRemoteSimModule::Instance()->sendSim(t, commands);
             } else {
-                Owl::ZActionModule::Instance()->sendLegacy(t, commands);
-            }**/
+                //Owl::ZActionModule::Instance()->sendLegacy(t, commands);
+                Owl::NActionModule::Instance()->sendLegacy(commands);
+            }
             //if(opm->isSimulation) Owl::ZSimModule::Instance()->sendEmptySim();
         }
     }
 }
 
 void Communicator::sendCommand(int team, int id) {
-    robotInfoMutex.lock();
+    GlobalData::Instance()->robotInfoMutex.lock();
     bool infrared = GlobalData::Instance()->robotInformation[team][id].infrared;
     bool flat = GlobalData::Instance()->robotInformation[team][id].flat;
     bool chip = GlobalData::Instance()->robotInformation[team][id].chip;
-    robotInfoMutex.unlock();
+    GlobalData::Instance()->robotInfoMutex.unlock();
 
-    //Owl::Protocol::Robot_Status robot_status;
-    //robot_status.set_robot_id(id);
-    rbk::protocol::Robot_Status robot_status;
-    robot_status.set_robot(id);
+    ZSS::Protocol::Robot_Status robot_status;
+    robot_status.set_robot_id(id);
+    //rbk::protocol::Robot_Status robot_status;
+    //robot_status.set_robot(id);
     robot_status.set_infrared(infrared);
     robot_status.set_flat_kick(flat);
     robot_status.set_chip_kick(chip);
@@ -112,8 +122,8 @@ void Communicator::sendCommand(int team, int id) {
     int size = robot_status.ByteSize();
     QByteArray datagram(size, 0);
     robot_status.SerializeToArray(datagram.data(), size);
-    // int port = team == 0? blue_feedback : yellow_feedback;
-    // sendSockets.writeDatagram(datagram.data(), size, QHostAddress(cpm->sim_address), port);
+    int port = team == 0? cpm->blue_feedback : cpm->yellow_feedback;
+    sendSockets.writeDatagram(datagram.data(), size, QHostAddress(cpm->local_address), port);
 }
 /**
 void Communicator::sendEmptyCmd(int t) {
@@ -130,7 +140,8 @@ void Communicator::startRecordCommands(bool start) {
     }
     startRecord = start;
 }
-void Communicator::recordCommands(rbk::protocol::SRC_Cmd commands) {
+//void Communicator::recordCommands(rbk::protocol::SRC_Cmd commands) {
+void Communicator::recordCommands(ZSS::Protocol::Robots_Command commands) {
     std::ofstream outfile;
     outfile.open(filename.toLatin1(), std::ios::app);
     for(int i = 0; i < commands.command_size(); i++) {
@@ -139,8 +150,10 @@ void Communicator::recordCommands(rbk::protocol::SRC_Cmd commands) {
         float vx = command.velocity_x() * 100;
         float vy = command.velocity_y() * 100;
         float vr = command.velocity_r() * 100;
-        float flat = command.flat_kick();
-        float chip = command.chip_kick(); 
+        float flat = command.kick() ? 0 : command.power();
+        float chip = command.kick() ? command.power() : 0;
+        //float flat = command.flat_kick();
+        //float chip = command.chip_kick(); 
         float dribble = command.dribbler_spin();
         outfile<<id<<" "<<vx<<" "<<vy<<" "<<vr<<" "<<dribble<<" "<<1<<" "<<0<<" "<<0<<" "<<0<<"\n";
     }

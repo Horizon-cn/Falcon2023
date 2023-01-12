@@ -20,9 +20,9 @@ CCompensate::~CCompensate() {
 
 void CCompensate::readCompensateTable(){
 #ifdef WIN32
-	const string path = "data\\ssl\\play_books\\";
+	const string path = "..\\data\\ssl\\play_books\\";
 #else
-	const string path = "data/ssl/play_books/";
+	const string path = "../data/ssl/play_books/";
 #endif
 	string sCarNum;
 

@@ -36,6 +36,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
       loadParam(refereePortToYellow,"AlertPorts/refereePortToYellow",10004);
       loadParam(VisionSim, "AlertPorts/VisionSim", 10020);
       loadParam(VisionReal, "AlertPorts/VisionReal", 10005);
+      loadParam(VisionRemote, "AlertPorts/VisionRemote", 10066);
       loadParam(serialPort, "AlertPorts/serialPort", "COM3");
       //Canvas
       loadParam(canvasHeight, "Canvas/canvasHeight", 960);
@@ -108,7 +109,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     double frameRate;
     //Useful Ports
     int refereePortToBlue, refereePortToYellow;
-    int VisionSim, VisionReal;
+    int VisionSim, VisionReal, VisionRemote;
     QString serialPort;
     //Canvas
     int canvasWidth, canvasHeight;

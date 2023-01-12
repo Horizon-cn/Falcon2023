@@ -21,7 +21,7 @@ namespace {
 	/// 调试开关
 	bool DRAW_TARGET = false;
 	bool RECORD_COMMAND = false;
-	ofstream velCommandData("./data/vel_command_record.txt");
+	ofstream velCommandData("../data/vel_command_record.txt");
 	bool NOT_MOVE = false;
 
 	/// 用于解决到点晃动的问题

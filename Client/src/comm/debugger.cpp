@@ -45,7 +45,7 @@ void CDebugger::receiveBlue(){
     }
     auto& datagram = GlobalData::Instance()->debugBlueMessages;
     while(true){
-        std::this_thread::sleep_for(std::chrono::microseconds(5));
+        std::this_thread::sleep_for(std::chrono::microseconds(500));
         while (receiverBlue.state() == QUdpSocket::BoundState && receiverBlue.hasPendingDatagrams()) {
             GlobalData::Instance()->debugMutex.lock();
             datagram.resize(receiverBlue.pendingDatagramSize());
@@ -62,7 +62,7 @@ void CDebugger::receiveYellow(){
     }
     auto& datagram = GlobalData::Instance()->debugYellowMessages;
     while(true){
-        std::this_thread::sleep_for(std::chrono::microseconds(5));
+        std::this_thread::sleep_for(std::chrono::microseconds(500));
         while (receiverYellow.state() == QUdpSocket::BoundState && receiverYellow.hasPendingDatagrams()) {
             GlobalData::Instance()->debugMutex.lock();
             datagram.resize(receiverYellow.pendingDatagramSize());

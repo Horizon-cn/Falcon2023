@@ -24,23 +24,25 @@
 #include "test.h"
 #include "game.h"
 #include "shellapi.h"
+#include "remotesim.h"
 namespace {
 QProcess *blueRBKProcess = nullptr;
 QProcess *yellowRBKProcess = nullptr;
 QProcess *simProcess = nullptr;
-QProcess *crayProcess = nullptr;
+//QProcess* crayProcess = nullptr;
+QProcess *monitorProcess = nullptr;
 auto opm = Owl::OParamManager::Instance();
 auto cpm = Owl::CParamManager::Instance();
 }
 Interaction::Interaction(QObject *parent) : QObject(parent) {
-    RBKpath[PARAM::BLUE] = cpm->BlueRBKPath;
-    RBKpath[PARAM::YELLOW] = cpm->YellowRBKPath;
+    RBKpath[PARAM::BLUE] = qApp->applicationDirPath() + "./Core"; //cpm->BlueRBKPath;
+    RBKpath[PARAM::YELLOW] = qApp->applicationDirPath() + "./Core"; //cpm->YellowRBKPath;
     RBKdirectory[PARAM::BLUE] = RBKpath[PARAM::BLUE].left(RBKpath[PARAM::BLUE].lastIndexOf('/'));
     RBKdirectory[PARAM::YELLOW] = RBKpath[PARAM::YELLOW].left(RBKpath[PARAM::YELLOW].lastIndexOf('/'));
-    SIMpath = cpm->grSimPath;
+    SIMpath = qApp->applicationDirPath() + "./grSim"; //cpm->grSimPath;
     SIMdirectory = SIMpath.left(SIMpath.lastIndexOf('/'));
-    Craypath = cpm->CrayPath;
-    Craydirectory = Craypath.left(Craypath.lastIndexOf('/'));
+//    Craypath = cpm->CrayPath;
+//    Craydirectory = Craypath.left(Craypath.lastIndexOf('/'));
 }
 Interaction::~Interaction() {
     if (simProcess != nullptr) {
@@ -67,15 +69,15 @@ Interaction::~Interaction() {
         yellowRBKProcess = nullptr;
         QTextStream(stdout) << "\n------------------------------------\nexit yellow rbk\n------------------------------------\n";
     }
-    if (crayProcess != nullptr) {
-        if (crayProcess->isOpen()) {
-            crayProcess->close();
+    if (monitorProcess != nullptr) {
+        if (monitorProcess->isOpen()) {
+            monitorProcess->close();
         }
-        delete crayProcess;
-        crayProcess = nullptr;
-        QTextStream(stdout) << "\n------------------------------------\nexit Cray\n------------------------------------\n";
+        delete monitorProcess;
+        monitorProcess = nullptr;
+        QTextStream(stdout) << "\n------------------------------------\nexit Monitor\n------------------------------------\n";
     }
-}
+}/**
 void Interaction::chooseRBKpath(int team) {
     QFileDialog dialog;
     QString lastRBKpath = RBKpath[team];
@@ -124,7 +126,7 @@ void Interaction::chooseCraypath() {
     else {
         Craypath = lastCraypath;
     }
-}
+}**/
 bool Interaction::controlBlueRBK(bool control) {
     if(control == false) {
         if (blueRBKProcess != nullptr) {
@@ -137,12 +139,14 @@ bool Interaction::controlBlueRBK(bool control) {
         }
     } else {
         blueRBKProcess = new QProcess();
+        // 告诉要打开的APP他的路径
         blueRBKProcess->setWorkingDirectory(RBKdirectory[PARAM::BLUE]); //"../RBK_RUN_2015/bin");
         blueRBKProcess->setCreateProcessArgumentsModifier(
                        [](QProcess::CreateProcessArguments *args) {
                args->flags |= CREATE_NEW_CONSOLE;
                args->startupInfo->dwFlags &=~ STARTF_USESTDHANDLES;
            });
+        // 要打开APP，用它的绝对路径
         QString name = QString("\"").append(RBKpath[PARAM::BLUE]).append("\""); //"../RBK_RUN_2015/bin/rbk.exe";
         blueRBKProcess->start(name);
         QTextStream(stdout) << "\n------------------------------------\n" << "running " << name << "\n------------------------------------\n";
@@ -195,9 +199,9 @@ bool Interaction::controlSim(bool control, bool show) {
         QTextStream(stdout) << "\n------------------------------------\n" << "running " << name << "\n------------------------------------\n";
     }
     return true;
-}
+}/**
 bool Interaction::controlCray(bool control) {
-    if(control == false) {
+    if (control == false) {
         if (crayProcess != nullptr) {
             if (crayProcess->isOpen()) {
                 crayProcess->close();
@@ -206,11 +210,30 @@ bool Interaction::controlCray(bool control) {
             crayProcess = nullptr;
             QTextStream(stdout) << "\n------------------------------------\nexit Cray\n------------------------------------\n";
         }
-    } else {
+    }
+    else {
         crayProcess = new QProcess();
-        QString name =  QString("\"").append(Craypath).append("\"");
+        QString name = QString("\"").append(Craypath).append("\"");
         crayProcess->start(name);
         QTextStream(stdout) << "\n------------------------------------\n" << "running " << name << "\n------------------------------------\n";
+    }
+    return true;
+}**/
+bool Interaction::controlMonitor(bool control) {
+    if(control == false) {
+        if (monitorProcess != nullptr) {
+            if (monitorProcess->isOpen()) {
+                monitorProcess->close();
+            }
+            delete monitorProcess;
+            monitorProcess = nullptr;
+            QTextStream(stdout) << "\n------------------------------------\nexit Monitor\n------------------------------------\n";
+        }
+    } else {
+        monitorProcess = new QProcess();
+        QString name = "sh ProcessAlive.sh"; //"./ProcessAlive.exe";
+        monitorProcess->start(name);
+        QTextStream(stdout) << "\n------------------------------------\n" << "start : " << name << "\n------------------------------------\n";
     }
     return true;
 }
@@ -239,7 +262,11 @@ bool Interaction::connectSim(bool sw, int color) { //0 blue 1 yellow
         ZCommunicator::Instance()->connectMedusa(color);
         Debugger::Instance()->start(color);
         Owl::ZSimModule::Instance()->disconnectSim(color);
-        return Owl::ZSimModule::Instance()->connectSim(color);
+        ZSS::ZRemoteSimModule::Instance()->disconnectSim(color);
+        if (ZCommunicator::Instance()->getGrsimInterfaceIndex() == 0 && opm->useSimInside)
+            return Owl::ZSimModule::Instance()->connectSim(color);
+        else
+            return ZSS::ZRemoteSimModule::Instance()->connectSim(color);
     } else {
 //        return Owl::ZSimModule::Instance()->disconnectSim(color); //fix a bug for Medusa out of Athena
         Debugger::Instance()->stop(color);
@@ -247,28 +274,32 @@ bool Interaction::connectSim(bool sw, int color) { //0 blue 1 yellow
 }
 void Interaction::kill(bool kill) {
     if(!kill) return;
+    ZRecRecorder::Instance()->stop();
+    QProcess killTask;
 #ifdef WIN32
-    ZRecRecorder::Instance()->stop();
 //    RefereeThread::Instance()->disconnectTCP();
-    QProcess killTask;
-    QString cray = "taskkill -im Cray.exe -f";
-    QString rbk = "taskkill -im rbk.exe -f";
+    //QString cray = "taskkill -im Cray.exe -f";
+    QString core = "taskkill -im Core.exe -f";
     QString grSim = "taskkill -im grSim.exe -f";
-    killTask.execute(rbk);
-    killTask.execute(grSim);
-    killTask.execute(cray);
-    killTask.close();
+    QString client = "taskkill -im Client.exe -f";
 #else
-    ZRecRecorder::Instance()->stop();
-    QProcess killTask;
-    QString cray = "pkill Cray";
-    QString rbk = "pkill rbk";
-    QString grSim = "pkill grsim";
-    killTask.execute(rbk);
-    killTask.execute(grSim);
-    killTask.execute(cray);
-    killTask.close();
+    //QString cray = "pkill Cray";
+    QString core = "pkill Core";
+    QString grSim = "pkill grSim";
+    QString client = "pkill Client";
 #endif
+    if (monitorProcess != nullptr) {
+        if (monitorProcess->isOpen()) {
+            monitorProcess->close();
+        }
+        delete monitorProcess;
+        monitorProcess = nullptr;
+    }
+    //killTask.execute(cray);
+    killTask.execute(core);
+    killTask.execute(grSim);
+    killTask.execute(client);
+    killTask.close();
 }
 void Interaction::controlProcess(int index, bool state) {
     GlobalData::Instance()->processControl[index] = state;
@@ -280,8 +311,10 @@ void Interaction::setVision(bool needStart, bool real) {
     if (needStart) {
         opm->updateParam(opm->isSimulation, "Alert/isSimulation", !real, true);
         VisionModule::Instance()->udpSocketConnect();
+        //if (real) RefereeThread::instance()->start();
     } else {
         VisionModule::Instance()->udpSocketDisconnect();
+        //RefereeThread::instance()->disconnectTCP();
     }
 }
 void Interaction::setRecorder(bool isRecording) {
@@ -321,6 +354,13 @@ void Interaction::setIfEdgeTest(bool ifEdgeTest) {
 
 void Interaction::setTestMode(bool isTesting, bool runTestingScripts){
     Test::Instance()->setMode(isTesting, runTestingScripts);
+}
+
+void Interaction::changeGrsimInterface(int index) {
+    ZCommunicator::Instance()->setGrsimInterfaceIndex(index);
+}
+QStringList Interaction::getGrsimInterfaces() {
+    return NetworkInterfaces::Instance()->getGrsimInterfaces();
 }
 
 void Interaction::getBasicInfo() {
@@ -407,12 +447,12 @@ void Interaction4Field::createGameRecorder() {
 void Interaction4Field::stopGameRecorder() {
     Game::Instance()->stopGameRecorder();
 }
-**//**
+**/
 void Interaction::updateInterfaces(){
-    ZNetworkInterfaces::Instance()->updateInterfaces();
+    NetworkInterfaces::Instance()->updateInterfaces();
 }
 QStringList Interaction::getInterfaces(){
-    return ZNetworkInterfaces::Instance()->getInterfaces();
+    return NetworkInterfaces::Instance()->getInterfaces();
 }
 void Interaction::changeVisionInterface(int index){
 //    if(portNum < ports.size() && portNum >= 0){
@@ -422,7 +462,7 @@ void Interaction::changeVisionInterface(int index){
     VisionModule::Instance()->setInterfaceIndex(index);
 //    qDebug() << "vision interface : " << index;
 }
-**/
+
 bool Interaction::connectSerialPort(bool sw){
     if(sw){
         return Owl::NActionModule::Instance()->openSerialPort();

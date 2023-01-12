@@ -158,15 +158,15 @@ ApplicationWindow {
                         border.width: 1;
                         color: "#303030";
                         anchors.fill: parent;
-                        Owl.Field{
-                            property int _index:index;
-                            type:_index+1;
-                            draw:_index == fields.currentIndex;
-                            width:fields.width;
-                            height:fields.height - 20;
-                        }
                     }
                 }
+            }
+            Owl.Field{
+                //property int _index:index;
+                type:fields.currentIndex+1;//_index+1;
+                draw:true;//_index == fields.currentIndex;
+                width:fields.width;
+                height:fields.height - 20;
             }
             style: TabViewStyle {
                 frameOverlap: 0

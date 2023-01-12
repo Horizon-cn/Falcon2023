@@ -20,7 +20,7 @@ class CVisionModule : public QObject {
     bool dealWithData();
     int FPS;
     QTime t;
-    //void setInterfaceIndex(const int);
+    void setInterfaceIndex(const int);
   signals:
     void needDraw();
     void recvPacket();
@@ -28,15 +28,13 @@ class CVisionModule : public QObject {
     void storeData();
   private:
     void receiveVision();
-    void readSimData();
     void edgeTest();
     void udpSend();
     void checkCommand();
     bool collectNewVision();
     QUdpSocket udpReceiveSocket, udpResendSocket;
-    QHostAddress groupAddress;
     quint64 counter;
-    //int _interface;
+    int _interface;
     bool IF_EDGE_TEST;
     Vision_DetectionFrame detectionFrame;
 };

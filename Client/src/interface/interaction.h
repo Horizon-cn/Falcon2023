@@ -10,16 +10,17 @@ class Interaction : public QObject {
     explicit Interaction(QObject *parent = nullptr);
     ~Interaction();
     
-    Q_INVOKABLE void chooseRBKpath(int);
-    Q_INVOKABLE QString getRBKpath(int team) { return RBKpath[team]; }
-    Q_INVOKABLE void chooseSIMpath();
-    Q_INVOKABLE QString getSIMpath() { return SIMpath; }
-    Q_INVOKABLE void chooseCraypath();
-    Q_INVOKABLE QString getCraypath() { return Craypath; }
+    //Q_INVOKABLE void chooseRBKpath(int);
+    //Q_INVOKABLE QString getRBKpath(int team) { return RBKpath[team]; }
+    //Q_INVOKABLE void chooseSIMpath();
+    //Q_INVOKABLE QString getSIMpath() { return SIMpath; }
+    //Q_INVOKABLE void chooseCraypath();
+    //Q_INVOKABLE QString getCraypath() { return Craypath; }
     Q_INVOKABLE bool controlBlueRBK(bool);
     Q_INVOKABLE bool controlYellowRBK(bool);
     Q_INVOKABLE bool controlSim(bool,bool);
-    Q_INVOKABLE bool controlCray(bool);
+    //Q_INVOKABLE bool controlCray(bool);
+    Q_INVOKABLE bool controlMonitor(bool);
     Q_INVOKABLE bool changeRBKSettings(bool, bool);
     Q_INVOKABLE bool connectRadio(bool,int,int);
     Q_INVOKABLE bool connectSim(bool,int);
@@ -49,9 +50,11 @@ class Interaction : public QObject {
     //Q_INVOKABLE void createGameRecorder();
     //Q_INVOKABLE void stopGameRecorder();
 
-    //Q_INVOKABLE QStringList getInterfaces();
-    //Q_INVOKABLE void updateInterfaces();
-    //Q_INVOKABLE void changeVisionInterface(int);
+    Q_INVOKABLE QStringList getInterfaces();
+    Q_INVOKABLE void updateInterfaces();
+    Q_INVOKABLE void changeVisionInterface(int);
+    Q_INVOKABLE void changeGrsimInterface(int);
+    Q_INVOKABLE QStringList getGrsimInterfaces();
     
     Q_INVOKABLE bool connectSerialPort(bool);
     Q_INVOKABLE bool changeSerialFrequency(int);
@@ -67,8 +70,8 @@ private:
     QString RBKdirectory[PARAM::TEAMS];
     QString SIMpath;
     QString SIMdirectory;
-    QString Craypath;
-    QString Craydirectory;
+    //QString Craypath;
+    //QString Craydirectory;
 
 public slots:
 

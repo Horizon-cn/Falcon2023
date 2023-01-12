@@ -11,7 +11,8 @@ Page{
     property bool blueRBKConnect : false;
     property bool yellowRBKConnect : false;
     property bool simConnect : false;
-    property bool crayConnect : false;
+    //property bool crayConnect : false;
+    property bool monitorConnect : false;
     property bool isSimulation : true;
     property bool kill : false;
     property bool ifEdgeTest : false;
@@ -30,8 +31,8 @@ Page{
         running:true;
         repeat:true;
         onTriggered: {
-            //interaction.updateInterfaces();
-            //interfaces4vision.updateModel();
+            interaction.updateInterfaces();
+            interfaces4vision.updateModel();
             radioComboBox.updateModel();
         }
     }
@@ -107,7 +108,6 @@ Page{
                         padding:0;
                         property int itemWidth : width - 2*padding;
                         property bool ifConnected : false;
-                        /**
                         ZComboBox{
                             id:interfaces4vision;
                             enabled:!visionControls.ifConnected;
@@ -122,7 +122,19 @@ Page{
                                 interaction.getInterfaces();
                             }
                         }
-                        **/
+                        ZComboBox{
+                            id:grsimInterface;
+                            model:interaction.getGrsimInterfaces();
+                            onActivated: interaction.changeGrsimInterface(currentIndex);
+                            function updateModel(){
+                                model = interaction.getGrsimInterfaces();
+                                if(currentIndex >= 0)
+                                    interaction.changeGrsimInterface(currentIndex);
+                            }
+                            Component.onCompleted: {
+                                interaction.getGrsimInterfaces();
+                            }
+                        }
                         ZSwitch{
                             id:simulation;
                             enabled:!visionControls.ifConnected;
@@ -178,11 +190,11 @@ Page{
                         horizontalItemAlignment: Grid.AlignHCenter;
                         spacing: 0;
                         rowSpacing: 0;
-                        columns:3;
+                        columns: 2;//3;
                         columnSpacing: 5
                         property int itemWidth :width - 2*padding;
                         Grid {
-                            property int buttonWidth: 60;
+                            property int buttonWidth: parent.itemWidth/2; //60;
                             ZButton{
                                 id: simCtrlBtn;
                                 icon.source:control.simConnect ? "/resource/stop.png" : "/resource/start.png";
@@ -194,7 +206,7 @@ Page{
                             }
                         }
                         Grid {
-                            property int buttonWidth: 70;
+                            property int buttonWidth: parent.width - parent.itemWidth/2 - 4; //70;
                             ZButton{
                                 id: simModeBtn;
                                 enabled:!control.simConnect;
@@ -203,7 +215,7 @@ Page{
                                     simModeBtn.text = simModeBtn.text == "Hide" ? "Show": "Hide";
                                 }
                             }
-                        }
+                        }/**
                         Grid {
                             property int buttonWidth: (parent.width - simCtrlBtn.parent.buttonWidth - simModeBtn.parent.buttonWidth-10);
                             ZButton{
@@ -220,7 +232,7 @@ Page{
                                     elide: Text.ElideMiddle
                                 }
                             }
-                        }
+                        }**/
                     }
                 }
                 ZGroupBox{
@@ -262,12 +274,13 @@ Page{
                             width:parent.itemWidth;
                             icon.source:control.radioConnect ? "/resource/connect.png" : "/resource/disconnect.png";
                             onClicked: {
-                                control.radioConnect = !control.radioConnect;
-                                interaction.connectSerialPort(control.radioConnect);
+                                if(interaction.connectSerialPort(control.radioConnect)){
+                                    control.radioConnect = !control.radioConnect;
+                                }
                             }
                         }
                     }
-                }
+                }/**
                 ZGroupBox{
                     title: qsTr("Cray")
                     visible: !control.isSimulation;
@@ -309,7 +322,7 @@ Page{
                             }
                         }
                     }
-                }
+                }**/
                 ZGroupBox{
                     title: qsTr("Controller")
                     Grid{
@@ -321,6 +334,13 @@ Page{
                         columnSpacing: 5
                         columns:1;
                         property int itemWidth : (width - (columns-1) * columnSpacing - 2*padding)/columns;
+                        ZButton{
+                            icon.source:control.monitorConnect ? "/resource/stop.png" : "/resource/start.png";
+                            onClicked: {
+                                control.monitorConnect = !control.monitorConnect;
+                                interaction.controlMonitor(control.monitorConnect)
+                            }
+                        }
                         Grid {
                             width:parent.width;
                             verticalItemAlignment: Grid.AlignVCenter;
@@ -328,9 +348,9 @@ Page{
                             spacing: 0;
                             rowSpacing: -5;
                             columnSpacing: 5;
-                            columns:3;
+                            columns:2; //3;
                             Grid {
-                                property int buttonWidth : 60;
+                                property int buttonWidth : parent.parent.itemWidth/2; //60;
                                 ZButton{
                                     id: bluerbk;
                                     icon.source:control.blueRBKConnect ? "/resource/stop.png" : "/resource/start.png";
@@ -353,7 +373,7 @@ Page{
                                 }
                             }
                             Grid{
-                                property int buttonWidth : 70;
+                                property int buttonWidth : parent.width - parent.parent.itemWidth/2 - 4; //70;
                                 ZButton{
                                     id: blueSideBtn;
                                     enabled:!control.blueRBKConnect;
@@ -362,7 +382,7 @@ Page{
                                         blueSideBtn.text = blueSideBtn.text == "LEFT" ? "RIGHT": "LEFT";
                                     }
                                 }
-                            }
+                            }/**
                             Grid{
                                 property int buttonWidth : parent.width - bluerbk.parent.buttonWidth - blueSideBtn.parent.buttonWidth - 10;
                                 ZButton{
@@ -379,9 +399,9 @@ Page{
                                         elide: Text.ElideMiddle;
                                     }
                                 }
-                            }
+                            }**/
                             Grid{
-                                property int buttonWidth : 60;
+                                property int buttonWidth : parent.parent.itemWidth/2; //60;
                                 ZButton{
                                     id: yellowrbk;
                                     icon.source:control.yellowRBKConnect ? "/resource/stop.png" : "/resource/start.png";
@@ -404,7 +424,7 @@ Page{
                                 }
                             }
                             Grid{
-                                property int buttonWidth : 70;
+                                property int buttonWidth : parent.width - parent.parent.itemWidth/2 - 4; //70;
                                 ZButton{
                                     id: yellowSideBtn;
                                     enabled:!control.yellowRBKConnect;
@@ -413,7 +433,7 @@ Page{
                                         yellowSideBtn.text = yellowSideBtn.text == "LEFT" ? "RIGHT": "LEFT";
                                     }
                                 }
-                            }
+                            }/**
                             Grid{
                                 property int buttonWidth : parent.width - yellowrbk.parent.buttonWidth - yellowSideBtn.parent.buttonWidth - 10;;
                                 ZButton{
@@ -430,7 +450,7 @@ Page{
                                         elide: Text.ElideMiddle;
                                     }
                                 }
-                            } 
+                            }**/ 
                         }
                     }
                 }

@@ -14,9 +14,9 @@ getBayesParam 输出一只队伍的参数
 #include<sstream>
 
 #ifdef WIN32
-const string CBayesReader::SCRIPT_PATH = "data\\ssl\\params\\GameFilterParam\\"; 
+const string CBayesReader::SCRIPT_PATH = "..\\data\\ssl\\params\\GameFilterParam\\"; 
 #else
-const string CBayesReader::SCRIPT_PATH = "data/ssl/params/GameFilterParam/";
+const string CBayesReader::SCRIPT_PATH = "../data/ssl/params/GameFilterParam/";
 #endif
 
 //////////////////////////////////////////////////////////////////////////

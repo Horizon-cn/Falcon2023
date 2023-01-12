@@ -14,7 +14,12 @@ auto cpm = Owl::CParamManager::Instance();
 }
 CSimulator::CSimulator(QObject *parent) : QObject(parent)
 {
-    sendSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, 1);
+    if (opm->useSimInside) {
+
+    }
+    else {
+        sendSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, 1);
+    }
 }
 CSimulator::~CSimulator(){
     sendSocket.abort();
@@ -92,8 +97,13 @@ void CSimulator::controlSingleRobot(int num,bool team){
     send(&packet);
 }
 void CSimulator::send(grSim_Packet* packet){
-    int size = packet->ByteSize();
-    QByteArray buffer(size,0);
-    packet->SerializeToArray(buffer.data(), size);
-    sendSocket.writeDatagram(buffer,size, QHostAddress(cpm->sim_address), cpm->sim_send);
+    if (opm->useSimInside) {
+
+    }
+    else {
+        int size = packet->ByteSize();
+        QByteArray buffer(size,0);
+        packet->SerializeToArray(buffer.data(), size);
+        sendSocket.writeDatagram(buffer,size, QHostAddress(cpm->sim_address), cpm->sim_send);
+    }
 }

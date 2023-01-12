@@ -1,36 +1,37 @@
-#ifndef SIMMODULE_H
-#define SIMMODULE_H
+#ifndef REMOTESIM_H
+#define REMOTESIM_H
+
 #include <QObject>
 #include <QUdpSocket>
 #include "singleton.h"
 #include "zss_cmd.pb.h"
-#include "src_cmd.pb.h"
 
-namespace Owl{
-class SimModule : public QObject{
+namespace ZSS{
+
+class RemoteSim : public QObject
+{
     Q_OBJECT
 public:
-    SimModule(QObject *parent = 0);
-    ~SimModule();
+    RemoteSim(QObject *parent = 0);
+    ~RemoteSim();
     bool connectSim(bool);
     bool disconnectSim(bool);
     void sendSim(int t, ZSS::Protocol::Robots_Command& command);
-    //void sendSim(int t, rbk::protocol::SRC_Cmd& command);
-    //void sendEmptySim();
 private slots:
     void readBlueData();
     void readYellowData();
 private:
     QByteArray tx;
     QByteArray rx;
-    // QUdpSocket sendSocket;
     QString receiveAddress;
     QUdpSocket blueReceiveSocket;
     QUdpSocket yellowReceiveSocket;
     QUdpSocket command_socket;
+    QString RemoteAddress;
 signals:
-    void receiveSimInfo(int,int);
+    void receiveRemoteInfo(int,int);
 };
-typedef Falcon::MeyersSingleton<SimModule> ZSimModule;
+
+typedef Falcon::MeyersSingleton<RemoteSim> ZRemoteSimModule;
 }
-#endif
+#endif // REMOTESIM_H

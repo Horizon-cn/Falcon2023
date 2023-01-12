@@ -7,9 +7,9 @@
 
 namespace{
 #ifdef WIN32
-    const string CONFIG_PATH = "data\\ssl\\defence_config\\";
+    const string CONFIG_PATH = "..\\data\\ssl\\defence_config\\";
 #else
-    const string CONFIG_PATH = "data/ssl/defence_config/";
+    const string CONFIG_PATH = "../data/ssl/defence_config/";
 #endif
 }
 COppRoleMatcher::COppRoleMatcher()

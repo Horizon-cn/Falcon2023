@@ -931,7 +931,7 @@ void Field::drawDebugMessages(int team) {
     pixmapPainter.setBrush(QBrush(DEBUG_BRUSH_COLOR));
     for(int i = 0; i < msgs.msgs_size(); i++) {
         auto& msg = msgs.msgs(i);
-        pixmapPainter.setPen(QPen(DEBUG_COLOR[msg.color()], ::w(15)));
+        pixmapPainter.setPen(QPen(DEBUG_COLOR[msg.color()], ::w(10)));
         double radius;
         switch(msg.type()) {
         case ZSS::Protocol::Debug_Msg_Debug_Type_ARC:

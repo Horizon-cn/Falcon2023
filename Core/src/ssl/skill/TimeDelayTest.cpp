@@ -17,8 +17,8 @@ namespace{
 	const int timeBase = 200;
 	bool canTakeTest = false;
 	unsigned int countNum = 0;
-	ofstream timeDelayData("./timeDelayData.txt");
-	//ofstream timeDelayData_X("./timeDelayData_X.txt");
+	ofstream timeDelayData("../data/timeDelayData.txt");
+	//ofstream timeDelayData_X("../data/timeDelayData_X.txt");
     QTime cur_time;
 }
 

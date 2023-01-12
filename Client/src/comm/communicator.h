@@ -2,7 +2,6 @@
 #define COMMUNICATOR_H
 
 #include <QObject>
-#include <QMutex>
 #include <QUdpSocket>
 #include <singleton.h>
 #include "globaldata.h"
@@ -17,15 +16,19 @@ class Communicator : public QObject {
     ~Communicator();
     bool connectMedusa(int);
     bool disconnectMedusa(int);
+    void setGrsimInterfaceIndex(const int index);
+    int getGrsimInterfaceIndex() {return grsimInterfaceIndex;}
     int getFPS(int);
     const Owl::RobotCommands getCommands(int t) {
         return commandBuffer[t];
     }
     void clearCommands() {
         commandBuffer[PARAM::BLUE] = Owl::RobotCommands();
+        commandBuffer[PARAM::YELLOW] = Owl::RobotCommands();
     }
     void startRecordCommands(bool);
-    void recordCommands(rbk::protocol::SRC_Cmd);
+    void recordCommands(ZSS::Protocol::Robots_Command);
+    //void recordCommands(rbk::protocol::SRC_Cmd);
   private slots:
     void receiveCommand(int);
     void sendCommand(int, int);
@@ -36,8 +39,7 @@ class Communicator : public QObject {
     QStringList networkInterfaceReadableNames;
     Owl::RobotCommands commandBuffer[PARAM::TEAMS];
     int networkInterfaceIndex;
-    QMutex robotInfoMutex;
-    bool isSimulation;
+    int grsimInterfaceIndex;
     QString filename;
     bool startRecord = false;
 };

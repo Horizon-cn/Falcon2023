@@ -13,7 +13,7 @@
 #include <QtDebug>
 #include <QFile>
 #include "staticparams.h"
-//#include "sslworld.h"
+#include "networkinterfaces.h"
 
 namespace {
     std::thread* visionReceiveThread = nullptr;
@@ -31,7 +31,7 @@ CVisionModule::CVisionModule(QObject *parent)
     , udpReceiveSocket()
     , udpResendSocket()
     , IF_EDGE_TEST(false)
-    //, _interface(0)
+    , _interface(0)
     {
 
     }
@@ -48,17 +48,22 @@ void CVisionModule::setIfEdgeTest(bool isEdgeTest) {
  */
 void CVisionModule::udpSocketConnect() {
     GlobalData::Instance()->initVision();
-    if(opm->useSimInside && opm->isSimulation) {
-        //World::Instance()->start();
-        visionReceiveThread = new std::thread([=] {readSimData();});
-        visionReceiveThread->detach();
+    int vision_port; //= opm->isSimulation ? opm->VisionSim : opm->VisionReal;
+    int grsimInterface = ZCommunicator::Instance()->getGrsimInterfaceIndex();
+    if (!opm->isSimulation) {
+        vision_port = opm->VisionReal;
+    }
+    else if(grsimInterface != 0) {
+        vision_port = opm->VisionRemote;
     }
     else {
-        int vision_port = opm->isSimulation ? opm->VisionSim : opm->VisionReal;
+        vision_port = opm->VisionReal;
+    }
+    if (!opm->isSimulation || grsimInterface != 0 || !opm->useSimInside) {
         //qDebug() << "VisionPort : " << vision_port;
         udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress);
-        udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address));
-        //udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address), NetworkInterfaces::Instance()->getFromIndex(_interface));
+        //udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address));
+        udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address), NetworkInterfaces::Instance()->getFromIndex(_interface));
         connect(&udpReceiveSocket, SIGNAL(readyRead()), this, SLOT(storeData()), Qt::DirectConnection);
         //if(udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)
         //    && udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address))){
@@ -66,8 +71,11 @@ void CVisionModule::udpSocketConnect() {
         //    visionReceiveThread->detach();
         //}
     }
+    else {
+
+    }
 }
-//void CVisionModule::setInterfaceIndex(const int index) { _interface = index; }
+void CVisionModule::setInterfaceIndex(const int index) { _interface = index; }
 /**
  * @brief disconnect UDP
  */
@@ -117,14 +125,6 @@ void CVisionModule::receiveVision(){
                 qDebug()<<"resend to autoref";
             }
             parse((void*)datagram.data(), datagram.size());
-        }
-    }
-}
-void CVisionModule::readSimData(){
-    while (true) {
-        if (GlobalData::Instance()->updateSimVision) {
-            GlobalData::Instance()->updateSimVision = false;
-            parse((void*)GlobalData::Instance()->simVision.data(), GlobalData::Instance()->simVision.size());
         }
     }
 }
@@ -263,8 +263,6 @@ void  CVisionModule::udpSend() {
         detectionBall->set_x(-32767);
         detectionBall->set_y(-32767);
     }
-    //detectionBall->set_p(Maintain::Instance()->getP().to_str());
-    //detectionBall->set_q(Maintain::Instance()->getQ().to_str());
     for (int team = 0; team < PARAM::TEAMS; team++) {
         for (int i = 0; i < result.robotSize[team]; i++) {
             if (i >= PARAM::ROBOTMAXID) break; //for sending MAX 11 car possible
@@ -295,8 +293,6 @@ void  CVisionModule::udpSend() {
             robot->set_raw_y(GlobalData::Instance()->processRobot[-1].robot[team][i].pos.y());
             robot->set_raw_orientation(GlobalData::Instance()->processRobot[-1].robot[team][i].angle);
             robot->set_valid(true);
-            //robot->set_p(DealRobot::Instance()->getP(team,i).to_str());
-            //robot->set_q(DealRobot::Instance()->getQ(team,i).to_str());
         }
     }
 

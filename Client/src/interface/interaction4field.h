@@ -5,6 +5,7 @@
 #include "visionmodule.h"
 #include "communicator.h"
 #include "field.h"
+#include "dealball.h"
 class Interaction4Field : public QObject
 {
     Q_OBJECT
@@ -13,6 +14,9 @@ public:
     ~Interaction4Field();
     Q_INVOKABLE int getFPS(){ return VisionModule::Instance()->getFPS();}
     Q_INVOKABLE int getRBKFPS(int team){ return ZCommunicator::Instance()->getFPS(team); }
+    Q_INVOKABLE double getBallVelocity() {
+        return DealBall::Instance()->getBallSpeed();
+    }
     Q_INVOKABLE void setArea(int a,int b,int c,int d);
     Q_INVOKABLE void resetArea();
 //    Q_INVOKABLE void moveField(int,int);
