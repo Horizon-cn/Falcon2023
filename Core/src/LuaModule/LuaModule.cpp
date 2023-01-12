@@ -44,7 +44,7 @@ CLuaModule::CLuaModule()
 	luaL_openlibs(m_pScriptContext);
 	tolua_zeus_open(m_pScriptContext);
 	InitLuaGlueFunc();
-	//	RunScript("./lua_scripts/ssl/StartZeus.lua");
+	//	RunScript("../lua_scripts/ssl/StartZeus.lua");
 
     pOption = new COptionModule();
 }

@@ -57,7 +57,7 @@ void CVisionModule::udpSocketConnect() {
         vision_port = opm->VisionRemote;
     }
     else {
-        vision_port = opm->VisionReal;
+        vision_port = opm->VisionSim;
     }
     if (!opm->isSimulation || grsimInterface != 0 || !opm->useSimInside) {
         //qDebug() << "VisionPort : " << vision_port;

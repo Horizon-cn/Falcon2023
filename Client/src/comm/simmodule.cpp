@@ -78,13 +78,13 @@ SimModule::~SimModule() {
 bool SimModule::connectSim(bool color) {
     if(color) {
         if(yellowReceiveSocket.bind(QHostAddress::AnyIPv4, cpm->yellow_status, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)) {
-            qDebug() << "Yellow connect successfully!!!";
+            qDebug() << "Yellow connect successfully!!! --simmodule";
             return true;
         }
         return false;
     }
     if(blueReceiveSocket.bind(QHostAddress::AnyIPv4, cpm->blue_status, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)) {
-        qDebug() << "Blue connect successfully!!!";
+        qDebug() << "Blue connect successfully!!! --simmodule";
         return true;
     }
     return false;
