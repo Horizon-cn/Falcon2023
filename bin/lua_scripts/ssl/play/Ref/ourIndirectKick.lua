@@ -12,13 +12,13 @@ function isCorner()
     end
 end
 if isCorner() and ball.refPosX()>=0 then
-	dofile("./lua_scripts/ssl/play/Ref/CornerKick/CornerKick.lua")
+	dofile("../lua_scripts/ssl/play/Ref/CornerKick/CornerKick.lua")
 
 elseif ball.refPosX()>200 then
-	dofile("./lua_scripts/ssl/play/Ref/FrontKick/FrontKick.lua")
+	dofile("../lua_scripts/ssl/play/Ref/FrontKick/FrontKick.lua")
 elseif ball.refPosX() < 200 and ball.refPosX() > -200 then
-	dofile("./lua_scripts/ssl/play/Ref/MiddleKick/MiddleKick.lua")
+	dofile("../lua_scripts/ssl/play/Ref/MiddleKick/MiddleKick.lua")
 else
-	dofile("./lua_scripts/ssl/play/Ref/BackKick/BackKick.lua")
+	dofile("../lua_scripts/ssl/play/Ref/BackKick/BackKick.lua")
 end
 gOurIndirectTable.lastRefCycle = vision:Cycle()

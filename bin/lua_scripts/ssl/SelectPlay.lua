@@ -13,13 +13,13 @@
 gNormalPlay = gOppoConfig.NorPlay
 -- 先注掉，在需要时可以开启使用
 -- if (not IS_TEST_MODE) and USE_SWITCH and gSwitchNum["state"] == "backup" then
--- 	dofile("./lua_scripts/ssl/opponent/Backup.lua")
+-- 	dofile("../lua_scripts/ssl/opponent/Backup.lua")
 -- else
--- 	dofile("./lua_scripts/ssl/opponent/"..OPPONENT_NAME..".lua")	
+-- 	dofile("../lua_scripts/ssl/opponent/"..OPPONENT_NAME..".lua")	
 -- end
 
 function RunRefScript(name)
-	local filename = "./lua_scripts/ssl/play/Ref/"..name..".lua"
+	local filename = "../lua_scripts/ssl/play/Ref/"..name..".lua"
 	dofile(filename)
 end
 

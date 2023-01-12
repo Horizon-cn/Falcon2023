@@ -1,8 +1,8 @@
-package.path = package.path .. ";./lua_scripts/ssl/skill/?.lua"
-package.path = package.path .. ";./lua_scripts/ssl/play/?.lua"
-package.path = package.path .. ";./lua_scripts/ssl/worldmodel/?.lua"
-package.path = package.path .. ";./lua_scripts/ssl/utils/?.lua"
-package.path = package.path .. ";./lua_scripts/ssl/opponent/?.lua"
+package.path = package.path .. ";../lua_scripts/ssl/skill/?.lua"
+package.path = package.path .. ";../lua_scripts/ssl/play/?.lua"
+package.path = package.path .. ";../lua_scripts/ssl/worldmodel/?.lua"
+package.path = package.path .. ";../lua_scripts/ssl/utils/?.lua"
+package.path = package.path .. ";../lua_scripts/ssl/opponent/?.lua"
 
 print("Step in Zeus.lua")
 
@@ -33,12 +33,12 @@ require("score")
 --require("combo")
 
 for _, value in ipairs(gSkill) do
-	local filename = "./lua_scripts/ssl/skill/"..value..".lua"
+	local filename = "../lua_scripts/ssl/skill/"..value..".lua"
 	dofile(filename)
 end
 
 for _, value in ipairs(gPlay) do
-	local filename = "./lua_scripts/ssl/play/"..value..".lua"
+	local filename = "../lua_scripts/ssl/play/"..value..".lua"
 	dofile(filename)
 end
 

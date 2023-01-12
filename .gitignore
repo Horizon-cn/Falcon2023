@@ -103,40 +103,44 @@ Core/*_pb2.py
 Core/share/proto/cpp/
 
 ZBin/*
-!ZBin/*.ini
-!ZBin/lua_scripts
-!ZBin/data
-!ZBin/*.sh
+# !ZBin/*.ini
+# !ZBin/lua_scripts
+# !ZBin/data
+# !ZBin/*.sh
 
-ZBin/Qt*
-ZBin/*.dll
-ZBin/*.exe
+# ZBin/Qt*
+# ZBin/*.dll
+# ZBin/*.exe
 # ZBin/*.ini
-ZBin/*.txt
-ZBin/*.label*
+# ZBin/*.txt
+# ZBin/*.label*
 
-ZBin/3rdParty/*
-ZBin/LOG/*.log
-ZBin/Client.exp
-ZBin/Client.lib
-ZBin/Client
-ZBin/Core
-ZBin/Core2
-ZBin/CoreD
-ZBin/grsim
-ZBin/Crazy
-ZBin/Client
-ZBin/Crazy2018
-ZBin/ballSpeedLog.txt
-ZBin/Core
-ZBin/Controller
+# ZBin/3rdParty/*
+# ZBin/LOG/*.log
+# ZBin/Client.exp
+# ZBin/Client.lib
+# ZBin/Client
+# ZBin/Core
+# ZBin/Core2
+# ZBin/CoreD
+# ZBin/grsim
+# ZBin/Crazy
+# ZBin/Client
+# ZBin/Crazy2018
+# ZBin/ballSpeedLog.txt
+# ZBin/Core
+# ZBin/Controller
 # python
-ZBin/__pycache__
-ZBin/*.py[cod]
-ZBin/*$py.class
-ZBin/Oppo/*
+# ZBin/__pycache__
+# ZBin/*.py[cod]
+# ZBin/*$py.class
+# ZBin/Oppo/*
 
-bin/
+bin/base
+!bin/base/ProcessAlive.sh
+bin/LOG
+bin/Oppo
+bin/package.txt
 
 build*/
 
