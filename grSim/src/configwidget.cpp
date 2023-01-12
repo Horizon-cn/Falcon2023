@@ -43,11 +43,11 @@ ConfigWidget::ConfigWidget()
 
   VarListPtr game_vars(new VarList("Game"));
   geo_vars->addChild(game_vars);
-  ADD_ENUM(StringEnum, Division, "Division A", "Division")
+  ADD_ENUM(StringEnum, Division, "Division B", "Division")
   ADD_TO_ENUM(Division, "Division A");
   ADD_TO_ENUM(Division, "Division B");
   END_ENUM(game_vars, Division);
-  ADD_VALUE(game_vars,Intz, Robots_Count, 8, "Robots Count")
+  ADD_VALUE(game_vars,Intz, Robots_Count, 6, "Robots Count")
   VarListPtr fields_vars(new VarList("Field"));
   VarListPtr div_a_vars(new VarList("Division A"));
   VarListPtr div_b_vars(new VarList("Division B"));
@@ -88,9 +88,9 @@ ConfigWidget::ConfigWidget()
   ADD_VALUE(div_b_vars, Double, DivB_Goal_Width,1.000,"Goal width")
   ADD_VALUE(div_b_vars, Double, DivB_Goal_Height,0.160,"Goal height")
 
-  ADD_ENUM(StringEnum,YellowTeam,"Parsian","Yellow Team");
+  ADD_ENUM(StringEnum,YellowTeam,"SRC","Yellow Team");
   END_ENUM(geo_vars,YellowTeam)
-  ADD_ENUM(StringEnum,BlueTeam,"Parsian","Blue Team");
+  ADD_ENUM(StringEnum,BlueTeam,"SRC","Blue Team");
   END_ENUM(geo_vars,BlueTeam)
 
     VarListPtr ballg_vars(new VarList("Ball"));
@@ -100,18 +100,18 @@ ConfigWidget::ConfigWidget()
   world.push_back(phys_vars);
     VarListPtr worldp_vars(new VarList("World"));
     phys_vars->addChild(worldp_vars);
-        ADD_VALUE(worldp_vars,Intz,NumOfCam,4,"The number of cameras")
-        ADD_VALUE(worldp_vars,Double,DesiredFPS,150,"Desired FPS")
+        ADD_VALUE(worldp_vars,Intz,NumOfCam,1,"The number of cameras")
+        ADD_VALUE(worldp_vars,Double,DesiredFPS,75,"Desired FPS")
         ADD_VALUE(worldp_vars,Bool,SyncWithGL,false,"Synchronize ODE with OpenGL")
         ADD_VALUE(worldp_vars,Double,DeltaTime,0.016,"ODE time step")
         ADD_VALUE(worldp_vars,Double,Gravity,9.8,"Gravity")
         ADD_VALUE(worldp_vars,Bool,ResetTurnOver,true,"Auto reset turn-over")
-		ADD_VALUE(worldp_vars, Bool, EnableYellowSim, false, "Enable Yellow Simulator")		//xjw
-		ADD_VALUE(worldp_vars, Bool, EnableWallSim, false, "Enable Wall Simulator")			//xjw
+		ADD_VALUE(worldp_vars, Bool, EnableYellowSim, true, "Enable Yellow Simulator")		//xjw
+		ADD_VALUE(worldp_vars, Bool, EnableWallSim, true, "Enable Wall Simulator")			//xjw
   VarListPtr ballp_vars(new VarList("Ball"));
     phys_vars->addChild(ballp_vars);
         ADD_VALUE(ballp_vars,Double,BallMass,0.043,"Ball mass");
-        ADD_VALUE(ballp_vars,Double,BallFriction,0.05,"Ball-ground friction")
+        ADD_VALUE(ballp_vars,Double,BallFriction,0.1,"Ball-ground friction")
         ADD_VALUE(ballp_vars,Double,BallSlip,1,"Ball-ground slip")
         ADD_VALUE(ballp_vars,Double,BallBounce,0.5,"Ball-ground bounce factor")
         ADD_VALUE(ballp_vars,Double,BallBounceVel,0.1,"Ball-ground bounce min velocity")

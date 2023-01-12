@@ -1,5 +1,9 @@
 set(TARGET_NAME grSim)
 
+IF(WIN32)
+    message(${CMAKE_C_FLAGS})
+ENDIF()
+
 # definitions for knowing the OS from the code
 if(MSVC)
     add_definitions(-DHAVE_MSVC)

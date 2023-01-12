@@ -125,7 +125,7 @@
 			</Var>
 		</Var>
 		<Var name="Blue Team" type="stringenum">
-			Parsian
+			SRC
 			<Var name="0" type="string">
 				ZJUNlict
 			</Var>
@@ -143,7 +143,7 @@
 			</Var>
 		</Var>
 		<Var name="Yellow Team" type="stringenum">
-			Parsian
+			SRC
 			<Var name="0" type="string">
 				ZJUNlict
 			</Var>
@@ -193,7 +193,7 @@
 				0.043000
 			</Var>
 			<Var name="Ball-ground friction" type="double" minval="" maxval="">
-				0.050000
+				0.100000
 			</Var>
 			<Var name="Ball-ground slip" type="double" minval="" maxval="">
 				1.000000

@@ -1,6 +1,7 @@
 set(TARGET_NAME Client)
 
 if (WIN32)
+    message(${CMAKE_C_FLAGS})
     # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 endif()
 

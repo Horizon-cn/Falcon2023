@@ -1,13 +1,7 @@
 set(TARGET_NAME Core)
 
 IF(WIN32)
-    # muti-processors build for VS
-    include(ProcessorCount)
-    ProcessorCount(N)
-    if(NOT N EQUAL 0)
-        SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   /MP${N} ")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP${N} ")
-    endif()
+    message(${CMAKE_C_FLAGS})
 ENDIF()
 
 set(libs)
@@ -103,6 +97,8 @@ aux_source_directory(./src/ssl/PointCalculation DIR_SSL_POINTCALCULATION_SRCS)
 aux_source_directory(./src/ssl/Vision DIR_SSL_VISION_SRCS)
 aux_source_directory(./src/ssl/WorldModel DIR_SSL_WORLDMODEL_SRCS)
 aux_source_directory(${CMAKE_SOURCE_DIR}/share DIR_SHARE_SRCS)
+## rc files
+FILE(GLOB RCFILES "${CMAKE_CURRENT_SOURCE_DIR}/*.rc")
 # for VS solution file
 IF(WIN32)
 source_group("include" FILES ${HEADERS})
@@ -134,6 +130,7 @@ source_group("include\\ssl\\WorldModel" FILES ${SSL_WORLDMODEL_HEADERS})
 source_group("src\\ssl\\WorldModel" FILES ${DIR_SSL_WORLDMODEL_SRCS})
 source_group("include\\share" FILES ${SHARE_HEADERS})
 source_group("src\\share" FILES ${DIR_SHARE_SRCS})
+source_group("rc" FILES ${RCFILES})
 ENDIF()
 add_executable(${TARGET_NAME} 
 		${PROTO_H} 
@@ -166,5 +163,6 @@ add_executable(${TARGET_NAME}
 		${SSL_POINTCALCULATION_HEADERS}
 		${SSL_VISION_HEADERS}
 		${SSL_WORLDMODEL_HEADERS}
-		${SHARE_HEADERS})
+		${SHARE_HEADERS}
+                                ${RCFILES})
 target_link_libraries(${TARGET_NAME} PRIVATE ${libs})
