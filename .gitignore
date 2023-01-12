@@ -140,7 +140,7 @@ bin/
 
 build*/
 
-grSim/
+# grSim/
 Crazy/
 Autoref/
 Client/lib
