@@ -166,7 +166,7 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu->addAction(robotwidget->toggleViewAction());
     viewMenu->addMenu(glwidget->cameraMenu);
 
-    //addDockWidget(Qt::LeftDockWidgetArea,dockconfig);
+    addDockWidget(Qt::LeftDockWidgetArea,dockconfig);
     addDockWidget(Qt::BottomDockWidgetArea, statusWidget);
     addDockWidget(Qt::LeftDockWidgetArea, robotwidget);
 

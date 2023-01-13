@@ -39,6 +39,5 @@ ENDFOREACH()
 add_subdirectory(Client)
 add_subdirectory(Core)
 add_subdirectory(grSim)
-# add_subdirectory(Controller)
 
 include(${PROJECT_SOURCE_DIR}/cmake/CopyThirdParty.cmake)
