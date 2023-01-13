@@ -43,6 +43,9 @@ Copyright (C) 2011, Parsian Robotic Center (eew.aut.ac.ir/~parsian/grsim)
 #include <VarXML.h>
 #include <VarTypes.h>
 
+#include "params.h"
+#include "singleton.h"
+
 using namespace VarTypes;
 
 
@@ -219,5 +222,33 @@ class ConfigDockWidget : public QDockWidget
   signals:
     void closeSignal(bool);
 };
+
+class ParamManagerOwl : public Falcon::ParamManager {
+public:
+    ParamManagerOwl() : ParamManager("../data/owl2.ini") {}
+    ~ParamManagerOwl() {}
+};
+typedef Falcon::MeyersSingleton<ParamManagerOwl> OParamManager;
+
+class ParamManagerCfg : public Falcon::ParamManager {
+public:
+    ParamManagerCfg() : ParamManager("../data/cfg.ini") {}
+    ~ParamManagerCfg() {}
+};
+typedef Falcon::MeyersSingleton<ParamManagerCfg> CParamManager;
+
+class ParamManagerVision : public Falcon::ParamManager {
+public:
+    ParamManagerVision() : ParamManager("../data/vision.ini") {}
+    ~ParamManagerVision() {}
+};
+typedef Falcon::MeyersSingleton<ParamManagerVision> VParamManager;
+
+class ParamManagerSimulator : public Falcon::ParamManager {
+public:
+    ParamManagerSimulator() : ParamManager("../data/simulator.ini") {}
+    ~ParamManagerSimulator() {}
+};
+typedef Falcon::MeyersSingleton<ParamManagerSimulator> SParamManager;
 
 #endif // CONFIGWIDGET_H

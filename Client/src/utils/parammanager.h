@@ -67,8 +67,8 @@ class ParamManagerOwl: public Falcon::ParamManager {
       loadParam(field_width, field+"/field_width", 9000);
       loadParam(goal_width, field+"/goal_width", 1200);
       loadParam(goal_depth, field+"/goal_depth",  200);
-      loadParam(penalty_depth, field+"/penalty_depth", 1000);
-      loadParam(penalty_width, field+"/penalty_width", 2000);
+      loadParam(penalty_depth, field+"/penalty_depth", 1200);
+      loadParam(penalty_width, field+"/penalty_width", 2400);
       loadParam(center_radius, field+"/center_radius",  500);
       if(field == "Division_B") {
         loadParam(if_ellipse_penalty, field+"/if_ellipse_penalty", false);
@@ -81,7 +81,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
       loadParam(yellowTeam, "Team/yellowTeam", "SRC");
       loadParam(KeeperID, "Team/KeeperID", 0);
       //Camera Settings
-      loadParam(total_cameras, "Camera/total_cameras", 4);
+      loadParam(total_cameras, "Camera/total_cameras", 1);
       //Special Vision Process
       loadParam(projection, "Vision/projection", false);
       loadParam(detectBallInRobot, "Vision/detectBallInRobot", true);
@@ -283,104 +283,6 @@ class ParamManagerVision: public Falcon::ParamManager {
     double ball_fast_dec;
     double ball_slow_dec;
 };
-class ParamManagerSimulator: public Falcon::ParamManager {
-  public:
-    ParamManagerSimulator(): ParamManager("../data/simulator.ini") {}
-    ~ParamManagerSimulator() {}
-    template <class T>
-    void updateParam(T& var, const QString & key, const QVariant & value, bool update) {
-      changeParam(key, value);
-      if(update) loadParam(var, key); //loadParamFromFile();
-    }
-    void updateParam(const QString & group, const QString & key, const QVariant & value, bool update) {
-      changeParam(group, key, value);
-      if(update) loadParamFromFile();
-    }
-    void loadParamFromFile() {
-      //
-      //geometeric settings
-      RobotCenterFromKicker = value("Geometery/CenterFromKicker", 0.073).toDouble();
-      RobotRadius = value("Geometery/Radius", 0.09).toDouble();
-      RobotHeight = value("Geometery/Height", 0.13).toDouble();
-      BottomHeight = value("Geometery/RobotBottomZValue", 0.02).toDouble();
-      KickerZ = value("Geometery/KickerZValue", 0.005).toDouble();
-      KickerThickness = value("Geometery/KickerThickness", 0.005).toDouble();
-      KickerWidth = value("Geometery/KickerWidth", 0.08).toDouble();
-      KickerHeight = value("Geometery/KickerHeight", 0.04).toDouble();
-      WheelRadius = value("Geometery/WheelRadius", 0.0325).toDouble();
-      WheelThickness = value("Geometery/WheelThickness", 0.005).toDouble();
-      Wheel1Angle = value("Geometery/Wheel1Angle", 60).toDouble();
-      Wheel2Angle = value("Geometery/Wheel2Angle", 135).toDouble();
-      Wheel3Angle = value("Geometery/Wheel3Angle", 225).toDouble();
-      Wheel4Angle = value("Geometery/Wheel4Angle", 300).toDouble();
-      //physical settings
-      BodyMass  = value("Physics/BodyMass", 2).toDouble();
-      WheelMass = value("Physics/WheelMass", 0.2).toDouble();
-      KickerMass= value("Physics/KickerMass",0.02).toDouble();
-      KickerDampFactor = value("Physics/KickerDampFactor", 0.2f).toDouble();
-      RollerTorqueFactor = value("Physics/RollerTorqueFactor", 0.06f).toDouble();
-      RollerPerpendicularTorqueFactor = value("Physics/RollerPerpendicularTorqueFactor", 0.005f).toDouble();
-      Kicker_Friction = value("Physics/KickerFriction", 0.8f).toDouble();
-      WheelTangentFriction = value("Physics/WheelTangentFriction", 0.8f).toDouble();
-      WheelPerpendicularFriction = value("Physics/WheelPerpendicularFriction", 0.05f).toDouble();
-      Wheel_Motor_FMax = value("Physics/WheelMotorMaximumApplyingTorque", 0.2f).toDouble();
-    }
-  public:
-    //world settings
-    bool SyncWithGL;
-    bool ResetTurnOver;
-    bool EnableYellowSim;
-    bool EnableWallSim;
-    //ball settings
-    double BallMass;
-    double BallFriction;
-    double BallSlip;
-    double BallBounce;
-    double BallBounceVel;
-    double BallLinearDamp;
-    double BallAngularDamp;
-    //communication settings
-    double sendDelay;
-    double sendGeometryEvery;
-    //gauss settings
-    bool noise;
-    double bot_noiseDeviation_x;
-    double bot_noiseDeviation_y;
-    double bot_noiseDeviation_angle;
-    double ball_noiseDeviation_x;
-    double ball_noiseDeviation_y;
-    bool vanishing;
-    double blue_team_vanishing;
-    double yellow_team_vanishing;
-    double ball_vanishing;
-    //geometeric settings
-    double RobotCenterFromKicker;
-    double RobotRadius;
-    double RobotHeight;
-    double BottomHeight;
-    double KickerZ;
-    double KickerThickness;
-    double KickerWidth;
-    double KickerHeight;
-    double WheelRadius;
-    double WheelThickness;
-    double Wheel1Angle;
-    double Wheel2Angle;
-    double Wheel3Angle;
-    double Wheel4Angle;
-    //physical settings
-    double BodyMass;
-    double WheelMass;
-    double KickerMass;
-    double KickerDampFactor;
-    double RollerTorqueFactor;
-    double RollerPerpendicularTorqueFactor;
-    double Kicker_Friction;
-    double WheelTangentFriction;
-    double WheelPerpendicularFriction;
-    double Wheel_Motor_FMax;
-
-};
 class ParamManagerKickParam: public Falcon::ParamManager {
   public:
     ParamManagerKickParam(): ParamManager("../data/kickparam.ini") {}
@@ -394,7 +296,6 @@ class ParamManagerLogClip: public Falcon::ParamManager {
 typedef Falcon::MeyersSingleton<ParamManagerOwl> OParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerCfg> CParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerVision> VParamManager;
-typedef Falcon::MeyersSingleton<ParamManagerSimulator> SParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerKickParam> KParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerLogClip> LParamManager;
 }

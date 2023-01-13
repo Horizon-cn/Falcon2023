@@ -31,23 +31,33 @@ Copyright (C) 2011, Parsian Robotic Center (eew.aut.ac.ir/~parsian/grsim)
 
 
 ConfigWidget::ConfigWidget()
-{      
+{ 
+    auto opm = OParamManager::Instance();
+    auto cpm = CParamManager::Instance();
+    auto vpm = VParamManager::Instance();
+    auto spm = SParamManager::Instance();
+    opm->setFileName();
+    cpm->setFileName();
+    vpm->setFileName();
+    spm->setFileName();
+    
   tmodel=new VarTreeModel();
   this->setModel(tmodel);
   use_vars = VarListPtr(new VarList("User"));
   world.push_back(use_vars); 
-  ADD_VALUE(use_vars,Double,LoginName,0,"LoginName")
+  ADD_VALUE(use_vars,Double,LoginName,opm->value("Alert", "LoginName", 0).toDouble(),"LoginName")
   geo_vars = VarListPtr(new VarList("Geometry"));
   world.push_back(geo_vars);  
   robot_settings = new QSettings;
 
   VarListPtr game_vars(new VarList("Game"));
   geo_vars->addChild(game_vars);
-  ADD_ENUM(StringEnum, Division, "Division B", "Division")
+  std::string type = opm->value("Alert", "field", "Division_A").toString() == "Division_B" ? "Division B" : "Division A";
+  ADD_ENUM(StringEnum, Division, type, "Division")
   ADD_TO_ENUM(Division, "Division A");
   ADD_TO_ENUM(Division, "Division B");
   END_ENUM(game_vars, Division);
-  ADD_VALUE(game_vars,Intz, Robots_Count, 6, "Robots Count")
+  ADD_VALUE(game_vars,Intz, Robots_Count, spm->value("game_vars/Robots_Count", 8).toInt(), "Robots Count")
   VarListPtr fields_vars(new VarList("Field"));
   VarListPtr div_a_vars(new VarList("Division A"));
   VarListPtr div_b_vars(new VarList("Division B"));
@@ -55,95 +65,95 @@ ConfigWidget::ConfigWidget()
   fields_vars->addChild(div_a_vars);
   fields_vars->addChild(div_b_vars);
 
-  ADD_VALUE(div_a_vars, Double, DivA_Field_Line_Width,0.010,"Line Thickness")
-  ADD_VALUE(div_a_vars, Double, DivA_Field_Length,12.000,"Length")
-  ADD_VALUE(div_a_vars, Double, DivA_Field_Width,9.000,"Width")
-  ADD_VALUE(div_a_vars, Double, DivA_Field_Rad,0.500,"Radius")
-  ADD_VALUE(div_a_vars, Double, DivA_Field_Free_Kick,0.700,"Free Kick Distance From Defense Area")
-  ADD_VALUE(div_a_vars, Double, DivA_Field_Penalty_Width,2.40,"Penalty width")
-  ADD_VALUE(div_a_vars, Double, DivA_Field_Penalty_Depth,1.20,"Penalty depth")
-  ADD_VALUE(div_a_vars, Double, DivA_Field_Penalty_Point,1.20,"Penalty point")
-  ADD_VALUE(div_a_vars, Double, DivA_Field_Margin,0.3,"Margin")
-  ADD_VALUE(div_a_vars, Double, DivA_Field_Referee_Margin,0.4,"Referee margin")
-  ADD_VALUE(div_a_vars, Double, DivA_Wall_Thickness,0.050,"Wall thickness")
-  ADD_VALUE(div_a_vars, Double, DivA_Goal_Thickness,0.020,"Goal thickness")
-  ADD_VALUE(div_a_vars, Double, DivA_Goal_Depth,0.200,"Goal depth")
-  ADD_VALUE(div_a_vars, Double, DivA_Goal_Width,1.200,"Goal width")
-  ADD_VALUE(div_a_vars, Double, DivA_Goal_Height,0.160,"Goal height")
-  ADD_VALUE(div_a_vars, Double, overlap,0.20,"Camera Overlap")
+  ADD_VALUE(div_a_vars, Double, DivA_Field_Line_Width,0.001*opm->value("Division_A/field_line_width", 10).toDouble(),"Line Thickness")
+  ADD_VALUE(div_a_vars, Double, DivA_Field_Length,0.001*opm->value("Division_A/field_length", 12000).toDouble(),"Length")
+  ADD_VALUE(div_a_vars, Double, DivA_Field_Width,0.001*opm->value("Division_A/field_width", 9000).toDouble(),"Width")
+  ADD_VALUE(div_a_vars, Double, DivA_Field_Rad,0.001*opm->value("Division_A/center_radius", 500).toDouble(),"Radius")
+  ADD_VALUE(div_a_vars, Double, DivA_Field_Free_Kick,0.001*opm->value("Division_A/field_free_kick", 700).toDouble(),"Free Kick Distance From Defense Area")
+  ADD_VALUE(div_a_vars, Double, DivA_Field_Penalty_Width,0.001*opm->value("Division_A/penalty_width", 2400).toDouble(),"Penalty width")
+  ADD_VALUE(div_a_vars, Double, DivA_Field_Penalty_Depth,0.001*opm->value("Division_A/penalty_depth", 1200).toDouble(),"Penalty depth")
+  ADD_VALUE(div_a_vars, Double, DivA_Field_Penalty_Point,0.001*opm->value("Division_A/penalty_point", 1200).toDouble(),"Penalty point")
+  ADD_VALUE(div_a_vars, Double, DivA_Field_Margin,0.001*opm->value("Division_A/field_margin", 300).toDouble(),"Margin")
+  ADD_VALUE(div_a_vars, Double, DivA_Field_Referee_Margin,0.001*opm->value("Division_A/field_referee_margin", 400).toDouble(),"Referee margin")
+  ADD_VALUE(div_a_vars, Double, DivA_Wall_Thickness,0.001*opm->value("Division_A/wall_thickness", 50).toDouble(),"Wall thickness")
+  ADD_VALUE(div_a_vars, Double, DivA_Goal_Thickness,0.001*opm->value("Division_A/goal_thickness", 20).toDouble(),"Goal thickness")
+  ADD_VALUE(div_a_vars, Double, DivA_Goal_Depth,0.001*opm->value("Division_A/goal_depth", 200).toDouble(),"Goal depth")
+  ADD_VALUE(div_a_vars, Double, DivA_Goal_Width,0.001*opm->value("Division_A/goal_width", 1200).toDouble(),"Goal width")
+  ADD_VALUE(div_a_vars, Double, DivA_Goal_Height,0.001*opm->value("Division_A/goal_height", 160).toDouble(),"Goal height")
+  ADD_VALUE(div_a_vars, Double, overlap,0.001*opm->value("Division_A/camera_overlap", 200).toDouble(),"Camera Overlap")
 
-  ADD_VALUE(div_b_vars, Double, DivB_Field_Line_Width,0.010,"Line Thickness")
-  ADD_VALUE(div_b_vars, Double, DivB_Field_Length,9.000,"Length")
-  ADD_VALUE(div_b_vars, Double, DivB_Field_Width,6.000,"Width")
-  ADD_VALUE(div_b_vars, Double, DivB_Field_Rad,0.500,"Radius")
-  ADD_VALUE(div_b_vars, Double, DivB_Field_Free_Kick,0.700,"Free Kick Distance From Defense Area")
-  ADD_VALUE(div_b_vars, Double, DivB_Field_Penalty_Width,2.00,"Penalty width")
-  ADD_VALUE(div_b_vars, Double, DivB_Field_Penalty_Depth,1.0,"Penalty depth")
-  ADD_VALUE(div_b_vars, Double, DivB_Field_Penalty_Point,1.00,"Penalty point")
-  ADD_VALUE(div_b_vars, Double, DivB_Field_Margin,0.30,"Margin")
-  ADD_VALUE(div_b_vars, Double, DivB_Field_Referee_Margin,0.4,"Referee margin")
-  ADD_VALUE(div_b_vars, Double, DivB_Wall_Thickness,0.050,"Wall thickness")
-  ADD_VALUE(div_b_vars, Double, DivB_Goal_Thickness,0.020,"Goal thickness")
-  ADD_VALUE(div_b_vars, Double, DivB_Goal_Depth,0.200,"Goal depth")
-  ADD_VALUE(div_b_vars, Double, DivB_Goal_Width,1.000,"Goal width")
-  ADD_VALUE(div_b_vars, Double, DivB_Goal_Height,0.160,"Goal height")
+  ADD_VALUE(div_b_vars, Double, DivB_Field_Line_Width,0.001*opm->value("Division_B/field_line_width", 10).toDouble(),"Line Thickness")
+  ADD_VALUE(div_b_vars, Double, DivB_Field_Length, 0.001 * opm->value("Division_B/field_length", 9000).toDouble(),"Length")
+  ADD_VALUE(div_b_vars, Double, DivB_Field_Width, 0.001 * opm->value("Division_B/field_width", 6000).toDouble(),"Width")
+  ADD_VALUE(div_b_vars, Double, DivB_Field_Rad, 0.001 * opm->value("Division_B/center_radius", 500).toDouble(),"Radius")
+  ADD_VALUE(div_b_vars, Double, DivB_Field_Free_Kick, 0.001 * opm->value("Division_B/field_free_kick", 700).toDouble(),"Free Kick Distance From Defense Area")
+  ADD_VALUE(div_b_vars, Double, DivB_Field_Penalty_Width, 0.001 * opm->value("Division_B/penalty_width", 2000).toDouble(),"Penalty width")
+  ADD_VALUE(div_b_vars, Double, DivB_Field_Penalty_Depth, 0.001 * opm->value("Division_B/penalty_depth", 1000).toDouble(),"Penalty depth")
+  ADD_VALUE(div_b_vars, Double, DivB_Field_Penalty_Point, 0.001 * opm->value("Division_B/penalty_point", 1000).toDouble(),"Penalty point")
+  ADD_VALUE(div_b_vars, Double, DivB_Field_Margin, 0.001 * opm->value("Division_B/field_margin", 300).toDouble(),"Margin")
+  ADD_VALUE(div_b_vars, Double, DivB_Field_Referee_Margin, 0.001 * opm->value("Division_B/field_referee_margin", 400).toDouble(),"Referee margin")
+  ADD_VALUE(div_b_vars, Double, DivB_Wall_Thickness, 0.001 * opm->value("Division_B/wall_thickness", 50).toDouble(),"Wall thickness")
+  ADD_VALUE(div_b_vars, Double, DivB_Goal_Thickness, 0.001 * opm->value("Division_B/goal_thickness", 20).toDouble(),"Goal thickness")
+  ADD_VALUE(div_b_vars, Double, DivB_Goal_Depth, 0.001 * opm->value("Division_B/goal_depth", 200).toDouble(),"Goal depth")
+  ADD_VALUE(div_b_vars, Double, DivB_Goal_Width, 0.001 * opm->value("Division_B/goal_width", 1000).toDouble(),"Goal width")
+  ADD_VALUE(div_b_vars, Double, DivB_Goal_Height, 0.001 * opm->value("Division_B/goal_height", 160).toDouble(),"Goal height")
 
-  ADD_ENUM(StringEnum,YellowTeam,"SRC","Yellow Team");
+  ADD_ENUM(StringEnum,YellowTeam,opm->value("Team", "blueTeam", "SRC").toString().toStdString(),"Yellow Team");
   END_ENUM(geo_vars,YellowTeam)
-  ADD_ENUM(StringEnum,BlueTeam,"SRC","Blue Team");
+  ADD_ENUM(StringEnum,BlueTeam,opm->value("Team", "yellowTeam", "SRC").toString().toStdString(),"Blue Team");
   END_ENUM(geo_vars,BlueTeam)
 
     VarListPtr ballg_vars(new VarList("Ball"));
     geo_vars->addChild(ballg_vars);
-        ADD_VALUE(ballg_vars,Double,BallRadius,0.0215,"Radius")
+        ADD_VALUE(ballg_vars,Double,BallRadius,0.001*vpm->value("Physics/ballradius", 21.5).toDouble(),"Radius")
   VarListPtr phys_vars(new VarList("Physics"));
   world.push_back(phys_vars);
     VarListPtr worldp_vars(new VarList("World"));
     phys_vars->addChild(worldp_vars);
-        ADD_VALUE(worldp_vars,Intz,NumOfCam,1,"The number of cameras")
-        ADD_VALUE(worldp_vars,Double,DesiredFPS,75,"Desired FPS")
-        ADD_VALUE(worldp_vars,Bool,SyncWithGL,false,"Synchronize ODE with OpenGL")
-        ADD_VALUE(worldp_vars,Double,DeltaTime,0.016,"ODE time step")
-        ADD_VALUE(worldp_vars,Double,Gravity,9.8,"Gravity")
-        ADD_VALUE(worldp_vars,Bool,ResetTurnOver,true,"Auto reset turn-over")
-		ADD_VALUE(worldp_vars, Bool, EnableYellowSim, true, "Enable Yellow Simulator")		//xjw
-		ADD_VALUE(worldp_vars, Bool, EnableWallSim, true, "Enable Wall Simulator")			//xjw
+        ADD_VALUE(worldp_vars,Intz,NumOfCam,opm->value("Camera/total_cameras", 1).toInt(),"The number of cameras")
+        ADD_VALUE(worldp_vars,Double,DesiredFPS,opm->value("Alert/frameRate", 75).toDouble(),"Desired FPS")
+        ADD_VALUE(worldp_vars,Bool,SyncWithGL,spm->value("worldp_vars", "SyncWithGL", false).toBool(),"Synchronize ODE with OpenGL")
+        ADD_VALUE(worldp_vars,Double,DeltaTime,spm->value("worldp_vars/DeltaTime", 0.016).toDouble(),"ODE time step")
+        ADD_VALUE(worldp_vars,Double,Gravity,vpm->value("Physics/G", 9.8).toDouble(),"Gravity")
+        ADD_VALUE(worldp_vars,Bool,ResetTurnOver,spm->value("worldp_vars/ResetTurnOver", true).toBool(),"Auto reset turn-over")
+		ADD_VALUE(worldp_vars, Bool, EnableYellowSim,spm->value("worldp_vars/EnableYellowSim", true).toBool(), "Enable Yellow Simulator")		//xjw
+		ADD_VALUE(worldp_vars, Bool, EnableWallSim,spm->value("worldp_vars/EnableWallSim", true).toBool(), "Enable Wall Simulator")			//xjw
   VarListPtr ballp_vars(new VarList("Ball"));
     phys_vars->addChild(ballp_vars);
-        ADD_VALUE(ballp_vars,Double,BallMass,0.043,"Ball mass");
-        ADD_VALUE(ballp_vars,Double,BallFriction,0.1,"Ball-ground friction")
-        ADD_VALUE(ballp_vars,Double,BallSlip,1,"Ball-ground slip")
-        ADD_VALUE(ballp_vars,Double,BallBounce,0.5,"Ball-ground bounce factor")
-        ADD_VALUE(ballp_vars,Double,BallBounceVel,0.1,"Ball-ground bounce min velocity")
-        ADD_VALUE(ballp_vars,Double,BallLinearDamp,0.004,"Ball linear damping")
-        ADD_VALUE(ballp_vars,Double,BallAngularDamp,0.004,"Ball angular damping")
+        ADD_VALUE(ballp_vars,Double,BallMass,spm->value("ballp_vars/BallMass", 0.043).toDouble(),"Ball mass");
+        ADD_VALUE(ballp_vars,Double,BallFriction,spm->value("ballp_vars/BallFriction", 0.1).toDouble(),"Ball-ground friction")
+        ADD_VALUE(ballp_vars,Double,BallSlip,spm->value("ballp_vars/BallSlip", 1).toDouble(),"Ball-ground slip")
+        ADD_VALUE(ballp_vars,Double,BallBounce,spm->value("ballp_vars/BallBounce", 0.5).toDouble(),"Ball-ground bounce factor")
+        ADD_VALUE(ballp_vars,Double,BallBounceVel,spm->value("ballp_vars/BallBounceVel", 0.1).toDouble(),"Ball-ground bounce min velocity")
+        ADD_VALUE(ballp_vars,Double,BallLinearDamp,spm->value("ballp_vars/BallLinearDamp", 0.004).toDouble(),"Ball linear damping")
+        ADD_VALUE(ballp_vars,Double,BallAngularDamp,spm->value("ballp_vars/BallAngularDamp", 0.004).toDouble(),"Ball angular damping")
   VarListPtr comm_vars(new VarList("Communication"));
   world.push_back(comm_vars);
-    ADD_VALUE(comm_vars,String,VisionMulticastAddr,"224.5.23.2","Vision multicast address")  //SSL Vision: "224.5.23.2"
-    ADD_VALUE(comm_vars,Intz,VisionMulticastPort,10020,"Vision multicast port")
-    ADD_VALUE(comm_vars,String,VisionMulticastAddr2,"224.5.23.2","Vision multicast address2")  //SSL Vision: "224.5.23.2"
+    ADD_VALUE(comm_vars,String,VisionMulticastAddr,cpm->value("IP", "ssl_address", "224.5.23.2").toString().toStdString(),"Vision multicast address")  //SSL Vision: "224.5.23.2"
+    ADD_VALUE(comm_vars,Intz,VisionMulticastPort,opm->value("AlertPorts/VisionSim", 10020).toInt(),"Vision multicast port")
+    ADD_VALUE(comm_vars,String,VisionMulticastAddr2, cpm->value("IP", "ssl_address", "224.5.23.2").toString().toStdString(),"Vision multicast address2")  //SSL Vision: "224.5.23.2"
     ADD_VALUE(comm_vars,Intz,VisionMulticastPort2,10025,"Vision multicast port2")
-    ADD_VALUE(comm_vars,Intz,CommandListenPort,20011,"Command listen port")
-    ADD_VALUE(comm_vars,Intz,BlueStatusSendPort,30011,"Blue Team status send port")
-    ADD_VALUE(comm_vars,Intz,YellowStatusSendPort,30012,"Yellow Team status send port")
-    ADD_VALUE(comm_vars,Intz,sendDelay,0,"Sending delay (milliseconds)")
-    ADD_VALUE(comm_vars,Intz,sendGeometryEvery,120,"Send geometry every X frames")
+    ADD_VALUE(comm_vars,Intz,CommandListenPort,cpm->value("Ports/sim_send", 20011).toInt(),"Command listen port")
+    ADD_VALUE(comm_vars,Intz,BlueStatusSendPort,cpm->value("Ports/blue_status", 30011).toInt(),"Blue Team status send port")
+    ADD_VALUE(comm_vars,Intz,YellowStatusSendPort,cpm->value("Ports/yellow_status", 30012).toInt(),"Yellow Team status send port")
+    ADD_VALUE(comm_vars,Intz,sendDelay,spm->value("comm_vars", "sendDelay", 0).toInt(),"Sending delay (milliseconds)")
+    ADD_VALUE(comm_vars,Intz,sendGeometryEvery,spm->value("comm_vars/sendGeometryEvery", 120).toInt(),"Send geometry every X frames")
     VarListPtr gauss_vars(new VarList("Gaussian noise"));
         comm_vars->addChild(gauss_vars);
-        ADD_VALUE(gauss_vars,Bool,noise,false,"Noise")
-        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_x,3,"Bot Deviation for x values")
-        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_y,3,"Bot Deviation for y values")
-        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_angle,2,"Bot Deviation for angle values")
-		ADD_VALUE(gauss_vars, Double, ball_noiseDeviation_x, 3, "Ball Deviation for x values")
-		ADD_VALUE(gauss_vars, Double, ball_noiseDeviation_y, 3, "Ball Deviation for y values")
+        ADD_VALUE(gauss_vars,Bool,noise,spm->value("gauss_vars", "noise", false).toBool(),"Noise")
+        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_x,spm->value("gauss_vars/bot_noiseDeviation_x", 3).toDouble(),"Bot Deviation for x values")
+        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_y,spm->value("gauss_vars/bot_noiseDeviation_y", 3).toDouble(),"Bot Deviation for y values")
+        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_angle,spm->value("gauss_vars/bot_noiseDeviation_angle", 2).toDouble(),"Bot Deviation for angle values")
+		ADD_VALUE(gauss_vars, Double, ball_noiseDeviation_x, spm->value("gauss_vars/ball_noiseDeviation_x", 3).toDouble(), "Ball Deviation for x values")
+		ADD_VALUE(gauss_vars, Double, ball_noiseDeviation_y, spm->value("gauss_vars/ball_noiseDeviation_y", 3).toDouble(), "Ball Deviation for y values")
     VarListPtr vanishing_vars(new VarList("Vanishing probability"));
         comm_vars->addChild(vanishing_vars);
-        ADD_VALUE(gauss_vars,Bool,vanishing,false,"Vanishing")
-        ADD_VALUE(vanishing_vars,Double,blue_team_vanishing,0,"Blue team")
-        ADD_VALUE(vanishing_vars,Double,yellow_team_vanishing,0,"Yellow team")
-        ADD_VALUE(vanishing_vars,Double,ball_vanishing,0,"Ball")
+        ADD_VALUE(gauss_vars,Bool,vanishing,spm->value("gauss_vars", "vanishing", false).toBool(),"Vanishing")
+        ADD_VALUE(vanishing_vars,Double,blue_team_vanishing,spm->value("vanishing_vars", "blue_team_vanishing", 0).toDouble(),"Blue team")
+        ADD_VALUE(vanishing_vars,Double,yellow_team_vanishing,spm->value("vanishing_vars", "yellow_team_vanishing", 0).toDouble(),"Yellow team")
+        ADD_VALUE(vanishing_vars,Double,ball_vanishing,spm->value("vanishing_vars", "ball_vanishing", 0).toDouble(),"Ball")
 
-    world=VarXML::read(world,(qApp->applicationDirPath() + QString("/../data/config/") + QString(".grsim.xml")).toStdString());
+    //world=VarXML::read(world,(qApp->applicationDirPath() + QString("/../data/config/") + QString(".grsim.xml")).toStdString());
 
     QDir dir;
     std::string blueteam = v_BlueTeam->getString();

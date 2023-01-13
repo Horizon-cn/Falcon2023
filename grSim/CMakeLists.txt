@@ -67,6 +67,7 @@ set(PROJECT_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/net
     ${CMAKE_CURRENT_SOURCE_DIR}/include/physics
+    ${CMAKE_SOURCE_DIR}/share
 )
 include_directories(${PROJECT_INCLUDE_DIRS} ${incs})
 
@@ -74,11 +75,13 @@ include_directories(${PROJECT_INCLUDE_DIRS} ${incs})
 aux_source_directory(./src CPPFILES)
 aux_source_directory(./src/physics PHYSICS_CPPFILES)
 aux_source_directory(./src/net NET_CPPFILES)
+aux_source_directory(${CMAKE_SOURCE_DIR}/share SHARE_CPPFILES)
 
 ## header files
 FILE(GLOB HEADERFILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 FILE(GLOB PHYSICS_HEADERFILES "${CMAKE_CURRENT_SOURCE_DIR}/include/physics/*.h")
 FILE(GLOB NET_HEADERFILES "${CMAKE_CURRENT_SOURCE_DIR}/include/net/*.h")
+FILE(GLOB SHARE_HEADERFILES "${CMAKE_SOURCE_DIR}/share/*.h")
 
 ## resource files
 FILE(GLOB RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.qrc" "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.rc")
@@ -88,10 +91,12 @@ IF(WIN32)
 source_group("include" FILES ${HEADERFILES})
 source_group("include\\physics" FILES ${PHYSICS_HEADERFILES})
 source_group("include\\net" FILES ${NET_HEADERFILES})
+source_group("include\\share" FILES ${SHARE_HEADERFILES})
 
 source_group("src" FILES ${CPPFILES})
 source_group("src\\physics" FILES ${PHYSICS_CPPFILES})
 source_group("src\\net" FILES ${NET_CPPFILES})
+source_group("src\\share" FILES ${SHARE_CPPFILES})
 
 source_group("resources" FILES ${RESOURCES})
 ENDIF()
@@ -105,10 +110,12 @@ set(srcs
     ${HEADERFILES}
     ${PHYSICS_HEADERFILES}
     ${NET_HEADERFILES}
+    ${SHARE_HEADERFILES}
 
     ${CPPFILES}
     ${PHYSICS_CPPFILES}
     ${NET_CPPFILES}
+    ${SHARE_CPPFILES}
 )
 
 add_executable(${TARGET_NAME} ${srcs})
