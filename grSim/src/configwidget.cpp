@@ -211,11 +211,12 @@ ConfigWidget::ConfigWidget()
 }
 
 ConfigWidget::~ConfigWidget() {
-    VarXML::write(world,(qApp->applicationDirPath() + QString("/../data/config/") + QString(".grsim.xml")).toStdString());
+    //VarXML::write(world,(qApp->applicationDirPath() + QString("/../data/config/") + QString(".grsim.xml")).toStdString());
 }
 
 
-ConfigDockWidget::ConfigDockWidget(QWidget* _parent,ConfigWidget* _conf){
+ConfigDockWidget::ConfigDockWidget(QWidget* _parent,ConfigWidget* _conf) : QDockWidget("Read-only Parameter", _parent) 
+{
     parent=_parent;conf=_conf;
     setWidget(conf);
     conf->move(0,20);
