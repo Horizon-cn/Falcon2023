@@ -22,7 +22,6 @@
 #include "src_heatMap.pb.h"
 #include <time.h>
 #include <thread>
-#include <staticparams.h>
 
 #define has_GPU false
 
@@ -152,7 +151,7 @@ void CGPUBestAlgThread::initialize(CVisionModule* pVision) {
 void CGPUBestAlgThread::startComm() {
     gpuCalcArea::heatMap_socket = new QUdpSocket();
     COptionModule* pOption = new COptionModule();
-    gpuCalcArea::heatMap_port = ZSS::Medusa::DEBUG_SCORE_SEND[pOption->MyColor() == TEAM_YELLOW];
+    gpuCalcArea::heatMap_port = pOption->MyColor() == TEAM_YELLOW ? CParamManager::Instance()->yellow_heat : CParamManager::Instance()->blue_heat;
     delete pOption;
 }
 
@@ -436,7 +435,7 @@ void CGPUBestAlgThread::sendPointValue() {
 		int size = msgs.ByteSize();
         QByteArray output(size, 0);
         msgs.SerializeToArray(output.data(), size);
-        gpuCalcArea::heatMap_socket->writeDatagram(output.data(), size, QHostAddress(ZSS::LOCAL_ADDRESS), gpuCalcArea::heatMap_port);
+        gpuCalcArea::heatMap_socket->writeDatagram(output.data(), size, QHostAddress(CParamManager::Instance()->local_address), gpuCalcArea::heatMap_port);
 		//删除掉message的部分，回收空间//
 		msgs.Clear();
 		//delete[] msgs;

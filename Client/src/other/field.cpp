@@ -588,10 +588,10 @@ void Field::middleCtrlModifierMoveEvent(QMouseEvent *e) {
     auto x2 = ::rx(MiddleEvent::start.x());
     auto y1 = ::ry(e->y());
     auto y2 = ::ry(MiddleEvent::start.y());
-    auto minX = min(x1, x2);
-    auto maxX = max(x1, x2);
-    auto minY = min(y1, y2);
-    auto maxY = max(y1, y2);
+    auto minX = std::min(x1, x2);
+    auto maxX = std::max(x1, x2);
+    auto minY = std::min(y1, y2);
+    auto maxY = std::max(y1, y2);
     if(maxX - minX < MIN_LENGTH * zoomRatio || maxY - minY < MIN_LENGTH * zoomRatio)
         GlobalSettings::Instance()->resetArea();
     else

@@ -1,3 +1,4 @@
+/**
 #include "optionobject.h"
 
 namespace {
@@ -73,3 +74,4 @@ void optionObject::run(){
     sendOption();
     sending = false;
 }
+**/

@@ -4,7 +4,6 @@
 #include <WorldModel/WorldModel.h>
 #include <WorldModel/server.h>
 #include "zss_debug.pb.h"
-#include "staticparams.h"
 #include <QMutex>
 
 extern ZSS::Protocol::Debug_Msgs guiDebugMsgs;
@@ -193,9 +192,9 @@ void CGDebugEngine::send(bool teamIsBlue){
     guiDebugMsgs.SerializeToArray(data.data(),size);
     int sent_size = 0;
     if(teamIsBlue){
-        sent_size = debug_socket.writeDatagram(data,data.size(),QHostAddress(ZSS::LOCAL_ADDRESS),ZSS::Medusa::DEBUG_MSG_SEND[Param::BLUE]);
+        sent_size = debug_socket.writeDatagram(data,data.size(),QHostAddress(CParamManager::Instance()->local_address),CParamManager::Instance()->blue_debug);
     } else {
-        sent_size = debug_socket.writeDatagram(data,data.size(),QHostAddress(ZSS::LOCAL_ADDRESS),ZSS::Medusa::DEBUG_MSG_SEND[Param::YELLOW]);
+        sent_size = debug_socket.writeDatagram(data,data.size(),QHostAddress(CParamManager::Instance()->local_address), CParamManager::Instance()->yellow_debug);
     }
 //    std::cout << "size: " << data.size() << ' ' << sent_size << std::endl;
     guiDebugMsgs.clear_msgs();

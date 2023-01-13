@@ -48,7 +48,7 @@ Page{
         id:interaction;
     }
 
-    Owl.Option{id:myOption}
+    //Owl.Option{id:myOption}
 
     header:TabBar {
         id: bar
@@ -363,11 +363,11 @@ Page{
                                         }else{
                                             interaction.connectRadio(control.blueRBKConnect,0,medusaFrq.value);
                                         }
-                                        while(myOption.processIsRunning());
+                                        //while(myOption.processIsRunning());
                                         interaction.controlBlueRBK(control.blueRBKConnect);
-                                        if(control.blueRBKConnect){
-                                            myOption.start();
-                                        }
+                                        //if(control.blueRBKConnect){
+                                        //    myOption.start();
+                                        //}
                                         interaction.controlProcess(0, control.blueRBKConnect);
                                     }
                                 }
@@ -414,11 +414,11 @@ Page{
                                         }else{
                                             interaction.connectRadio(control.yellowRBKConnect,1,medusaFrq.value);
                                         }
-                                        while(myOption.processIsRunning());
+                                        //while(myOption.processIsRunning());
                                         interaction.controlYellowRBK(control.yellowRBKConnect);
-                                        if(control.yellowRBKConnect){
-                                            myOption.start();
-                                        }
+                                        //if(control.yellowRBKConnect){
+                                        //    myOption.start();
+                                        //}
                                         interaction.controlProcess(1, control.yellowRBKConnect);
                                     }
                                 }

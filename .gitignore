@@ -136,7 +136,7 @@ ZBin/*
 # ZBin/*$py.class
 # ZBin/Oppo/*
 
-bin/base
+bin/base/*
 !bin/base/ProcessAlive.sh
 bin/LOG
 bin/Oppo

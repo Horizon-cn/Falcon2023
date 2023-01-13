@@ -16,7 +16,6 @@
 #include <WorldModel/DribbleStatus.h>
 #include <TaskMediator.h>
 #include <PlayerCommandV2.h>
-#include "staticparams.h"
 #include <CommandFactory.h>
 //#include <PathPlan/PathPlanner.h>
 #include <BallStatus.h>
@@ -169,10 +168,10 @@ void CActionModule::sendToOwl(const rbk::protocol::SRC_Cmd& cmds)
         }
     }
     //·¢ËÍcmd//
-    int port = ZSS::Athena::CONTROL_SEND[isYellow];
+	int port = isYellow ? CParamManager::Instance()->yellow_control : CParamManager::Instance()->blue_control;
     int size = ZSS_CMDS.ByteSize();
     QByteArray data(size, 0);
     ZSS_CMDS.SerializeToArray(data.data(), size);
-    cmds_socket->writeDatagram(data.data(), size, QHostAddress(ZSS::LOCAL_ADDRESS), port);
+    cmds_socket->writeDatagram(data.data(), size, QHostAddress(CParamManager::Instance()->local_address), port);
     ZSS_CMDS.Clear();
 }

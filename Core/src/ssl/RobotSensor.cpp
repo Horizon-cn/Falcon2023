@@ -8,7 +8,6 @@
 #include <thread>
 #include <QUdpSocket>
 #include <QMutex>
-#include "staticparams.h"
 #include <QNetworkInterface>
 
 using namespace std;
@@ -26,10 +25,10 @@ namespace {
 CRobotSensor::CRobotSensor()
 {
     auto pOption = new COptionModule();
-    int team = (pOption->MyColor() == TEAM_YELLOW);
+    int port = pOption->MyColor() == TEAM_YELLOW ? CParamManager::Instance()->yellow_feedback : CParamManager::Instance()->blue_feedback;
     delete pOption;
     robot_status_socket = new QUdpSocket();
-    robot_status_socket->bind(QHostAddress::AnyIPv4, ZSS::Athena::CONTROL_BACK_RECEIVE[team], QUdpSocket::ShareAddress);
+    robot_status_socket->bind(QHostAddress::AnyIPv4, port, QUdpSocket::ShareAddress);
     robot_status_thread = new std::thread([=] {receiveRobotStatus();});
     robot_status_thread->detach();
 	// 数据进行初始化

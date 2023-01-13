@@ -18,11 +18,14 @@ CChipBallJudge* chipBallJudge;
 CSupportPos* supportPos;
 CSupportPos2022* supportPos2022;
 CParamManagerSkill* paramManager;
-
+ParamManagerOwl* oParamManager;
+ParamManagerCfg* cParamManager;
 
 void initializeSingleton()
 {
 	paramManager    = ParamManager::Instance();
+	oParamManager   = OParamManager::Instance();
+	cParamManager   = CParamManager::Instance();
 	vision			= VisionModule::Instance();
     kickStatus		= KickStatus::Instance();
 	dribbleStatus	= DribbleStatus::Instance();

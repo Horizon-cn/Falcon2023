@@ -1,7 +1,7 @@
 #include "OptionModule.h"
 #include <param.h>
 #include "WorldModel/WorldModel.h"
-#include "parammanager.h"
+#include "ParamManagerNew.h"
 
 COptionModule::COptionModule()
 {
@@ -18,9 +18,8 @@ COptionModule::~COptionModule(void)
 
 //too many couplings, can't use
 void COptionModule::update() {
-    bool isRightSide, isYellowTeam;
-    ZSS::ZParamManager::Instance()->loadParam(isRightSide, "ZAlert/IsRight", 0);
-    ZSS::ZParamManager::Instance()->loadParam(isYellowTeam, "ZAlert/IsYellow", 0);
+    bool isRightSide = OParamManager::Instance()->isRight;
+    bool isYellowTeam = OParamManager::Instance()->isYellow;
 
 	if (!isRightSide) {
 		_side = Param::Field::POS_SIDE_LEFT;

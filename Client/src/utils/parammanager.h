@@ -176,12 +176,12 @@ class ParamManagerCfg: public Falcon::ParamManager {
       loadParam(sim_send, "Ports/sim_send", 20011);
       loadParam(blue_status, "Ports/blue_status", 30011);
       loadParam(yellow_status, "Ports/yellow_status", 30012);
-      loadParam(blue_control, "Ports/blue_control", 50001);
-      loadParam(yellow_control, "Ports/yellow_control", 50002);
+      loadParam(blue_control, "Ports/blue_control", 50011);
+      loadParam(yellow_control, "Ports/yellow_control", 50012);
       loadParam(blue_feedback, "Ports/blue_feedback", 60001);
       loadParam(yellow_feedback, "Ports/yellow_feedback", 60002);
-      loadParam(blue_vision, "Ports/blue_vision", 23334);
-      loadParam(yellow_vision, "Ports/yellow_vision", 23333);
+      loadParam(blue_vision, "Ports/blue_vision", 23333);
+      loadParam(yellow_vision, "Ports/yellow_vision", 23334);
       loadParam(blue_debug, "Ports/blue_debug", 20001);
       loadParam(yellow_debug, "Ports/yellow_debug", 20002);
       loadParam(blue_heat, "Ports/blue_heat", 20003);

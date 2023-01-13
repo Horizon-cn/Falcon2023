@@ -8,8 +8,7 @@
 #include <QMutex>
 #include <QNetworkProxy>
 #include <QNetworkInterface>
-#include "staticparams.h"
-#include "parammanager.h"
+#include "ParamManagerNew.h"
 extern bool IS_SIMULATION;
 namespace {
     std::thread* receive_vision_thread;
@@ -41,15 +40,13 @@ CDataReceiver4rbk::CDataReceiver4rbk():referee_socket(){
     auto pOption = new COptionModule();
     isYellow = pOption->MyColor();
     delete pOption;
-    int vision_port = ZSS::Athena::VISION_SEND[isYellow == TEAM_YELLOW ? PARAM::YELLOW : PARAM::BLUE];
-    int referee_port;
-    ZSS::ZParamManager::Instance()->loadParam(referee_port, "AlertPorts/ZSS_RefereePort", 39991);
-    if (IS_SIMULATION && isYellow == TEAM_YELLOW) referee_port += 1;
+    int vision_port = (isYellow == TEAM_YELLOW) ? CParamManager::Instance()->yellow_vision : CParamManager::Instance()->blue_vision;
+    int referee_port = isYellow == TEAM_YELLOW ? OParamManager::Instance()->refereePortToYellow : OParamManager::Instance()->refereePortToBlue;
     referee_socket.setProxy(QNetworkProxy::NoProxy);
     referee_socket.bind(QHostAddress::AnyIPv4, referee_port, QUdpSocket::ShareAddress);
-    //referee_socket.joinMulticastGroup(QHostAddress(ZSS::REF_ADDRESS)); // receive Athena ref, need to change ZSS_ADDRESS
+    //referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address)); // receive Athena ref, need to change ZSS_ADDRESS
     foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces()) {
-        referee_socket.joinMulticastGroup(QHostAddress(ZSS::REF_ADDRESS), iface);
+        referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address), iface);
     }
     referee_thread = new std::thread([=] {receiveRefMsgs();});
     referee_thread->detach();

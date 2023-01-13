@@ -33,7 +33,7 @@ void qmlRegister() {
     qmlRegisterType<ViewerInterface>("Owl", 1, 0, "ViewerInterface");
     qmlRegisterType<LogSlider>("Owl", 1, 0, "LogSlider");
     qmlRegisterType<LogEventLabel>("Owl", 1, 0, "LogEventLabel");
-    qmlRegisterType<optionObject>("Owl", 1, 0, "Option");
+    //qmlRegisterType<optionObject>("Owl", 1, 0, "Option");
     //qmlRegisterType<Test>("Owl", 1, 0, "Test");
     qmlRegisterSingletonType<rec_slider>("Owl", 1, 0, "RecSlider", &rec_slider::Instance);
     qmlRegisterSingletonType<RecEventLabel>("Owl", 1, 0, "RecEventLabel", &RecEventLabel::Instance);

@@ -16,7 +16,7 @@
 #include "Vision/DataReceiver4rbk.h"
 #include <thread>
 #include <QCoreApplication>
-#include <parammanager.h>
+#include <ParamManagerNew.h>
 
 ZSS::Protocol::Debug_Msgs guiDebugMsgs;
 
@@ -30,7 +30,8 @@ bool VERBOSE_MODE = false;
 // handle _vision_event;
 
 void run(){
-    ZSS::ZParamManager::Instance()->loadParam(IS_SIMULATION, "Alert/IsSimulation", 1);
+    IS_SIMULATION = OParamManager::Instance()->isSimulation;
+    std::cout << "IS_SIMULATION : " << IS_SIMULATION << std::endl;
     //_vision_event = CreateEvent(NULL, true, false, NULL);
     initializeSingleton(); // init parammanager first
     CCtrlBreakHandler breakHandler;
@@ -75,6 +76,12 @@ void run(){
 
 int main(int argc, char* argv[]) {
     QCoreApplication a(argc, argv);
+    OParamManager::Instance()->setFileName();
+    OParamManager::Instance()->update();
+    CParamManager::Instance()->setFileName();
+    CParamManager::Instance()->update();
+    ParamManager::Instance()->setFileName();
+    ParamManager::Instance()->update();
     std::thread t(run);
     t.detach();
     return a.exec();

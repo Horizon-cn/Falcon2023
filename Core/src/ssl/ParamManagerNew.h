@@ -5,36 +5,64 @@
 #include <QSettings>
 #include <QDebug>
 #include "singleton.h"
+#include "params.h"
 
 struct GetBallParam {
     double back_bias;
 };
-
-class CParamManagerNew {
+class ParamManagerOwl : public Falcon::ParamManager {
 public:
-    CParamManagerNew();
-    CParamManagerNew(const QString&);
-    ~CParamManagerNew();
-    bool loadParam(QChar&, const QString&, QChar d = 0);
-    bool loadParam(int&, const QString&, int d = 0);
-    bool loadParam(double&, const QString&, double d = 0);
-    bool loadParam(QString&, const QString&, QString d = "");
-    bool loadParam(bool&, const QString&, bool d = false);
-    bool changeParam(const QString&, const QVariant&);
-    bool changeParam(const QString&, const QString&, const QVariant&);
-    QStringList allKeys();
-    QStringList allKeys(const QString&);
-    QStringList allGroups();
-    QVariant value(const QString&, const QVariant& defaultValue = QVariant());
-    QVariant value(const QString&, const QString&, const QVariant& defaultValue = QVariant());
-    void sync();
-    void clear();
-protected:
-    QSettings *settings;
+    ParamManagerOwl() : ParamManager("../data/owl2.ini") {}
+    ~ParamManagerOwl() {}
+    void update()
+    {
+        //Global Settings
+        loadParam(isSimulation, "Alert/isSimulation", true);
+        loadParam(isYellow, "Alert/isYellow", false);
+        loadParam(isRight, "Alert/isRight", false);
+        //Useful Ports
+        loadParam(refereePortToBlue, "AlertPorts/refereePortToBlue", 10002);
+        loadParam(refereePortToYellow, "AlertPorts/refereePortToYellow", 10004);
+    }
+public:
+    //Global Settings
+    bool isSimulation, isYellow, isRight;
+    //Useful Ports
+    int refereePortToBlue, refereePortToYellow;
 };
-class CParamManagerSkill : public CParamManagerNew {
+typedef Falcon::MeyersSingleton<ParamManagerOwl> OParamManager;
+class ParamManagerCfg : public Falcon::ParamManager {
+public:
+    ParamManagerCfg() : ParamManager("../data/cfg.ini") {}
+    ~ParamManagerCfg() {}
+    void update() {
+        //IP address
+        loadParam(local_address, "IP/local_address", "127.0.0.1");
+        loadParam(referee_address, "IP/referee_address", "224.5.23.1");
+        //internal port
+        loadParam(blue_control, "Ports/blue_control", 50011);
+        loadParam(yellow_control, "Ports/yellow_control", 50012);
+        loadParam(blue_feedback, "Ports/blue_feedback", 60001);
+        loadParam(yellow_feedback, "Ports/yellow_feedback", 60002);
+        loadParam(blue_vision, "Ports/blue_vision", 23333);
+        loadParam(yellow_vision, "Ports/yellow_vision", 23334);
+        loadParam(blue_debug, "Ports/blue_debug", 20001);
+        loadParam(yellow_debug, "Ports/yellow_debug", 20002);
+        loadParam(blue_heat, "Ports/blue_heat", 20003);
+        loadParam(yellow_heat, "Ports/yellow_heat", 20004);
+    }
+public:
+    QString local_address, referee_address;
+    int blue_control, yellow_control;
+    int blue_feedback, yellow_feedback;
+    int blue_vision, yellow_vision;
+    int blue_debug, yellow_debug;
+    int blue_heat, yellow_heat;
+};
+typedef Falcon::MeyersSingleton<ParamManagerCfg> CParamManager;
+class CParamManagerSkill : public Falcon::ParamManager {
     public:
-        CParamManagerSkill() : CParamManagerNew("../data/skill.ini") {update();}
+        CParamManagerSkill() : ParamManager("../data/skill.ini") {}
         ~CParamManagerSkill() {}
         void update()
         {

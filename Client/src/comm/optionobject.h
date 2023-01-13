@@ -1,3 +1,4 @@
+/**
 #ifndef OPTIONOBJECT_H
 #define OPTIONOBJECT_H
 
@@ -38,3 +39,4 @@ public slots:
 };
 
 #endif // OPTIONOBJECT_H
+**/

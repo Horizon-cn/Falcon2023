@@ -22,6 +22,8 @@
 #include "PointCalculation/SupportPos2022.h"
 
 extern CParamManagerSkill* paramManager;
+extern ParamManagerOwl* oParamManager;
+extern ParamManagerCfg* cParamManager;
 extern CVisionModule*  vision;
 extern CKickStatus*    kickStatus;
 extern CDribbleStatus* dribbleStatus;
