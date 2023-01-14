@@ -293,11 +293,23 @@ class ParamManagerLogClip: public Falcon::ParamManager {
     ParamManagerLogClip(): ParamManager("../data/logclip.ini") {}
     ~ParamManagerLogClip() {}
 };
+class ParamManagerSimulator : public Falcon::ParamManager {
+public:
+    ParamManagerSimulator() : ParamManager("../data/simulator.ini") {}
+    ~ParamManagerSimulator() {}
+};
+class ParamManagerSkill : public Falcon::ParamManager {
+public:
+    ParamManagerSkill() : ParamManager("../data/skill.ini") {}
+    ~ParamManagerSkill() {}
+};
 typedef Falcon::MeyersSingleton<ParamManagerOwl> OParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerCfg> CParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerVision> VParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerKickParam> KParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerLogClip> LParamManager;
+typedef Falcon::MeyersSingleton<ParamManagerSimulator> SIParamManager;
+typedef Falcon::MeyersSingleton<ParamManagerSkill> SKParamManager;
 }
 
 #endif // PARAMMANAGER_H

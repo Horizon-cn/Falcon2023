@@ -30,6 +30,9 @@ private:
     QString judgeType(const QVariant& value) const;
     void setupModelData();
     TreeItem *rootItem;
+    
+    template<typename T>
+    void setParamTree(T pm);
 };
 
 #endif // PARAMINTERFACE_H

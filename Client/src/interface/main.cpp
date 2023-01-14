@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     // 博客链接https://blog.csdn.net/luoyayun361/article/details/117752657
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     // 注册App
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
     app.setOrganizationName("SRC");
     app.setOrganizationDomain("https://src-ssl.github.io/");
     app.setFont(QFont("Microsoft YaHei", 9));
@@ -64,6 +64,8 @@ int main(int argc, char *argv[]) {
     Owl::VParamManager::Instance()->setFileName();
     Owl::CParamManager::Instance()->setFileName();
     Owl::LParamManager::Instance()->setFileName();
+    Owl::SIParamManager::Instance()->setFileName();
+    Owl::SKParamManager::Instance()->setFileName();
     Owl::OParamManager::Instance()->loadParamFromFile();
     Owl::VParamManager::Instance()->loadParamFromFile();
     Owl::CParamManager::Instance()->loadParamFromFile();

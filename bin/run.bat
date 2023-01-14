@@ -6,4 +6,4 @@ echo Current dir is %~dp0%
 ::Client.exe
 %~dp0%\base\Client.exe
 
-::pause
+pause

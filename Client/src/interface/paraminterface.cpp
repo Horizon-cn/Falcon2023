@@ -3,10 +3,9 @@
 #include "treeitem.h"
 #include "display.h"
 #include <regex>
+#include <QDir>
 namespace{
-    auto opm = Owl::OParamManager::Instance();
-    auto cpm = Owl::CParamManager::Instance();
-    auto vpm = Owl::VParamManager::Instance();
+    QString current_pm = "owl2";
 }
 ParamInterface::ParamInterface(QObject *parent)
     : QAbstractItemModel(parent),rootItem(nullptr) {
@@ -46,7 +45,16 @@ bool ParamInterface::setData(const QModelIndex &index, const QVariant &value,int
     TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
     item->changeData(2,value.toString());
     item->changeData(1,judgeType(value));
-    opm->updateParam(item->parentItem()->data(0),item->data(0),value,true);
+    if (current_pm == "cfg")
+        Owl::CParamManager::Instance()->updateParam(item->parentItem()->data(0), item->data(0), value, true);
+    else if (current_pm == "simulator")
+        Owl::SIParamManager::Instance()->changeParam(item->parentItem()->data(0), item->data(0), value);
+    else if (current_pm == "skill")
+        Owl::SKParamManager::Instance()->changeParam(item->parentItem()->data(0), item->data(0), value);
+    else if (current_pm == "vision")
+        Owl::VParamManager::Instance()->updateParam(item->parentItem()->data(0), item->data(0), value, true);
+    else
+        Owl::OParamManager::Instance()->updateParam(item->parentItem()->data(0),item->data(0),value,true);
     qDebug() << item->parentItem()->data(0) << item->data(0) << value.toString();
     emit dataChanged(index, index);
     return true;
@@ -67,14 +75,52 @@ QString ParamInterface::getType(const QModelIndex &index){
     return "Invalid";
 }
 void ParamInterface::reload(){
+    QDialog dialog;
+    QFormLayout form(&dialog);
+    form.addRow(new QLabel("Choose Parameter:"));
+    QComboBox* comboBox = new QComboBox(&dialog);
+    QDir dir;
+    dir.setCurrent(qApp->applicationDirPath() + "/../data/");
+    dir.setNameFilters(QStringList() << "*.ini");
+    dir.setSorting(QDir::Size | QDir::Reversed);
+    QFileInfoList list = dir.entryInfoList();
+    for (int i = 0; i < list.size(); ++i) {
+        QFileInfo fileInfo = list.at(i);
+        QStringList s = fileInfo.fileName().split(".");
+        QString str;
+        if (s.count() > 0) str = s[0];
+        comboBox->addItem(str);
+    }
+    comboBox->setCurrentIndex(0);
+    form.addRow(comboBox);
+    // Add Cancel and OK button
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    form.addRow(&buttonBox);
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+    if (dialog.exec() == QDialog::Accepted) {
+        current_pm = comboBox->currentText();
+    }
     beginResetModel();
-    opm->sync();
+    if (current_pm == "cfg") {
+        Owl::CParamManager::Instance()->sync();
+        Owl::CParamManager::Instance()->loadParamFromFile();
+    }
+    else if (current_pm == "simulator")
+        Owl::SIParamManager::Instance()->sync();
+    else if (current_pm == "skill")
+        Owl::SKParamManager::Instance()->sync();
+    else if (current_pm == "vision") {
+        Owl::VParamManager::Instance()->sync();
+        Owl::VParamManager::Instance()->loadParamFromFile();
+    }
+    else {
+        Owl::OParamManager::Instance()->sync();
+        Owl::OParamManager::Instance()->loadParamFromFile();
+    }
     setupModelData();
     endResetModel();
     this->resetInternalData();
-    opm->loadParamFromFile();
-    cpm->loadParamFromFile();
-    vpm->loadParamFromFile();
 }
 QModelIndex ParamInterface::parent(const QModelIndex &index) const{
     if (!index.isValid())
@@ -129,16 +175,30 @@ void ParamInterface::setupModelData(){
     QList<QString> rootData;
     rootData << "settingName" << "settingType" << "settingValue";
     rootItem = new TreeItem(rootData);
-    foreach(QString groupName, opm->allGroups()){
+    if (current_pm == "cfg")
+        setParamTree(Owl::CParamManager::Instance());
+    else if (current_pm == "simulator")
+        setParamTree(Owl::SIParamManager::Instance());
+    else if (current_pm == "skill")
+        setParamTree(Owl::SKParamManager::Instance());
+    else if (current_pm == "vision")
+        setParamTree(Owl::VParamManager::Instance());
+    else
+        setParamTree(Owl::OParamManager::Instance());
+}
+
+template<typename T>
+void ParamInterface::setParamTree(T pm) {
+    foreach(QString groupName, pm->allGroups()) {
         QStringList value;
         value << groupName << " " << " ";
-        auto* groupParent = new TreeItem(value,rootItem);
+        auto* groupParent = new TreeItem(value, rootItem);
         rootItem->appendChild(groupParent);
-        foreach(QString key,opm->allKeys(groupName)){
-            auto&& temp = opm->value(groupName,key).toString();
+        foreach(QString key, pm->allKeys(groupName)) {
+            auto&& temp = pm->value(groupName, key).toString();
             QStringList value;
             value << key << judgeType(temp) << temp;
-            groupParent->appendChild(new TreeItem(value,groupParent));
+            groupParent->appendChild(new TreeItem(value, groupParent));
         }
     }
 }
