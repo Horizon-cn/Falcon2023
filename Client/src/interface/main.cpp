@@ -20,6 +20,8 @@
 #include "rec_eventlabel.h"
 #include "optionobject.h"
 #include "globaldata.h"
+#include "Config.h"
+#include <FrameworkWidgetFactory.h>
 
 void qmlRegister() {
     qmlRegisterType<Field>("Owl", 1, 0, "Field");
@@ -38,7 +40,16 @@ void qmlRegister() {
     qmlRegisterSingletonType<rec_slider>("Owl", 1, 0, "RecSlider", &rec_slider::Instance);
     qmlRegisterSingletonType<RecEventLabel>("Owl", 1, 0, "RecEventLabel", &RecEventLabel::Instance);
 }
-
+/**
+class CustomFrameworkWidgetFactory : public KDDockWidgets::DefaultWidgetFactory {
+public:
+    ~CustomFrameworkWidgetFactory() override = default;
+    QUrl titleBarFilename() const override{ return QUrl("qrc:/src/qml/CustomDW/TitleBar.qml"); }
+    QUrl dockwidgetFilename() const override { return QUrl("qrc:/src/qml/CustomDW/DockWidget.qml"); }
+    QUrl frameFilename() const override { return QUrl("qrc:/src/qml/CustomDW/Frame.qml"); }
+    QUrl floatingWindowFilename() const override { return QUrl("qrc:/src/qml/CustomDW/FloatingWindow.qml"); }
+};
+**/
 int main(int argc, char *argv[]) {
     // 展示可视化界面，使用KDDockWidgets
     // 博客链接https://blog.csdn.net/luoyayun361/article/details/117752657
@@ -74,22 +85,24 @@ int main(int argc, char *argv[]) {
     // 注册QML接口
     qmlRegister();
     // 启动程序    
-    //auto flags = KDDockWidgets::Config::self().flags();
-    //KDDockWidgets::Config::self().setFlags(flags);
-    // config.setSeparatorThickness(0);
-    // config.setFrameworkWidgetFactory(new CustomFrameworkWidgetFactory());
+    auto flags = KDDockWidgets::Config::self().flags();
+    KDDockWidgets::Config::self().setFlags(flags);
+    KDDockWidgets::Config::self().setSeparatorThickness(0);
+    //auto& config = KDDockWidgets::Config::self();
+    //config.setFrameworkWidgetFactory(new CustomFrameworkWidgetFactory());
 
     QQmlApplicationEngine engine;
 
-    //KDDockWidgets::Config::self().setQmlEngine(&engine);
+    KDDockWidgets::Config::self().setQmlEngine(&engine);
 
-    // engine.addImportPath("qrc:/src/qml/main.qml");
-    const QUrl url(QStringLiteral("qrc:/src/qml/main.qml"));
-    //QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-    //    &app, [url](QObject* obj, const QUrl& objUrl) {
-    //        if (!obj && url == objUrl)
-    //            QCoreApplication::exit(-1);
-    //    }, Qt::QueuedConnection);
+    engine.addImportPath("qrc:/src/qml");
+    const QUrl url(QStringLiteral("qrc:/src/qml/mainKD.qml"));
+    //const QUrl url(QStringLiteral("qrc:/src/qml/main.qml"));
+    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+        &app, [url](QObject* obj, const QUrl& objUrl) {
+            if (!obj && url == objUrl)
+                QCoreApplication::exit(-1);
+        }, Qt::QueuedConnection);
     engine.load(url);
     
     return app.exec();

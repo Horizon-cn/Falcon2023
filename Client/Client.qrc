@@ -1,6 +1,12 @@
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
+        <file>src/qml/mainKD.qml</file>
+        <file>src/qml/ControlBoardKD.qml</file>
+        <file>src/qml/RefereeBoxKD.qml</file>
+        <file>src/qml/SettingsKD.qml</file>
+        <file>src/qml/ViewerKD.qml</file>
+        <file>src/qml/ToolKitKD.qml</file>
         <file>src/qml/main.qml</file>
         <file>src/qml/ControlBoard.qml</file>
         <file>src/qml/RefereeBox.qml</file>

@@ -27,7 +27,7 @@ ENDIF()
 find_package(Qt5 COMPONENTS Core Quick QuickControls2 SerialPort Widgets Network Gui Qml OpenGL REQUIRED)
 
 ## KDDockWidgets
-# include(${CMAKE_SOURCE_DIR}/cmake/GetKDDockWidgets.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/GetKDDockWidgets.cmake)
 
 ## boost
 # include(${CMAKE_SOURCE_DIR}/cmake/GetBoost.cmake)
