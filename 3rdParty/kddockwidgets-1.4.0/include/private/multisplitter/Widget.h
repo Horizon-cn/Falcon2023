@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "kddockwidgets/docks_export.h"
+#include "docks_export.h"
 #include "Item_p.h"
 
 #include <QRect>

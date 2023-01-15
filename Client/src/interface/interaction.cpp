@@ -366,7 +366,7 @@ QStringList Interaction::getGrsimInterfaces() {
 void Interaction::getBasicInfo() {
     QDialog dialog;
     QFormLayout form(&dialog);
-    form.addRow(new QLabel("owl2 - visual platform developed by SRC team\nmainly used for controlling and debugging robots\ncreated in " + cpm->version));
+    form.addRow(new QLabel("Falcon - AI framework developed by SRC team\nmainly used for controlling and debugging robots\ncreated in " + cpm->version));
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok, Qt::Horizontal, &dialog);
     form.addRow(&buttonBox);
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));

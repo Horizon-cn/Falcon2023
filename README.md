@@ -28,7 +28,9 @@
 - [ ] 参数管理优化
 	- [ ] 参数共享（Core比较麻烦）
 	- [x] Client参数显示可选择文件
-- [ ] Client界面改动，采用KDDockWidgets
+- [ ] Client界面优化
+	- [x] 采用KDDockWidgets
+	- [ ] 优化界面的初始化排布，分界面可恢复
 - [ ] 内置sublime，可在Client上打开脚本
 - [ ] 串口通讯和Cray整合（回校后)
 
@@ -53,7 +55,7 @@
 
 ## 编译方法
 
-- Ubuntu : 具体编译方法见B站，搜索"Rocos环境配置",最后再加上下载Vartypes
+- Ubuntu : 具体编译方法见B站，搜索"Rocos环境配置",最后再加上下载Vartypes、KDDockWidgets
 ```bash
 $ cd /tmp
 $ git clone https://github.com/jpfeltracco/vartypes.git
@@ -68,15 +70,17 @@ $ sudo make install
 	- 注意检查是否有 3rdParty 
 	- 使用CMake Gui，输入源代码所在目录和编译目录（一般是源代码所在目录/build）
 	- 直接Configure，Qt需要输入路径，如D:\QT\Qt5.12.9\5.12.9\msvc2017_64\lib\cmake\Qt5，其他的都已设置好，无需手动输入
-	- 完成后点击Generate，在点击Open Project
+	- 注意，KDDockWigets与QT版本有关联，如果QT版本小于5.15，手动勾选KDDOCKWIDGETS_QT5.12变量，重新Configure
+	- 完成后点击Generate，再点击Open Project
 	- 在vs中选择Release x64模式，并设置Core项目属性，选择15工具集
 	- 开始生成，没有报错则完成
 	- 如果需要使用GPU，按照相应教程设置vs工具和项目属性
-	- 运行bin/package.bat
+	- 运行bin/package.bat，首次编译或更换qt路径时需删除package.txt重新输入其他路径（如D:\QT\Qt5.12.9\5.12.9\msvc2017_64）
 
 ## 使用方法
 
 - 启动run.bat
+- 调整界面排布到适合的形式
 
 ## 常见问题
 

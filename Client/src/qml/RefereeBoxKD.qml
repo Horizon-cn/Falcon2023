@@ -230,7 +230,7 @@ ScrollView {
                             highlighted:next_command == index;
                             onClicked:getButtonsCommand(index);
                             Component.onCompleted: {
-                                color = color[modelData.cmd_type];
+                                color = "#fbeb9c"; //color[modelData.cmd_type];
                             }
                         }
                     }
@@ -267,7 +267,7 @@ ScrollView {
                             highlighted:next_command == index;
                             onClicked:getButtonsCommand(index);
                             Component.onCompleted: {
-                                color = color[modelData.cmd_type];
+                                color = "#79a6ea"; //color[modelData.cmd_type];
                             }
                         }
                     }

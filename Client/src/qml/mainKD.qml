@@ -341,6 +341,7 @@ ApplicationWindow {
             addDockWidget(dock4, KDDW.KDDockWidgets.Location_OnBottom, dock3);
             addDockWidget(dock5, KDDW.KDDockWidgets.Location_OnBottom, dock4);
             addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnBottom, dock5);
+            //dock5.addDockWidgetAsTab(dock6);
         }
     }
     property variant controlRobotShortCut:["`","1","2","3","4","5","6","7","8","9","0","-","=","i","o","p","[","Ctrl+`","Ctrl+1","Ctrl+2","Ctrl+3","Ctrl+4","Ctrl+5","Ctrl+6","Ctrl+7","Ctrl+8","Ctrl+9","Ctrl+0","Ctrl+-","Ctrl+=","Ctrl+i","Ctrl+o","Ctrl+p","Ctrl+["];

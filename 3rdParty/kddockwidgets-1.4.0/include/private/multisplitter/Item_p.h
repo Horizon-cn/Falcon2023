@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "kddockwidgets/docks_export.h"
-#include "kddockwidgets/KDDockWidgets.h"
+#include "docks_export.h"
+#include "KDDockWidgets.h"
 
 #include <QObject>
 #include <QVector>
