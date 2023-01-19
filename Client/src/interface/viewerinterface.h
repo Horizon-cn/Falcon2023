@@ -1,3 +1,4 @@
+/**
 #ifndef VIEWERINTERFACE_H
 #define VIEWERINTERFACE_H
 
@@ -74,3 +75,4 @@ public:
 };
 
 #endif // VIEWERINTERFACE_H
+**/

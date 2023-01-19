@@ -83,6 +83,9 @@ Page{
             break;
         }
     }
+StackLayout {
+    width: parent.width;
+    height:parent.height;
 ScrollView {
     id : root;
     clip : true;
@@ -311,5 +314,6 @@ ScrollView {
         }
         **/
     }
+}
 }
 }

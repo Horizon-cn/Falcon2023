@@ -32,7 +32,7 @@ void qmlRegister() {
     qmlRegisterType<GameState>("Owl", 1, 0, "GameState");
     qmlRegisterType<RefereeBox>("Owl", 1, 0, "RefereeBox");
     qmlRegisterType<ParamInterface>("Owl", 1, 0, "ParamModel");
-    qmlRegisterType<ViewerInterface>("Owl", 1, 0, "ViewerInterface");
+    //qmlRegisterType<ViewerInterface>("Owl", 1, 0, "ViewerInterface");
     qmlRegisterType<LogSlider>("Owl", 1, 0, "LogSlider");
     qmlRegisterType<LogEventLabel>("Owl", 1, 0, "LogEventLabel");
     //qmlRegisterType<optionObject>("Owl", 1, 0, "Option");

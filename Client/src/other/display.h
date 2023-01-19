@@ -38,6 +38,12 @@ private slots:
     void repaint();
 private:
     void init();
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+#if QT_CONFIG(wheelevent)
+    void wheelEvent(QWheelEvent* event) override;
+#endif
 private:
     void paintAxes();
     void paintData();

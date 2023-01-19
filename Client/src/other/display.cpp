@@ -9,6 +9,8 @@ namespace{
 const QColor COLOR_BACKGROUND(40,40,40);
 const QColor COLOR_AXES(100,100,100);
 auto opm = Owl::OParamManager::Instance();
+DataQueue<Owl::ReceiveVisionMessage> visionRecord;
+DataQueue<Owl::RobotCommands> commandRecord;
 template<typename T>
 T limitRange(T value, T minValue, T maxValue) {
     return value > maxValue ? maxValue : (value < minValue) ? minValue : value;
@@ -16,21 +18,32 @@ T limitRange(T value, T minValue, T maxValue) {
 float MAP_WIDTH;
 float MAP_HEIGHT;
 float MAXIMUM;
-float x(float a){return limitRange(a,0.0f,1.0f)*MAP_WIDTH;};
+qreal zoomRatio = 1;
+const static qreal zoomStep = 0.05;
+const static qreal zoomMax = 20;
+const static qreal zoomMin = 0.1;
+int pressed = -1;
+QPoint start, end;
+float ax(float a) {return limitRange(a, 0.0f, 1.0f) * MAP_WIDTH;}
+float x(float a) {return limitRange(a, 0.0f, 1.0f) * MAP_WIDTH * zoomRatio + (end - start).x(); };
 float y(float a){return (1 - limitRange(a,0.0f,MAXIMUM)/MAXIMUM)*MAP_HEIGHT;};
 float w(float a){return a*MAP_WIDTH;};
 float h(float a){return -a/MAXIMUM*MAP_HEIGHT;};
+float display_x(int index) { return ((float)index / Vision::MAINTAIN_STORE_BUFFER); }
 }
 Display::Display(QQuickItem *parent)
     : QQuickPaintedItem (parent)
     , pixmap(nullptr){
     setImplicitWidth(200);
     setImplicitHeight(300);
+    display = false;
+    start = end = QPoint(0, 0);
     pixmap = new QPixmap(QSize(200, 300));
     pixmapPainter.begin(pixmap);
     pixmapPainter.setPen(Qt::NoPen);
     pixmapPainter.setRenderHint(QPainter::HighQualityAntialiasing, true);
     pixmapPainter.setRenderHint(QPainter::TextAntialiasing, true);
+    setAcceptedMouseButtons(Qt::MiddleButton);
     initAxes();
 }
 void Display::paint(QPainter* painter) {
@@ -82,28 +95,28 @@ void Display::paintAxes(){
     if(opm->display_mode=="Vxy" || opm->display_mode=="BallSpeed"){
         for(int i=0;i<=opm->horizontLines;i++){
             auto height = MAXIMUM/opm->horizontLines*i;
-            pixmapPainter.drawLine(::x(0),::y(height),::x(1),::y(height));
-            pixmapPainter.drawText(QPointF(::x(0),::y(height+0.1)),QString::number(height,'g',2));
+            pixmapPainter.drawLine(::ax(0),::y(height),::ax(1),::y(height));
+            pixmapPainter.drawText(QPointF(::ax(0),::y(height+0.1)),QString::number(height,'g',2));
         }
     }
     else {
         for(int i=0;i<=opm->horizontLines;i++){
             auto height = MAXIMUM/opm->horizontLines*i;
-            pixmapPainter.drawLine(::x(0),::y(height),::x(1),::y(height));
-            pixmapPainter.drawText(QPointF(::x(0),::y(height+0.1)),QString::number((height-MAXIMUM/2),'g',2));
+            pixmapPainter.drawLine(::ax(0),::y(height),::ax(1),::y(height));
+            pixmapPainter.drawText(QPointF(::ax(0),::y(height+0.1)),QString::number((height-MAXIMUM/2),'g',2));
         }
     }
     auto height = opm->limitation;
     pixmapPainter.setPen(Qt::red);
     if(opm->display_mode=="Vxy" || opm->display_mode=="BallSpeed") {
-        pixmapPainter.drawLine(::x(0),::y(height),::x(1),::y(height));
-        pixmapPainter.drawText(QPointF(::x(0),::y(height+0.1)),QString::number(height,'g',2));
+        pixmapPainter.drawLine(::ax(0),::y(height),::ax(1),::y(height));
+        pixmapPainter.drawText(QPointF(::ax(0),::y(height+0.1)),QString::number(height,'g',2));
     }
     else {
-        pixmapPainter.drawLine(::x(0),::y(MAXIMUM/2+height),::x(1),::y(MAXIMUM/2+height));
-        pixmapPainter.drawLine(::x(0),::y(MAXIMUM/2-height),::x(1),::y(MAXIMUM/2-height));
-        pixmapPainter.drawText(QPointF(::x(0),::y(MAXIMUM/2+height+0.1)),QString::number(height,'g',2));
-        pixmapPainter.drawText(QPointF(::x(0),::y(MAXIMUM/2-height+0.1)),QString::number(-height,'g',2));
+        pixmapPainter.drawLine(::ax(0),::y(MAXIMUM/2+height),::ax(1),::y(MAXIMUM/2+height));
+        pixmapPainter.drawLine(::ax(0),::y(MAXIMUM/2-height),::ax(1),::y(MAXIMUM/2-height));
+        pixmapPainter.drawText(QPointF(::ax(0),::y(MAXIMUM/2+height+0.1)),QString::number(height,'g',2));
+        pixmapPainter.drawText(QPointF(::ax(0),::y(MAXIMUM/2-height+0.1)),QString::number(-height,'g',2));
     }
 }
 void Display::paintData(){
@@ -115,26 +128,28 @@ void Display::paintData(){
     QPoint newPoint_c = lastPoint_c;
     QPoint newPoint_r = lastPoint_r;
     double maintain;
+    visionRecord = GlobalData::Instance()->maintain;
+    commandRecord = GlobalData::Instance()->robotCommand[opm->display_teamIndex];
     if(opm->display_mode=="Vxy"){
         for(int i=0;i<Vision::MAINTAIN_STORE_BUFFER;i+=1){
-            auto gd = GlobalData::Instance()->maintain[1+i-Vision::MAINTAIN_STORE_BUFFER];
-            auto command = GlobalData::Instance()->robotCommand[opm->display_teamIndex][i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vxy.mod();
+            auto gd = visionRecord[1+i-Vision::MAINTAIN_STORE_BUFFER];
+            auto command = commandRecord[i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vxy.mod();
             auto raw = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].raw.vel.vxy.mod();
             if (gd.robotIndex[opm->display_teamIndex][opm->display_robotID] == -1) maintain = 0;
             else maintain = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].velocity.vxy.mod();
-            newPoint_m.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_m.setX(::x(display_x(i)));
             newPoint_m.setY(::y(maintain/1000.0f));
             pixmapPainter.setPen(QColor(200,200,200));
             pixmapPainter.drawLine(lastPoint_m,newPoint_m);
             lastPoint_m = newPoint_m;
 
-            newPoint_c.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_c.setX(::x(display_x(i)));
             newPoint_c.setY(::y(command/1000.0f));
             pixmapPainter.setPen(Qt::yellow);
             pixmapPainter.drawLine(lastPoint_c,newPoint_c);
             lastPoint_c = newPoint_c;
 
-            newPoint_r.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_r.setX(::x(display_x(i)));
             newPoint_r.setY(::y(raw/1000.0f));
             pixmapPainter.setPen(Qt::green);
             pixmapPainter.drawLine(lastPoint_r,newPoint_r);
@@ -143,16 +158,16 @@ void Display::paintData(){
     }
     else if(opm->display_mode=="BallSpeed"){
         for(int i=0;i<Vision::MAINTAIN_STORE_BUFFER;i+=1){
-            auto gd = GlobalData::Instance()->maintain[1+i-Vision::MAINTAIN_STORE_BUFFER];
+            auto gd = visionRecord[1+i-Vision::MAINTAIN_STORE_BUFFER];
             auto raw = gd.ball->raw.vel.vxy.mod();
             maintain = gd.ball->velocity.mod();
-            newPoint_m.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_m.setX(::x(display_x(i)));
             newPoint_m.setY(::y(maintain/1000.0f));
             pixmapPainter.setPen(QColor(200,200,200));
             pixmapPainter.drawLine(lastPoint_m,newPoint_m);
             lastPoint_m = newPoint_m;
 
-            newPoint_r.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_r.setX(::x(display_x(i)));
             newPoint_r.setY(::y(raw/1000.0f));
             pixmapPainter.setPen(Qt::green);
             pixmapPainter.drawLine(lastPoint_r,newPoint_r);
@@ -161,24 +176,24 @@ void Display::paintData(){
     }
     else if(opm->display_mode=="Vx"){
         for(int i=0;i<Vision::MAINTAIN_STORE_BUFFER;i+=1){
-            auto gd = GlobalData::Instance()->maintain[1+i-Vision::MAINTAIN_STORE_BUFFER];
-            auto command = GlobalData::Instance()->robotCommand[opm->display_teamIndex][i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vx();
+            auto gd = visionRecord[1+i-Vision::MAINTAIN_STORE_BUFFER];
+            auto command = commandRecord[i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vx();
             auto raw = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].raw.vel.vx();
             if (gd.robotIndex[opm->display_teamIndex][opm->display_robotID] == -1) maintain = 0;
             else maintain = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].velocity.vx();
-            newPoint_m.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_m.setX(::x(display_x(i)));
             newPoint_m.setY(::y(MAXIMUM/2+maintain/1000.0f));
             pixmapPainter.setPen(QColor(200,200,200));
             pixmapPainter.drawLine(lastPoint_m,newPoint_m);
             lastPoint_m = newPoint_m;
 
-            newPoint_c.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_c.setX(::x(display_x(i)));
             newPoint_c.setY(::y(MAXIMUM/2+command/1000.0f));
             pixmapPainter.setPen(Qt::yellow);
             pixmapPainter.drawLine(lastPoint_c,newPoint_c);
             lastPoint_c = newPoint_c;
 
-            newPoint_r.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_r.setX(::x(display_x(i)));
             newPoint_r.setY(::y(MAXIMUM/2+raw/1000.0f));
             pixmapPainter.setPen(Qt::green);
             pixmapPainter.drawLine(lastPoint_r,newPoint_r);
@@ -187,24 +202,24 @@ void Display::paintData(){
     }
     else if(opm->display_mode=="Vy"){
         for(int i=0;i<Vision::MAINTAIN_STORE_BUFFER;i+=1){
-            auto gd = GlobalData::Instance()->maintain[1+i-Vision::MAINTAIN_STORE_BUFFER];
-            auto command = GlobalData::Instance()->robotCommand[opm->display_teamIndex][i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vy();
+            auto gd = visionRecord[1+i-Vision::MAINTAIN_STORE_BUFFER];
+            auto command = commandRecord[i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vy();
             auto raw = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].raw.vel.vy();
             if (gd.robotIndex[opm->display_teamIndex][opm->display_robotID] == -1) maintain = 0;
             else maintain = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].velocity.vy();
-            newPoint_m.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_m.setX(::x(display_x(i)));
             newPoint_m.setY(::y(MAXIMUM/2+maintain/1000.0f));
             pixmapPainter.setPen(QColor(200,200,200));
             pixmapPainter.drawLine(lastPoint_m,newPoint_m);
             lastPoint_m = newPoint_m;
 
-            newPoint_c.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_c.setX(::x(display_x(i)));
             newPoint_c.setY(::y(MAXIMUM/2+command/1000.0f));
             pixmapPainter.setPen(Qt::yellow);
             pixmapPainter.drawLine(lastPoint_c,newPoint_c);
             lastPoint_c = newPoint_c;
 
-            newPoint_r.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_r.setX(::x(display_x(i)));
             newPoint_r.setY(::y(MAXIMUM/2+raw/1000.0f));
             pixmapPainter.setPen(Qt::green);
             pixmapPainter.drawLine(lastPoint_r,newPoint_r);
@@ -213,24 +228,24 @@ void Display::paintData(){
     }
     else if(opm->display_mode=="Vr"){
         for(int i=0;i<Vision::MAINTAIN_STORE_BUFFER;i+=1){
-            auto gd = GlobalData::Instance()->maintain[1+i-Vision::MAINTAIN_STORE_BUFFER];
-            auto command = GlobalData::Instance()->robotCommand[opm->display_teamIndex][i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vr;
+            auto gd = visionRecord[1+i-Vision::MAINTAIN_STORE_BUFFER];
+            auto command = commandRecord[i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vr;
             auto raw = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].raw.vel.vr;
             if (gd.robotIndex[opm->display_teamIndex][opm->display_robotID] == -1) maintain = 0;
             else maintain = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].velocity.vr;
-            newPoint_m.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_m.setX(::x(display_x(i)));
             newPoint_m.setY(::y(MAXIMUM/2+maintain));
             pixmapPainter.setPen(QColor(200,200,200));
             pixmapPainter.drawLine(lastPoint_m,newPoint_m);
             lastPoint_m = newPoint_m;
 
-            newPoint_c.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_c.setX(::x(display_x(i)));
             newPoint_c.setY(::y(MAXIMUM/2+command));
             pixmapPainter.setPen(Qt::yellow);
             pixmapPainter.drawLine(lastPoint_c,newPoint_c);
             lastPoint_c = newPoint_c;
 
-            newPoint_r.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_r.setX(::x(display_x(i)));
             newPoint_r.setY(::y(MAXIMUM/2+raw));
             pixmapPainter.setPen(Qt::green);
             pixmapPainter.drawLine(lastPoint_r,newPoint_r);
@@ -239,17 +254,17 @@ void Display::paintData(){
     }
     else if(opm->display_mode=="Angle"){
         for(int i=0;i<Vision::MAINTAIN_STORE_BUFFER;i+=1){
-            auto gd = GlobalData::Instance()->maintain[1+i-Vision::MAINTAIN_STORE_BUFFER];
+            auto gd = visionRecord[1+i-Vision::MAINTAIN_STORE_BUFFER];
             auto raw = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].raw.angle;
             if (gd.robotIndex[opm->display_teamIndex][opm->display_robotID] == -1) maintain = 0;
             else maintain = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].angle;
-            newPoint_m.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_m.setX(::x(display_x(i)));
             newPoint_m.setY(::y(MAXIMUM/2+maintain));
             pixmapPainter.setPen(QColor(200,200,200));
             pixmapPainter.drawLine(lastPoint_m,newPoint_m);
             lastPoint_m = newPoint_m;
 
-            newPoint_r.setX(::x((float)i/Vision::MAINTAIN_STORE_BUFFER));
+            newPoint_r.setX(::x(display_x(i)));
             newPoint_r.setY(::y(MAXIMUM/2+raw));
             pixmapPainter.setPen(Qt::green);
             pixmapPainter.drawLine(lastPoint_r,newPoint_r);
@@ -258,17 +273,20 @@ void Display::paintData(){
     }
 }
 void Display::resetSize(int width,int height){
-    pixmapPainter.end();
-    delete pixmap;
-    pixmap = new QPixmap(QSize(this->property("width").toReal(), this->property("height").toReal()));
-    pixmapPainter.begin(pixmap);
-    MAP_WIDTH = this->property("width").toReal();
-    MAP_HEIGHT = this->property("height").toReal();
-    area = QRect(0, 0, this->property("width").toReal(), this->property("height").toReal());
-    init();
+    if (this->property("width").toReal() > 0 && this->property("height").toReal() > 0) {
+        pixmapPainter.end();
+        delete pixmap;
+        pixmap = new QPixmap(QSize(this->property("width").toReal(), this->property("height").toReal()));
+        qDebug() << pixmapPainter.begin(pixmap);
+        MAP_WIDTH = this->property("width").toReal();
+        MAP_HEIGHT = this->property("height").toReal();
+        area = QRect(0, 0, this->property("width").toReal(), this->property("height").toReal());
+        init();
+    }    
 }
 
 void Display::ifNeedDisplay(bool needDisplay){
+    display = needDisplay;
     if(needDisplay) {
         connect(VisionModule::Instance(), SIGNAL(needDraw()), this, SLOT(draw()));
     }
@@ -323,12 +341,12 @@ void Display::setDisplayMode() {
     spinbox6->setRange(0, 1000);
     spinbox6->setValue(opm->limitation);
     form.addRow(value6, spinbox6);
-    /**QSlider *slider = new QSlider(Qt::Horizontal);
-    slider->setRange(0, 130);
-    slider->setValue(opm->limitation);
-    QObject::connect(spinbox6, SIGNAL(valueChanged(int)),slider, SLOT(setValue(int)));
-    QObject::connect(slider, SIGNAL(valueChanged(int)),spinbox6, SLOT(setValue(int)));
-    form.addRow(slider);**/
+    //QSlider *slider = new QSlider(Qt::Horizontal);
+    //slider->setRange(0, 130);
+    //slider->setValue(opm->limitation);
+    //QObject::connect(spinbox6, SIGNAL(valueChanged(int)),slider, SLOT(setValue(int)));
+    //QObject::connect(slider, SIGNAL(valueChanged(int)),spinbox6, SLOT(setValue(int)));
+    //form.addRow(slider);
     // Add Cancel and OK button
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     form.addRow(&buttonBox);
@@ -353,4 +371,41 @@ int Display::getDisplayHeight() {
     return opm->display_height;
 }
 
+#if QT_CONFIG(wheelevent)
+void Display::wheelEvent(QWheelEvent* e) {
+    qreal oldRatio = zoomRatio;
+    zoomRatio += (e->delta() > 0 ? zoomStep*5 : -zoomStep);
+    zoomRatio = limitRange(zoomRatio, zoomMin, zoomMax);
+    qDebug() << "zoomRatio" << zoomRatio;
+    pixmapPainter.setRenderHint(QPainter::Antialiasing, zoomRatio > 0.5);
+}
+#endif
 
+void Display::mousePressEvent(QMouseEvent* e) {
+    pressed = e->buttons();
+    switch (pressed) {
+    case Qt::MiddleButton:
+        start = end = e->pos();
+        break;
+    default:
+        break;
+    }
+}
+void Display::mouseMoveEvent(QMouseEvent* e) {
+    switch (pressed) {
+    case Qt::MiddleButton:
+        end = e->pos();
+        repaint();
+        break;
+    default:
+        break;
+    }
+}
+void Display::mouseReleaseEvent(QMouseEvent* e) {
+    switch (pressed) {
+    case Qt::MiddleButton:
+        break;
+    default:
+        break;
+    }
+}

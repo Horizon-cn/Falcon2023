@@ -1,20 +1,14 @@
 # define
 option(KDDOCKWIDGETS_QTQUICK ON)
 option(KDDOCKWIDGETS_QT6 OFF)
-option(KDDOCKWIDGETS_QT5.12 OFF)
 add_definitions(-DKDDOCKWIDGETS_QTQUICK)
 add_definitions(-DKDDOCKWIDGETS_QT6)
-# add_definitions(-DKDDOCKWIDGETS_QT5.12)
 
 IF (WIN32)
 	# include(${THIRDPARTY_LIB_DIR}/kddockwidgets/cmake/KDDockWidgetsConfig.cmake)
 
-	message("KDDOCKWIDGETS_QT5.12 : ${KDDOCKWIDGETS_QT5.12}")
-	IF (NOT KDDOCKWIDGETS_QT5.12)
-		set(KDDockWidgets_DIR ${THIRDPARTY_LIB_DIR}/kddockwidgets-1.5.0)
-	ELSE()
-		set(KDDockWidgets_DIR ${THIRDPARTY_LIB_DIR}/kddockwidgets-1.4.0)
-	ENDIF()
+	set(KDDockWidgets_DIR ${THIRDPARTY_LIB_DIR}/kddockwidgets-1.5.0)
+
 	list(APPEND CMAKE_PREFIX_PATH ${KDDockWidgets_DIR})
 	message("Find KDDockWidgets : ${KDDockWidgets_DIR}")
 	set(KDDOCKWIDGETS_INCLUDE_DIRS "${KDDockWidgets_DIR}/include")

@@ -70,7 +70,7 @@ $ sudo make install
 	- 注意检查是否有 3rdParty 
 	- 使用CMake Gui，输入源代码所在目录和编译目录（一般是源代码所在目录/build）
 	- 直接Configure，Qt需要输入路径，如D:\QT\Qt5.12.9\5.12.9\msvc2017_64\lib\cmake\Qt5，其他的都已设置好，无需手动输入
-	- 注意，KDDockWigets与QT版本有关联，如果QT版本小于5.15，手动勾选KDDOCKWIDGETS_QT5.12变量，重新Configure
+	- 注意，KDDockWigets与QT版本有关联，QT版本需不低于5.15
 	- 完成后点击Generate，再点击Open Project
 	- 在vs中选择Release x64模式，并设置Core项目属性，选择15工具集
 	- 开始生成，没有报错则完成

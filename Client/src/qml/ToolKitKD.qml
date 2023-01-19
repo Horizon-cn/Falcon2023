@@ -15,6 +15,9 @@ Page{
     property bool isCutting: true;
     property bool isCuttingLog: true;
     property bool isLabeling: false;
+StackLayout {
+    width: parent.width;
+    height:parent.height;
 ScrollView {
     clip: true;
     contentWidth: parent.width;
@@ -616,4 +619,5 @@ property variant recplayerShortCut: ["m", "Left", "Right", "Up", "Down"];
             recPlaySpinBox.value = recPlaySpinBox.value - 1;
         }
     }
+}
 }

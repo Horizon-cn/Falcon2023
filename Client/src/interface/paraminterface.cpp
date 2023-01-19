@@ -4,6 +4,11 @@
 #include "display.h"
 #include <regex>
 #include <QDir>
+#include <QInputDialog>
+#include <QFormLayout>
+#include <QComboBox>
+#include <QLabel>
+#include <QDialogButtonBox>
 namespace{
     QString current_pm = "owl2";
 }
