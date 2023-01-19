@@ -587,6 +587,7 @@ ScrollView {
         }
     }
 }
+}
 property variant recplayerShortCut: ["m", "Left", "Right", "Up", "Down"];
 
     Shortcut{
@@ -619,5 +620,4 @@ property variant recplayerShortCut: ["m", "Left", "Right", "Up", "Down"];
             recPlaySpinBox.value = recPlaySpinBox.value - 1;
         }
     }
-}
 }
