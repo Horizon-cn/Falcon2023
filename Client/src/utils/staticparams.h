@@ -12,7 +12,7 @@ namespace PARAM {
 	const int TEAMS = 2;
 	const int PROCESS = 4;
 	const int SIM = 2; //sim process
-	const int CRAY = 3; //Cray process
+//	const int CRAY = 3; //Cray process
 }
 namespace Vision {
 	const int CAMERA_STORE_BUFFER = 100;

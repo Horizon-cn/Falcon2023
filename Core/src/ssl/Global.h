@@ -24,6 +24,8 @@
 extern CParamManagerSkill* paramManager;
 extern ParamManagerOwl* oParamManager;
 extern ParamManagerCfg* cParamManager;
+extern ParamManagerVision* vParamManager;
+extern ParamManagerSimulator* sParamManager;
 extern CVisionModule*  vision;
 extern CKickStatus*    kickStatus;
 extern CDribbleStatus* dribbleStatus;

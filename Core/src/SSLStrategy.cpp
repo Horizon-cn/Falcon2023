@@ -57,7 +57,7 @@ void run(){
 		if (! DataReceiver4rbk::Instance()->getGameInfo(&option,gameInfo)) {
 			continue;
 		}
-
+        
         vision->SetRefRecvMsg(gameInfo);
         vision->SetNewVision(gameInfo);
 		
@@ -76,10 +76,12 @@ void run(){
 
 int main(int argc, char* argv[]) {
     QCoreApplication a(argc, argv);
-    OParamManager::Instance()->setFileName();
+//    OParamManager::Instance()->setFileName();
     OParamManager::Instance()->update();
     CParamManager::Instance()->setFileName();
     CParamManager::Instance()->update();
+//    VParamManager::Instance()->setFileName();
+    SParamManager::Instance()->setFileName();
     ParamManager::Instance()->setFileName();
     ParamManager::Instance()->update();
     std::thread t(run);

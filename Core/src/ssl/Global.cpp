@@ -20,12 +20,16 @@ CSupportPos2022* supportPos2022;
 CParamManagerSkill* paramManager;
 ParamManagerOwl* oParamManager;
 ParamManagerCfg* cParamManager;
+ParamManagerVision* vParamManager;
+ParamManagerSimulator* sParamManager;
 
 void initializeSingleton()
 {
 	paramManager    = ParamManager::Instance();
 	oParamManager   = OParamManager::Instance();
 	cParamManager   = CParamManager::Instance();
+	vParamManager   = VParamManager::Instance();
+	sParamManager   = SParamManager::Instance();
 	vision			= VisionModule::Instance();
     kickStatus		= KickStatus::Instance();
 	dribbleStatus	= DribbleStatus::Instance();

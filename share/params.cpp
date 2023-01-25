@@ -14,6 +14,10 @@ namespace Falcon {
     void ParamManager::setFileName() {
         settings = new QSettings(QApplication::applicationDirPath() + "/" + filename, QSettings::IniFormat);
     }
+    int ParamManager::setFileName(QString appPath) {
+        settings = new QSettings(appPath + "/" + filename, QSettings::IniFormat);
+        return 0;
+    }
     bool ParamManager::loadParam(QChar& value, const QString& key, QChar defaultValue) {
         value = settings->value(key, defaultValue).toChar();
         if (!settings->contains(key)) {

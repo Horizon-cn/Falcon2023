@@ -67,6 +67,7 @@ $ make
 $ sudo make install
 ```
 - Windows : 
+	- [编译视频](https://jbox.sjtu.edu.cn/l/c1CcEe)
 	- 注意检查是否有 3rdParty 
 	- 使用CMake Gui，输入源代码所在目录和编译目录（一般是源代码所在目录/build）
 	- 直接Configure，Qt需要输入路径，如D:\QT\Qt5.12.9\5.12.9\msvc2017_64\lib\cmake\Qt5，其他的都已设置好，无需手动输入

@@ -1,7 +1,6 @@
 #ifndef PARAMMANAGERNEW_H
 #define PARAMMANAGERNEW_H
 
-#include <param.h>
 #include <QSettings>
 #include <QDebug>
 #include "singleton.h"
@@ -60,6 +59,18 @@ public:
     int blue_heat, yellow_heat;
 };
 typedef Falcon::MeyersSingleton<ParamManagerCfg> CParamManager;
+class ParamManagerVision : public Falcon::ParamManager {
+public:
+    ParamManagerVision() : ParamManager("../data/vision.ini") {}
+    ~ParamManagerVision() {}
+};
+typedef Falcon::MeyersSingleton<ParamManagerVision> VParamManager;
+class ParamManagerSimulator : public Falcon::ParamManager {
+public:
+    ParamManagerSimulator() : ParamManager("../data/simulator.ini") {}
+    ~ParamManagerSimulator() {}
+};
+typedef Falcon::MeyersSingleton<ParamManagerSimulator> SParamManager;
 class CParamManagerSkill : public Falcon::ParamManager {
     public:
         CParamManagerSkill() : ParamManager("../data/skill.ini") {}
