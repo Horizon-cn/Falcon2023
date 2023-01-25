@@ -45,18 +45,18 @@ namespace Param{
 
 		const double PITCH_LENGTH = OParamManager::Instance()->value(field + "/field_length", 12000).toDouble() * 0.1; //1200; // 场地长
 		const double PITCH_WIDTH = OParamManager::Instance()->value(field + "/field_width", 9000).toDouble() * 0.1; //900; // 场地宽
-		const double PITCH_MARGIN = OParamManager::Instance()->value(field + "/field_margin", 300).toDouble() * 0.1; //1; // 场地的边界宽度
+		const double PITCH_MARGIN = OParamManager::Instance()->value(field + "/field_line_width", 10).toDouble() * 0.1; //1; // 场地的边界宽度
 		const double CENTER_CIRCLE_R = OParamManager::Instance()->value(field + "/center_radius", 500).toDouble() * 0.1 * 2; //100; // 中圈半径?直径
 		const double PENALTY_AREA_WIDTH = OParamManager::Instance()->value(field + "/penalty_width", 2400).toDouble() * 0.1; //240; // 禁区宽度
 		const double PENALTY_AREA_DEPTH = OParamManager::Instance()->value(field + "/penalty_depth", 1200).toDouble() * 0.1; //120; // 禁区深度
 		const double PENALTY_AREA_R = OParamManager::Instance()->value("Division_B/penalty_radius", 800).toDouble() * 0.1; //80; // 两个圆弧
 		const double PENALTY_AREA_L = OParamManager::Instance()->value("Division_B/penalty_area_l", 350).toDouble() * 0.1; //35; // 连接两个圆弧的线段
 		const double PENALTY_L = 50;
-		const double PENALTY_MARK_X = 480; // 点球点的X坐标
-		const double FIELD_WALL_DIST = 20; // 场地护栏到边界的距离
+		const double PENALTY_MARK_X = OParamManager::Instance()->value(field + "/penalty_point", 1200).toDouble() * 0.1; //480; // 点球点的X坐标
+		const double FIELD_WALL_DIST = OParamManager::Instance()->value(field + "/field_margin", 300).toDouble() * 0.1;  //20; // 场地护栏到边界的距离
 		const double GOAL_WIDTH = OParamManager::Instance()->value(field + "/goal_width", 1200).toDouble() * 0.1; //120; // 球门宽度
 		const double GOAL_DEPTH = OParamManager::Instance()->value(field + "/goal_depth", 200).toDouble() * 0.1; //20; // 球门深度
-		const double FREE_KICK_AVOID_BALL_DIST = 50; // 开任意球的时候,对方必须离球这么远
+		const double FREE_KICK_AVOID_BALL_DIST = OParamManager::Instance()->value(field + "/field_free_kick", 700).toDouble() * 0.1; //50; // 开任意球的时候,对方必须离球这么远
 		const double RATIO = 1.5;
 	}
 	namespace Math{
