@@ -374,14 +374,14 @@ void Interaction::getBasicInfo() {
 }
 void Interaction::getMoreInfo() {
     QFileDialog dialog;
-    QString Infopath = dialog.getOpenFileName(&dialog, QString::fromLocal8Bit("open"), "./Help", "All files(*.*)");
+    QString Infopath = dialog.getOpenFileName(&dialog, QString::fromLocal8Bit("open"), QApplication::applicationDirPath()+"/../Help", "All files(*.*)");
     if (!Infopath.isEmpty()) {        
         QTextCodec *code = QTextCodec::codecForName("GB2312");//解决中文路径问题
         char* cexe = code->fromUnicode(Infopath).data();
         //QByteArray temp = Infopath.toLatin1();
         //char *cexe = temp.data();
 
-        //QString qexe = QDir::currentPath()+QString("/owl2.exe");
+        //QString qexe = QApplication::applicationDirPath()+QString("/owl2.exe");
         //QString str2 = qexe.replace(QRegExp("\\/"),"\\\\");//左右斜杠转换
         //QByteArray str1 = str2.toLatin1();
         //LPCSTR path1 = str1.data();

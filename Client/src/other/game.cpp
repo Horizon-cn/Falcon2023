@@ -88,7 +88,7 @@ bool CGame::outOfBoundary() {
 
 bool CGame::hasCrashed() {
    if(mode=="hard") return false;
-   QFile file(QDir::currentPath() + "/Formations/" + formation + ".json");
+   QFile file(QApplication::applicationDirPath() + "/../Formations/" + formation + ".json");
     if ( !file.open( QIODevice::ReadWrite ) ) {
         qDebug() << "fail opening file";
         return true;
@@ -468,8 +468,8 @@ void CGame::stopGameRecorder() {
 }
 
 void CGame::writeGameInfo() {
-   if(isGrade==1) filepath = QDir::currentPath() + "/GameInfo/Trail/trail"+QDateTime::currentDateTime().toString("yyyy-MM-dd-HH-mm-ss")+".xlsx";
-   else filepath = QDir::currentPath()+"/GameInfo/Grade/grade"+QDateTime::currentDateTime().toString("yyyy-MM-dd-HH-mm-ss")+".xlsx";
+   if(isGrade==1) filepath = QApplication::applicationDirPath() + "/GameInfo/Trail/trail"+QDateTime::currentDateTime().toString("yyyy-MM-dd-HH-mm-ss")+".xlsx";
+   else filepath = QApplication::applicationDirPath()+"/GameInfo/Grade/grade"+QDateTime::currentDateTime().toString("yyyy-MM-dd-HH-mm-ss")+".xlsx";
    QAxObject *excel = new QAxObject(this);
    excel->setControl("Excel.Application");
    excel->setProperty("Visiblie", false);

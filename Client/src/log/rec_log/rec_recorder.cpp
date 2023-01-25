@@ -36,7 +36,7 @@ void RecRecorder::start() {
 //        qDebug() << "I AM RUNNING";
     QDateTime datetime;
 //        qDebug() << datetime.currentDateTime().toString("yyyy-MM-dd-HH-mm-ss");
-    filename = QString("LOG/Rec").append(datetime.currentDateTime().toString("yyyy-MM-dd-HH-mm-ss")).append(".log");
+    filename = QString("../LOG/Rec").append(datetime.currentDateTime().toString("yyyy-MM-dd-HH-mm-ss")).append(".log");
 //    recordFile = new QFile(filename);
     QDir::setCurrent(qApp->applicationDirPath());
     recordFile.setFileName(filename);

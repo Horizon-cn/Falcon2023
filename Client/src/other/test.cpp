@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QIODevice>
 #include <QDataStream>
+#include <QDir>
 #include "globaldata.h"
 #include "simmodule.h"
 #include "parammanager.h"
@@ -207,7 +208,8 @@ void CTest::storeTestingDataV2() {
         ballIO = nullptr;
         ballFile.close();
         QDateTime datetime;
-        ballFileName = QString("LOG/BallSpeed").append(datetime.currentDateTime().toString("yyyy-MM-dd-HH-mm-ss")).append(".txt"); //QString("Test/6/")+QString("ball")+QString::number(file_num)+QString(".txt");
+        ballFileName = QString("../LOG/BallSpeed").append(datetime.currentDateTime().toString("yyyy-MM-dd-HH-mm-ss")).append(".txt"); //QString("Test/6/")+QString("ball")+QString::number(file_num)+QString(".txt");
+        QDir::setCurrent(qApp->applicationDirPath());
         ballFile.setFileName(ballFileName);
         ballFile.open(QIODevice::WriteOnly | QIODevice::Append);
         ballIO = &ballFile;

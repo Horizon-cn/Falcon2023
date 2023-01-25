@@ -136,7 +136,7 @@ void Communicator::sendEmptyCmd(int t) {
 void Communicator::startRecordCommands(bool start) {
     if (start) {
         QDateTime currentTime;
-        filename = "LOG/"+currentTime.currentDateTime().toString("yyyy.MM.dd.hh.mm.ss.zzz") + ".txt";
+        filename = qApp->applicationDirPath()+"/../LOG/"+currentTime.currentDateTime().toString("yyyy.MM.dd.hh.mm.ss.zzz") + ".txt";
     }
     startRecord = start;
 }

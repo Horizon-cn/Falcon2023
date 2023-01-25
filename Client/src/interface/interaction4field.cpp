@@ -48,7 +48,7 @@ void Interaction4Field::singleRobotControl(int id, int team) {
     Simulator::Instance()->controlSingleRobot(id, team == 1);
 }
 void Interaction4Field::saveFormation() {
-    QString file_name = QFileDialog::getSaveFileName(NULL, tr("Save File"),"./Formations", tr(" (*.json)"));
+    QString file_name = QFileDialog::getSaveFileName(NULL, tr("Save File"),QApplication::applicationDirPath()+"/../Formations", tr(" (*.json)"));
     QFile *file = new QFile(file_name);
     qDebug() << file_name;
     if(!file->open(QIODevice::ReadWrite)) {
@@ -110,7 +110,7 @@ void Interaction4Field::generateFormationJson(QJsonDocument& jsonDoc) {
 
 void Interaction4Field::readFormationJson(QString fileName) {
     menubar_crt_file = fileName;
-    QFile file(QDir::currentPath() + "/Formations/" + fileName + ".json");
+    QFile file(QApplication::applicationDirPath() + "/../Formations/" + fileName + ".json");
     if ( !file.open( QIODevice::ReadWrite ) ) {
         qDebug() << "fail opening file";
         return;
@@ -176,7 +176,7 @@ void Interaction4Field::readFormationJson(QString fileName) {
 QStringList Interaction4Field::getFormationFileName() {
     QStringList list;
 
-    QDir dir("./Formations");
+    QDir dir(QApplication::applicationDirPath()+"/../Formations");
         if(!dir.exists())
             return list;
 
