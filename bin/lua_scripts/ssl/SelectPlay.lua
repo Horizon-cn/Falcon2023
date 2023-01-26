@@ -78,7 +78,11 @@ else
 	if IS_TEST_MODE then
 		if gLastPlay == "" or NeedExit(gCurrentPlay) then
 			debugEngine:gui_debug_msg(CGeoPoint:new_local(-param.pitchLength/2,-param.pitchWidth/2),'TEST_MODE',0)
-			gCurrentPlay = gTestPlay
+			if type(gTestPlay) == "string" then
+				gCurrentPlay = gTestPlay
+			elseif type(gTestPlay) == "function" then
+				gCurrentPlay = gTestPlay()
+			end
 		end
 		if gCurrentPlay ~= gLastPlay or
 			NeedExit(gCurrentPlay) then

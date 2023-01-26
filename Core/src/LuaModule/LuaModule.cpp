@@ -856,6 +856,44 @@ extern "C" int FUNC_GetIsSimulation(lua_State* L)
 	return 1;
 }
 
+extern "C" int FUNC_GetIsYellow(lua_State * L)
+{
+	LuaModule::Instance()->PushBool(OParamManager::Instance()->isYellow);
+	return 1;
+}
+
+extern "C" int FUNC_GetFieldParam(lua_State * L)
+{
+	string str = LuaModule::Instance()->GetStringArgument(1, NULL);
+	double param = 0;
+	if (str == "MAX_PLAYER")
+		param = Param::Field::MAX_PLAYER;
+	else if (str == "PITCH_LENGTH")
+		param = Param::Field::PITCH_LENGTH;
+	else if (str == "PITCH_WIDTH")
+		param = Param::Field::PITCH_WIDTH;
+	else if (str == "GOAL_WIDTH")
+		param = Param::Field::GOAL_WIDTH;
+	else if (str == "GOAL_DEPTH")
+		param = Param::Field::GOAL_DEPTH;
+	else if (str == "FREE_KICK_AVOID_BALL_DIST")
+		param = Param::Field::FREE_KICK_AVOID_BALL_DIST;
+	else if (str == "PLAYER_SIZE")
+		param = Param::Vehicle::V2::PLAYER_SIZE;
+	else if (str == "PENALTY_AREA_WIDTH")
+		param = Param::Field::PENALTY_AREA_WIDTH;
+	else if (str == "PENALTY_AREA_DEPTH")
+		param = Param::Field::PENALTY_AREA_DEPTH;
+	else if (str == "PENALTY_AREA_R")
+		param = Param::Field::PENALTY_AREA_R;
+	else if (str == "PENALTY_AREA_L")
+		param = Param::Field::PENALTY_AREA_L;
+	else if (str == "PLAYER_FRONT_TO_CENTER")
+		param = Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER;
+	LuaModule::Instance()->PushNumber(param);
+	return 1;
+}
+
 extern "C" int FUNC_GetKickOffDefPos(lua_State* L)
 {
 	string str = LuaModule::Instance()->GetStringArgument(1, NULL);
@@ -1195,6 +1233,8 @@ luaDef GUIGlue[] =
 	{"CMarking",			Skill_Marking},
 	{"CTimeOut",			FUNC_TimeOut},
 	{"CGetIsSimulation",	FUNC_GetIsSimulation},
+	{"CGetIsYellow",	    FUNC_GetIsYellow},
+	{"CGetFieldParam",	    FUNC_GetFieldParam},
 	{"CTestCircleBall",     Skill_CircleBall},
 	{"CPenaltyGoalie",		Skill_PenaltyGoalie},
 	{"CSpeed",				Skill_Speed},

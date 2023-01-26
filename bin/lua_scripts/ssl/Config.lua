@@ -1,11 +1,18 @@
 IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
+IS_YELLOW = CGetIsYellow()
 USE_SWITCH = false
 OPPONENT_NAME = "Avoidfoul" --"Avoidfoul"
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
-gTestPlay = "Test_NormalDefend" -- Test_NormalMiddleDefend --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
+gTestPlay = function ()
+	if not IS_YELLOW then
+		return "Test_NormalDefend"
+	else
+		return "Test_NormalMiddleDefend"
+	end
+end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
 gSwitchNum = {
 	["normal"]  = 6,
