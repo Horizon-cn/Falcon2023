@@ -35,11 +35,11 @@ auto opm = Owl::OParamManager::Instance();
 auto cpm = Owl::CParamManager::Instance();
 }
 Interaction::Interaction(QObject *parent) : QObject(parent) {
-    RBKpath[PARAM::BLUE] = qApp->applicationDirPath() + "./Core"; //cpm->BlueRBKPath;
-    RBKpath[PARAM::YELLOW] = qApp->applicationDirPath() + "./Core"; //cpm->YellowRBKPath;
+    RBKpath[PARAM::BLUE] = qApp->applicationDirPath() + "/Core"; //cpm->BlueRBKPath;
+    RBKpath[PARAM::YELLOW] = qApp->applicationDirPath() + "/Core"; //cpm->YellowRBKPath;
     RBKdirectory[PARAM::BLUE] = RBKpath[PARAM::BLUE].left(RBKpath[PARAM::BLUE].lastIndexOf('/'));
     RBKdirectory[PARAM::YELLOW] = RBKpath[PARAM::YELLOW].left(RBKpath[PARAM::YELLOW].lastIndexOf('/'));
-    SIMpath = qApp->applicationDirPath() + "./grSim"; //cpm->grSimPath;
+    SIMpath = qApp->applicationDirPath() + "/grSim"; //cpm->grSimPath;
     SIMdirectory = SIMpath.left(SIMpath.lastIndexOf('/'));
 //    Craypath = cpm->CrayPath;
 //    Craydirectory = Craypath.left(Craypath.lastIndexOf('/'));

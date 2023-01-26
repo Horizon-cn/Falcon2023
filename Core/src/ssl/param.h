@@ -8,7 +8,6 @@
 #ifndef _PARAM_H_
 #define _PARAM_H_
 #include "os_param.h" // 和系统有关的参数
-#include "singleton.h"
 #include "ParamManagerNew.h"
 /**
 * 参数名字空间Param.

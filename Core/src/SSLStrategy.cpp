@@ -17,6 +17,7 @@
 #include <thread>
 #include <QCoreApplication>
 #include <ParamManagerNew.h>
+#include <QDir>
 
 ZSS::Protocol::Debug_Msgs guiDebugMsgs;
 
@@ -75,6 +76,7 @@ void run(){
 }
 
 int main(int argc, char* argv[]) {
+    qDebug() << QDir::currentPath();
     QCoreApplication a(argc, argv);
 //    OParamManager::Instance()->setFileName();
     OParamManager::Instance()->update();
