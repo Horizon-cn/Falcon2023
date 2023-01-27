@@ -2,7 +2,13 @@
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.3
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Dialogs 1.2
 import Owl 1.0 as Owl
+import Components 1.0
+Page{
+StackLayout {
+    width: parent.width;
+    height:parent.height;
 ScrollView{
     id:viewer;
     clip:true;
@@ -13,7 +19,8 @@ ScrollView{
     ScrollBar.horizontal.interactive: true;
     ScrollBar.vertical.interactive: true;
     property bool needDisplay : false;
-    Owl.ViewerInterface{ id : viewerInterface; }
+    property bool freezeDisplay : false;
+    //Owl.ViewerInterface{ id : viewerInterface; }
     Grid{
         padding: 5;
         topPadding: 15;
@@ -33,13 +40,12 @@ ScrollView{
                 horizontalItemAlignment: Grid.AlignHCenter;
                 spacing: 0;
                 rowSpacing: 0;
-                columns:2;
+                columns:4;
                 columnSpacing: 5
-                property int itemWidth :width - 2*padding;
+                property int itemWidth :(width - (columns-1) * columnSpacing - 2*padding)/columns;
                 Grid {
-                    property int buttonWidth: parent.itemWidth/2;
+                    property int buttonWidth: parent.itemWidth;
                     ZButton{
-                        id: displayButton;
                         icon.source:viewer.needDisplay ? "/resource/stop.png" : "/resource/start.png";
                         onClicked: {
                             viewer.needDisplay = !viewer.needDisplay;
@@ -48,12 +54,45 @@ ScrollView{
                     }
                 }
                 Grid {
-                    property int buttonWidth: (parent.width - displayButton.parent.buttonWidth - 5);
+                    property int buttonWidth: parent.itemWidth;
                     ZButton{
                         text:"SET";
                         onClicked: {
                             display.setDisplayMode();
                         }
+                    }
+                }
+                Grid {
+                    property int buttonWidth: parent.itemWidth;
+                    ZButton{
+                        text:viewer.freezeDisplay?"RESUME":"FREEZE";
+                        onClicked: {
+                            display.ifNeedDisplay(viewer.freezeDisplay);
+                            viewer.freezeDisplay = !viewer.freezeDisplay;
+                        }
+                    }
+                }
+                Grid {
+                    property int buttonWidth: parent.itemWidth;
+                    ZButton{
+                        text:"LOAD";
+                        onClicked: {
+                            fdrs.open();
+                        }
+                    }
+                }
+                FileDialog {
+                    id:fdrs
+                    title: "Please select"
+                    selectExisting: true
+                    selectFolder: false
+                    selectMultiple: false
+                    nameFilters: ["Rec files (*.txt)"]
+                    onAccepted: {
+                        console.log("You chose: " + fdrs.fileUrl);
+                    }
+                    onRejected: {
+                        console.log("Canceled");
                     }
                 }
             }
@@ -70,7 +109,7 @@ ScrollView{
             onHeightChanged: {
                 resetSize(width,height);
             }
-        }
+        }/**
         ZGroupBox{
             title: qsTr("Robot")
             Grid{
@@ -93,6 +132,8 @@ ScrollView{
                     }
                 }
             }
-        }
+        }**/
     }
+}
+}
 }

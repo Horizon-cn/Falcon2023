@@ -1,25 +1,26 @@
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
-        <file>src/qml/mainKD.qml</file>
-        <file>src/qml/ControlBoardKD.qml</file>
-        <file>src/qml/RefereeBoxKD.qml</file>
-        <file>src/qml/SettingsKD.qml</file>
-        <file>src/qml/ViewerKD.qml</file>
-        <file>src/qml/ToolKitKD.qml</file>
-        <file>src/qml/main.qml</file>
-        <file>src/qml/ControlBoard.qml</file>
-        <file>src/qml/RefereeBox.qml</file>
-        <file>src/qml/Settings.qml</file>
-        <file>src/qml/ToolBarSeparator.qml</file>
-        <file>src/qml/Viewer.qml</file>
-        <file>src/qml/ZButton.qml</file>
-        <file>src/qml/ZComboBox.qml</file>
-        <file>src/qml/ZGroupBox.qml</file>
-        <file>src/qml/ZRefButton.qml</file>
-        <file>src/qml/ZRobot.qml</file>
-        <file>src/qml/ZSwitch.qml</file>
-        <file>src/qml/ZValue.qml</file>
+        <file>src/qml/KDDockWidgets/mainKD.qml</file>
+        <file>src/qml/KDDockWidgets/ControlBoardKD.qml</file>
+        <file>src/qml/KDDockWidgets/RefereeBoxKD.qml</file>
+        <file>src/qml/KDDockWidgets/SettingsKD.qml</file>
+        <file>src/qml/KDDockWidgets/ViewerKD.qml</file>
+        <file>src/qml/KDDockWidgets/ToolKitKD.qml</file>
+        <file>src/qml/Widgets/main.qml</file>
+        <file>src/qml/Widgets/ControlBoard.qml</file>
+        <file>src/qml/Widgets/RefereeBox.qml</file>
+        <file>src/qml/Widgets/Settings.qml</file>
+        <file>src/qml/Widgets/Viewer.qml</file>
+        <file>src/qml/Components/qmldir</file>
+        <file>src/qml/Components/ToolBarSeparator.qml</file>
+        <file>src/qml/Components/ZButton.qml</file>
+        <file>src/qml/Components/ZComboBox.qml</file>
+        <file>src/qml/Components/ZGroupBox.qml</file>
+        <file>src/qml/Components/ZRefButton.qml</file>
+        <file>src/qml/Components/ZRobot.qml</file>
+        <file>src/qml/Components/ZSwitch.qml</file>
+        <file>src/qml/Components/ZValue.qml</file>
         <file>resource/connect.png</file>
         <file>resource/Heartbeat.png</file>
         <file>resource/nHeartbeat.png</file>

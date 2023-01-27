@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
     CParamManager::Instance()->update();
 //    VParamManager::Instance()->setFileName();
     SParamManager::Instance()->setFileName();
-    ParamManager::Instance()->setFileName();
+//    ParamManager::Instance()->setFileName();
     ParamManager::Instance()->update();
     std::thread t(run);
     t.detach();

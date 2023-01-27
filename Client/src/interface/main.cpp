@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
     KDDockWidgets::Config::self().setQmlEngine(&engine);
 
     engine.addImportPath("qrc:/src/qml");
-    const QUrl url(QStringLiteral("qrc:/src/qml/mainKD.qml"));
-    //const QUrl url(QStringLiteral("qrc:/src/qml/main.qml"));
+    const QUrl url(QStringLiteral("qrc:/src/qml/KDDockWidgets/mainKD.qml"));
+    //const QUrl url(QStringLiteral("qrc:/src/qml/Widgets/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
         &app, [url](QObject* obj, const QUrl& objUrl) {
             if (!obj && url == objUrl)

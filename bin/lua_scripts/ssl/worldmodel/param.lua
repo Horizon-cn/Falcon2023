@@ -46,4 +46,4 @@ penaltySegment	= CGetFieldParam("PENALTY_AREA_L") -- 35	--
 playerFrontToCenter = CGetFieldParam("PLAYER_FRONT_TO_CENTER") -- 7.6
 lengthRatio	= 1
 widthRatio	= 1
-stopRatio = 1
+-- stopRatio = 1

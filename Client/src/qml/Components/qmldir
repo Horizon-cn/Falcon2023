@@ -1,0 +1,9 @@
+module Components
+ToolBarSeparator 1.0 ToolBarSeparator.qml
+ZButton 1.0 ZButton.qml
+ZComboBox 1.0 ZComboBox.qml
+ZGroupBox 1.0 ZGroupBox.qml
+ZRefButton 1.0 ZRefButton.qml
+ZRobot 1.0 ZRobot.qml
+ZSwitch 1.0 ZSwitch.qml
+ZValue 1.0 ZValue.qml

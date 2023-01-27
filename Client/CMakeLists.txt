@@ -87,7 +87,10 @@ get_pb_file(PROTO_H PROTO_CPP ${PROTO_LIST})
 set(QML_DIRS)
 list(APPEND QML_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src/qml)
 set(QML_IMPORT_PATH ${QML_DIRS})
-FILE(GLOB QMLFILES ${QML_DIRS}/*.qml)
+# FILE(GLOB QMLFILES ${QML_DIRS}/*.qml)
+FILE(GLOB QML_COMPONENTS_FILES ${QML_DIRS}/Components/*.qml)
+FILE(GLOB QML_KDDOCKWIDGETS_FILES ${QML_DIRS}/KDDockWidgets/*.qml)
+FILE(GLOB QML_WIDGETS_FILES ${QML_DIRS}/Widgets/*.qml)
 
 set(PROJECT_INCLUDE_DIRS
     ${CMAKE_BINARY_DIR}/proto
@@ -165,7 +168,10 @@ source_group("src\\share" FILES ${SHARE_CPPFILES})
 
 source_group("rc" FILES ${RCFILES})
 source_group("qrc" FILES ${QRCFILES})
-source_group("qml" FILES ${QMLFILES})
+# source_group("qml" FILES ${QMLFILES})
+source_group("qml\\Components" FILES ${QML_COMPONENTS_FILES})
+source_group("qml\\KDDockWidgets" FILES ${QML_KDDOCKWIDGETS_FILES})
+source_group("qml\\Widgets" FILES ${QML_WIDGETS_FILES})
 ENDIF()
 
 set(SRC
@@ -195,7 +201,10 @@ set(SRC
 
     ${RCFILES}
     ${QRCFILES}
-    ${QMLFILES}
+    # ${QMLFILES}
+    ${QML_COMPONENTS_FILES}
+    ${QML_KDDOCKWIDGETS_FILES}
+    ${QML_WIDGETS_FILES}
     ${PROTO_CPP}
     ${PROTO_H}
 )

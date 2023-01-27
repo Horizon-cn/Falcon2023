@@ -87,7 +87,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(DRAW_BALLPLACE_AREA, "Debug/DRAW_BALLPLACE_AREA", 0);
             loadParam(DRAW_PENALTY_DEBUG_MSG, "Debug/DRAW_PENALTY_DEBUG_MSG", 1);
 
-            loadParam(TOUCH_SHIFT_DIST, "TOUCHKICK/TOUCH_SHIFT_DIST", 0);
+            loadParam(TOUCH_SHIFT_DIST, "TOUCHKICK/TOUCH_SHIFT_DIST", 9.96);
             loadParam(TOUCH_Debug, "TOUCHKICK/TOUCH_Debug", 0);
 
             loadParam(DEFENCE_DEBUG_MODE, "Defence/DEFENCE_DEBUG_MODE", 1);

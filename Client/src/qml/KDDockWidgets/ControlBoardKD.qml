@@ -4,6 +4,7 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.3
 import Owl 1.0 as Owl
+import Components 1.0
 
 Page{
     id:control;
