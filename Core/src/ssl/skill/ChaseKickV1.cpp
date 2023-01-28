@@ -394,7 +394,7 @@ void CChaseKickV1::plan(const CVisionModule* pVision)
 			}
 			else {      //接球情况
 				if (isBallAtFront) {        //球在车前
-                    if (real_predict_ballPos.x() > Param::Field::PITCH_LENGTH / 2 -  1.5 * ParamManager::Instance()->PENALTY_AREA_DEPTH ) {
+                    if (real_predict_ballPos.x() > Param::Field::PITCH_LENGTH / 2 -  1.5 * Param::Field::PENALTY_AREA_DEPTH ) {
 						if (ballSpeed > 50) {       //车速较快,站车速线投影点
 							GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(251, 361), "NEED_TURN,  front field, receive ball in high speed");
 							chase_kick_task.player.pos = projMe + Utils::Polar2Vector(-Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER, reverse_BallVelDir);
@@ -443,7 +443,7 @@ void CChaseKickV1::plan(const CVisionModule* pVision)
 						chase_kick_task.player.pos = projMe + Utils::Polar2Vector(Param::Field::MAX_PLAYER_SIZE, nowdir);
 						chase_kick_task.player.vel = CVector(0, 0);
 					}
-                    else if (real_predict_ballPos.x() > Param::Field::PITCH_LENGTH / 2 - 1.5 * ParamManager::Instance()->PENALTY_AREA_DEPTH) {
+                    else if (real_predict_ballPos.x() > Param::Field::PITCH_LENGTH / 2 - 1.5 * Param::Field::PENALTY_AREA_DEPTH) {
 						//球预计朝前场飞去，优先原则是拦住球，不要让出界
 						GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(251,361), "Ball from behind, front field, receive ball");
 						if (ballSpeed > 50) {       //车速较快,站车速线投影点
@@ -551,7 +551,7 @@ void CChaseKickV1::plan(const CVisionModule* pVision)
 			}
 			else {      // 接球情况
 				if (isBallAtFront) {        // 球在车前
-                    if (real_predict_ballPos.x() > Param::Field::PITCH_LENGTH / 2 - 1.5 * ParamManager::Instance()->PENALTY_AREA_DEPTH ) {
+                    if (real_predict_ballPos.x() > Param::Field::PITCH_LENGTH / 2 - 1.5 * Param::Field::PENALTY_AREA_DEPTH ) {
 						if (ballSpeed > 50) {       // 车速较快,站车速线投影点
 							GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(251, 361), "NEED_TURN,  front field, receive ball in high speed");
 							chase_kick_task.player.pos = projMe + Utils::Polar2Vector(-Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER, reverse_BallVelDir);
@@ -597,7 +597,7 @@ void CChaseKickV1::plan(const CVisionModule* pVision)
 						chase_kick_task.player.pos = projMe + Utils::Polar2Vector(1.5 * Param::Field::MAX_PLAYER_SIZE, nowdir);
 						chase_kick_task.player.vel = CVector(0, 0);
 					}
-                    else if (real_predict_ballPos.x() > Param::Field::PITCH_LENGTH / 2 - 1.5 * ParamManager::Instance()->PENALTY_AREA_DEPTH) {
+                    else if (real_predict_ballPos.x() > Param::Field::PITCH_LENGTH / 2 - 1.5 * Param::Field::PENALTY_AREA_DEPTH) {
 						// 球预计朝前场飞去，优先原则是拦住球，不要让出界
 						GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(251,361), "Ball from behind, front field, receive ball");
 						if (ballSpeed > 50) {       // 车速较快,站车速线投影点
@@ -753,7 +753,7 @@ void CChaseKickV1::plan(const CVisionModule* pVision)
 	{
 		//cout << "FUCK BALL 0" <<endl;
 		double end_vel = 0;
-        double ENDVEL_ENDX = Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH - CHASEKICK_TOPENALTY_GAP;
+        double ENDVEL_ENDX = Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - CHASEKICK_TOPENALTY_GAP;
 		if (me.X() > CHASEKICK_ENDVEL_STARTX && me.X() < ENDVEL_ENDX && ENDVEL_ENDX > CHASEKICK_ENDVEL_STARTX) {
 			end_vel = (CHASEKICK_MAXENDVEL - 0) / (ENDVEL_ENDX - CHASEKICK_ENDVEL_STARTX) *  (me.X() - ENDVEL_ENDX);
 			//GDebugEngine::Instance()->gui_debug_line(CGeoPoint(me.X(), end_vel), CGeoPoint(ENDVEL_ENDX, 0));

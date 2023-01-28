@@ -89,14 +89,14 @@ namespace Utils {
     // ?§Ø?¦Ë??????????????. Modified by HXY.
     bool InOurPenaltyArea(const CGeoPoint& p, const double buffer) {
         // buffer??????????????
-        return (p.x() < -Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH + buffer
+        return (p.x() < -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + buffer
             && std::fabs(p.y()) < Param::Field::PENALTY_AREA_WIDTH / 2 + buffer);
     }
 
     // ?§Ø?¦Ë???????§Ù?????. Modified by HXY.
     bool InTheirPenaltyArea(const CGeoPoint& p, const double buffer) {
         // buffer??????????????
-        return (p.x() > Param::Field::PITCH_LENGTH / 2 - paramManager->PENALTY_AREA_DEPTH - buffer
+        return (p.x() > Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - buffer
             && std::fabs(p.y()) < Param::Field::PENALTY_AREA_WIDTH / 2 + buffer);
     }
 
@@ -140,17 +140,17 @@ namespace Utils {
 
         if (p.y() > 0) {
             // ?????????????????????????????????
-            if (-Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH - p.x() < Param::Field::PENALTY_AREA_WIDTH / 2 - p.y())
+            if (-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH - p.x() < Param::Field::PENALTY_AREA_WIDTH / 2 - p.y())
             // ?????????????
-                return CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH + buffer, p.y());
+                return CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + buffer, p.y());
             // ?????????????
             else return CGeoPoint(p.x(), Param::Field::PENALTY_AREA_WIDTH / 2 + buffer);
         }
         else {
             // ????????????????????????¡¤????????
-            if (-Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH - p.x() < p.y() - (-Param::Field::PENALTY_AREA_WIDTH / 2))
+            if (-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH - p.x() < p.y() - (-Param::Field::PENALTY_AREA_WIDTH / 2))
             // ?????????????
-                return CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH + buffer, p.y());
+                return CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + buffer, p.y());
             // ???????????¡¤?
             else return CGeoPoint(p.x(), -Param::Field::PENALTY_AREA_WIDTH / 2 - buffer);
         }
@@ -164,17 +164,17 @@ namespace Utils {
 
         if (p.y() > 0) {
             // ??????????????????????????????????
-            if (p.x() - Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH < Param::Field::PENALTY_AREA_WIDTH / 2 - p.y())
+            if (p.x() - Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH < Param::Field::PENALTY_AREA_WIDTH / 2 - p.y())
             // ??????????????
-                return CGeoPoint(Param::Field::PITCH_LENGTH / 2 - paramManager->PENALTY_AREA_DEPTH - buffer, p.y());
+                return CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - buffer, p.y());
             // ?????????????
             else return CGeoPoint(p.x(), Param::Field::PENALTY_AREA_WIDTH / 2 + buffer);
         }
         else {
             // ?????????????????????????¡¤????????
-            if (p.x() - Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH < Param::Field::PENALTY_AREA_WIDTH / 2 + p.y())
+            if (p.x() - Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH < Param::Field::PENALTY_AREA_WIDTH / 2 + p.y())
             // ??????????????
-                return CGeoPoint(Param::Field::PITCH_LENGTH / 2 - paramManager->PENALTY_AREA_DEPTH - buffer, p.y());
+                return CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - buffer, p.y());
             // ???????????¡¤?
             else return CGeoPoint(p.x(), -Param::Field::PENALTY_AREA_WIDTH / 2 - buffer);
         }
@@ -919,7 +919,7 @@ namespace Utils {
 
             }
             else {// 2018??????????????
-                CGeoRectangle defenseBox(-Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH + avoidBuffer, -Param::Field::PENALTY_AREA_WIDTH / 2 - avoidBuffer, -Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2 + avoidBuffer);
+                CGeoRectangle defenseBox(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidBuffer, -Param::Field::PENALTY_AREA_WIDTH / 2 - avoidBuffer, -Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2 + avoidBuffer);
                 CGeoLineRectangleIntersection intersection(moving_seg, defenseBox);
                 if (intersection.intersectant()) {
                     if (moving_seg.IsPointOnLineOnSegment(intersection.point1()) || moving_seg.IsPointOnLineOnSegment(intersection.point2())) {

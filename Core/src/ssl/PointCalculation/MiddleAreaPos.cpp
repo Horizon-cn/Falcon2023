@@ -184,10 +184,10 @@ CGeoPoint CMiddleAreaPos::generateMiddlePos(const CVisionModule* pVision)
 	CGeoPoint targetPos = CGeoPoint(0,0);
 	if (POS_SIDE_LEFT == ballSide)
 	{
-        targetPos = CGeoPoint(-(Param::Field::PITCH_LENGTH/2-ParamManager::Instance()->PENALTY_AREA_DEPTH),Param::Field::PENALTY_AREA_WIDTH/2); // 已修改为Brazil zhyaic
+        targetPos = CGeoPoint(-(Param::Field::PITCH_LENGTH/2-Param::Field::PENALTY_AREA_DEPTH),Param::Field::PENALTY_AREA_WIDTH/2); // 已修改为Brazil zhyaic
 	} else if (POS_SIDE_RIGHT == ballSide)
 	{
-        targetPos = CGeoPoint(-(Param::Field::PITCH_LENGTH/2-ParamManager::Instance()->PENALTY_AREA_DEPTH),-Param::Field::PENALTY_AREA_WIDTH/2); // 已修改为Brazil zhyaic
+        targetPos = CGeoPoint(-(Param::Field::PITCH_LENGTH/2-Param::Field::PENALTY_AREA_DEPTH),-Param::Field::PENALTY_AREA_WIDTH/2); // 已修改为Brazil zhyaic
 	}
 
 	if (enemyBreakMe>=0)//敌人存在

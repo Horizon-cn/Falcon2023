@@ -49,7 +49,7 @@ void CEnemyDefendTacticAnalys::updateCurrentTacticInfo(const CVisionModule* pVis
 		////添加对方守门员判断区域
 		CGeoPoint theirGoal = CGeoPoint(Param::Field::PITCH_LENGTH / 2.0,0);
 		double jointLength = Param::Field::PENALTY_AREA_L;
-        double penaltyDepth = ParamManager::Instance()->PENALTY_AREA_DEPTH;
+        double penaltyDepth = Param::Field::PENALTY_AREA_DEPTH;
 		addLongCircle(theirGoal,penaltyDepth,jointLength,LONGCIRCLE);
 		////添加对方后卫判断区域
 		double outerRadius = penaltyDepth + 5*Param::Vehicle::V2::PLAYER_SIZE;

@@ -486,7 +486,7 @@ bool CMarkingPosV2::isInSpecialAreaBackLineMode(const CVisionModule *pVision,con
 					}
 					theBallLogCycle = pVision->Cycle();
 				}
-                if (logBallPos.x() < -Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH + 10)//条件：我方角球
+                if (logBallPos.x() < -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + 10)//条件：我方角球
 				{
 					const PlayerVisionT& opp = pVision->TheirPlayer(num);
 					CGeoPoint oppPrePos = opp.Pos() + Utils::Polar2Vector(opp.Vel().mod() * SPECIAL_AREA_PRE_TIME,opp.Vel().dir());
@@ -502,7 +502,7 @@ bool CMarkingPosV2::isInSpecialAreaBackLineMode(const CVisionModule *pVision,con
 bool CMarkingPosV2::checkInSpecialArea_A(const CGeoPoint p,const CGeoPoint ballPos)
 {
 	int theFlag = ballPos.y() > 0 ? -1 : 1;
-    CGeoPoint p1 = CGeoPoint(-Param::Field::PITCH_LENGTH/2.0 + ParamManager::Instance()->PENALTY_AREA_DEPTH,theFlag*Param::Field::PENALTY_AREA_L/2.0);
+    CGeoPoint p1 = CGeoPoint(-Param::Field::PITCH_LENGTH/2.0 + Param::Field::PENALTY_AREA_DEPTH,theFlag*Param::Field::PENALTY_AREA_L/2.0);
 	double refDir = CVector(p1 - CGeoPoint(-Param::Field::PITCH_LENGTH/2.0,0)).dir();
 	double goal2oppDir = CVector(p - CGeoPoint(-Param::Field::PITCH_LENGTH/2.0,0)).dir();
 	if (p.x() < SPECIAL_AREA_X_BUFFER && (goal2oppDir*theFlag > refDir*theFlag))

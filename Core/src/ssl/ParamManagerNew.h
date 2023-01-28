@@ -6,9 +6,9 @@
 #include "singleton.h"
 #include "params.h"
 
-struct GetBallParam {
-    double back_bias;
-};
+//struct GetBallParam {
+//    double back_bias;
+//};
 class ParamManagerOwl : public Falcon::ParamManager {
 public:
     ParamManagerOwl() : ParamManager("../data/owl2.ini") {}
@@ -122,9 +122,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(PlACEBALL_ROT_ACCELERATION, "Motion/PlACEBALL_ROT_ACCELERATION", 3);
             loadParam(PlACEBALL_CLOSE_DISTANCE, "Motion/PlACEBALL_CLOSE_DISTANCE", 100);
 
-            loadParam(FIELD_WALL_DIST, "Field/FIELD_WALL_DIST", 10);
-            loadParam(PENALTY_AREA_DEPTH, "Field/PENALTY_AREA_DEPTH", 120);
-            loadParam(SUPPORT_DIST, "Field/SUPPORT_DIST", 1);
+            loadParam(SUPPORT_DIST, "Support/SUPPORT_DIST", 1);
 
             loadParam(SLOW_BALL_SPD, "Goalie/SLOW_BALL_SPD", 25.0);
             loadParam(KICKPOWER_GOALIE, "Goalie/KICKPOWER_GOALIE", 550);
@@ -268,11 +266,9 @@ class CParamManagerSkill : public Falcon::ParamManager {
         int PlACEBALL_PLAYER_NUM;
         double D_MAX_FACTOR;
         double MAX_WHEEL_SPEED;
-        // 场地参数
-        double FIELD_WALL_DIST;
-        double PENALTY_AREA_DEPTH;
+        // Support参数
         double SUPPORT_DIST;
-        GetBallParam GET_BALL_PARAM;
+        //GetBallParam GET_BALL_PARAM;
         // Goalie2022参数 by SYLG
         double SLOW_BALL_SPD;
         int KICKPOWER_GOALIE;

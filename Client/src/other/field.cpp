@@ -812,7 +812,7 @@ void Field::drawMaintainVision(int index) {
 }
 void Field::paintCar(const QColor& color, quint8 num, qreal x, qreal y, qreal radian, bool ifDrawNum, const QColor& textColor, bool needCircle) {
     static qreal radius = opm->carDiameter / 2.0;
-    static qreal chordAngel = qRadiansToDegrees(qAcos(1.0 * opm->carFaceWidth / opm->carDiameter));
+    static qreal chordAngel = qRadiansToDegrees(qAsin(2.0 * Owl::VParamManager::Instance()->botCenterToMouth / opm->carDiameter)); //qRadiansToDegrees(qAcos(1.0 * opm->carFaceWidth / opm->carDiameter));
     pixmapPainter.setBrush(QBrush(color));
     pixmapPainter.setPen(QPen(COLOR_RED, ::w(30), Qt::DotLine));
     pixmapPainter.drawLine(QPointF(::x(x), ::y(y)), QPointF(::x(x), ::y(y)) + QPointF(::w(200) * qSin(radian + M_PI_2), ::w(200) * qCos(radian + M_PI_2)));
@@ -846,7 +846,7 @@ void Field::paintOffCar() {
 }
 void Field::paintCarShadow(qreal x, qreal y, qreal radian) {
     static qreal radius = opm->carDiameter / 2.0;
-    static qreal chordAngel = qRadiansToDegrees(qAcos(1.0 * opm->carFaceWidth / opm->carDiameter));
+    static qreal chordAngel = qRadiansToDegrees(qAsin(2.0 * Owl::VParamManager::Instance()->botCenterToMouth / opm->carDiameter)); //qRadiansToDegrees(qAcos(1.0 * opm->carFaceWidth / opm->carDiameter));
     pixmapPainter.setBrush(QBrush(QColor(255, 255, 255, 80)));
     pixmapPainter.setPen(Qt::NoPen);
 //    pixmapPainter.drawLine(QPointF(::x(x), ::y(y)), QPointF(::x(x), ::y(y)) + QPointF(30 * qSin(radian + M_PI_2), 30 * qCos(radian + M_PI_2)));

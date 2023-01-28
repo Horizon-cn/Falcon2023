@@ -44,7 +44,7 @@ bool CEnemyDefendTacticArea::isInLongCircle(CGeoPoint & enemyCarPos)
 
 	if (abs(enemyCarPos.y()) < Param::Field::PENALTY_AREA_L / 2.0)
 	{
-        if ((enemyCarPos - theirGoal ).mod() <  ( ParamManager::Instance()->PENALTY_AREA_DEPTH - 10 ))
+        if ((enemyCarPos - theirGoal ).mod() <  ( Param::Field::PENALTY_AREA_DEPTH - 10 ))
 		{
 			return true;
 		}else
@@ -82,7 +82,7 @@ bool CEnemyDefendTacticArea::isInAnnulus(CGeoPoint & enemyCarPos)
  ////ÄÚÔ²ÅÐ¶Ï
 	if (abs(enemyCarPos.y()) < Param::Field::PENALTY_AREA_L / 2.0)
 	{
-        if ((enemyCarPos - theirGoal ).mod() <  ( ParamManager::Instance()->PENALTY_AREA_DEPTH - 10 ))
+        if ((enemyCarPos - theirGoal ).mod() <  ( Param::Field::PENALTY_AREA_DEPTH - 10 ))
 		{
 			inInterCircle = true;
 		}else
@@ -108,7 +108,7 @@ bool CEnemyDefendTacticArea::isInAnnulus(CGeoPoint & enemyCarPos)
 	////ÍâÔ²ÅÐ¶Ï
 	if (abs(enemyCarPos.y()) < Param::Field::PENALTY_AREA_L / 2.0)
 	{
-        if ((enemyCarPos - theirGoal ).mod() <  ( ParamManager::Instance()->PENALTY_AREA_DEPTH + buffer ))
+        if ((enemyCarPos - theirGoal ).mod() <  ( Param::Field::PENALTY_AREA_DEPTH + buffer ))
 		{
 			inOuterCicle = true;
 		}else

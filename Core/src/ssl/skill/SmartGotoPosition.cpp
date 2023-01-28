@@ -402,7 +402,7 @@ void CSmartGotoPosition::validateFinalTarget(CGeoPoint& finalTarget, const CVisi
     }
     // ?????????????????? NOT_DODGE_PENALTY ???¦Ë???????????????????
     if  (WorldModel::Instance()->CurrentRefereeMsg() != "ourBallPlacement" && !(playerFlag & PlayerStatus::NOT_DODGE_PENALTY)) {
-        finalTarget = Utils::MakeInField(finalTarget, paramManager->FIELD_WALL_DIST);
+        finalTarget = Utils::MakeInField(finalTarget, -1*Param::Field::FIELD_WALL_DIST);
         if (!isGoalie && Utils::InOurPenaltyArea(finalTarget, avoidLength))
             finalTarget = Utils::MakeOutOfOurPenaltyArea(finalTarget, avoidLength);
         if (Utils::InTheirPenaltyArea(finalTarget, theirPenaltyAvoidLength))
@@ -508,23 +508,23 @@ CVector CSmartGotoPosition::validateFinalVel(const bool isGoalie, const CGeoPoin
 
 // ?????????????§Û??œý???????
 CGeoPoint CSmartGotoPosition::dealPlanFail(CGeoPoint startPoint, CGeoPoint nextPoint, double avoidLength, bool shrinkTheirPenalty) {
-    CGeoRectangle theirPenalty(CGeoPoint(Param::Field::PITCH_LENGTH / 2 -paramManager->PENALTY_AREA_DEPTH, -Param::Field::PENALTY_AREA_WIDTH / 2), CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2));
-    CGeoRectangle ourPenalty(CGeoPoint(-Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2), CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH, Param::Field::PENALTY_AREA_WIDTH / 2));
+    CGeoRectangle theirPenalty(CGeoPoint(Param::Field::PITCH_LENGTH / 2 -Param::Field::PENALTY_AREA_DEPTH, -Param::Field::PENALTY_AREA_WIDTH / 2), CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2));
+    CGeoRectangle ourPenalty(CGeoPoint(-Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2), CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH, Param::Field::PENALTY_AREA_WIDTH / 2));
     CGeoLine pathLine(startPoint, nextPoint);
     if (!shrinkTheirPenalty) {
-        theirPenalty = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - paramManager->PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE, -Param::Field::PENALTY_AREA_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE), CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2 + Param::Vehicle::V2::PLAYER_SIZE));
+        theirPenalty = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE, -Param::Field::PENALTY_AREA_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE), CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2 + Param::Vehicle::V2::PLAYER_SIZE));
     }
     CGeoLineRectangleIntersection theirInter(pathLine, theirPenalty);
     CGeoLineRectangleIntersection ourInter(pathLine, ourPenalty);
     CGeoPoint nextPointNew = nextPoint;
-    CGeoPoint candidate11 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - paramManager->PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST),
-        candidate12 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - paramManager->PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
-        candidate21 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - paramManager->PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
-        candidate22 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - paramManager->PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST),
-        candidate31 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST),
-        candidate32 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
-        candidate41 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
-        candidate42 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST);
+    CGeoPoint candidate11 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST),
+        candidate12 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
+        candidate21 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
+        candidate22 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST),
+        candidate31 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST),
+        candidate32 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
+        candidate41 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
+        candidate42 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST);
     if (DRAW_PENALTY_DEBUG_MSG) {
         GDebugEngine::Instance()->gui_debug_x(candidate11);
         GDebugEngine::Instance()->gui_debug_x(candidate21);
@@ -542,7 +542,7 @@ CGeoPoint CSmartGotoPosition::dealPlanFail(CGeoPoint startPoint, CGeoPoint nextP
             (startPoint.y() < -Param::Field::PENALTY_AREA_WIDTH / 2 && nextPoint.y() < -Param::Field::PENALTY_AREA_WIDTH / 2) ||
             (startPoint.y() < Param::Field::PENALTY_AREA_WIDTH / 2 && startPoint.y() > -Param::Field::PENALTY_AREA_WIDTH / 2 && nextPoint.y() < Param::Field::PENALTY_AREA_WIDTH / 2 && nextPoint.y() > -Param::Field::PENALTY_AREA_WIDTH / 2))) {
 
-            if (startPoint.x() > Param::Field::PITCH_LENGTH / 2 - paramManager->PENALTY_AREA_DEPTH) {
+            if (startPoint.x() > Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH) {
                 if (startPoint.y() > Param::Field::PENALTY_AREA_WIDTH / 2) {
                     nextPointNew = candidate11;
                     if (nextPoint.dist(candidate12) < nextPoint.dist(candidate12) && startPoint.dist(candidate11) < 5)
@@ -554,7 +554,7 @@ CGeoPoint CSmartGotoPosition::dealPlanFail(CGeoPoint startPoint, CGeoPoint nextP
                         nextPointNew = candidate22;
                 }
             }
-            else if (startPoint.x() < -Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH) {
+            else if (startPoint.x() < -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH) {
                 if (startPoint.y() > Param::Field::PENALTY_AREA_WIDTH / 2) {
                     nextPointNew = candidate31;
                     if (nextPoint.dist(candidate32) < nextPoint.dist(candidate32) && startPoint.dist(candidate31) < 5)
@@ -566,7 +566,7 @@ CGeoPoint CSmartGotoPosition::dealPlanFail(CGeoPoint startPoint, CGeoPoint nextP
                         nextPointNew = candidate42;
                 }
             }
-            else if (nextPoint.x() > Param::Field::PITCH_LENGTH / 2 - paramManager->PENALTY_AREA_DEPTH) {
+            else if (nextPoint.x() > Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH) {
                 if (nextPoint.y() > Param::Field::PENALTY_AREA_WIDTH / 2) {
                     nextPointNew = candidate12;
                     if (nextPoint.dist(candidate11) < nextPoint.dist(candidate12) && startPoint.dist(candidate12) < 5)
@@ -578,7 +578,7 @@ CGeoPoint CSmartGotoPosition::dealPlanFail(CGeoPoint startPoint, CGeoPoint nextP
                         nextPointNew = candidate21;
                 }
             }
-            else if (nextPoint.x() < -Param::Field::PITCH_LENGTH / 2 + paramManager->PENALTY_AREA_DEPTH) {
+            else if (nextPoint.x() < -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH) {
                 if (nextPoint.y() > Param::Field::PENALTY_AREA_WIDTH / 2) {
                     nextPointNew = candidate32;
                     if (nextPoint.dist(candidate31) < nextPoint.dist(candidate32) && startPoint.dist(candidate32) < 5)

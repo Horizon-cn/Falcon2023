@@ -157,18 +157,17 @@ void CRRTPathPlannerNew::initPlanner(int maxNodesNum, int maxWayPointsNum, int m
 
     /* from chen siyuan */
     /* 将RRT搜索范围缩小，避免规划出界 */
-    double field_wall_dist = ParamManager::Instance()->FIELD_WALL_DIST;
     if (planInOurField) {
-        this->_searchAreaLeftBound = -Param::Field::PITCH_LENGTH / 2 + field_wall_dist;
+        this->_searchAreaLeftBound = -Param::Field::PITCH_LENGTH / 2 - Param::Field::FIELD_WALL_DIST;
         this->_searchAreaRightBound = -Param::Vehicle::V2::PLAYER_SIZE;
-        this->_searchAreaLowerBound = -Param::Field::PITCH_WIDTH / 2 + field_wall_dist;
-        this->_searchAreaUpperBound = Param::Field::PITCH_WIDTH / 2 - field_wall_dist;
+        this->_searchAreaLowerBound = -Param::Field::PITCH_WIDTH / 2 - Param::Field::FIELD_WALL_DIST;
+        this->_searchAreaUpperBound = Param::Field::PITCH_WIDTH / 2 + Param::Field::FIELD_WALL_DIST;
     }
     else {
-        this->_searchAreaLeftBound = -Param::Field::PITCH_LENGTH / 2 + field_wall_dist;
-        this->_searchAreaRightBound = Param::Field::PITCH_LENGTH / 2 - field_wall_dist;
-        this->_searchAreaLowerBound = -Param::Field::PITCH_WIDTH / 2 + field_wall_dist;
-        this->_searchAreaUpperBound = Param::Field::PITCH_WIDTH / 2 - field_wall_dist;
+        this->_searchAreaLeftBound = -Param::Field::PITCH_LENGTH / 2 - Param::Field::FIELD_WALL_DIST;
+        this->_searchAreaRightBound = Param::Field::PITCH_LENGTH / 2 + Param::Field::FIELD_WALL_DIST;
+        this->_searchAreaLowerBound = -Param::Field::PITCH_WIDTH / 2 - Param::Field::FIELD_WALL_DIST;
+        this->_searchAreaUpperBound = Param::Field::PITCH_WIDTH / 2 + Param::Field::FIELD_WALL_DIST;
     }
 
 

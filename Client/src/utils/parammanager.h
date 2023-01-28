@@ -82,10 +82,6 @@ class ParamManagerOwl: public Falcon::ParamManager {
       loadParam(KeeperID, "Team/KeeperID", 0);
       //Camera Settings
       loadParam(total_cameras, "Camera/total_cameras", 1);
-      //Special Vision Process
-      loadParam(projection, "Vision/projection", false);
-      loadParam(detectBallInRobot, "Vision/detectBallInRobot", true);
-      loadParam(FilteDirection, "Vision/FilteDirection", false);
       //Simulator
       loadParam(useSimInside, "Simulator/useSimInside", false);
       //Display Settings
@@ -137,8 +133,6 @@ class ParamManagerOwl: public Falcon::ParamManager {
     int KeeperID;
     //Camera Settings
     int total_cameras;
-    //Special Vision Process
-    bool projection, detectBallInRobot, FilteDirection;
     //Simulator
     bool useSimInside;
     //Display Settings
@@ -233,10 +227,13 @@ class ParamManagerVision: public Falcon::ParamManager {
       loadParam(acceleration, "Robot/acceleration", 0);
       loadParam(thresholdToDec, "Robot/thresholdToDec", -1000);
       loadParam(thresholdToAcc, "Robot/thresholdToAcc", 4000);
+      loadParam(FilteDirection, "Robot/FilteDirection", false);
       //DealBall
       loadParam(ballMergeDist, "Ball/ballMergeDist", 140);
       loadParam(ballMinBelieveFrame, "Ball/ballMinBelieveFrame", 10);
       loadParam(inValidSpeed, "Ball/inValidSpeed", 12000);
+      loadParam(projection, "Ball/projection", false);
+      loadParam(detectBallInRobot, "Ball/detectBallInRobot", true);
       //Kalman
       loadParam(ballFollowProp, "Kalman/ballFollowProp", 1.0);
       //Collision
@@ -261,10 +258,12 @@ class ParamManagerVision: public Falcon::ParamManager {
     double carMinBelieveFrame, theirCarMaxLostFrame, ourCarMaxLostFrame, maxLostFrame;
     double deceleration, acceleration;
     double thresholdToDec, thresholdToAcc;
+    bool FilteDirection;
     //DealBall
     double ballMergeDist;
     double ballMinBelieveFrame;
     double inValidSpeed;
+    bool projection, detectBallInRobot;
     //Kalman
     double ballFollowProp;
     //Collision

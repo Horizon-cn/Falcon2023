@@ -105,7 +105,7 @@ void CDealBall::init() {
                 //currentball = GlobalData::Instance()->camera[i][0].ball[j];
                 if (!isValidInfo(GlobalData::Instance()->camera[i][0].ball[j])) continue;
                 simBall = GlobalData::Instance()->camera[i][0].ball[j];
-                if (opm->projection && opm->isSimulation && !touchGround(simBall)){
+                if (vpm->projection && opm->isSimulation && !touchGround(simBall)){
                     project(i, simBall);
                     result.addBall(simBall.pos, simBall.raw, simBall.height, i);
                 }
@@ -422,7 +422,7 @@ void CDealBall::updateVel(Owl::ReceiveVisionMessage& result) {
         result.ball[0] = lastBall;
         result.ball[0].accelerate = result.ball[0].velocity = CVector(0,0);
     }
-    else if(opm->isSimulation && opm->detectBallInRobot && ballInRobot(result.ball[0].pos)) {
+    else if(opm->isSimulation && vpm->detectBallInRobot && ballInRobot(result.ball[0].pos)) {
         result.ball[0].pos = result.ball[0].pos + -GlobalData::Instance()->maintain[0].ball[0].velocity*dt;
         Simulator::Instance()->setBall(result.ball[0].pos.x()*0.001, result.ball[0].pos.y()*0.001, 0, 0);
         result.ball[0].velocity = -GlobalData::Instance()->maintain[0].ball[0].velocity;

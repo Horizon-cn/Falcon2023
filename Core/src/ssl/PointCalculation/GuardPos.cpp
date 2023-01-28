@@ -11,14 +11,14 @@ namespace {
     const double MIN_DIST_TO_PENALTY = Param::Vehicle::V2::PLAYER_SIZE * 2;
     const double MIN_DIST_TO_TEAMMATE = Param::Vehicle::V2::PLAYER_SIZE * 2 + Param::Field::BALL_SIZE * 2;
     // ???????????¦¶
-    CGeoPoint PENALTY_RIGHT_UP(-Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH + MIN_DIST_TO_PENALTY, -(Param::Field::PENALTY_AREA_WIDTH / 2 + MIN_DIST_TO_PENALTY));
-    CGeoPoint PENALTY_RIGHT_DOWN(-Param::Field::PITCH_LENGTH / 2 + ParamManager::Instance()->PENALTY_AREA_DEPTH + MIN_DIST_TO_PENALTY, Param::Field::PENALTY_AREA_WIDTH / 2 + MIN_DIST_TO_PENALTY);
+    CGeoPoint PENALTY_RIGHT_UP(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + MIN_DIST_TO_PENALTY, -(Param::Field::PENALTY_AREA_WIDTH / 2 + MIN_DIST_TO_PENALTY));
+    CGeoPoint PENALTY_RIGHT_DOWN(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + MIN_DIST_TO_PENALTY, Param::Field::PENALTY_AREA_WIDTH / 2 + MIN_DIST_TO_PENALTY);
     CGeoPoint PENALTY_LEFT_UP(-Param::Field::PITCH_LENGTH / 2, -(Param::Field::PENALTY_AREA_WIDTH / 2 + MIN_DIST_TO_PENALTY));
     CGeoPoint PENALTY_LEFT_DOWN(-Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2 + MIN_DIST_TO_PENALTY);
     CGeoRectangle guardMoveRec(PENALTY_LEFT_UP, PENALTY_RIGHT_DOWN);
     // ????????????
-    CGeoPoint LEFTBACK_CRITICAL_POINT = CGeoPoint(-(Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE), -Param::Field::PITCH_WIDTH / 2);
-    CGeoPoint RIGHTBACK_CRITICAL_POINT = CGeoPoint(-(Param::Field::PITCH_LENGTH / 2 - ParamManager::Instance()->PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE), Param::Field::PITCH_WIDTH / 2);
+    CGeoPoint LEFTBACK_CRITICAL_POINT = CGeoPoint(-(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE), -Param::Field::PITCH_WIDTH / 2);
+    CGeoPoint RIGHTBACK_CRITICAL_POINT = CGeoPoint(-(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE), Param::Field::PITCH_WIDTH / 2);
     bool DEBUG_GUARD_POS = false;
     const double VALID_THRESHOLD = 500;
 
