@@ -186,8 +186,6 @@ public:
   DEF_VALUE(bool, Bool, EnableWallSim)			//xjw
   DEF_VALUE(std::string,String,VisionMulticastAddr)  
   DEF_VALUE(int,Intz,VisionMulticastPort)
-  DEF_VALUE(std::string,String,VisionMulticastAddr2)  
-  DEF_VALUE(int,Intz,VisionMulticastPort2)
   DEF_VALUE(int,Intz,CommandListenPort)
   DEF_VALUE(int,Intz,BlueStatusSendPort)
   DEF_VALUE(int,Intz,YellowStatusSendPort)

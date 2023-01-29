@@ -12,6 +12,7 @@
 namespace {
     auto opm = Owl::OParamManager::Instance();
     auto vpm = Owl::VParamManager::Instance();
+    auto spm = Owl::SIParamManager::Instance();
     long long min(long long a, long long b ) {
         if (a < b) return a;
         else return b;
@@ -476,7 +477,7 @@ void CDealBall::updateVel(Owl::ReceiveVisionMessage& result) {
 }
 
 bool CDealBall::touchGround(const Owl::Ball &ball) {
-    return fabs(ball.height - vpm->ballradius) < 10;
+    return fabs(ball.height - spm->BallRadius) < 10;
 }
 
 void CDealBall::project(int camId, Owl::Ball &ball) {

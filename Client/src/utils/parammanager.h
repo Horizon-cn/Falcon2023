@@ -187,6 +187,8 @@ class ParamManagerCfg: public Falcon::ParamManager {
       loadParam(VisionAutoRef, "Ports/VisionAutoRef", 10006);
       //Version
       loadParam(version, "Basic/version", "2022.4.23");
+      //Math
+      loadParam(PI, "Math/PI", 3.14159265358979323846);
     }
   public:
     QString BlueRBKPath, YellowRBKPath, grSimPath, CrayPath;
@@ -202,6 +204,7 @@ class ParamManagerCfg: public Falcon::ParamManager {
     int GC_Port;
     int refereePortToAutoRef, VisionAutoRef, refereePortFromGC;
     QString version;
+    double PI;
 };
 class ParamManagerVision: public Falcon::ParamManager {
   public:
@@ -234,23 +237,20 @@ class ParamManagerVision: public Falcon::ParamManager {
       loadParam(inValidSpeed, "Ball/inValidSpeed", 12000);
       loadParam(projection, "Ball/projection", false);
       loadParam(detectBallInRobot, "Ball/detectBallInRobot", true);
+      loadParam(v_switch, "Ball/v_switch", 2000);
+      loadParam(acc_slide, "Ball/acc_slide", -4000);
+      loadParam(acc_roll, "Ball/acc_roll", -325); 
+      loadParam(ball_delc_change_point, "Ball/ball_delc_change_point", 250);
+      loadParam(ball_fast_dec, "Ball/ball_fast_dec", 360);
+      loadParam(ball_slow_dec, "Ball/ball_slow_dec", 27.5);
       //Kalman
       loadParam(ballFollowProp, "Kalman/ballFollowProp", 1.0);
       //Collision
       loadParam(robotsCollisionDist, "Collision/robotsCollisionDist", 180);
       //Physics
-      loadParam(G, "Physics/G", 9.8);
-      loadParam(PI, "Physics/PI", 3.14159265358979323846);
       loadParam(chipAngle, "Physics/chipAngle", 45);
       loadParam(botCenterToMouth, "Physics/botCenterToMouth", 76);
-      loadParam(ballradius, "Physics/ballradius", 21.5);
-      loadParam(total_lated_frame, "Physics/total_lated_frame", 4.7);
-      loadParam(v_switch, "Physics/v_switch", 2000);
-      loadParam(acc_slide, "Physics/acc_slide", -4000);
-      loadParam(acc_roll, "Physics/acc_roll", -325);
-      loadParam(ball_delc_change_point, "Physics/ball_delc_change_point", 250);
-      loadParam(ball_fast_dec, "Physics/ball_fast_dec", 360);
-      loadParam(ball_slow_dec, "Physics/ball_slow_dec", 27.5);
+      loadParam(total_lated_frame, "Physics/total_lated_frame", 4.7);       
     }
   public:
     //DealRobot
@@ -264,23 +264,15 @@ class ParamManagerVision: public Falcon::ParamManager {
     double ballMinBelieveFrame;
     double inValidSpeed;
     bool projection, detectBallInRobot;
+    double v_switch, acc_slide, acc_roll, ball_delc_change_point, ball_fast_dec, ball_slow_dec;
     //Kalman
     double ballFollowProp;
     //Collision
     double robotsCollisionDist;
     //Physics
-    double G;
-    double PI;
     double chipAngle;
     double botCenterToMouth;
-    double ballradius;
-    double total_lated_frame;
-    double v_switch;
-    double acc_slide;
-    double acc_roll;
-    double ball_delc_change_point;
-    double ball_fast_dec;
-    double ball_slow_dec;
+    double total_lated_frame;   
 };
 class ParamManagerKickParam: public Falcon::ParamManager {
   public:
@@ -296,6 +288,22 @@ class ParamManagerSimulator : public Falcon::ParamManager {
 public:
     ParamManagerSimulator() : ParamManager("../data/simulator.ini") {}
     ~ParamManagerSimulator() {}
+    template <class T>
+    void updateParam(T& var, const QString& key, const QVariant& value, bool update) {
+        changeParam(key, value);
+        if (update) loadParam(var, key); //loadParamFromFile();
+    }
+    void updateParam(const QString& group, const QString& key, const QVariant& value, bool update) {
+        changeParam(group, key, value);
+        if (update) loadParamFromFile();
+    }
+    void loadParamFromFile() {
+        loadParam(Gravity, "worldp_vars/Gravity", 9.8);
+        BallRadius = value("Ball/BallRadius", 0.0215).toDouble() * 1000;
+    }
+public:
+    double Gravity;
+    double BallRadius;
 };
 class ParamManagerSkill : public Falcon::ParamManager {
 public:

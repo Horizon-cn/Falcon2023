@@ -18,6 +18,8 @@ namespace Param{
 	const auto a = OParamManager::Instance()->setFileName("./");
 	const auto b = VParamManager::Instance()->setFileName("./");
 	const auto c = ParamManager::Instance()->setFileName("./");
+	const auto d = SParamManager::Instance()->setFileName("./");
+	const auto e = CParamManager::Instance()->setFileName("./");
 	//const int CAMERA = 8;
 	//const int BALLNUM = 20;
 	//const int BLUE = 0;
@@ -32,7 +34,7 @@ namespace Param{
 
 		/* 长度单位均为厘米,时间单位均为秒,质量单位为克,角度单位为弧度 */
 		/* Ball */
-		const double BALL_SIZE = VParamManager::Instance()->value("Physics/ballradius", 21.5).toDouble()*0.1*2; //5; // 半径?直径
+		const double BALL_SIZE = SParamManager::Instance()->value("Ball/BallRadius", 0.0215).toDouble()*100*2; //5; // 半径?直径
 		//const double BALL_DECAY = -0.8; // 阻力对球的加速度和速度成正比,单位为 /s
 		/* Player */
 		const double MAX_PLAYER_SIZE = OParamManager::Instance()->value("Size/carDiameter", 180).toDouble() * 0.1; //18;
@@ -60,7 +62,7 @@ namespace Param{
 		const double RATIO = 1.5;
 	}
 	namespace Math{
-		const double PI = VParamManager::Instance()->value("Physics/PI", 3.14159265358979323846).toDouble(); //3.14159265358979323846;
+		const double PI = CParamManager::Instance()->value("Math/PI", 3.14159265358979323846).toDouble(); //3.14159265358979323846;
 		//const double test = SingleParamManager::Instance()->test_double;
 	}
 	namespace Vehicle{

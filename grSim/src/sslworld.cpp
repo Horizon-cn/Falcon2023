@@ -944,7 +944,6 @@ void SSLWorld::sendVisionBuffer()
         delete sendQueue.front();
         sendQueue.pop_front();
         visionServer->send(*packet);
-        visionServer2->send(*packet);
         delete packet;
         if (sendQueue.isEmpty()) break;
     }

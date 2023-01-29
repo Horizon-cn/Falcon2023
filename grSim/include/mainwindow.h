@@ -87,7 +87,6 @@ private:
     GLWidgetGraphicsView *view;
     QSize lastSize;
     RoboCupSSLServer *visionServer;
-    RoboCupSSLServer *visionServer2;
     QUdpSocket *commandSocket;
     QUdpSocket *blueStatusSocket,*yellowStatusSocket;
 

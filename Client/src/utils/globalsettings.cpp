@@ -4,6 +4,7 @@
 namespace{
     auto opm = Owl::OParamManager::Instance();
     auto vpm = Owl::VParamManager::Instance();
+    auto cpm = Owl::CParamManager::Instance();
 }
 CGlobalSettings::CGlobalSettings(QObject *parent):QObject(parent),minimumX(-999999),minimumY(-999999),maximumX(999999),maximumY(999999){
 
@@ -81,15 +82,15 @@ double CGlobalSettings::saoConvert(double direction) {
         result = direction;
         break;
     case 1:
-        result = direction - vpm->PI / 2;
+        result = direction - cpm->PI / 2;
         break;
     case 2:
-        result = direction + vpm->PI / 2;
+        result = direction + cpm->PI / 2;
         break;
     case 3:
         // there maybe some problems with original direction 
-        if(fabs(direction) > vpm->PI / 2 && fabs(direction) < 3* vpm->PI / 2)
-            result = atan(9/8*tan(direction)) + vpm->PI;
+        if(fabs(direction) > cpm->PI / 2 && fabs(direction) < 3* cpm->PI / 2)
+            result = atan(9/8*tan(direction)) + cpm->PI;
         else
             result = atan(9/8*tan(direction));
         break;

@@ -105,7 +105,7 @@ ConfigWidget::ConfigWidget()
 
     VarListPtr ballg_vars(new VarList("Ball"));
     geo_vars->addChild(ballg_vars);
-        ADD_VALUE(ballg_vars,Double,BallRadius,0.001*vpm->value("Physics/ballradius", 21.5).toDouble(),"Radius")
+        ADD_VALUE(ballg_vars,Double,BallRadius,spm->value("Ball/BallRadius", 0.0215).toDouble(),"Radius")
   VarListPtr phys_vars(new VarList("Physics"));
   world.push_back(phys_vars);
     VarListPtr worldp_vars(new VarList("World"));
@@ -114,25 +114,23 @@ ConfigWidget::ConfigWidget()
         ADD_VALUE(worldp_vars,Double,DesiredFPS,opm->value("Alert/frameRate", 75).toDouble(),"Desired FPS")
         ADD_VALUE(worldp_vars,Bool,SyncWithGL,spm->value("worldp_vars", "SyncWithGL", false).toBool(),"Synchronize ODE with OpenGL")
         ADD_VALUE(worldp_vars,Double,DeltaTime,spm->value("worldp_vars/DeltaTime", 0.016).toDouble(),"ODE time step")
-        ADD_VALUE(worldp_vars,Double,Gravity,vpm->value("Physics/G", 9.8).toDouble(),"Gravity")
+        ADD_VALUE(worldp_vars,Double,Gravity,spm->value("worldp_vars/Gravity", 9.8).toDouble(),"Gravity")
         ADD_VALUE(worldp_vars,Bool,ResetTurnOver,spm->value("worldp_vars/ResetTurnOver", true).toBool(),"Auto reset turn-over")
 		ADD_VALUE(worldp_vars, Bool, EnableYellowSim,spm->value("worldp_vars/EnableYellowSim", true).toBool(), "Enable Yellow Simulator")		//xjw
 		ADD_VALUE(worldp_vars, Bool, EnableWallSim,spm->value("worldp_vars/EnableWallSim", true).toBool(), "Enable Wall Simulator")			//xjw
   VarListPtr ballp_vars(new VarList("Ball"));
     phys_vars->addChild(ballp_vars);
-        ADD_VALUE(ballp_vars,Double,BallMass,spm->value("ballp_vars/BallMass", 0.043).toDouble(),"Ball mass");
-        ADD_VALUE(ballp_vars,Double,BallFriction,spm->value("ballp_vars/BallFriction", 0.1).toDouble(),"Ball-ground friction")
-        ADD_VALUE(ballp_vars,Double,BallSlip,spm->value("ballp_vars/BallSlip", 1).toDouble(),"Ball-ground slip")
-        ADD_VALUE(ballp_vars,Double,BallBounce,spm->value("ballp_vars/BallBounce", 0.5).toDouble(),"Ball-ground bounce factor")
-        ADD_VALUE(ballp_vars,Double,BallBounceVel,spm->value("ballp_vars/BallBounceVel", 0.1).toDouble(),"Ball-ground bounce min velocity")
-        ADD_VALUE(ballp_vars,Double,BallLinearDamp,spm->value("ballp_vars/BallLinearDamp", 0.004).toDouble(),"Ball linear damping")
-        ADD_VALUE(ballp_vars,Double,BallAngularDamp,spm->value("ballp_vars/BallAngularDamp", 0.004).toDouble(),"Ball angular damping")
+        ADD_VALUE(ballp_vars,Double,BallMass,spm->value("Ball/BallMass", 0.043).toDouble(),"Ball mass");
+        ADD_VALUE(ballp_vars,Double,BallFriction,spm->value("Ball/BallFriction", 0.1).toDouble(),"Ball-ground friction")
+        ADD_VALUE(ballp_vars,Double,BallSlip,spm->value("Ball/BallSlip", 1).toDouble(),"Ball-ground slip")
+        ADD_VALUE(ballp_vars,Double,BallBounce,spm->value("Ball/BallBounce", 0.5).toDouble(),"Ball-ground bounce factor")
+        ADD_VALUE(ballp_vars,Double,BallBounceVel,spm->value("Ball/BallBounceVel", 0.1).toDouble(),"Ball-ground bounce min velocity")
+        ADD_VALUE(ballp_vars,Double,BallLinearDamp,spm->value("Ball/BallLinearDamp", 0.004).toDouble(),"Ball linear damping")
+        ADD_VALUE(ballp_vars,Double,BallAngularDamp,spm->value("Ball/BallAngularDamp", 0.004).toDouble(),"Ball angular damping")
   VarListPtr comm_vars(new VarList("Communication"));
   world.push_back(comm_vars);
     ADD_VALUE(comm_vars,String,VisionMulticastAddr,cpm->value("IP", "ssl_address", "224.5.23.2").toString().toStdString(),"Vision multicast address")  //SSL Vision: "224.5.23.2"
     ADD_VALUE(comm_vars,Intz,VisionMulticastPort,opm->value("AlertPorts/VisionSim", 10020).toInt(),"Vision multicast port")
-    ADD_VALUE(comm_vars,String,VisionMulticastAddr2, cpm->value("IP", "ssl_address", "224.5.23.2").toString().toStdString(),"Vision multicast address2")  //SSL Vision: "224.5.23.2"
-    ADD_VALUE(comm_vars,Intz,VisionMulticastPort2,10025,"Vision multicast port2")
     ADD_VALUE(comm_vars,Intz,CommandListenPort,cpm->value("Ports/sim_send", 20011).toInt(),"Command listen port")
     ADD_VALUE(comm_vars,Intz,BlueStatusSendPort,cpm->value("Ports/blue_status", 30011).toInt(),"Blue Team status send port")
     ADD_VALUE(comm_vars,Intz,YellowStatusSendPort,cpm->value("Ports/yellow_status", 30012).toInt(),"Yellow Team status send port")

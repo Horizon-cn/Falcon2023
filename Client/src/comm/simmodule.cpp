@@ -34,6 +34,7 @@ grSim_Robot_Command *grsim_robots[PARAM::ROBOTMAXID];
 auto opm = Owl::OParamManager::Instance();
 auto cpm = Owl::CParamManager::Instance();
 auto vpm = Owl::VParamManager::Instance();
+auto spm = Owl::SIParamManager::Instance();
 }
 SimModule::SimModule(QObject *parent) : QObject(parent) {
     grsim_commands = grsim_packet.mutable_commands();
@@ -181,11 +182,11 @@ void SimModule::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
             //grsim_robots[id]->set_kickspeedx(commands.flat_kick());
         } else {
         //else if (commands.chip_kick()!=0){
-            double radian = vpm->chipAngle * vpm->PI / 180.0;
-            double vx = sqrt(commands.power() * vpm->G / 2.0 / tan(radian));
+            double radian = vpm->chipAngle * cpm->PI / 180.0;
+            double vx = sqrt(commands.power() * spm->Gravity / 2.0 / tan(radian));
             vx = vx >= (6.5 * cos(radian))? (6.5 * cos(radian)) : vx;
-            //double vx = sqrt(trans_length(commands.power()) * vpm->G / 2.0 / tan(radian));
-            //double vx = sqrt(commands.chip_kick() * vpm->G / 2.0 / tan(radian));
+            //double vx = sqrt(trans_length(commands.power()) * spm->Gravity / 2.0 / tan(radian));
+            //double vx = sqrt(commands.chip_kick() * spm->Gravity / 2.0 / tan(radian));
             double vz = vx * tan(radian);
             grsim_robots[id]->set_kickspeedz(vx);
             grsim_robots[id]->set_kickspeedx(vz);

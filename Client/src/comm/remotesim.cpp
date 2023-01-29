@@ -24,6 +24,7 @@ std::thread* yellowReceiveThread = nullptr;
 auto opm = Owl::OParamManager::Instance();
 auto cpm = Owl::CParamManager::Instance();
 auto vpm = Owl::VParamManager::Instance();
+auto spm = Owl::SIParamManager::Instance();
 
 bool trans_dribble(double dribble) {
     return dribble>1;
@@ -190,8 +191,8 @@ void RemoteSim::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
             grsim_robots[id]->set_kickspeedz(0);
             grsim_robots[id]->set_kickspeedx(commands.power() >= 6.5? 6.5 : commands.power());
         } else {
-            double radian = vpm->chipAngle * vpm->PI / 180.0;
-            double vx = sqrt(commands.power() * vpm->G / 2.0 / tan(radian));
+            double radian = vpm->chipAngle * cpm->PI / 180.0;
+            double vx = sqrt(commands.power() * spm->Gravity / 2.0 / tan(radian));
             vx = vx >= (6.5 * cos(radian))? (6.5 * cos(radian)) : vx;
             double vz = vx * tan(radian);
             grsim_robots[id]->set_kickspeedz(vx);

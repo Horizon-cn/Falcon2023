@@ -75,7 +75,6 @@ MainWindow::MainWindow(QWidget *parent)
     glwidget->resize(512,512);    
 
     visionServer = NULL;
-    visionServer2 = NULL;
     commandSocket = NULL;
     blueStatusSocket = NULL;
     yellowStatusSocket = NULL;
@@ -85,7 +84,6 @@ MainWindow::MainWindow(QWidget *parent)
     reconnectYellowStatusSocket();
 
     glwidget->ssl->visionServer = visionServer;
-    glwidget->ssl->visionServer2 = visionServer2;
     glwidget->ssl->commandSocket = commandSocket;
     glwidget->ssl->blueStatusSocket = blueStatusSocket;
     glwidget->ssl->yellowStatusSocket = yellowStatusSocket;
@@ -264,8 +262,6 @@ MainWindow::MainWindow(QWidget *parent)
     //network
     QObject::connect(configwidget->v_VisionMulticastAddr.get(), SIGNAL(wasEdited(VarPtr)), this, SLOT(reconnectVisionSocket()));
     QObject::connect(configwidget->v_VisionMulticastPort.get(), SIGNAL(wasEdited(VarPtr)), this, SLOT(reconnectVisionSocket()));
-    QObject::connect(configwidget->v_VisionMulticastAddr2.get(), SIGNAL(wasEdited(VarPtr)), this, SLOT(reconnectVisionSocket()));
-    QObject::connect(configwidget->v_VisionMulticastPort2.get(), SIGNAL(wasEdited(VarPtr)), this, SLOT(reconnectVisionSocket()));
     QObject::connect(configwidget->v_CommandListenPort.get(), SIGNAL(wasEdited(VarPtr)), this, SLOT(reconnectCommandSocket()));
     QObject::connect(configwidget->v_BlueStatusSendPort.get(), SIGNAL(wasEdited(VarPtr)), this, SLOT(reconnectBlueStatusSocket()));
     QObject::connect(configwidget->v_YellowStatusSendPort.get(), SIGNAL(wasEdited(VarPtr)), this, SLOT(reconnectYellowStatusSocket()));
@@ -440,7 +436,6 @@ void MainWindow::restartSimulator()
 	else glwidget->ssl = new SSLWorld(glwidget, glwidget->cfg, glwidget->forms[2], glwidget->forms[4]);
     glwidget->ssl->glinit();
     glwidget->ssl->visionServer = visionServer;
-    glwidget->ssl->visionServer2 = visionServer2;
     glwidget->ssl->commandSocket = commandSocket;
     glwidget->ssl->blueStatusSocket = blueStatusSocket;
     glwidget->ssl->yellowStatusSocket = yellowStatusSocket;
@@ -568,15 +563,9 @@ void MainWindow::reconnectVisionSocket()
     if (visionServer == NULL) {
         visionServer = new RoboCupSSLServer(this);
     }
-    if (visionServer2 == NULL) {
-        visionServer2 = new RoboCupSSLServer(this);
-    }
     visionServer->change_address(configwidget->VisionMulticastAddr());
     visionServer->change_port(configwidget->VisionMulticastPort());
-    visionServer2->change_address(configwidget->VisionMulticastAddr2());
-    visionServer2->change_port(configwidget->VisionMulticastPort2());
     logStatus(QString("Vision server connected on: %1").arg(configwidget->VisionMulticastPort()),QColor("green"));
-    logStatus(QString("Vision server connected on: %1").arg(configwidget->VisionMulticastPort2()),QColor("green"));
 }
 
 void MainWindow::recvActions()
