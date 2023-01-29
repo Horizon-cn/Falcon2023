@@ -679,6 +679,7 @@ void Field::drawBallLine() {
 void Field::initPainterPath() {
     pen.setWidth(::w(30));
     painterPath = QPainterPath();
+    painterPath.addRect(::x(-opm->field_length/2.0-opm->field_wall_dist), ::y(-opm->field_width/2.0-opm->field_wall_dist), ::w(opm->field_length+2*opm->field_wall_dist), ::h(opm->field_width+2*opm->field_wall_dist));
     painterPath.addRect(::x(-opm->field_length / 2.0), ::y(-opm->field_width / 2.0), ::w(opm->field_length), ::h(opm->field_width));
     painterPath.addRect(::x(-opm->field_length / 2.0), ::y(-opm->goal_width / 2.0), ::w(-opm->goal_depth), ::h(opm->goal_width));
     painterPath.addRect(::x(opm->field_length / 2.0), ::y(-opm->goal_width / 2.0), ::w(opm->goal_depth), ::h(opm->goal_width));

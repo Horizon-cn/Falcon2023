@@ -50,7 +50,7 @@ double CDealRobot::posDist(CGeoPoint pos1, CGeoPoint pos2) {
 }
 
 bool CDealRobot::isValidInfo(Owl::Robot robot) {
-    if (abs(robot.pos.x()) < opm->field_length / 2 + opm->extendLength && abs(robot.pos.y()) < opm->field_width / 2 + opm->extendLength && fabs(robot.angle) <= 10)
+    if (abs(robot.pos.x()) < opm->field_length / 2 + opm->field_wall_dist && abs(robot.pos.y()) < opm->field_width / 2 + opm->field_wall_dist && fabs(robot.angle) <= 10)
         return true;
     else
         return false;
@@ -326,7 +326,7 @@ void CDealRobot::updateVel(int team, Owl::ReceiveVisionMessage& result) {
             robot.velocity.vr = 0;
             //lastValid[team][robot.id] += 1 / FPS;
         }
-        if (abs(robot.pos.x()) > opm->field_length / 2 + opm->extendLength && abs(robot.pos.y()) > opm->field_width / 2 + opm->extendLength) {
+        if (abs(robot.pos.x()) > opm->field_length / 2 + opm->field_wall_dist && abs(robot.pos.y()) > opm->field_width / 2 + opm->field_wall_dist) {
             playerPosVel = PosFilter(initPosCov, posMeasErr, posModelErr);
             robot.pos = CGeoPoint(-32767, -32767);
             lastRobot[team][robot.id].pos = CGeoPoint(0, 0);

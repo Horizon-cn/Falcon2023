@@ -27,8 +27,8 @@ class CDealBall {
     }
 //    void updateVel(const Matrix2d tempMatrix, ReceiveVisionMessage& result);
     void updateVel(Owl::ReceiveVisionMessage& result);
-    int getFPS(){return VisionModule::Instance()->FPS==0? Owl::OParamManager::Instance()->frameRate:VisionModule::Instance()->FPS;}
-                //{return Owl::VParamManager::Instance()->frameRate;}
+    int getFPS(){return VisionModule::Instance()->FPS==0? Owl::SIParamManager::Instance()->DesiredFPS:VisionModule::Instance()->FPS;}
+                //{return Owl::SIParamManager::Instance()->DesiredFPS;}
     double dt;
     double dt1;
     int ballState;

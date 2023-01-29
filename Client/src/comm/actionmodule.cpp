@@ -248,7 +248,7 @@ void encodeLegacy(const rbk::protocol::Message_SSL_Command& command, QByteArray&
     double origin_vx = command.velocity_x();
     double origin_vy = command.velocity_y();
     double origin_vr = command.velocity_r();
-    double dt = 1. / opm->frameRate;
+    double dt = 1. / Owl::SIParamManager::Instance()->DesiredFPS;
     double theta = - origin_vr * dt;
     CVector v(origin_vx, origin_vy);
     v = v.rotate(theta);

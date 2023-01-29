@@ -24,8 +24,8 @@ class CDealRobot {
     void updateVel(int team, Owl::ReceiveVisionMessage& result);
     Matrix2d& getP(int team, int num, int cam){return posFilter[team][num].getP();}
     Matrix2d& getQ(int team, int num, int cam){return posFilter[team][num].getQ();}
-    int getFPS(){return Owl::OParamManager::Instance()->frameRate;}
-                //{return VisionModule::Instance()->FPS==0? Owl::VParamManager::Instance()->frameRate:VisionModule::Instance()->FPS;}
+    int getFPS(){return Owl::SIParamManager::Instance()->DesiredFPS;}
+                //{return VisionModule::Instance()->FPS==0? Owl::SIParamManager::Instance()->DesiredFPS:VisionModule::Instance()->FPS;}
 //    bool updateCommand(Owl::Protocol::Robot_Command command);
     QTime t1;
     bool visionProblem[PARAM::TEAMS][PARAM::ROBOTMAXID];

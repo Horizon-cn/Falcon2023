@@ -30,7 +30,6 @@ class ParamManagerOwl: public Falcon::ParamManager {
       loadParam(field, "Alert/field", "Division_A");
       loadParam(updateGeometry, "Alert/updateGeometry", false);
       loadParam(saoAction, "Alert/saoAction", 0);
-      loadParam(frameRate, "Alert/frameRate", 75);
       //Useful Ports
       loadParam(refereePortToBlue,"AlertPorts/refereePortToBlue",10002);
       loadParam(refereePortToYellow,"AlertPorts/refereePortToYellow",10004);
@@ -75,7 +74,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
         loadParam(penalty_radius, field+"/penalty_radius", 800);
         loadParam(penalty_area_l, field+"/penalty_area_l", 350);
       }
-      loadParam(extendLength, field+"/extendLength", 200);
+      loadParam(field_wall_dist, field + "/field_margin", 300);
       //Team
       loadParam(blueTeam, "Team/blueTeam", "SRC");
       loadParam(yellowTeam, "Team/yellowTeam", "SRC");
@@ -102,7 +101,6 @@ class ParamManagerOwl: public Falcon::ParamManager {
     QString field;
     bool updateGeometry;
     int saoAction;
-    double frameRate;
     //Useful Ports
     int refereePortToBlue, refereePortToYellow;
     int VisionSim, VisionReal, VisionRemote;
@@ -125,9 +123,9 @@ class ParamManagerOwl: public Falcon::ParamManager {
     int penalty_width, penalty_depth;
     int goal_thickness, goal_depth, goal_width;
     int realWidth, realHeight;
-    int extendLength;
     bool if_ellipse_penalty;
     int penalty_radius, penalty_area_l;
+    int field_wall_dist;
     //Team
     QString blueTeam, yellowTeam;
     int KeeperID;
@@ -240,7 +238,7 @@ class ParamManagerVision: public Falcon::ParamManager {
       loadParam(v_switch, "Ball/v_switch", 2000);
       loadParam(acc_slide, "Ball/acc_slide", -4000);
       loadParam(acc_roll, "Ball/acc_roll", -325); 
-      loadParam(ball_delc_change_point, "Ball/ball_delc_change_point", 250);
+      loadParam(ball_delc_change_point, "Ball/ball_delc_change_point", 2500);
       loadParam(ball_fast_dec, "Ball/ball_fast_dec", 360);
       loadParam(ball_slow_dec, "Ball/ball_slow_dec", 27.5);
       //Kalman
@@ -298,12 +296,14 @@ public:
         if (update) loadParamFromFile();
     }
     void loadParamFromFile() {
-        loadParam(Gravity, "worldp_vars/Gravity", 9.8);
+        loadParam(Gravity, "World/Gravity", 9.8);
         BallRadius = value("Ball/BallRadius", 0.0215).toDouble() * 1000;
+        loadParam(DesiredFPS, "World/DesiredFPS", 75);
     }
 public:
     double Gravity;
     double BallRadius;
+    double DesiredFPS;
 };
 class ParamManagerSkill : public Falcon::ParamManager {
 public:

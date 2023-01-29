@@ -42,7 +42,7 @@ double CDealBall::posDist(CGeoPoint pos1, CGeoPoint pos2) {
 }
 
 bool CDealBall::isValidInfo(Owl::Ball ball) {
-    if (abs(ball.pos.x()) < opm->field_length / 2 + opm->extendLength && abs(ball.pos.y()) < opm->field_width / 2 + opm->extendLength)
+    if (abs(ball.pos.x()) < opm->field_length / 2 + opm->field_wall_dist && abs(ball.pos.y()) < opm->field_width / 2 + opm->field_wall_dist)
         return true;
     else
         return false;
@@ -92,7 +92,7 @@ void CDealBall::init() {
     _cycle = GlobalData::Instance()->processBall.cycle() + 1;
     result.init();
     FPS = getFPS();
-    dt = 1 / opm->frameRate;
+    dt = 1 / spm->DesiredFPS;
     //dt = 1 / FPS;
     //dt1 = 1 / FPS;
     //qDebug()<<"dt1"<<dt1;
@@ -305,14 +305,14 @@ void CDealBall::run() {
         //currentPossible = 0;
     //} 
     /**else {
-        CVector lastVel = GlobalData::Instance()->maintain[0].ball[0].velocity / vpm->frameRate;
+        CVector lastVel = GlobalData::Instance()->maintain[0].ball[0].velocity / spm->DesiredFPS;
 
         if (GlobalData::Instance()->maintain[0].ball[0].velocity.mod() >= vpm->v_switch)
-            ballTravel = lastVel + lastVel.unit() * (vpm->acc_slide / vpm->frameRate / vpm->frameRate / 2 ) ;
+            ballTravel = lastVel + lastVel.unit() * (vpm->acc_slide / spm->DesiredFPS / spm->DesiredFPS / 2 ) ;
         else if (GlobalData::Instance()->maintain[0].ball[0].velocity.mod() <= 1e-8)
             ballTravel = CVector(0, 0);
         else
-            ballTravel = lastVel +  lastVel.unit() * (vpm->acc_roll / vpm->frameRate / vpm->frameRate / 2 );
+            ballTravel = lastVel +  lastVel.unit() * (vpm->acc_roll / spm->DesiredFPS / spm->DesiredFPS / 2 );
         //result.addBall(GlobalData::Instance()->maintain[0].ball[0].pos + ballTravel);
         //result.addBall(GlobalData::Instance()->maintain[0].ball[0].pos + ballTravel, GlobalData::Instance()->maintain[0].ball[0].rawPos );
         result.addBall(GlobalData::Instance()->maintain[0].ball[0].pos + ballTravel, GlobalData::Instance()->maintain[0].ball[0].raw);
@@ -363,7 +363,7 @@ void CDealBall::run() {
 //void CDealBall::updateVel(const Matrix2d tempMatrix, ReceiveVisionMessage& result) {
 void CDealBall::updateVel(Owl::ReceiveVisionMessage& result) {
     bool isFar = false;
-    //timeStamp += 1 / vpm->frameRate;
+    //timeStamp += 1 / spm->DesiredFPS;
 
     if(!ballKalmanFilter.isInit()) {
         ballKalmanFilter.initState(result.ball[0].pos, CVector(0, 0));
@@ -436,17 +436,17 @@ void CDealBall::updateVel(Owl::ReceiveVisionMessage& result) {
 /**
     // 1.进行Kalman滤波，估计球的位置以及球速//
     CGeoPoint filtPoint (tempMatrix(0, 0), tempMatrix(1, 0));
-    CVector ballVel(tempMatrix(2, 0)* vpm->frameRate, tempMatrix(3, 0)*vpm->frameRate);
+    CVector ballVel(tempMatrix(2, 0)* spm->DesiredFPS, tempMatrix(3, 0)*spm->DesiredFPS);
     ballVel = ballVel / lostFrame;
     result.ball[0].fill(filtPoint.x(), filtPoint.y(), 0, ballVel);
     // 2.延时补偿，根据延时帧率将位置和速度进行修正//
     for( int i = 0; i < vpm->total_lated_frame; ++i ) {
-        //thisCycle.SetPos(thisCycle.Pos() + thisCycle.Vel() / vpm->frameRate);
+        //thisCycle.SetPos(thisCycle.Pos() + thisCycle.Vel() / spm->DesiredFPS);
         CVector uniVec = ballVel / (ballVel.mod() + 1.0);
         if ( ballVel.mod() > vpm->ball_delc_change_point )
-            ballVel = ( uniVec * ( ballVel.mod() - vpm->ball_fast_dec / vpm->frameRate ));
+            ballVel = ( uniVec * ( ballVel.mod() - vpm->ball_fast_dec / spm->DesiredFPS ));
         else if ( ballVel.mod() > 50 )
-            ballVel = ( uniVec * ( ballVel.mod() - vpm->ball_slow_dec / vpm->frameRate ));
+            ballVel = ( uniVec * ( ballVel.mod() - vpm->ball_slow_dec / spm->DesiredFPS ));
         else {
             ballVel = (CVector(0, 0));
         }

@@ -57,7 +57,7 @@ ConfigWidget::ConfigWidget()
   ADD_TO_ENUM(Division, "Division A");
   ADD_TO_ENUM(Division, "Division B");
   END_ENUM(game_vars, Division);
-  ADD_VALUE(game_vars,Intz, Robots_Count, spm->value("game_vars/Robots_Count", 8).toInt(), "Robots Count")
+  ADD_VALUE(game_vars,Intz, Robots_Count, spm->value("Game/Robots_Count", 8).toInt(), "Robots Count")
   VarListPtr fields_vars(new VarList("Field"));
   VarListPtr div_a_vars(new VarList("Division A"));
   VarListPtr div_b_vars(new VarList("Division B"));
@@ -111,13 +111,13 @@ ConfigWidget::ConfigWidget()
     VarListPtr worldp_vars(new VarList("World"));
     phys_vars->addChild(worldp_vars);
         ADD_VALUE(worldp_vars,Intz,NumOfCam,opm->value("Camera/total_cameras", 1).toInt(),"The number of cameras")
-        ADD_VALUE(worldp_vars,Double,DesiredFPS,opm->value("Alert/frameRate", 75).toDouble(),"Desired FPS")
-        ADD_VALUE(worldp_vars,Bool,SyncWithGL,spm->value("worldp_vars", "SyncWithGL", false).toBool(),"Synchronize ODE with OpenGL")
-        ADD_VALUE(worldp_vars,Double,DeltaTime,spm->value("worldp_vars/DeltaTime", 0.016).toDouble(),"ODE time step")
-        ADD_VALUE(worldp_vars,Double,Gravity,spm->value("worldp_vars/Gravity", 9.8).toDouble(),"Gravity")
-        ADD_VALUE(worldp_vars,Bool,ResetTurnOver,spm->value("worldp_vars/ResetTurnOver", true).toBool(),"Auto reset turn-over")
-		ADD_VALUE(worldp_vars, Bool, EnableYellowSim,spm->value("worldp_vars/EnableYellowSim", true).toBool(), "Enable Yellow Simulator")		//xjw
-		ADD_VALUE(worldp_vars, Bool, EnableWallSim,spm->value("worldp_vars/EnableWallSim", true).toBool(), "Enable Wall Simulator")			//xjw
+        ADD_VALUE(worldp_vars,Double,DesiredFPS,spm->value("World/DesiredFPS", 75).toDouble(),"Desired FPS")
+        ADD_VALUE(worldp_vars,Bool,SyncWithGL,spm->value("World", "SyncWithGL", false).toBool(),"Synchronize ODE with OpenGL")
+        ADD_VALUE(worldp_vars,Double,DeltaTime,spm->value("World/DeltaTime", 0.016).toDouble(),"ODE time step")
+        ADD_VALUE(worldp_vars,Double,Gravity,spm->value("World/Gravity", 9.8).toDouble(),"Gravity")
+        ADD_VALUE(worldp_vars,Bool,ResetTurnOver,spm->value("World/ResetTurnOver", true).toBool(),"Auto reset turn-over")
+		ADD_VALUE(worldp_vars, Bool, EnableYellowSim,spm->value("World/EnableYellowSim", true).toBool(), "Enable Yellow Simulator")		//xjw
+		ADD_VALUE(worldp_vars, Bool, EnableWallSim,spm->value("World/EnableWallSim", true).toBool(), "Enable Wall Simulator")			//xjw
   VarListPtr ballp_vars(new VarList("Ball"));
     phys_vars->addChild(ballp_vars);
         ADD_VALUE(ballp_vars,Double,BallMass,spm->value("Ball/BallMass", 0.043).toDouble(),"Ball mass");
@@ -134,22 +134,22 @@ ConfigWidget::ConfigWidget()
     ADD_VALUE(comm_vars,Intz,CommandListenPort,cpm->value("Ports/sim_send", 20011).toInt(),"Command listen port")
     ADD_VALUE(comm_vars,Intz,BlueStatusSendPort,cpm->value("Ports/blue_status", 30011).toInt(),"Blue Team status send port")
     ADD_VALUE(comm_vars,Intz,YellowStatusSendPort,cpm->value("Ports/yellow_status", 30012).toInt(),"Yellow Team status send port")
-    ADD_VALUE(comm_vars,Intz,sendDelay,spm->value("comm_vars", "sendDelay", 0).toInt(),"Sending delay (milliseconds)")
-    ADD_VALUE(comm_vars,Intz,sendGeometryEvery,spm->value("comm_vars/sendGeometryEvery", 120).toInt(),"Send geometry every X frames")
+    ADD_VALUE(comm_vars,Intz,sendDelay,spm->value("Communication", "sendDelay", 0).toInt(),"Sending delay (milliseconds)")
+    ADD_VALUE(comm_vars,Intz,sendGeometryEvery,spm->value("Communication/sendGeometryEvery", 120).toInt(),"Send geometry every X frames")
     VarListPtr gauss_vars(new VarList("Gaussian noise"));
         comm_vars->addChild(gauss_vars);
-        ADD_VALUE(gauss_vars,Bool,noise,spm->value("gauss_vars", "noise", false).toBool(),"Noise")
-        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_x,spm->value("gauss_vars/bot_noiseDeviation_x", 3).toDouble(),"Bot Deviation for x values")
-        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_y,spm->value("gauss_vars/bot_noiseDeviation_y", 3).toDouble(),"Bot Deviation for y values")
-        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_angle,spm->value("gauss_vars/bot_noiseDeviation_angle", 2).toDouble(),"Bot Deviation for angle values")
-		ADD_VALUE(gauss_vars, Double, ball_noiseDeviation_x, spm->value("gauss_vars/ball_noiseDeviation_x", 3).toDouble(), "Ball Deviation for x values")
-		ADD_VALUE(gauss_vars, Double, ball_noiseDeviation_y, spm->value("gauss_vars/ball_noiseDeviation_y", 3).toDouble(), "Ball Deviation for y values")
+        ADD_VALUE(gauss_vars,Bool,noise,spm->value("Noise", "noise", false).toBool(),"Noise")
+        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_x,spm->value("Noise/bot_noiseDeviation_x", 3).toDouble(),"Bot Deviation for x values")
+        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_y,spm->value("Noise/bot_noiseDeviation_y", 3).toDouble(),"Bot Deviation for y values")
+        ADD_VALUE(gauss_vars,Double,bot_noiseDeviation_angle,spm->value("Noise/bot_noiseDeviation_angle", 2).toDouble(),"Bot Deviation for angle values")
+		ADD_VALUE(gauss_vars, Double, ball_noiseDeviation_x, spm->value("Noise/ball_noiseDeviation_x", 3).toDouble(), "Ball Deviation for x values")
+		ADD_VALUE(gauss_vars, Double, ball_noiseDeviation_y, spm->value("Noise/ball_noiseDeviation_y", 3).toDouble(), "Ball Deviation for y values")
     VarListPtr vanishing_vars(new VarList("Vanishing probability"));
         comm_vars->addChild(vanishing_vars);
-        ADD_VALUE(gauss_vars,Bool,vanishing,spm->value("gauss_vars", "vanishing", false).toBool(),"Vanishing")
-        ADD_VALUE(vanishing_vars,Double,blue_team_vanishing,spm->value("vanishing_vars", "blue_team_vanishing", 0).toDouble(),"Blue team")
-        ADD_VALUE(vanishing_vars,Double,yellow_team_vanishing,spm->value("vanishing_vars", "yellow_team_vanishing", 0).toDouble(),"Yellow team")
-        ADD_VALUE(vanishing_vars,Double,ball_vanishing,spm->value("vanishing_vars", "ball_vanishing", 0).toDouble(),"Ball")
+        ADD_VALUE(gauss_vars,Bool,vanishing,spm->value("Vanishing", "vanishing", false).toBool(),"Vanishing")
+        ADD_VALUE(vanishing_vars,Double,blue_team_vanishing,spm->value("Vanishing", "blue_team_vanishing", 0).toDouble(),"Blue team")
+        ADD_VALUE(vanishing_vars,Double,yellow_team_vanishing,spm->value("Vanishing", "yellow_team_vanishing", 0).toDouble(),"Yellow team")
+        ADD_VALUE(vanishing_vars,Double,ball_vanishing,spm->value("Vanishing", "ball_vanishing", 0).toDouble(),"Ball")
 
     //world=VarXML::read(world,(qApp->applicationDirPath() + QString("/../data/config/") + QString(".grsim.xml")).toStdString());
 

@@ -82,7 +82,7 @@ namespace Param{
 		//const double BALL_AVOID_DIST = Param::Field::BALL_SIZE / 2 + 2.0f;
 	}
 	namespace Vision{
-		const double FRAME_RATE = OParamManager::Instance()->value("Alert/frameRate", 75).toDouble(); //75; // 每秒桢数
+		const double FRAME_RATE = SParamManager::Instance()->value("World/DesiredFPS", 75).toDouble(); //75; // 每秒桢数
 	}
 	namespace Latency{ 
 		const float TOTAL_LATED_FRAME = VParamManager::Instance()->value("Physics/total_lated_frame", 4.7).toFloat(); //4.7f; // 延迟的周期数,四舍五入
