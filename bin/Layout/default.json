@@ -1,0 +1,449 @@
+{
+    "allDockWidgets": [
+        {
+            "lastPosition": {
+                "lastFloatingGeometry": {
+                    "height": 0,
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                },
+                "placeholders": [
+                    {
+                        "isFloatingWindow": false,
+                        "itemIndex": 5,
+                        "mainWindowUniqueName": "MainWindow"
+                    }
+                ],
+                "tabIndex": -1,
+                "wasFloating": false
+            },
+            "uniqueName": "Settings"
+        },
+        {
+            "lastPosition": {
+                "lastFloatingGeometry": {
+                    "height": 0,
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                },
+                "placeholders": [
+                    {
+                        "isFloatingWindow": false,
+                        "itemIndex": 4,
+                        "mainWindowUniqueName": "MainWindow"
+                    }
+                ],
+                "tabIndex": -1,
+                "wasFloating": false
+            },
+            "uniqueName": "ToolKit"
+        },
+        {
+            "lastPosition": {
+                "lastFloatingGeometry": {
+                    "height": 0,
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                },
+                "placeholders": [
+                    {
+                        "isFloatingWindow": false,
+                        "itemIndex": 3,
+                        "mainWindowUniqueName": "MainWindow"
+                    }
+                ],
+                "tabIndex": -1,
+                "wasFloating": false
+            },
+            "uniqueName": "Viewer"
+        },
+        {
+            "lastPosition": {
+                "lastFloatingGeometry": {
+                    "height": 0,
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                },
+                "placeholders": [
+                    {
+                        "isFloatingWindow": false,
+                        "itemIndex": 2,
+                        "mainWindowUniqueName": "MainWindow"
+                    }
+                ],
+                "tabIndex": -1,
+                "wasFloating": false
+            },
+            "uniqueName": "RefereeBox"
+        },
+        {
+            "lastPosition": {
+                "lastFloatingGeometry": {
+                    "height": 0,
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                },
+                "placeholders": [
+                    {
+                        "isFloatingWindow": false,
+                        "itemIndex": 1,
+                        "mainWindowUniqueName": "MainWindow"
+                    }
+                ],
+                "tabIndex": -1,
+                "wasFloating": false
+            },
+            "uniqueName": "ControlBoard"
+        },
+        {
+            "lastPosition": {
+                "lastFloatingGeometry": {
+                    "height": 0,
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                },
+                "placeholders": [
+                    {
+                        "isFloatingWindow": false,
+                        "itemIndex": 0,
+                        "mainWindowUniqueName": "MainWindow"
+                    }
+                ],
+                "tabIndex": -1,
+                "wasFloating": false
+            },
+            "uniqueName": "Fields"
+        }
+    ],
+    "closedDockWidgets": [
+    ],
+    "floatingWindows": [
+    ],
+    "mainWindows": [
+        {
+            "affinities": [
+            ],
+            "geometry": {
+                "height": 980,
+                "width": 1920,
+                "x": 9,
+                "y": 38
+            },
+            "isVisible": true,
+            "multiSplitterLayout": {
+                "frames": {
+                    "10": {
+                        "currentTabIndex": 0,
+                        "dockWidgets": [
+                            "ToolKit"
+                        ],
+                        "geometry": {
+                            "height": 191,
+                            "width": 613,
+                            "x": 1307,
+                            "y": 573
+                        },
+                        "id": "10",
+                        "isNull": false,
+                        "mainWindowUniqueName": "MainWindow",
+                        "objectName": "ToolKit",
+                        "options": 0
+                    },
+                    "14": {
+                        "currentTabIndex": 0,
+                        "dockWidgets": [
+                            "Settings"
+                        ],
+                        "geometry": {
+                            "height": 191,
+                            "width": 613,
+                            "x": 1307,
+                            "y": 764
+                        },
+                        "id": "14",
+                        "isNull": false,
+                        "mainWindowUniqueName": "MainWindow",
+                        "objectName": "Settings",
+                        "options": 0
+                    },
+                    "2": {
+                        "currentTabIndex": 0,
+                        "dockWidgets": [
+                            "Fields"
+                        ],
+                        "geometry": {
+                            "height": 955,
+                            "width": 1307,
+                            "x": 0,
+                            "y": 0
+                        },
+                        "id": "2",
+                        "isNull": false,
+                        "mainWindowUniqueName": "MainWindow",
+                        "objectName": "Fields",
+                        "options": 0
+                    },
+                    "3": {
+                        "currentTabIndex": 0,
+                        "dockWidgets": [
+                            "ControlBoard"
+                        ],
+                        "geometry": {
+                            "height": 189,
+                            "width": 613,
+                            "x": 1307,
+                            "y": 0
+                        },
+                        "id": "3",
+                        "isNull": false,
+                        "mainWindowUniqueName": "MainWindow",
+                        "objectName": "ControlBoard",
+                        "options": 0
+                    },
+                    "5": {
+                        "currentTabIndex": 0,
+                        "dockWidgets": [
+                            "RefereeBox"
+                        ],
+                        "geometry": {
+                            "height": 192,
+                            "width": 613,
+                            "x": 1307,
+                            "y": 189
+                        },
+                        "id": "5",
+                        "isNull": false,
+                        "mainWindowUniqueName": "MainWindow",
+                        "objectName": "RefereeBox",
+                        "options": 0
+                    },
+                    "7": {
+                        "currentTabIndex": 0,
+                        "dockWidgets": [
+                            "Viewer"
+                        ],
+                        "geometry": {
+                            "height": 192,
+                            "width": 613,
+                            "x": 1307,
+                            "y": 381
+                        },
+                        "id": "7",
+                        "isNull": false,
+                        "mainWindowUniqueName": "MainWindow",
+                        "objectName": "Viewer",
+                        "options": 0
+                    }
+                },
+                "layout": {
+                    "children": [
+                        {
+                            "guestId": "2",
+                            "isContainer": false,
+                            "isVisible": true,
+                            "objectName": "Fields",
+                            "sizingInfo": {
+                                "geometry": {
+                                    "height": 955,
+                                    "width": 1307,
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "maxSize": {
+                                    "height": 16777215,
+                                    "width": 16777215
+                                },
+                                "minSize": {
+                                    "height": 171,
+                                    "width": 80
+                                }
+                            }
+                        },
+                        {
+                            "children": [
+                                {
+                                    "guestId": "3",
+                                    "isContainer": false,
+                                    "isVisible": true,
+                                    "objectName": "ControlBoard",
+                                    "sizingInfo": {
+                                        "geometry": {
+                                            "height": 189,
+                                            "width": 613,
+                                            "x": 0,
+                                            "y": 0
+                                        },
+                                        "maxSize": {
+                                            "height": 16777215,
+                                            "width": 16777215
+                                        },
+                                        "minSize": {
+                                            "height": 171,
+                                            "width": 80
+                                        }
+                                    }
+                                },
+                                {
+                                    "guestId": "5",
+                                    "isContainer": false,
+                                    "isVisible": true,
+                                    "objectName": "RefereeBox",
+                                    "sizingInfo": {
+                                        "geometry": {
+                                            "height": 192,
+                                            "width": 613,
+                                            "x": 0,
+                                            "y": 189
+                                        },
+                                        "maxSize": {
+                                            "height": 16777215,
+                                            "width": 16777215
+                                        },
+                                        "minSize": {
+                                            "height": 171,
+                                            "width": 80
+                                        }
+                                    }
+                                },
+                                {
+                                    "guestId": "7",
+                                    "isContainer": false,
+                                    "isVisible": true,
+                                    "objectName": "Viewer",
+                                    "sizingInfo": {
+                                        "geometry": {
+                                            "height": 192,
+                                            "width": 613,
+                                            "x": 0,
+                                            "y": 381
+                                        },
+                                        "maxSize": {
+                                            "height": 16777215,
+                                            "width": 16777215
+                                        },
+                                        "minSize": {
+                                            "height": 171,
+                                            "width": 80
+                                        }
+                                    }
+                                },
+                                {
+                                    "guestId": "10",
+                                    "isContainer": false,
+                                    "isVisible": true,
+                                    "objectName": "ToolKit",
+                                    "sizingInfo": {
+                                        "geometry": {
+                                            "height": 191,
+                                            "width": 613,
+                                            "x": 0,
+                                            "y": 573
+                                        },
+                                        "maxSize": {
+                                            "height": 16777215,
+                                            "width": 16777215
+                                        },
+                                        "minSize": {
+                                            "height": 171,
+                                            "width": 80
+                                        }
+                                    }
+                                },
+                                {
+                                    "guestId": "14",
+                                    "isContainer": false,
+                                    "isVisible": true,
+                                    "objectName": "Settings",
+                                    "sizingInfo": {
+                                        "geometry": {
+                                            "height": 191,
+                                            "width": 613,
+                                            "x": 0,
+                                            "y": 764
+                                        },
+                                        "maxSize": {
+                                            "height": 16777215,
+                                            "width": 16777215
+                                        },
+                                        "minSize": {
+                                            "height": 171,
+                                            "width": 80
+                                        }
+                                    }
+                                }
+                            ],
+                            "isContainer": true,
+                            "isVisible": false,
+                            "objectName": "",
+                            "orientation": 2,
+                            "sizingInfo": {
+                                "geometry": {
+                                    "height": 955,
+                                    "width": 613,
+                                    "x": 1307,
+                                    "y": 0
+                                },
+                                "maxSize": {
+                                    "height": 16777215,
+                                    "width": 16777215
+                                },
+                                "minSize": {
+                                    "height": 90,
+                                    "width": 80
+                                }
+                            }
+                        }
+                    ],
+                    "isContainer": true,
+                    "isVisible": false,
+                    "objectName": "",
+                    "orientation": 1,
+                    "sizingInfo": {
+                        "geometry": {
+                            "height": 955,
+                            "width": 1920,
+                            "x": 0,
+                            "y": 0
+                        },
+                        "maxSize": {
+                            "height": 16777215,
+                            "width": 16777215
+                        },
+                        "minSize": {
+                            "height": 90,
+                            "width": 80
+                        }
+                    }
+                }
+            },
+            "options": 0,
+            "screenIndex": 0,
+            "screenSize": {
+                "height": 1080,
+                "width": 1920
+            },
+            "uniqueName": "MainWindow",
+            "windowState": 0
+        }
+    ],
+    "screenInfo": [
+        {
+            "devicePixelRatio": 1,
+            "geometry": {
+                "height": 1080,
+                "width": 1920,
+                "x": 0,
+                "y": 0
+            },
+            "index": 0,
+            "name": "\\\\.\\DISPLAY1"
+        }
+    ],
+    "serializationVersion": 3
+}

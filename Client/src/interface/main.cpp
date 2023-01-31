@@ -40,16 +40,16 @@ void qmlRegister() {
     qmlRegisterSingletonType<rec_slider>("Owl", 1, 0, "RecSlider", &rec_slider::Instance);
     qmlRegisterSingletonType<RecEventLabel>("Owl", 1, 0, "RecEventLabel", &RecEventLabel::Instance);
 }
-/**
+
 class CustomFrameworkWidgetFactory : public KDDockWidgets::DefaultWidgetFactory {
 public:
     ~CustomFrameworkWidgetFactory() override = default;
-    QUrl titleBarFilename() const override{ return QUrl("qrc:/src/qml/CustomDW/TitleBar.qml"); }
-    QUrl dockwidgetFilename() const override { return QUrl("qrc:/src/qml/CustomDW/DockWidget.qml"); }
-    QUrl frameFilename() const override { return QUrl("qrc:/src/qml/CustomDW/Frame.qml"); }
-    QUrl floatingWindowFilename() const override { return QUrl("qrc:/src/qml/CustomDW/FloatingWindow.qml"); }
+    //QUrl titleBarFilename() const override{ return QUrl("qrc:/src/qml/ComponentsKD/TitleBar.qml"); }
+    QUrl dockwidgetFilename() const override { return QUrl("qrc:/src/qml/ComponentsKD/DockWidget.qml"); }
+    //QUrl frameFilename() const override { return QUrl("qrc:/src/qml/ComponentsKD/Frame.qml"); }
+    //QUrl floatingWindowFilename() const override { return QUrl("qrc:/src/qml/ComponentsKD/FloatingWindow.qml"); }
 };
-**/
+
 int main(int argc, char *argv[]) {
     // 展示可视化界面，使用KDDockWidgets
     // 博客链接https://blog.csdn.net/luoyayun361/article/details/117752657
@@ -90,8 +90,7 @@ int main(int argc, char *argv[]) {
     auto flags = KDDockWidgets::Config::self().flags();
     KDDockWidgets::Config::self().setFlags(flags);
     KDDockWidgets::Config::self().setSeparatorThickness(0);
-    //auto& config = KDDockWidgets::Config::self();
-    //config.setFrameworkWidgetFactory(new CustomFrameworkWidgetFactory());
+    //KDDockWidgets::Config::self().setFrameworkWidgetFactory(new CustomFrameworkWidgetFactory());
 
     QQmlApplicationEngine engine;
 

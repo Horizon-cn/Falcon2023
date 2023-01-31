@@ -21,6 +21,7 @@
         <file>src/qml/Components/ZRobot.qml</file>
         <file>src/qml/Components/ZSwitch.qml</file>
         <file>src/qml/Components/ZValue.qml</file>
+        <file>src/qml/ComponentsKD/DockWidget.qml</file>
         <file>resource/connect.png</file>
         <file>resource/Heartbeat.png</file>
         <file>resource/nHeartbeat.png</file>

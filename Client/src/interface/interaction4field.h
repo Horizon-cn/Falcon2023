@@ -34,8 +34,14 @@ public:
     Q_INVOKABLE static void readFormationJson(QString);
     Q_INVOKABLE static QStringList getFormationFileName();
     Q_INVOKABLE QString getMenubar_CrtFile() const {return menubar_crt_file;}
+    Q_INVOKABLE static QStringList getLayoutFileName();
+    Q_INVOKABLE QString setLayoutFileName();
+    Q_INVOKABLE void setCurrentLayout(QString text) { lastLayout = text; qDebug() << "Current Layout is " << text; }
+    Q_INVOKABLE QString getLastLayout() const { return lastLayout; }
+    Q_INVOKABLE QString getLayoutPath() { return qApp->applicationDirPath() + "/../Layout/"; }
 private:
     static QString menubar_crt_file;
+    QString lastLayout;
 Q_SIGNALS:
     void moveFieldSignal(int,int);
 signals:

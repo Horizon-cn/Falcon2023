@@ -41,12 +41,43 @@ ApplicationWindow {
             fps.text = (interaction4field.getFPS()).toString() + "\n" + (interaction4field.getRBKFPS(0)).toString()+ "\n" + (interaction4field.getRBKFPS(1)).toString();
         }
     }
-
+    property var filename : "layout";
     Owl.Interaction4Field { id : interaction4field; }
     Owl.Interaction { id : interaction }
-
+    KDDW.LayoutSaver { 
+        id: layoutSaver 
+        function saveLayout(){
+            filename = interaction4field.setLayoutFileName();
+            if (filename != "")
+                layoutSaver.saveToFile(interaction4field.getLayoutPath() + filename + ".json")
+        }
+        function reloadLayout(text){
+            layoutSaver.restoreFromFile(interaction4field.getLayoutPath() + text + ".json");
+            interaction4field.setCurrentLayout(text);
+        }
+    }
+    
     menuBar: MenuBar {
         height: 25;
+        Menu{
+            title: "Layout"
+            MenuItem{
+                text: "Save As";
+                onTriggered: layoutSaver.saveLayout();
+            }
+            Menu{
+                title: "Load"
+                Repeater{
+                    model: interaction4field.getLayoutFileName();
+                    MenuItem{
+                        text: modelData;
+                        onTriggered: {
+                            layoutSaver.reloadLayout(text);
+                        }
+                    }
+                }
+            }
+        }
         Menu{
             title: "Formation"
             MenuItem{
@@ -341,12 +372,13 @@ ApplicationWindow {
             addDockWidget(dock4, KDDW.KDDockWidgets.Location_OnBottom, dock3);
             addDockWidget(dock5, KDDW.KDDockWidgets.Location_OnBottom, dock4);
             addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnBottom, dock5);
+            //dock5.addDockWidgetToContainingWindow(dock6, KDDW.KDDockWidgets.Location_OnRight);
             //dock5.addDockWidgetAsTab(dock6);
         }
     }
     property variant controlRobotShortCut:["`","1","2","3","4","5","6","7","8","9","0","-","=","i","o","p","[","Ctrl+`","Ctrl+1","Ctrl+2","Ctrl+3","Ctrl+4","Ctrl+5","Ctrl+6","Ctrl+7","Ctrl+8","Ctrl+9","Ctrl+0","Ctrl+-","Ctrl+=","Ctrl+i","Ctrl+o","Ctrl+p","Ctrl+["];
     property variant controlRobotShortCut2:["Shift+`","Shift+1","Shift+2","Shift+3","Shift+4","Shift+5","Shift+6","Shift+7","Shift+8","Shift+9","Shift+0","Shift+-","Shift+=","Shift+i","Shift+o","Shift+p","Shift+[","Alt+`","Alt+1","Alt+2","Alt+3","Alt+4","Alt+5","Alt+6","Alt+7","Alt+8","Alt+9","Alt+0","Alt+-","Alt+=","Alt+i","Alt+o","Alt+p","Alt+["];
-    property variant otherShortCut:["Ctrl+q","Ctrl+c","Ctrl+s","Ctrl+v"];
+    property variant otherShortCut:["Ctrl+q","Ctrl+c","Ctrl+s","Ctrl+v","Shift+s","Shift+v"];
 
     function robotControl(index){
         var team = (index > 16 ? 1 : 0);
@@ -858,7 +890,19 @@ ApplicationWindow {
     Shortcut{
         sequence:otherShortCut[3];
         onActivated: {
-            interaction4fieldfield.readFormationJson(interaction4fieldfield.getMenubar_CrtFile());
+            interaction4fieldfield.readFormationJson(interaction4field.getMenubar_CrtFile());
+        }
+    }
+    Shortcut{
+        sequence:otherShortCut[4];
+        onActivated: {
+            layoutSaver.saveLayout();
+        }
+    }
+    Shortcut{
+        sequence:otherShortCut[5];
+        onActivated: {
+            layoutSaver.reloadLayout(interaction4field.getLastLayout());
         }
     }
 }

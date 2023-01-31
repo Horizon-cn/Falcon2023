@@ -14,7 +14,9 @@
 #include "staticparams.h"
 QString Interaction4Field::menubar_crt_file = "";
 namespace  {}
-Interaction4Field::Interaction4Field(QObject *parent) : QObject(parent) {}
+Interaction4Field::Interaction4Field(QObject *parent) : QObject(parent) {
+    lastLayout = "default";
+}
 Interaction4Field::~Interaction4Field() {}
 void Interaction4Field::setArea(int a,int b,int c,int d){
     GlobalSettings::Instance()->setArea(a,b,c,d);
@@ -192,4 +194,39 @@ QStringList Interaction4Field::getFormationFileName() {
     return list;
 }
 
+QStringList Interaction4Field::getLayoutFileName() {
+    QStringList list;
 
+    QDir dir(QApplication::applicationDirPath() + "/../Layout");
+    if (!dir.exists())
+        return list;
+
+    QStringList filters;
+    filters << QString("*.json");
+    dir.setFilter(QDir::Files | QDir::NoSymLinks); //设置类型过滤器，只为文件格式
+    dir.setNameFilters(filters);  //设置文件名称过滤器，只为filters格式
+
+    for (int i = 0; i < dir.count(); i++)
+    {
+        list.append(dir[i].chopped(5));  //文件名称
+    }
+    return list;
+}
+
+QString Interaction4Field::setLayoutFileName() {
+    QString filename = "";
+    QDialog dialog;
+    QFormLayout form(&dialog);
+    form.addRow(new QLabel("Set Layout Name:"));
+    QLineEdit* lineEdit = new QLineEdit(&dialog);
+    form.addRow(lineEdit);
+    // Add Cancel and OK button
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    form.addRow(&buttonBox);
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+    if (dialog.exec() == QDialog::Accepted) {
+        filename = lineEdit->text();
+    }
+    return filename;
+}

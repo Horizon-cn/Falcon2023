@@ -126,7 +126,6 @@ class ParamManagerOwl: public Falcon::ParamManager {
     int field_length, field_width, center_radius;
     int penalty_width, penalty_depth;
     int goal_thickness, goal_depth, goal_width;
-    int realWidth, realHeight;
     bool if_ellipse_penalty;
     int penalty_radius, penalty_area_l;
     int field_wall_dist;

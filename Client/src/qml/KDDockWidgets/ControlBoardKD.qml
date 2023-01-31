@@ -109,6 +109,7 @@ Page{
                         }
                         ZComboBox{
                             id:grsimInterface;
+                            enabled:!visionControls.ifConnected;
                             model:interaction.getGrsimInterfaces();
                             onActivated: interaction.changeGrsimInterface(currentIndex);
                             function updateModel(){
