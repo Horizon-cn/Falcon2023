@@ -14,9 +14,7 @@
 #include "staticparams.h"
 QString Interaction4Field::menubar_crt_file = "";
 namespace  {}
-Interaction4Field::Interaction4Field(QObject *parent) : QObject(parent) {
-    lastLayout = "default";
-}
+Interaction4Field::Interaction4Field(QObject *parent) : QObject(parent) {}
 Interaction4Field::~Interaction4Field() {}
 void Interaction4Field::setArea(int a,int b,int c,int d){
     GlobalSettings::Instance()->setArea(a,b,c,d);
@@ -227,6 +225,37 @@ QString Interaction4Field::setLayoutFileName() {
     QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
     if (dialog.exec() == QDialog::Accepted) {
         filename = lineEdit->text();
+    }
+    return filename;
+}
+
+QString Interaction4Field::chooseLayout() {
+    QString filename = "";
+    QDialog dialog;
+    QFormLayout form(&dialog);
+    form.addRow(new QLabel("Choose Layout:"));
+    QComboBox* comboBox = new QComboBox(&dialog);
+    QDir dir;
+    dir.setCurrent(qApp->applicationDirPath() + "/../Layout/");
+    dir.setNameFilters(QStringList() << "*.json");
+    dir.setSorting(QDir::Size | QDir::Reversed);
+    QFileInfoList list = dir.entryInfoList();
+    for (int i = 0; i < list.size(); ++i) {
+        QFileInfo fileInfo = list.at(i);
+        QStringList s = fileInfo.fileName().split(".");
+        QString str;
+        if (s.count() > 0) str = s[0];
+        comboBox->addItem(str);
+    }
+    comboBox->setCurrentIndex(0);
+    form.addRow(comboBox);
+    // Add Cancel and OK button
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    form.addRow(&buttonBox);
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+    if (dialog.exec() == QDialog::Accepted) {
+        filename = comboBox->currentText();
     }
     return filename;
 }

@@ -41,7 +41,7 @@ ApplicationWindow {
             fps.text = (interaction4field.getFPS()).toString() + "\n" + (interaction4field.getRBKFPS(0)).toString()+ "\n" + (interaction4field.getRBKFPS(1)).toString();
         }
     }
-    property var filename : "layout";
+    property var filename : "default";
     Owl.Interaction4Field { id : interaction4field; }
     Owl.Interaction { id : interaction }
     KDDW.LayoutSaver { 
@@ -53,7 +53,6 @@ ApplicationWindow {
         }
         function reloadLayout(text){
             layoutSaver.restoreFromFile(interaction4field.getLayoutPath() + text + ".json");
-            interaction4field.setCurrentLayout(text);
         }
     }
     
@@ -890,7 +889,7 @@ ApplicationWindow {
     Shortcut{
         sequence:otherShortCut[3];
         onActivated: {
-            interaction4fieldfield.readFormationJson(interaction4field.getMenubar_CrtFile());
+            interaction4field.readFormationJson(interaction4field.getMenubar_CrtFile());
         }
     }
     Shortcut{
@@ -902,7 +901,9 @@ ApplicationWindow {
     Shortcut{
         sequence:otherShortCut[5];
         onActivated: {
-            layoutSaver.reloadLayout(interaction4field.getLastLayout());
+            filename = interaction4field.chooseLayout();
+            if (filename != "")
+                layoutSaver.reloadLayout(filename);
         }
     }
 }
