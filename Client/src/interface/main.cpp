@@ -81,6 +81,7 @@ int main(int argc, char *argv[]) {
     Owl::VParamManager::Instance()->loadParamFromFile();
     Owl::CParamManager::Instance()->loadParamFromFile();
     Owl::SIParamManager::Instance()->loadParamFromFile();
+    Owl::SKParamManager::Instance()->loadParamFromFile();
     Owl::LParamManager::Instance()->clear();
     GlobalData::Instance();
     // 注册QML接口

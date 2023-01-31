@@ -13,15 +13,16 @@ class ParamManagerOwl: public Falcon::ParamManager {
     ParamManagerOwl(): ParamManager("../data/owl2.ini") {}
     ~ParamManagerOwl() {}
     template <class T>
-    void updateParam(T& var, const QString & key, const QVariant & value, bool update) {
-      changeParam(key, value);
-      if(update) loadParam(var, key); //loadParamFromFile();
+    void updateParam(T& var, const QString& key, const QVariant& value, bool update) {
+        changeParam(key, value);
+        if (update) loadParam(var, key); //loadParamFromFile();
     }
-    void updateParam(const QString & group, const QString & key, const QVariant & value, bool update) {
-      changeParam(group, key, value);
-      if(update) loadParamFromFile();
+    void updateParam(const QString& group, const QString& key, const QVariant& value, bool update) {
+        changeParam(group, key, value);
+        if (update) loadParamFromFile();
     }
     void loadParamFromFile() {
+      qDebug() << "load" + filename;
       //Global Settings
       loadParam(LoginName, "Alert/LoginName", 0);
       loadParam(isSimulation, "Alert/isSimulation", true);
@@ -75,6 +76,9 @@ class ParamManagerOwl: public Falcon::ParamManager {
         loadParam(penalty_area_l, field+"/penalty_area_l", 350);
       }
       loadParam(field_wall_dist, field + "/field_margin", 300);
+      loadParam(line_thickness, field + "/field_line_width", 10);
+      loadParam(wall_thickness, field + "/wall_thickness", 50);
+      loadParam(goal_thickness, field + "/goal_thickness", 20);
       //Team
       loadParam(blueTeam, "Team/blueTeam", "SRC");
       loadParam(yellowTeam, "Team/yellowTeam", "SRC");
@@ -118,7 +122,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     //Size
     int ballDiameter, shadowDiameter, carDiameter, carFaceWidth, numberSize, debugPointSize;
     //Field
-    int line_thickness;
+    int line_thickness, wall_thickness;
     int field_length, field_width, center_radius;
     int penalty_width, penalty_depth;
     int goal_thickness, goal_depth, goal_width;
@@ -144,15 +148,16 @@ class ParamManagerCfg: public Falcon::ParamManager {
     ParamManagerCfg(): ParamManager("../data/cfg.ini") {}
     ~ParamManagerCfg() {}
     template <class T>
-    void updateParam(T& var, const QString & key, const QVariant & value, bool update) {
-      changeParam(key, value);
-      if(update) loadParam(var, key); //loadParamFromFile();
+    void updateParam(T& var, const QString& key, const QVariant& value, bool update) {
+        changeParam(key, value);
+        if (update) loadParam(var, key); //loadParamFromFile();
     }
-    void updateParam(const QString & group, const QString & key, const QVariant & value, bool update) {
-      changeParam(group, key, value);
-      if(update) loadParamFromFile();
+    void updateParam(const QString& group, const QString& key, const QVariant& value, bool update) {
+        changeParam(group, key, value);
+        if (update) loadParamFromFile();
     }
     void loadParamFromFile() {
+      qDebug() << "load" + filename;
       //software path
       loadParam(BlueRBKPath, "Path/BlueRBKPath", "CHOOSE CONTROLLER PATH");
       loadParam(YellowRBKPath, "Path/YellowRBKPath", "CHOOSE CONTROLLER PATH");
@@ -209,15 +214,16 @@ class ParamManagerVision: public Falcon::ParamManager {
     ParamManagerVision(): ParamManager("../data/vision.ini") {}
     ~ParamManagerVision() {}
     template <class T>
-    void updateParam(T& var, const QString & key, const QVariant & value, bool update) {
-      changeParam(key, value);
-      if(update) loadParam(var, key); //loadParamFromFile();
+    void updateParam(T& var, const QString& key, const QVariant& value, bool update) {
+        changeParam(key, value);
+        if (update) loadParam(var, key); //loadParamFromFile();
     }
-    void updateParam(const QString & group, const QString & key, const QVariant & value, bool update) {
-      changeParam(group, key, value);
-      if(update) loadParamFromFile();
+    void updateParam(const QString& group, const QString& key, const QVariant& value, bool update) {
+        changeParam(group, key, value);
+        if (update) loadParamFromFile();
     }
     void loadParamFromFile() {
+      qDebug() << "load" + filename;
       //DealRobot
       loadParam(robotMergeDist, "Robot/robotMergeDist", 100);
       loadParam(carMinBelieveFrame, "Robot/carMinBelieveFrame", 3);
@@ -247,7 +253,6 @@ class ParamManagerVision: public Falcon::ParamManager {
       loadParam(robotsCollisionDist, "Collision/robotsCollisionDist", 180);
       //Physics
       loadParam(chipAngle, "Physics/chipAngle", 45);
-      loadParam(botCenterToMouth, "Physics/botCenterToMouth", 76);
       loadParam(total_lated_frame, "Physics/total_lated_frame", 4.7);       
     }
   public:
@@ -269,7 +274,6 @@ class ParamManagerVision: public Falcon::ParamManager {
     double robotsCollisionDist;
     //Physics
     double chipAngle;
-    double botCenterToMouth;
     double total_lated_frame;   
 };
 class ParamManagerKickParam: public Falcon::ParamManager {
@@ -296,19 +300,43 @@ public:
         if (update) loadParamFromFile();
     }
     void loadParamFromFile() {
+        qDebug() << "load" + filename;
         loadParam(Gravity, "World/Gravity", 9.8);
         BallRadius = value("Ball/BallRadius", 0.0215).toDouble() * 1000;
         loadParam(DesiredFPS, "World/DesiredFPS", 75);
+        team = value("Team", "blueTeam", "SRC").toString();
+        robot_settings = new QSettings(qApp->applicationDirPath()+ QString("/../data/config/") + QString("%1.ini").arg(team), QSettings::IniFormat);
+        CenterFromKicker = robot_settings->value("Geometery/CenterFromKicker", 0.073).toDouble() * 1000;
+        RobotRadius = robot_settings->value("Geometery/Radius", 0.09).toDouble() * 1000;
     }
 public:
     double Gravity;
     double BallRadius;
     double DesiredFPS;
+    QString team;
+    QSettings* robot_settings;
+    double CenterFromKicker;
+    double RobotRadius;
 };
 class ParamManagerSkill : public Falcon::ParamManager {
 public:
     ParamManagerSkill() : ParamManager("../data/skill.ini") {}
     ~ParamManagerSkill() {}
+    template <class T>
+    void updateParam(T& var, const QString& key, const QVariant& value, bool update) {
+        changeParam(key, value);
+        if (update) loadParam(var, key); //loadParamFromFile();
+    }
+    void updateParam(const QString& group, const QString& key, const QVariant& value, bool update) {
+        changeParam(group, key, value);
+        if (update) loadParamFromFile();
+    }
+    void loadParamFromFile() {
+        qDebug() << "load" + filename;
+        MAX_BALL_SPEED = value("Rule/MAX_BALL_SPEED", 630).toDouble() / 100.0;
+    }
+public:
+    double MAX_BALL_SPEED;
 };
 typedef Falcon::MeyersSingleton<ParamManagerOwl> OParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerCfg> CParamManager;

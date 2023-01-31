@@ -98,9 +98,9 @@ ConfigWidget::ConfigWidget()
   ADD_VALUE(div_b_vars, Double, DivB_Goal_Width, 0.001 * opm->value("Division_B/goal_width", 1000).toDouble(),"Goal width")
   ADD_VALUE(div_b_vars, Double, DivB_Goal_Height, 0.001 * opm->value("Division_B/goal_height", 160).toDouble(),"Goal height")
 
-  ADD_ENUM(StringEnum,YellowTeam,opm->value("Team", "blueTeam", "SRC").toString().toStdString(),"Yellow Team");
+  ADD_ENUM(StringEnum,YellowTeam,spm->value("Team", "blueTeam", "SRC").toString().toStdString(),"Yellow Team");
   END_ENUM(geo_vars,YellowTeam)
-  ADD_ENUM(StringEnum,BlueTeam,opm->value("Team", "yellowTeam", "SRC").toString().toStdString(),"Blue Team");
+  ADD_ENUM(StringEnum,BlueTeam,spm->value("Team", "yellowTeam", "SRC").toString().toStdString(),"Blue Team");
   END_ENUM(geo_vars,BlueTeam)
 
     VarListPtr ballg_vars(new VarList("Ball"));

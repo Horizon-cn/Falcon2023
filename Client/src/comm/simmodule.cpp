@@ -34,7 +34,8 @@ grSim_Robot_Command *grsim_robots[PARAM::ROBOTMAXID];
 auto opm = Owl::OParamManager::Instance();
 auto cpm = Owl::CParamManager::Instance();
 auto vpm = Owl::VParamManager::Instance();
-auto spm = Owl::SIParamManager::Instance();
+auto sipm = Owl::SIParamManager::Instance();
+auto skpm = Owl::SKParamManager::Instance();
 }
 SimModule::SimModule(QObject *parent) : QObject(parent) {
     grsim_commands = grsim_packet.mutable_commands();
@@ -178,13 +179,13 @@ void SimModule::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
         //if (commands.flat_kick()!=0) {
             grsim_robots[id]->set_kickspeedz(0);
             //grsim_robots[id]->set_kickspeedx(trans_length(commands.power()));
-            grsim_robots[id]->set_kickspeedx(commands.power() >= 6.5? 6.5 : commands.power());
+            grsim_robots[id]->set_kickspeedx(commands.power() >= skpm->MAX_BALL_SPEED? skpm->MAX_BALL_SPEED : commands.power());
             //grsim_robots[id]->set_kickspeedx(commands.flat_kick());
         } else {
         //else if (commands.chip_kick()!=0){
             double radian = vpm->chipAngle * cpm->PI / 180.0;
-            double vx = sqrt(commands.power() * spm->Gravity / 2.0 / tan(radian));
-            vx = vx >= (6.5 * cos(radian))? (6.5 * cos(radian)) : vx;
+            double vx = sqrt(commands.power() * sipm->Gravity / 2.0 / tan(radian));
+            vx = vx >= (skpm->MAX_BALL_SPEED * cos(radian))? (skpm->MAX_BALL_SPEED * cos(radian)) : vx;
             //double vx = sqrt(trans_length(commands.power()) * spm->Gravity / 2.0 / tan(radian));
             //double vx = sqrt(commands.chip_kick() * spm->Gravity / 2.0 / tan(radian));
             double vz = vx * tan(radian);
@@ -195,7 +196,7 @@ void SimModule::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
         double vx = commands.velocity_x();
         double vy = -commands.velocity_y();
         double vr = -commands.velocity_r();
-        double dt = 1. / spm->DesiredFPS;
+        double dt = 1. / sipm->DesiredFPS;
         double theta = - vr * dt;
         CVector v(vx, vy);
         v = v.rotate(theta);

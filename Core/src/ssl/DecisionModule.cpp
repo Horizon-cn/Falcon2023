@@ -79,7 +79,7 @@ void CDecisionModule::DoTeamMode()
 	} else {
         qDebug()<<"other decision yet to be implemented, plz use lua";
 	}
-
+	
 	return ;
 }
 

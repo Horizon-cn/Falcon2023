@@ -55,7 +55,7 @@ bool ParamInterface::setData(const QModelIndex &index, const QVariant &value,int
     else if (current_pm == "simulator")
         Owl::SIParamManager::Instance()->updateParam(item->parentItem()->data(0), item->data(0), value, true);
     else if (current_pm == "skill")
-        Owl::SKParamManager::Instance()->changeParam(item->parentItem()->data(0), item->data(0), value);
+        Owl::SKParamManager::Instance()->updateParam(item->parentItem()->data(0), item->data(0), value, true);
     else if (current_pm == "vision")
         Owl::VParamManager::Instance()->updateParam(item->parentItem()->data(0), item->data(0), value, true);
     else
@@ -115,8 +115,10 @@ void ParamInterface::reload(){
         Owl::SIParamManager::Instance()->sync();
         Owl::SIParamManager::Instance()->loadParamFromFile();
     }
-    else if (current_pm == "skill")
+    else if (current_pm == "skill") {
         Owl::SKParamManager::Instance()->sync();
+        Owl::SKParamManager::Instance()->loadParamFromFile();
+    }
     else if (current_pm == "vision") {
         Owl::VParamManager::Instance()->sync();
         Owl::VParamManager::Instance()->loadParamFromFile();

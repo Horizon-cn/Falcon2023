@@ -53,12 +53,17 @@ const int ballRatio = 3;
 
 auto opm = Owl::OParamManager::Instance();
 auto cpm = Owl::CParamManager::Instance();
+auto sipm = Owl::SIParamManager::Instance();
 qreal zoomRatio = 1;
 QPoint zoomStart = QPoint(0, 0);
 QRect area;
 // for field lines;
 QPainterPath painterPath;
+QPainterPath painterPathGoal;
+QPainterPath painterPathWall;
 QPen pen = QPen(QColor(150, 150, 150), 1);
+QPen penGoal = QPen(QColor(150, 150, 150), 1);
+QPen penWall = QPen(QColor(150, 150, 150), 1);
 double x(double _x) {
     return (_x * opm->canvasWidth / opm->param_canvasWidth + opm->canvasWidth / 2.0 - zoomStart.x()) / zoomRatio;
 }
@@ -353,7 +358,7 @@ void Field::leftDoubleClickEvent(QMouseEvent * e){
     }
 }
 void Field::checkClosestBall(double x, double y) {
-    double limit = pow(opm->ballDiameter, 2) / 4;
+    double limit = pow(sipm->BallRadius*2, 2) / 4; //pow(opm->ballDiameter, 2) / 4;
     auto& vision = GlobalData::Instance()->maintain[0];
     if (vision.ball[0].valid) {
         const Owl::Ball& ball = vision.ball[0];
@@ -492,7 +497,7 @@ void Field::rightDoubleClickEvent(QMouseEvent * e){
     }
 }
 void Field::checkClosestRobot(double x, double y, bool include_off_robots) {
-    double limit = pow(opm->carDiameter, 2) / 4;
+    double limit = pow(sipm->RobotRadius*2, 2) / 4; //pow(opm->carDiameter, 2) / 4;
     auto& vision = GlobalData::Instance()->processRobot[0];
     for(int color = PARAM::BLUE; color <= PARAM::YELLOW; color++) {
         int iter_range = include_off_robots? PARAM::ROBOTMAXID : vision.robotSize[color]%PARAM::ROBOTMAXID;
@@ -665,6 +670,8 @@ void Field::repaint() {//change here!!!!!!! 每帧视觉都更新
 void Field::paintInit() {
     drawCtrlC();
     pixmapPainter.strokePath(painterPath, pen);
+    pixmapPainter.strokePath(painterPathGoal, penGoal);
+    pixmapPainter.strokePath(painterPathWall, penWall);
     drawSelectedArea();
 }
 void Field::drawBallLine() {
@@ -677,12 +684,9 @@ void Field::drawBallLine() {
 }
 
 void Field::initPainterPath() {
-    pen.setWidth(::w(30));
+    pen.setWidth(::w(opm->line_thickness)); //30
     painterPath = QPainterPath();
-    painterPath.addRect(::x(-opm->field_length/2.0-opm->field_wall_dist), ::y(-opm->field_width/2.0-opm->field_wall_dist), ::w(opm->field_length+2*opm->field_wall_dist), ::h(opm->field_width+2*opm->field_wall_dist));
     painterPath.addRect(::x(-opm->field_length / 2.0), ::y(-opm->field_width / 2.0), ::w(opm->field_length), ::h(opm->field_width));
-    painterPath.addRect(::x(-opm->field_length / 2.0), ::y(-opm->goal_width / 2.0), ::w(-opm->goal_depth), ::h(opm->goal_width));
-    painterPath.addRect(::x(opm->field_length / 2.0), ::y(-opm->goal_width / 2.0), ::w(opm->goal_depth), ::h(opm->goal_width));
     painterPath.moveTo(::x(-opm->field_length / 2.0), ::y(0));
     painterPath.lineTo(::x(opm->field_length / 2.0), ::y(0));
     painterPath.moveTo(::x(0), ::y(opm->field_width / 2.0));
@@ -742,6 +746,13 @@ void Field::initPainterPath() {
         painterPath.addRect(::x(-opm->field_length / 2.0), ::y(-opm->penalty_width / 2.0), ::w(opm->penalty_depth), ::h(opm->penalty_width));
         painterPath.addRect(::x(opm->field_length / 2.0), ::y(-opm->penalty_width / 2.0), ::w(-opm->penalty_depth), ::h(opm->penalty_width));
     }
+    penGoal.setWidth(::w(opm->goal_thickness)); //30
+    painterPathGoal = QPainterPath();
+    painterPathGoal.addRect(::x(-opm->field_length / 2.0), ::y(-opm->goal_width / 2.0), ::w(-opm->goal_depth), ::h(opm->goal_width));
+    painterPathGoal.addRect(::x(opm->field_length / 2.0), ::y(-opm->goal_width / 2.0), ::w(opm->goal_depth), ::h(opm->goal_width));
+    penWall.setWidth(::w(opm->wall_thickness)); //30
+    painterPathWall = QPainterPath();
+    painterPathWall.addRect(::x(-opm->field_length / 2.0 - opm->field_wall_dist), ::y(-opm->field_width / 2.0 - opm->field_wall_dist), ::w(opm->field_length + 2 * opm->field_wall_dist), ::h(opm->field_width + 2 * opm->field_wall_dist));
 }
 void Field::drawOriginVision(int index) { //TODO: Draw field here!
     for(int i = 0; i < opm->total_cameras; i++) {
@@ -808,12 +819,12 @@ void Field::drawMaintainVision(int index) {
         else if(ball.valid) ballColor = COLOR_ORANGE;
         else ballColor = COLOR_ORANGE_SHADOW;
         paintBall(ballColor, ball.pos.x(), ball.pos.y());
-        //paintFocus(COLOR_RED, ball.pos.x(), ball.pos.y(), 500, ballFocusCount++);
+        paintFocus(COLOR_RED, ball.pos.x(), ball.pos.y(), 500, ballFocusCount++);
     }
 }
 void Field::paintCar(const QColor& color, quint8 num, qreal x, qreal y, qreal radian, bool ifDrawNum, const QColor& textColor, bool needCircle) {
-    static qreal radius = opm->carDiameter / 2.0;
-    static qreal chordAngel = qRadiansToDegrees(qAsin(2.0 * Owl::VParamManager::Instance()->botCenterToMouth / opm->carDiameter)); //qRadiansToDegrees(qAcos(1.0 * opm->carFaceWidth / opm->carDiameter));
+    static qreal radius = sipm->RobotRadius; //opm->carDiameter / 2.0;
+    static qreal chordAngel = qRadiansToDegrees(qAsin(1.0 * sipm->CenterFromKicker / sipm->RobotRadius)); //qRadiansToDegrees(qAsin(2.0 * sipm->CenterFromKicker / opm->carDiameter)); //qRadiansToDegrees(qAcos(1.0 * opm->carFaceWidth / opm->carDiameter));
     pixmapPainter.setBrush(QBrush(color));
     pixmapPainter.setPen(QPen(COLOR_RED, ::w(30), Qt::DotLine));
     pixmapPainter.drawLine(QPointF(::x(x), ::y(y)), QPointF(::x(x), ::y(y)) + QPointF(::w(200) * qSin(radian + M_PI_2), ::w(200) * qCos(radian + M_PI_2)));
@@ -831,7 +842,7 @@ void Field::paintCar(const QColor& color, quint8 num, qreal x, qreal y, qreal ra
         int fontSize = ::h(-opm->numberSize);
         font.setPixelSize(fontSize);
         pixmapPainter.setFont(font);
-        pixmapPainter.drawText(::x(x - opm->numberSize), ::y(y + opm->carDiameter * 0.4), QString::number(num, 16).toUpper());
+        pixmapPainter.drawText(::x(x - opm->numberSize), ::y(y + sipm->RobotRadius * 0.8), QString::number(num, 16).toUpper()); //pixmapPainter.drawText(::x(x - opm->numberSize), ::y(y + opm->carDiameter * 0.4), QString::number(num, 16).toUpper());
     }
 }
 void Field::paintOffCar() {
@@ -846,8 +857,8 @@ void Field::paintOffCar() {
     }
 }
 void Field::paintCarShadow(qreal x, qreal y, qreal radian) {
-    static qreal radius = opm->carDiameter / 2.0;
-    static qreal chordAngel = qRadiansToDegrees(qAsin(2.0 * Owl::VParamManager::Instance()->botCenterToMouth / opm->carDiameter)); //qRadiansToDegrees(qAcos(1.0 * opm->carFaceWidth / opm->carDiameter));
+    static qreal radius = sipm->RobotRadius; //opm->carDiameter / 2.0;
+    static qreal chordAngel = qRadiansToDegrees(qAsin(1.0 * sipm->CenterFromKicker / sipm->RobotRadius)); //qRadiansToDegrees(qAsin(2.0 * sipm->CenterFromKicker / opm->carDiameter)); //qRadiansToDegrees(qAcos(1.0 * opm->carFaceWidth / opm->carDiameter));
     pixmapPainter.setBrush(QBrush(QColor(255, 255, 255, 80)));
     pixmapPainter.setPen(Qt::NoPen);
 //    pixmapPainter.drawLine(QPointF(::x(x), ::y(y)), QPointF(::x(x), ::y(y)) + QPointF(30 * qSin(radian + M_PI_2), 30 * qCos(radian + M_PI_2)));
@@ -856,12 +867,12 @@ void Field::paintCarShadow(qreal x, qreal y, qreal radian) {
 void Field::paintBall(const QColor& color, qreal x, qreal y) {
     pixmapPainter.setBrush(QBrush(color));
     pixmapPainter.setPen(Qt::NoPen);
-    pixmapPainter.drawEllipse(QRectF(::x(x - opm->ballDiameter / 2.0), ::y(y - opm->ballDiameter / 2.0), ::w(opm->ballDiameter), ::h(opm->ballDiameter)));
+    pixmapPainter.drawEllipse(QRectF(::x(x - sipm->BallRadius), ::y(y - sipm->BallRadius), ::w(sipm->BallRadius*2), ::h(sipm->BallRadius*2))); //pixmapPainter.drawEllipse(QRectF(::x(x - opm->ballDiameter / 2.0), ::y(y - opm->ballDiameter / 2.0), ::w(opm->ballDiameter), ::h(opm->ballDiameter)));
 }
 void Field::paintpredict() {
     pixmapPainter.setBrush(QBrush(Qt::black));
     pixmapPainter.setPen(Qt::NoPen);
-    pixmapPainter.drawEllipse(::x(getpredict_x() - opm->ballDiameter / 2.0), ::y(getpredict_y() - opm->ballDiameter / 2.0), ::w(opm->ballDiameter), ::h(opm->ballDiameter));
+    pixmapPainter.drawEllipse(::x(getpredict_x() - sipm->BallRadius), ::y(getpredict_y() - sipm->BallRadius), ::w(sipm->BallRadius*2), ::h(sipm->BallRadius*2)); //pixmapPainter.drawEllipse(::x(getpredict_x() - opm->ballDiameter / 2.0), ::y(getpredict_y() - opm->ballDiameter / 2.0), ::w(opm->ballDiameter), ::h(opm->ballDiameter));
 }
 void Field::paintShadow(const QColor& color, qreal x, qreal y) {
     pixmapPainter.setBrush(QBrush(color));
@@ -969,7 +980,7 @@ void Field::drawDebugMessages(int team) {
             break;
         case ZSS::Protocol::Debug_Msg_Debug_Type_ROBOT:
             if (!opm->type_robot) break;
-            pixmapPainter.drawEllipse(::x(msg.robot().pos().x() * 10 - opm->carDiameter / 2.0), ::y(-msg.robot().pos().y() * 10 + opm->carDiameter / 2.0), ::w((opm->carDiameter)), ::h(-(opm->carDiameter)));
+            pixmapPainter.drawEllipse(::x(msg.robot().pos().x() * 10 - sipm->RobotRadius), ::y(-msg.robot().pos().y() * 10 + sipm->RobotRadius), ::w((sipm->RobotRadius*2)), ::h(-(sipm->RobotRadius*2))); //pixmapPainter.drawEllipse(::x(msg.robot().pos().x() * 10 - opm->carDiameter / 2.0), ::y(-msg.robot().pos().y() * 10 + opm->carDiameter / 2.0), ::w((opm->carDiameter)), ::h(-(opm->carDiameter)));
             break;
         //case Owl::Protocol::Debug_Msg_Debug_Type_CURVE:
         //case Owl::Protocol::Debug_Msg_Debug_Type_POLYGON:

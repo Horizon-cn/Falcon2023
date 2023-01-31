@@ -12,7 +12,7 @@
 namespace {
     auto opm = Owl::OParamManager::Instance();
     auto vpm = Owl::VParamManager::Instance();
-    auto spm = Owl::SIParamManager::Instance();
+    auto sipm = Owl::SIParamManager::Instance();
     long long min(long long a, long long b ) {
         if (a < b) return a;
         else return b;
@@ -54,7 +54,7 @@ bool CDealBall::ballInRobot(CGeoPoint ballPos) {
     for (int team = 0; team < PARAM::TEAMS; team++) {
         for (int id = 0; id < PARAM::ROBOTMAXID; id++){
             if(maintain.robotIndex[team][id] == -1) continue;
-            if (maintain.robot[team][maintain.robotIndex[team][id]].pos.dist(ballPos) <= vpm->botCenterToMouth)
+            if (maintain.robot[team][maintain.robotIndex[team][id]].pos.dist(ballPos) <= sipm->CenterFromKicker)
                 return true;
         }
     }
@@ -92,7 +92,7 @@ void CDealBall::init() {
     _cycle = GlobalData::Instance()->processBall.cycle() + 1;
     result.init();
     FPS = getFPS();
-    dt = 1 / spm->DesiredFPS;
+    dt = 1 / sipm->DesiredFPS;
     //dt = 1 / FPS;
     //dt1 = 1 / FPS;
     //qDebug()<<"dt1"<<dt1;
@@ -249,7 +249,7 @@ void CDealBall::checkInfrared(Owl::Ball ball) {
                 CGeoPoint botPos = maintain.robot[team][maintain.robotIndex[team][id]].pos;
                 double botDir =  maintain.robot[team][maintain.robotIndex[team][id]].angle;
                 CVector angleVector = CVector(cos(botDir), sin(botDir));
-                infraredBall.pos = ( botPos + angleVector * vpm->botCenterToMouth );
+                infraredBall.pos = ( botPos + angleVector * sipm->CenterFromKicker );
                 
                 CVector ballPosVector = ball.pos - infraredBall.pos;
                 double verticalDist = ballPosVector.x()*angleVector.x()+ballPosVector.y()*angleVector.y(),
@@ -305,14 +305,14 @@ void CDealBall::run() {
         //currentPossible = 0;
     //} 
     /**else {
-        CVector lastVel = GlobalData::Instance()->maintain[0].ball[0].velocity / spm->DesiredFPS;
+        CVector lastVel = GlobalData::Instance()->maintain[0].ball[0].velocity / sipm->DesiredFPS;
 
         if (GlobalData::Instance()->maintain[0].ball[0].velocity.mod() >= vpm->v_switch)
-            ballTravel = lastVel + lastVel.unit() * (vpm->acc_slide / spm->DesiredFPS / spm->DesiredFPS / 2 ) ;
+            ballTravel = lastVel + lastVel.unit() * (vpm->acc_slide / sipm->DesiredFPS / sipm->DesiredFPS / 2 ) ;
         else if (GlobalData::Instance()->maintain[0].ball[0].velocity.mod() <= 1e-8)
             ballTravel = CVector(0, 0);
         else
-            ballTravel = lastVel +  lastVel.unit() * (vpm->acc_roll / spm->DesiredFPS / spm->DesiredFPS / 2 );
+            ballTravel = lastVel +  lastVel.unit() * (vpm->acc_roll / sipm->DesiredFPS / sipm->DesiredFPS / 2 );
         //result.addBall(GlobalData::Instance()->maintain[0].ball[0].pos + ballTravel);
         //result.addBall(GlobalData::Instance()->maintain[0].ball[0].pos + ballTravel, GlobalData::Instance()->maintain[0].ball[0].rawPos );
         result.addBall(GlobalData::Instance()->maintain[0].ball[0].pos + ballTravel, GlobalData::Instance()->maintain[0].ball[0].raw);
@@ -332,7 +332,7 @@ void CDealBall::run() {
                 if (maintain.robotIndex[team][id] == -1) continue;
                 CGeoPoint botPos = maintain.robot[team][maintain.robotIndex[team][id]].pos;
                 double botDir =  maintain.robot[team][maintain.robotIndex[team][id]].angle;
-                infraredBall.pos = ( botPos + CVector(cos(botDir), sin(botDir)) * vpm->botCenterToMouth );
+                infraredBall.pos = ( botPos + CVector(cos(botDir), sin(botDir)) * sipm->CenterFromKicker );
                 bool tooFarFromVisionBall = false;
                 for (int visionball = 0; visionball < result.ballSize; visionball++) {
                     if(infraredBall.pos.dist(result.ball[visionball].pos)>150) {
@@ -363,7 +363,7 @@ void CDealBall::run() {
 //void CDealBall::updateVel(const Matrix2d tempMatrix, ReceiveVisionMessage& result) {
 void CDealBall::updateVel(Owl::ReceiveVisionMessage& result) {
     bool isFar = false;
-    //timeStamp += 1 / spm->DesiredFPS;
+    //timeStamp += 1 / sipm->DesiredFPS;
 
     if(!ballKalmanFilter.isInit()) {
         ballKalmanFilter.initState(result.ball[0].pos, CVector(0, 0));
@@ -436,17 +436,17 @@ void CDealBall::updateVel(Owl::ReceiveVisionMessage& result) {
 /**
     // 1.进行Kalman滤波，估计球的位置以及球速//
     CGeoPoint filtPoint (tempMatrix(0, 0), tempMatrix(1, 0));
-    CVector ballVel(tempMatrix(2, 0)* spm->DesiredFPS, tempMatrix(3, 0)*spm->DesiredFPS);
+    CVector ballVel(tempMatrix(2, 0)* sipm->DesiredFPS, tempMatrix(3, 0)*sipm->DesiredFPS);
     ballVel = ballVel / lostFrame;
     result.ball[0].fill(filtPoint.x(), filtPoint.y(), 0, ballVel);
     // 2.延时补偿，根据延时帧率将位置和速度进行修正//
     for( int i = 0; i < vpm->total_lated_frame; ++i ) {
-        //thisCycle.SetPos(thisCycle.Pos() + thisCycle.Vel() / spm->DesiredFPS);
+        //thisCycle.SetPos(thisCycle.Pos() + thisCycle.Vel() / sipm->DesiredFPS);
         CVector uniVec = ballVel / (ballVel.mod() + 1.0);
         if ( ballVel.mod() > vpm->ball_delc_change_point )
-            ballVel = ( uniVec * ( ballVel.mod() - vpm->ball_fast_dec / spm->DesiredFPS ));
+            ballVel = ( uniVec * ( ballVel.mod() - vpm->ball_fast_dec / sipm->DesiredFPS ));
         else if ( ballVel.mod() > 50 )
-            ballVel = ( uniVec * ( ballVel.mod() - vpm->ball_slow_dec / spm->DesiredFPS ));
+            ballVel = ( uniVec * ( ballVel.mod() - vpm->ball_slow_dec / sipm->DesiredFPS ));
         else {
             ballVel = (CVector(0, 0));
         }
@@ -477,7 +477,7 @@ void CDealBall::updateVel(Owl::ReceiveVisionMessage& result) {
 }
 
 bool CDealBall::touchGround(const Owl::Ball &ball) {
-    return fabs(ball.height - spm->BallRadius) < 10;
+    return fabs(ball.height - sipm->BallRadius) < 10;
 }
 
 void CDealBall::project(int camId, Owl::Ball &ball) {

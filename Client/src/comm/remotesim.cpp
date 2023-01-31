@@ -24,7 +24,8 @@ std::thread* yellowReceiveThread = nullptr;
 auto opm = Owl::OParamManager::Instance();
 auto cpm = Owl::CParamManager::Instance();
 auto vpm = Owl::VParamManager::Instance();
-auto spm = Owl::SIParamManager::Instance();
+auto sipm = Owl::SIParamManager::Instance();
+auto skpm = Owl::SKParamManager::Instance();
 
 bool trans_dribble(double dribble) {
     return dribble>1;
@@ -189,11 +190,11 @@ void RemoteSim::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
         //set flatkick or chipkick
         if (!commands.kick()) {
             grsim_robots[id]->set_kickspeedz(0);
-            grsim_robots[id]->set_kickspeedx(commands.power() >= 6.5? 6.5 : commands.power());
+            grsim_robots[id]->set_kickspeedx(commands.power() >= skpm->MAX_BALL_SPEED? skpm->MAX_BALL_SPEED : commands.power());
         } else {
             double radian = vpm->chipAngle * cpm->PI / 180.0;
-            double vx = sqrt(commands.power() * spm->Gravity / 2.0 / tan(radian));
-            vx = vx >= (6.5 * cos(radian))? (6.5 * cos(radian)) : vx;
+            double vx = sqrt(commands.power() * sipm->Gravity / 2.0 / tan(radian));
+            vx = vx >= (skpm->MAX_BALL_SPEED * cos(radian))? (skpm->MAX_BALL_SPEED * cos(radian)) : vx;
             double vz = vx * tan(radian);
             grsim_robots[id]->set_kickspeedz(vx);
             grsim_robots[id]->set_kickspeedx(vz);

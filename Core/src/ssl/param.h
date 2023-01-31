@@ -27,6 +27,7 @@ namespace Param{
 	//const int BALLMERGEDISTANCE = 0;
 	//const int ROBOTMERGEDOSTANCE = 100;
 	//const int TEAMS = 2;
+	const QString team = SParamManager::Instance()->value("Team", "blueTeam", "SRC").toString();
 	namespace Field{
 		const int POS_SIDE_LEFT = 1;
 		const int POS_SIDE_RIGHT = -1;
@@ -37,12 +38,11 @@ namespace Param{
 		const double BALL_SIZE = SParamManager::Instance()->value("Ball/BallRadius", 0.0215).toDouble()*100*2; //5; // 半径?直径
 		//const double BALL_DECAY = -0.8; // 阻力对球的加速度和速度成正比,单位为 /s
 		/* Player */
-		const double MAX_PLAYER_SIZE = OParamManager::Instance()->value("Size/carDiameter", 180).toDouble() * 0.1; //18;
+		const double MAX_PLAYER_SIZE = QSettings(QString("../data/config/") + QString("%1.ini").arg(team), QSettings::IniFormat).value("Geometery/Radius", 0.09).toDouble() * 200; //18;
 		/* Field */
 		const QString field = OParamManager::Instance()->value("Alert", "field", "Division_A").toString();
 		//const double GOAL_POST_AVOID_LENGTH = 2;         //伸进场地内门柱的避障长度
 		const double GOAL_POST_THICKNESS = OParamManager::Instance()->value(field + "/goal_thickness", 20).toDouble() * 0.1; //2;           //门柱宽度
-		//const int MAX_BALL_SPEED = 630;
 		const bool   IF_USE_ELLIPSE = OParamManager::Instance()->value("Division_B", "if_ellipse_penalty", false).toBool(); //false;             // whether use ellipse penalty
 
 		const double PITCH_LENGTH = OParamManager::Instance()->value(field + "/field_length", 12000).toDouble() * 0.1; //1200; // 场地长
@@ -67,8 +67,8 @@ namespace Param{
 	}
 	namespace Vehicle{
 		namespace V2{
-			const double PLAYER_SIZE = OParamManager::Instance()->value("Size/carDiameter", 180).toDouble() * 0.05; //9;
-			const double PLAYER_FRONT_TO_CENTER = VParamManager::Instance()->value("Physics/botCenterToMouth", 76).toDouble() * 0.1; //7.6;
+			const double PLAYER_SIZE = QSettings(QString("../data/config/") + QString("%1.ini").arg(team), QSettings::IniFormat).value("Geometery/Radius", 0.09).toDouble() * 100; //9;
+			const double PLAYER_FRONT_TO_CENTER = QSettings(QString("../data/config/") + QString("%1.ini").arg(team), QSettings::IniFormat).value("Geometery/CenterFromKicker", 0.073).toDouble() * 100; //7.6;
 			const double KICK_ANGLE = ::Param::Math::PI*17/180; // 可以击球的最大相对身体角度
 			//const double DRIBBLE_SIZE = PLAYER_FRONT_TO_CENTER + ::Param::Field::BALL_SIZE; // 带球时离球的距离
 			const double DRIBBLE_ANGLE = ::Param::Math::PI * 17 / 180; // 可以带球的最大相对身体角度
@@ -88,8 +88,9 @@ namespace Param{
 		const float TOTAL_LATED_FRAME = VParamManager::Instance()->value("Physics/total_lated_frame", 4.7).toFloat(); //4.7f; // 延迟的周期数,四舍五入
 	}
 	namespace Rule{
-		const int Version = 2019; // 规则的版本
-		const double MaxDribbleDist = 50; // 最大带球距离
+		const int Version = ParamManager::Instance()->value("Rule/Version", 2019).toInt(); //2019; // 规则的版本
+		const double MaxDribbleDist = ParamManager::Instance()->value("Rule/MaxDribbleDist", 50).toDouble(); //50; // 最大带球距离
+		//const int MAX_BALL_SPEED = ParamManager::Instance()->value("Rule/MAX_BALL_SPEED", 630).toInt(); //630;
 	}
 }
 #endif
