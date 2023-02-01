@@ -385,7 +385,7 @@ ApplicationWindow {
             addDockWidget(dock5, KDDW.KDDockWidgets.Location_OnBottom, dock4);
             addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnBottom, dock5);
             //dock5.addDockWidgetToContainingWindow(dock6, KDDW.KDDockWidgets.Location_OnRight);
-            //dock5.addDockWidgetAsTab(dock6);   
+            //dock5.addDockWidgetAsTab(dock6);
         }
         function createWidget(index) {
             if (index == 0)

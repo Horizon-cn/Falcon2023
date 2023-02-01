@@ -48,7 +48,7 @@ const static QColor COLOR_DARKGREEN(48, 48, 48);
 const static QColor COLOR_RED(220, 53, 47);
 const static QColor COLOR_LIGHTWHITE(255, 255, 255, 20);
 const static qreal zoomStep = 0.05;
-const static qreal zoomMin = 0.35;
+const static qreal zoomMin = 0.35; //0.1;
 const int ballRatio = 3;
 
 auto opm = Owl::OParamManager::Instance();
@@ -57,6 +57,7 @@ auto sipm = Owl::SIParamManager::Instance();
 qreal zoomRatio = 1;
 QPoint zoomStart = QPoint(0, 0);
 QRect area;
+QSize size;
 // for field lines;
 QPainterPath painterPath;
 QPainterPath painterPathGoal;
@@ -148,7 +149,7 @@ Field::Field(QQuickItem *parent)
 //    pixmapPainter.setRenderHint(QPainter::TextAntialiasing, true);
 //    pixmapPainter.setRenderHint(QPainter::SmoothPixmapTransform, true);
     ::area = QRect(0, 0, this->property("width").toReal(), this->property("height").toReal());
-//    ::size = QSize(this->property("width").toReal()/2.0, this->property("height").toReal()/2.0);
+//    ::size = QSize(this->property("width").toReal(), this->property("height").toReal());
     robotID = -1;
     robotTeam = -1;
     pressedRobot = false;
@@ -924,7 +925,7 @@ void Field::drawSelectedArea() {
     pixmapPainter.setBrush(QBrush(COLOR_LIGHTWHITE));
     pixmapPainter.setPen(Qt::NoPen);
     float width = abs(GS->maximumX - GS->minimumX),
-          height = abs(GS->maximumY - GS->minimumY);
+        height = abs(GS->maximumY - GS->minimumY);
     pixmapPainter.drawRect(QRectF(::x(GS->minimumX), ::y(GS->minimumY), ::w(width), ::h(height)));
 }
 void Field::drawDebugMessages(int team) {
@@ -939,7 +940,7 @@ void Field::drawDebugMessages(int team) {
 //    qDebug() << "FUCK DEBUG MESSAGE SIZE" << msgs.ByteSize();
     GlobalData::Instance()->debugMutex.unlock();
 //    qDebug() << "FUCK DEBUG SIZE" << msgs.msgs_size();
-    pixmapPainter.setFont(QFont("Helvetica [Cronyx]", ::w(130), QFont::Bold));
+    pixmapPainter.setFont(QFont("Helvetica [Cronyx]", ::w(130), QFont::Normal)); //QFont::Bold));
     pixmapPainter.setBrush(QBrush(DEBUG_BRUSH_COLOR));
     for(int i = 0; i < msgs.msgs_size(); i++) {
         auto& msg = msgs.msgs(i);

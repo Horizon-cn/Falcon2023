@@ -53,12 +53,12 @@ namespace Param{
 		const double PENALTY_AREA_DEPTH = OParamManager::Instance()->value(field + "/penalty_depth", 1200).toDouble() * 0.1; //120; // 禁区深度
 		const double PENALTY_AREA_R = OParamManager::Instance()->value("Division_B/penalty_radius", 800).toDouble() * 0.1; //80; // 两个圆弧
 		const double PENALTY_AREA_L = OParamManager::Instance()->value("Division_B/penalty_area_l", 350).toDouble() * 0.1; //35; // 连接两个圆弧的线段
-		const double PENALTY_L = 50;
+		const double PENALTY_L = ParamManager::Instance()->value("Defence/penalty_l", 50).toDouble(); //50;
 		const double PENALTY_MARK_X = OParamManager::Instance()->value(field + "/penalty_point", 1200).toDouble() * 0.1; //480; // 点球点的X坐标
 		const double FIELD_WALL_DIST = OParamManager::Instance()->value(field + "/field_margin", 300).toDouble() * 0.1;  //20; // 场地护栏到边界的距离
 		const double GOAL_WIDTH = OParamManager::Instance()->value(field + "/goal_width", 1200).toDouble() * 0.1; //120; // 球门宽度
 		const double GOAL_DEPTH = OParamManager::Instance()->value(field + "/goal_depth", 200).toDouble() * 0.1; //20; // 球门深度
-		const double FREE_KICK_AVOID_BALL_DIST = OParamManager::Instance()->value(field + "/field_free_kick", 700).toDouble() * 0.1; //50; // 开任意球的时候,对方必须离球这么远
+		const double FREE_KICK_AVOID_BALL_DIST = ParamManager::Instance()->value("Rule/free_kick_avoid_ball_dist", 50).toDouble(); //50; // 开任意球的时候,对方必须离球这么远
 		const double RATIO = 1.5;
 	}
 	namespace Math{

@@ -11,6 +11,7 @@
 	- `data` -- 重要参数和记录数据
 	- `Formation` -- 机器人阵型文件
 	- `Help` -- 更多使用教程
+	- `Layout` -- 保存的界面排布设置
 	- `LOG` -- log文件
 	- `lua_scripts` -- lua脚本
 	- `package.bat` -- QT自动打包脚本
@@ -38,6 +39,8 @@
 	- [x] 采用KDDockWidgets
 	- [x] 优化界面的初始化排布，分界面可恢复
 	- [ ] 优化各种显示物体的大小，画面整洁易观察
+	- [ ] 解决关于KDDockWidgets的Warning
+	- [ ] 与视觉模块解耦，分线程运行
 - [ ] 修改lua框架，可在Client上设置要跑的脚本
 - [ ] 串口通讯和Cray整合（回校后)
 
