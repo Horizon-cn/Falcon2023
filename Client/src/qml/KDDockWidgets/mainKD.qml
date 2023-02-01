@@ -59,6 +59,18 @@ ApplicationWindow {
     menuBar: MenuBar {
         height: 25;
         Menu{
+            title: "Widget"
+            Repeater{
+                model: [dock1.uniqueName, dock2.uniqueName, dock3.uniqueName, dock4.uniqueName, dock5.uniqueName, dock6.uniqueName];
+                MenuItem{
+                    text: modelData;
+                    onTriggered: {
+                        layout.createWidget(index);
+                    }
+                }
+            }
+        }
+        Menu{
             title: "Layout"
             MenuItem{
                 text: "Save As";
@@ -162,6 +174,7 @@ ApplicationWindow {
     }
 
     KDDW.MainWindowLayout {
+        id: layout
         width: parent.width
         height:parent.height
         anchors.fill: parent
@@ -372,7 +385,21 @@ ApplicationWindow {
             addDockWidget(dock5, KDDW.KDDockWidgets.Location_OnBottom, dock4);
             addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnBottom, dock5);
             //dock5.addDockWidgetToContainingWindow(dock6, KDDW.KDDockWidgets.Location_OnRight);
-            //dock5.addDockWidgetAsTab(dock6);
+            //dock5.addDockWidgetAsTab(dock6);   
+        }
+        function createWidget(index) {
+            if (index == 0)
+                addDockWidget(dock1, KDDW.KDDockWidgets.Location_OnLeft);
+            else if (index == 1)
+                addDockWidget(dock2, KDDW.KDDockWidgets.Location_OnBottom);
+            else if (index == 2)
+                addDockWidget(dock2, KDDW.KDDockWidgets.Location_OnBottom);
+            else if (index == 3)
+                addDockWidget(dock4, KDDW.KDDockWidgets.Location_OnBottom);
+            else if (index == 4)
+                addDockWidget(dock5, KDDW.KDDockWidgets.Location_OnBottom);
+            else if (index == 5)
+                addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnBottom); 
         }
     }
     property variant controlRobotShortCut:["`","1","2","3","4","5","6","7","8","9","0","-","=","i","o","p","[","Ctrl+`","Ctrl+1","Ctrl+2","Ctrl+3","Ctrl+4","Ctrl+5","Ctrl+6","Ctrl+7","Ctrl+8","Ctrl+9","Ctrl+0","Ctrl+-","Ctrl+=","Ctrl+i","Ctrl+o","Ctrl+p","Ctrl+["];
