@@ -39,6 +39,8 @@ ApplicationWindow {
         repeat:true;
         onTriggered: {
             fps.text = (interaction4field.getFPS()).toString() + "\n" + (interaction4field.getRBKFPS(0)).toString()+ "\n" + (interaction4field.getRBKFPS(1)).toString();
+            loadLayout.updateModel();
+            loadFormation.updateModel();
         }
     }
     property var filename : "default";
@@ -61,7 +63,7 @@ ApplicationWindow {
         Menu{
             title: "Widget"
             Repeater{
-                model: [dock1.uniqueName, dock2.uniqueName, dock3.uniqueName, dock4.uniqueName, dock5.uniqueName, dock6.uniqueName];
+                model: [dock1.uniqueName, dock2.uniqueName, dock3.uniqueName, dock4.uniqueName, dock5.uniqueName, dock6.uniqueName, dock7.uniqueName];
                 MenuItem{
                     text: modelData;
                     onTriggered: {
@@ -79,6 +81,7 @@ ApplicationWindow {
             Menu{
                 title: "Load"
                 Repeater{
+                    id: loadLayout;
                     model: interaction4field.getLayoutFileName();
                     MenuItem{
                         text: modelData;
@@ -86,6 +89,7 @@ ApplicationWindow {
                             layoutSaver.reloadLayout(text);
                         }
                     }
+                    function updateModel() { model = interaction4field.getLayoutFileName(); }
                 }
             }
         }
@@ -98,6 +102,7 @@ ApplicationWindow {
             Menu{
                 title: "Load"
                 Repeater{
+                    id: loadFormation;
                     model: interaction4field.getFormationFileName();
                     MenuItem{
                         text: modelData;
@@ -105,6 +110,7 @@ ApplicationWindow {
                             interaction4field.readFormationJson(text);
                         }
                     }
+                    function updateModel() { model = interaction4field.getFormationFileName(); }
                 }
             }
         }
@@ -374,6 +380,11 @@ ApplicationWindow {
             uniqueName: "Settings"
             SettingsKD{}
         }
+        KDDW.DockWidget {
+            id: dock7
+            uniqueName: "RemoteControl"
+            RemoteControl{}
+        }
 
         Component.onCompleted: {
             // Add dock1 to the Bottom location
@@ -384,6 +395,7 @@ ApplicationWindow {
             addDockWidget(dock4, KDDW.KDDockWidgets.Location_OnBottom, dock3);
             addDockWidget(dock5, KDDW.KDDockWidgets.Location_OnBottom, dock4);
             addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnBottom, dock5);
+            //addDockWidget(dock7, KDDW.KDDockWidgets.Location_OnBottom, dock6);
             //dock5.addDockWidgetToContainingWindow(dock6, KDDW.KDDockWidgets.Location_OnRight);
             //dock5.addDockWidgetAsTab(dock6);
         }
@@ -399,7 +411,9 @@ ApplicationWindow {
             else if (index == 4)
                 addDockWidget(dock5, KDDW.KDDockWidgets.Location_OnBottom);
             else if (index == 5)
-                addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnBottom); 
+                addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnBottom);
+            else if (index == 6)
+                addDockWidget(dock7, KDDW.KDDockWidgets.Location_OnBottom);
         }
     }
     property variant controlRobotShortCut:["`","1","2","3","4","5","6","7","8","9","0","-","=","i","o","p","[","Ctrl+`","Ctrl+1","Ctrl+2","Ctrl+3","Ctrl+4","Ctrl+5","Ctrl+6","Ctrl+7","Ctrl+8","Ctrl+9","Ctrl+0","Ctrl+-","Ctrl+=","Ctrl+i","Ctrl+o","Ctrl+p","Ctrl+["];

@@ -7,6 +7,7 @@
         <file>src/qml/KDDockWidgets/SettingsKD.qml</file>
         <file>src/qml/KDDockWidgets/ViewerKD.qml</file>
         <file>src/qml/KDDockWidgets/ToolKitKD.qml</file>
+        <file>src/qml/KDDockWidgets/RemoteControl.qml</file>
         <file>src/qml/Widgets/main.qml</file>
         <file>src/qml/Widgets/ControlBoard.qml</file>
         <file>src/qml/Widgets/RefereeBox.qml</file>
@@ -21,6 +22,14 @@
         <file>src/qml/Components/ZRobot.qml</file>
         <file>src/qml/Components/ZSwitch.qml</file>
         <file>src/qml/Components/ZValue.qml</file>
+        <file>src/qml/Components/ZText.qml</file>
+        <file>src/qml/Components/ZSpinBox.qml</file>
+        <file>src/qml/Gamepad/qmldir</file>
+        <file>src/qml/Gamepad/ButtonImage.qml</file>
+        <file>src/qml/Gamepad/DPad.qml</file>
+        <file>src/qml/Gamepad/JoystickViewer.qml</file>
+        <file>src/qml/Gamepad/LeftThumbstick.qml</file>
+        <file>src/qml/Gamepad/RightThumbstick.qml</file>
         <file>src/qml/ComponentsKD/DockWidget.qml</file>
         <file>resource/connect.png</file>
         <file>resource/Heartbeat.png</file>
@@ -46,5 +55,19 @@
         <file>resource/next.png</file>
         <file>resource/scissors1.png</file>
         <file>resource/scissors2.png</file>
+        <file>resource/gamepad/xboxControllerStart.png</file>
+        <file>resource/gamepad/xboxControllerRightTrigger.png</file>
+        <file>resource/gamepad/xboxControllerRightThumbstick.png</file>
+        <file>resource/gamepad/xboxControllerRightShoulder.png</file>
+        <file>resource/gamepad/xboxControllerLeftTrigger.png</file>
+        <file>resource/gamepad/xboxControllerLeftThumbstick.png</file>
+        <file>resource/gamepad/xboxControllerLeftShoulder.png</file>
+        <file>resource/gamepad/xboxControllerDPad.png</file>
+        <file>resource/gamepad/xboxControllerButtonY.png</file>
+        <file>resource/gamepad/xboxControllerButtonX.png</file>
+        <file>resource/gamepad/xboxControllerButtonGuide.png</file>
+        <file>resource/gamepad/xboxControllerButtonB.png</file>
+        <file>resource/gamepad/xboxControllerButtonA.png</file>
+        <file>resource/gamepad/xboxControllerBack.png</file>
     </qresource>
 </RCC>

@@ -1,0 +1,6 @@
+module Gamepad
+ButtonImage 1.0 ButtonImage.qml
+DPad 1.0 DPad.qml
+JoystickViewer 1.0 JoystickViewer.qml
+LeftThumbstick 1.0 LeftThumbstick.qml
+RightThumbstick 1.0 RightThumbstick.qml

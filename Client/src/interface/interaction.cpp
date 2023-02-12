@@ -2,7 +2,6 @@
 #include "visionmodule.h"
 #include "globaldata.h"
 #include "maintain.h"
-#include "actionmodule.h"
 #include "globalsettings.h"
 #include "simmodule.h"
 #include "refereethread.h"
@@ -247,11 +246,11 @@ bool Interaction::connectRadio(bool sw, int color, int frq) {
         ZCommunicator::Instance()->disconnectMedusa(color);
         ZCommunicator::Instance()->connectMedusa(color);
         Debugger::Instance()->start(color);
-        Owl::ZActionModule::Instance()->disconnectRadio(color);
+        Owl::ActionModule::Instance()->closeSerialPort();
 //        RefereeThread::Instance()->run();
-        return Owl::ZActionModule::Instance()->connectRadio(color, frq);
+        return Owl::ActionModule::Instance()->openSerialPort();
     } else {
-//        return Owl::ZActionModule::Instance()->disconnectRadio(color);
+//        return Owl::ActionModule::Instance()->closeSerialPort();
         Debugger::Instance()->stop(color);
 //        RefereeThread::Instance()->disconnectTCP();
     }
@@ -464,25 +463,31 @@ void Interaction::changeVisionInterface(int index){
 }
 
 bool Interaction::connectSerialPort(bool sw){
-    if(sw){
-        return Owl::NActionModule::Instance()->openSerialPort();
+    if(!sw){
+        return Owl::ActionModule::Instance()->openSerialPort();
     }
-    return Owl::NActionModule::Instance()->closeSerialPort();
+    return Owl::ActionModule::Instance()->closeSerialPort();
 }
 bool Interaction::changeSerialFrequency(int frequency){
-    return Owl::NActionModule::Instance()->changeFrequency(frequency);
+    return Owl::ActionModule::Instance()->changeFrequency(frequency);
 }
 bool Interaction::changeSerialPort(int index){
-    return Owl::NActionModule::Instance()->changePorts(index);
+    return Owl::ActionModule::Instance()->changePorts(index);
 }
 QStringList Interaction::getSerialPortsList(){
-    return Owl::NActionModule::Instance()->updatePortsList();
+    return Owl::ActionModule::Instance()->updatePortsList();
 }
 int Interaction::getFrequency(){
-    return Owl::NActionModule::Instance()->getFrequency();
+    return Owl::ActionModule::Instance()->getFrequency();
 }
 int Interaction::getMaxFrequency(){
-    return Owl::NActionModule::Instance()->getMaxFrequency();
+    return Owl::ActionModule::Instance()->getMaxFrequency();
+}
+bool Interaction::sendCommand(int robotNum) {
+    return Owl::ActionModule::Instance()->sendLegacy(robotNum);
+}
+bool Interaction::getInfrared(int robotID) {
+    return GlobalData::Instance()->robotInformation[opm->isYellow][robotID].infrared;
 }
 void Interaction::startRecordCommands(bool start){
     ZCommunicator::Instance()->startRecordCommands(start);

@@ -7,3 +7,5 @@ ZRefButton 1.0 ZRefButton.qml
 ZRobot 1.0 ZRobot.qml
 ZSwitch 1.0 ZSwitch.qml
 ZValue 1.0 ZValue.qml
+ZSpinBox 1.0 ZSpinBox.qml
+ZText 1.0 ZText.qml

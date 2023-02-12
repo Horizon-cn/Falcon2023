@@ -8,7 +8,7 @@ import Components 1.0
 
 Page{
     id:control;
-    property bool radioConnect : false;
+    //property bool radioConnect : false;
     property bool blueRBKConnect : false;
     property bool yellowRBKConnect : false;
     property bool simConnect : false;
@@ -20,12 +20,12 @@ Page{
     Timer{
         id:oneSecond;
         interval:800;
-        running:true;
+        running:!visionControls.ifConnected; //true;
         repeat:true;
         onTriggered: {
             interaction.updateInterfaces();
             interfaces4vision.updateModel();
-            radioComboBox.updateModel();
+            //radioComboBox.updateModel();
         }
     }
 
@@ -220,7 +220,7 @@ Page{
                             }
                         }**/
                     }
-                }
+                }/**
                 ZGroupBox{
                     title: qsTr("Radio")
                     visible: !control.isSimulation;
@@ -266,7 +266,7 @@ Page{
                             }
                         }
                     }
-                }/**
+                }**//**
                 ZGroupBox{
                     title: qsTr("Cray")
                     visible: !control.isSimulation;
@@ -347,7 +347,8 @@ Page{
                                         if(!simulation.checked){
                                             interaction.connectSim(control.blueRBKConnect,0);
                                         }else{
-                                            interaction.connectRadio(control.blueRBKConnect,0,medusaFrq.value);
+                                            interaction.connectRadio(control.blueRBKConnect,0,0); // freq is useless
+                                            //interaction.connectRadio(control.blueRBKConnect,0,medusaFrq.value);
                                         }
                                         //while(myOption.processIsRunning());
                                         interaction.controlBlueRBK(control.blueRBKConnect);
@@ -398,7 +399,8 @@ Page{
                                         if(!simulation.checked){
                                             interaction.connectSim(control.yellowRBKConnect,1);
                                         }else{
-                                            interaction.connectRadio(control.yellowRBKConnect,1,medusaFrq.value);
+                                            interaction.connectRadio(control.yellowRBKConnect,1,8);
+                                            //interaction.connectRadio(control.yellowRBKConnect,1,medusaFrq.value);
                                         }
                                         //while(myOption.processIsRunning());
                                         interaction.controlYellowRBK(control.yellowRBKConnect);

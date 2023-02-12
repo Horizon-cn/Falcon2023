@@ -23,7 +23,7 @@ public slots:
 public:
     explicit ViewerInterface(QObject *parent = Q_NULLPTR){
         QObject::connect(VisionModule::Instance(),SIGNAL(needDraw()),this,SLOT(changeRobotInfo()));
-        QObject::connect(Owl::ZActionModule::Instance(),SIGNAL(receiveRobotInfo(int,int)),this,SLOT(changeRobotInfo(int,int)));
+        QObject::connect(Owl::ActionModule::Instance(),SIGNAL(receiveRobotInfo(int,int)),this,SLOT(changeRobotInfo(int,int)));
         QObject::connect(Owl::ZSimModule::Instance(),SIGNAL(receiveSimInfo(int,int)),this,SLOT(changeRobotInfo(int,int)));
     }
     enum Roles {

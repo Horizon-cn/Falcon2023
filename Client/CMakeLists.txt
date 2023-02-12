@@ -13,7 +13,7 @@ set(incs)
 set(libs)
 
 ## find Qt
-set(SRC_QT Core Widgets Quick SerialPort)
+set(SRC_QT Core Widgets Quick SerialPort Gamepad)
 foreach(component ${SRC_QT})
     list(APPEND incs ${Qt5${component}_INCLUDE_DIRS})
     list(APPEND libs Qt5::${component})
@@ -90,6 +90,7 @@ set(QML_IMPORT_PATH ${QML_DIRS})
 # FILE(GLOB QMLFILES ${QML_DIRS}/*.qml)
 FILE(GLOB QML_COMPONENTS_FILES ${QML_DIRS}/Components/*.qml)
 FILE(GLOB QML_COMPONENTSKD_FILES ${QML_DIRS}/ComponentsKD/*.qml)
+FILE(GLOB QML_GAMEPAD_FILES ${QML_DIRS}/Gamepad/*.qml)
 FILE(GLOB QML_KDDOCKWIDGETS_FILES ${QML_DIRS}/KDDockWidgets/*.qml)
 FILE(GLOB QML_WIDGETS_FILES ${QML_DIRS}/Widgets/*.qml)
 
@@ -172,6 +173,7 @@ source_group("qrc" FILES ${QRCFILES})
 # source_group("qml" FILES ${QMLFILES})
 source_group("qml\\Components" FILES ${QML_COMPONENTS_FILES})
 source_group("qml\\ComponentsKD" FILES ${QML_COMPONENTSKD_FILES})
+source_group("qml\\Gamepad" FILES ${QML_GAMEPAD_FILES})
 source_group("qml\\KDDockWidgets" FILES ${QML_KDDOCKWIDGETS_FILES})
 source_group("qml\\Widgets" FILES ${QML_WIDGETS_FILES})
 ENDIF()
@@ -203,9 +205,10 @@ set(SRC
 
     ${RCFILES}
     ${QRCFILES}
-    # ${QMLFILES}
+    ${QMLFILES}
     ${QML_COMPONENTS_FILES}
     ${QML_COMPONENTSKD_FILES}
+    ${QML_GAMEPAD_FILES}
     ${QML_KDDOCKWIDGETS_FILES}
     ${QML_WIDGETS_FILES}
     ${PROTO_CPP}

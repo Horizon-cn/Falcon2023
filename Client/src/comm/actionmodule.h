@@ -1,70 +1,50 @@
-#ifndef ZACTIONMODULE_H
-#define ZACTIONMODULE_H
-#include <QObject>
-#include <QMutex>
-#include <QUdpSocket>
+#ifndef CACTIONMODULE_H
+#define CACTIONMODULE_H
 #include <QSerialPort>
-#include "singleton.h"
+#include <singleton.h>
 #include "zss_cmd.pb.h"
-#include "src_cmd.pb.h"
 #include "staticparams.h"
 namespace Owl {
-class ActionModule : public QObject {
-    Q_OBJECT
-  public:
-    ActionModule(QObject *parent = 0);
-    ~ActionModule();
-    //void sendLegacy(int t, const Owl::Protocol::Robots_Command&);
-    void sendLegacy(int t, const rbk::protocol::SRC_Cmd&);
-    bool connectRadio(int, int);
-    bool disconnectRadio(int);
-    int team[PARAM::TEAMS];
-  private slots:
-    void readData();
-  private:
-    void sendStartPacket(int, int);
-  private:
-    QByteArray tx;
-    QByteArray rx;
-    QUdpSocket sendSocket;
-    QUdpSocket receiveSocket;
-    QMutex robotInfoMutex;
-  signals:
-    void receiveRobotInfo(int, int);
-};
-typedef Falcon::MeyersSingleton<ActionModule> ZActionModule;
-
-class ActionModuleSerialVersion : public QObject
-{
-    Q_OBJECT
-public:
-    ActionModuleSerialVersion(QObject *parent = 0);
-    ~ActionModuleSerialVersion();
-    bool changeFrequency(int);
-    int getFrequency(){return frequency;}
-    int getMaxFrequency(){return 9;}
-    QStringList& updatePortsList();
-    bool changePorts(int);
-    std::string getSerialPort(){return serial.portName().toStdString();}
-    bool openSerialPort();
-    bool closeSerialPort();
-    void setMedusaSettings(bool,bool);
-    void sendLegacy(const ZSS::Protocol::Robots_Command&);
-    QSerialPort serial;
-signals:
-    void receiveRobotInfo(int,int);
-private slots:
-    void readData();
-private:
-    void sendStartPacket();
-private:
-    QStringList ports;
-    int frequency = 8;
-    QByteArray tx;
-    QByteArray rx;
-    int _color;
-    int _side;
-};
-typedef Falcon::MeyersSingleton<ActionModuleSerialVersion> NActionModule;
+	class CActionModule : public QObject
+	{
+		Q_OBJECT
+	public:
+		CActionModule(QObject* parent = 0);
+		~CActionModule();
+		bool changeFrequency(int);
+        int getFrequency() { return frequency; }
+        int getMaxFrequency() { return 9; }
+        QStringList& updatePortsList();
+        bool changePorts(int);
+        std::string getSerialPort() { return serial.portName().toStdString(); }
+        bool openSerialPort();
+        bool closeSerialPort();
+        void updateCommandParams(int, int, int, int, int, bool, int, bool, bool, int);
+        bool sendLegacy(int);
+        bool encode(int);
+        bool encodeNew(int);
+        QSerialPort serial;
+    signals:
+        void receiveRobotInfo(int, int);
+    private slots:
+        void readData();
+    private:
+        void sendStartPacket();
+    private:
+        QStringList ports;
+        int frequency;
+        QByteArray tx;
+        QByteArray rx;
+        bool shoot[PARAM::ROBOTMAXID];
+        bool ctrl[PARAM::ROBOTMAXID];
+        bool shootMode[PARAM::ROBOTMAXID];//false is "flat shoot" and true is "lift shoot".
+        int robotID[PARAM::ROBOTMAXID];
+        int velX[PARAM::ROBOTMAXID];
+        int velY[PARAM::ROBOTMAXID];
+        int velR[PARAM::ROBOTMAXID];
+        int ctrlPowerLevel[PARAM::ROBOTMAXID];
+        int shootPowerLevel[PARAM::ROBOTMAXID];
+    };
+    typedef Falcon::MeyersSingleton<CActionModule> ActionModule;
 }
-#endif // ZACTIONMODULE_H
+#endif // CACTIONMODULE_H

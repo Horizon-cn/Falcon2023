@@ -7,7 +7,7 @@ GroupBox{
     label: Rectangle {
         x:parent.leftPadding;
         y:-12;
-        color: "#303030"
+        color: "#303030" //"#333"
         Text {
             text: parent.parent.title;
             color:"white"

@@ -35,7 +35,7 @@ void Communicator::setGrsimInterfaceIndex(const int index) {
 Communicator::Communicator(QObject *parent) : QObject(parent) {
     QObject::connect(Owl::ZSimModule::Instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)));
     QObject::connect(ZSS::ZRemoteSimModule::Instance(), SIGNAL(receiveRemoteInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
-    QObject::connect(Owl::ZActionModule::Instance(), SIGNAL(receiveRobotInfo(int, int)), this, SLOT(sendCommand(int, int)));
+    QObject::connect(Owl::ActionModule::Instance(), SIGNAL(receiveRobotInfo(int, int)), this, SLOT(sendCommand(int, int)));
     for(int i = 0; i < PARAM::TEAMS; i++) {
         /** connect(&receiveSocket[i], &QUdpSocket::readyRead, [ = ]() {
             receiveCommand(i);
@@ -96,8 +96,12 @@ void Communicator::receiveCommand(int t) {
                 else
                     ZSS::ZRemoteSimModule::Instance()->sendSim(t, commands);
             } else {
-                //Owl::ZActionModule::Instance()->sendLegacy(t, commands);
-                Owl::NActionModule::Instance()->sendLegacy(commands);
+                for (int i = 0; i < commands.command_size(); i++) {
+                    auto command = commands.command(i);
+                    Owl::ActionModule::Instance()->updateCommandParams(i, command.robot_id(), command.velocity_x()*100, command.velocity_y()*100, 
+                        command.velocity_r()*40, command.dribbler_spin()>0, command.dribbler_spin()*3, command.kick(), command.power()>0, command.power()*100);
+                }                
+                Owl::ActionModule::Instance()->sendLegacy(commands.command_size());
             }
             //if(opm->isSimulation) Owl::ZSimModule::Instance()->sendEmptySim();
         }

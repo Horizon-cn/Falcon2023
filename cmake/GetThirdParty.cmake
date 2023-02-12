@@ -24,7 +24,7 @@ IF(WIN32)
 	## if you have different Qt visions and CMake cannot link the right one
     #set(CMAKE_PREFIX_PATH D:/App/Qt/5.14.1/msvc2015_64/lib/cmake)
 ENDIF()
-find_package(Qt5 COMPONENTS Core Quick QuickControls2 SerialPort Widgets Network Gui Qml OpenGL REQUIRED)
+find_package(Qt5 COMPONENTS Core Quick QuickControls2 SerialPort Widgets Network Gui Qml OpenGL Gamepad REQUIRED)
 
 ## KDDockWidgets
 include(${CMAKE_SOURCE_DIR}/cmake/GetKDDockWidgets.cmake)
