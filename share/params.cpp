@@ -28,7 +28,8 @@ namespace Falcon {
         return true;
     }
     bool ParamManager::loadParam(int& value, const QString& key, int defaultValue) {
-        value = settings->value(key, defaultValue).toInt();
+        //value = settings->value(key, defaultValue).toInt();
+        value = (int)settings->value(key, defaultValue).toDouble(); // 避免类型错误直接为0
         if (!settings->contains(key)) {
             settings->setValue(key, defaultValue);
             settings->sync();

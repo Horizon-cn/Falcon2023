@@ -166,7 +166,7 @@ void CActionModule::sendToOwl(const rbk::protocol::SRC_Cmd& cmds)
             zss_cmd->set_kick(false);
             zss_cmd->set_power(0);
         }
-    }
+	}
     //·¢ËÍcmd//
 	int port = isYellow ? CParamManager::Instance()->yellow_control : CParamManager::Instance()->blue_control;
     int size = ZSS_CMDS.ByteSize();

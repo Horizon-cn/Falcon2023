@@ -307,7 +307,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
         int KICKPOWER;
         int CHIPPOWER;
         int ADV_FPASSPOWER;
-        int ADV_CPASSPOWER;
+        double ADV_CPASSPOWER;
         int RELIEF_POWER;
         int  BACK_POWER;
         int BACK_POWER_V3;

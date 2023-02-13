@@ -36,7 +36,7 @@ CAdvance::CAdvance()
 	KICKPOWER = paramManager->KICKPOWER;
 	CHIPPOWER = paramManager->CHIPPOWER; // 暂时不用了
     ADV_FPASSPOWER_Alpha = paramManager->ADV_FPASSPOWER;
-    ADV_CPASSPOWER_Alpha = paramManager->ADV_CPASSPOWER;
+	ADV_CPASSPOWER_Alpha = paramManager->ADV_CPASSPOWER;
     // max:600 350
 	RELIEF_POWER = paramManager->RELIEF_POWER;
     BACK_POWER = paramManager->BACK_POWER;

@@ -21,18 +21,10 @@ find_package(VarTypes)
 
 ## QT
 IF(WIN32)
-	## if you have different Qt visions and CMake cannot link the right one, you can manually set the correct path or use the environment variable
-    option(USE_ENV_FINDQT OFF)
-    option(CUSTOM_PATH_FINDQT OFF)
-    
-    if (USE_ENV_FINDQT)
-        set(CMAKE_PREFIX_PATH $ENV{QT_CMAKE})
-        message("USE_ENV_FINDQT : $ENV{QT_CMAKE}")
-    elseif (CUSTOM_PATH_FINDQT)
-        set(CUSTOM_PATH_QT "D:/QT/5.15.2/msvc2019_64/lib/cmake/Qt5")
-        set(CMAKE_PREFIX_PATH ${CUSTOM_PATH_QT})
-        message("CUSTOM_PATH_FINDQT : ${CUSTOM_PATH_QT}")
-    endif()
+	## if you have different Qt visions and CMake cannot link the right one, you can manually set the correct path or use the environment variable    
+    #set(CMAKE_PREFIX_PATH $ENV{QT_CMAKE})
+    set(CMAKE_PREFIX_PATH "D:/QT/5.15.2/msvc2019_64/lib/cmake/Qt5")
+    #message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}")
 ENDIF()
 find_package(Qt5 COMPONENTS Core Quick QuickControls2 SerialPort Widgets Network Gui Qml OpenGL Gamepad REQUIRED)
 
