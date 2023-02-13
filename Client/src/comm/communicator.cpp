@@ -98,7 +98,7 @@ void Communicator::receiveCommand(int t) {
             } else {
                 for (int i = 0; i < commands.command_size(); i++) {
                     auto command = commands.command(i);
-                    Owl::ActionModule::Instance()->updateCommandParams(i, command.robot_id(), command.velocity_x()*100, command.velocity_y()*100, 
+                    Owl::ActionModule::Instance()->updateCommandParams(command.robot_id(), command.velocity_x()*100, command.velocity_y()*100, 
                         command.velocity_r()*40, command.dribbler_spin()>0, command.dribbler_spin()*3, command.kick(), command.power()>0, command.power()*100);
                 }                
                 Owl::ActionModule::Instance()->sendLegacy(commands.command_size());

@@ -19,7 +19,7 @@ namespace Owl {
         std::string getSerialPort() { return serial.portName().toStdString(); }
         bool openSerialPort();
         bool closeSerialPort();
-        void updateCommandParams(int, int, int, int, int, bool, int, bool, bool, int);
+        void updateCommandParams(int, int, int, int, bool, int, bool, bool, int);
         bool sendLegacy(int);
         bool encode(int);
         bool encodeNew(int);

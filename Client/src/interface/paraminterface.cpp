@@ -58,6 +58,8 @@ bool ParamInterface::setData(const QModelIndex &index, const QVariant &value,int
         Owl::SKParamManager::Instance()->updateParam(item->parentItem()->data(0), item->data(0), value, true);
     else if (current_pm == "vision")
         Owl::VParamManager::Instance()->updateParam(item->parentItem()->data(0), item->data(0), value, true);
+    else if (current_pm == "kickparam")
+        Owl::KParamManager::Instance()->updateParam(item->parentItem()->data(0), item->data(0), value, true);
     else
         Owl::OParamManager::Instance()->updateParam(item->parentItem()->data(0),item->data(0),value,true);
     qDebug() << item->parentItem()->data(0) << item->data(0) << value.toString();
@@ -122,6 +124,10 @@ void ParamInterface::reload(){
     else if (current_pm == "vision") {
         Owl::VParamManager::Instance()->sync();
         Owl::VParamManager::Instance()->loadParamFromFile();
+    }
+    else if (current_pm == "kickparam") {
+        Owl::KParamManager::Instance()->sync();
+        Owl::KParamManager::Instance()->loadParamFromFile();
     }
     else {
         Owl::OParamManager::Instance()->sync();
@@ -192,6 +198,8 @@ void ParamInterface::setupModelData(){
         setParamTree(Owl::SKParamManager::Instance());
     else if (current_pm == "vision")
         setParamTree(Owl::VParamManager::Instance());
+    else if (current_pm == "kickparam")
+        setParamTree(Owl::KParamManager::Instance());
     else
         setParamTree(Owl::OParamManager::Instance());
 }

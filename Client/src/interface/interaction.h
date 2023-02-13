@@ -63,9 +63,7 @@ class Interaction : public QObject {
     Q_INVOKABLE QStringList getSerialPortsList();
     Q_INVOKABLE int getFrequency();
     Q_INVOKABLE int getMaxFrequency();
-    Q_INVOKABLE void updateCommandParams(int robotNum, int robotID, int velX, int velY, int velR, bool dribble, int dribbleLevel, bool mode, bool shoot, int power) {
-        Owl::ActionModule::Instance()->updateCommandParams(robotNum, robotID, velX, velY, velR, dribble, dribbleLevel, mode, shoot, power);
-    }
+    Q_INVOKABLE void updateCommandParams(int, int, int, int, bool, int, bool, bool, int);
     Q_INVOKABLE bool sendCommand(int);
     Q_INVOKABLE bool getInfrared(int);
 

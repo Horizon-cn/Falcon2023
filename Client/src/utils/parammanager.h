@@ -5,6 +5,7 @@
 #include <QString>
 #include <QDebug>
 #include "singleton.h"
+#include "staticparams.h"
 #include "params.h"
 
 namespace Owl {
@@ -275,10 +276,41 @@ class ParamManagerVision: public Falcon::ParamManager {
     double chipAngle;
     double total_lated_frame;   
 };
-class ParamManagerKickParam: public Falcon::ParamManager {
-  public:
-    ParamManagerKickParam(): ParamManager("../data/kickparam.ini") {}
+class ParamManagerKickParam : public Falcon::ParamManager {
+public:
+    ParamManagerKickParam() : ParamManager("../data/kickparam.ini") {}
     ~ParamManagerKickParam() {}
+    template <class T>
+    void updateParam(T& var, const QString& key, const QVariant& value, bool update) {
+        changeParam(key, value);
+        if (update) loadParam(var, key); //loadParamFromFile();
+    }
+    void updateParam(const QString& group, const QString& key, const QVariant& value, bool update) {
+        changeParam(group, key, value);
+        if (update) loadParamFromFile();
+    }
+    void loadParamFromFile() {
+        qDebug() << "load" + filename;
+        loadParam(convertPower, "General/convertPower", true);
+        for (int i = 0; i < PARAM::ROBOTMAXID; i++) {
+            loadParam(flat_a[i], QString("Robot%1/flat_a").arg(i), 0);
+            loadParam(flat_b[i], QString("Robot%1/flat_b").arg(i), 18.14);
+            loadParam(flat_c[i], QString("Robot%1/flat_c").arg(i), 100);
+            loadParam(chip_a[i], QString("Robot%1/chip_a").arg(i), 0);
+            loadParam(chip_b[i], QString("Robot%1/chip_b").arg(i), 32);
+            loadParam(chip_c[i], QString("Robot%1/chip_c").arg(i), 0);
+            loadParam(flat_max[i], QString("Robot%1/flat_max").arg(i), 127);
+            loadParam(flat_min[i], QString("Robot%1/flat_min").arg(i), 60);
+            loadParam(chip_max[i], QString("Robot%1/chip_max").arg(i), 127);
+            loadParam(chip_min[i], QString("Robot%1/chip_min").arg(i), 30);
+        }
+    }
+public:
+    bool convertPower;
+    double flat_a[PARAM::ROBOTMAXID], flat_b[PARAM::ROBOTMAXID], flat_c[PARAM::ROBOTMAXID];
+    double chip_a[PARAM::ROBOTMAXID], chip_b[PARAM::ROBOTMAXID], chip_c[PARAM::ROBOTMAXID];
+    int flat_max[PARAM::ROBOTMAXID], flat_min[PARAM::ROBOTMAXID];
+    int chip_max[PARAM::ROBOTMAXID], chip_min[PARAM::ROBOTMAXID];
 };
 class ParamManagerLogClip: public Falcon::ParamManager {
   public:

@@ -29,7 +29,15 @@ list(APPEND incs ${OPENGL_INCLUDE_DIR})
 list(APPEND libs ${OPENGL_LIBRARIES})
 
 # Qt
-list(APPEND libs Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network)
+# list(APPEND libs Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network)
+set(SRC_QT Core Widgets OpenGL Network)
+foreach(component ${SRC_QT})
+    list(APPEND incs ${Qt5${component}_INCLUDE_DIRS})
+    list(APPEND libs Qt5::${component})
+endforeach()
+if (WIN32)
+    list(APPEND libs Qt5::WinMain)
+endif()
 
 # ODE
 list(APPEND incs ${ODE_INCLUDE_DIRS})

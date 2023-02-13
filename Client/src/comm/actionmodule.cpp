@@ -6,11 +6,12 @@
 namespace Owl {
     namespace {
         const int TRANSMIT_PACKET_SIZE = 25;
-        const int TRANS_FEEDBACK_SIZE = 25; //18;
+        const int TRANS_FEEDBACK_SIZE = 25; //18; //20;
         const int ROBOTS_PER_PACKET = 4; //3;
         const int MAX_PACKET_NUM = 4;
 
         auto opm = OParamManager::Instance();
+        auto kpm = KParamManager::Instance();
 
         int limit_speed(int vel) {
             if (abs(vel) > 511) {
@@ -20,6 +21,33 @@ namespace Owl {
                     return -511;
             }
             return vel;
+        }
+        int convertKickPower(int num, int mode, int power) {
+            if (num >= PARAM::ROBOTMAXID) return 0;
+            power = fabs(power); // 防止离谱的错误参数
+            if (kpm->convertPower) {
+                if (mode == 0) {
+                    power = (int)(0.00001 * kpm->flat_a[num] * power * power + kpm->flat_b[num] * power + kpm->flat_c[num]);
+                    if (power > kpm->flat_max[num]) {
+                        power = kpm->flat_max[num];
+                    }
+                    else if (power < kpm->flat_min[num]) {
+                        power = kpm->flat_min[num];
+                    }
+                }
+                else if (mode == 1) {
+                    int newPower = 0;
+                    newPower = (int)(kpm->chip_a[num] * power * power + kpm->chip_b[num] * power + kpm->chip_c[num]);
+                    if (newPower > kpm->chip_max[num] || power > 400) {
+                        newPower = kpm->chip_max[num];
+                    }
+                    else if (newPower < kpm->chip_min[num]) {
+                        newPower = kpm->chip_min[num];
+                    }
+                    power = newPower;
+                }
+            }          
+            return (power > 127 ? 127 : power);
         }
     }
 	CActionModule::CActionModule(QObject* parent) : QObject(parent) {
@@ -127,18 +155,18 @@ namespace Owl {
         serial.write(startPacket2);
         serial.flush();
     }
-    void CActionModule::updateCommandParams(int robotNum, int robotID, int velX, int velY, int velR, bool ctrl, int ctrlLevel, bool mode, bool shoot, int power) {
-        this->robotID[robotNum] = robotID;
+    void CActionModule::updateCommandParams(int robotID, int velX, int velY, int velR, bool ctrl, int ctrlLevel, bool mode, bool shoot, int power) {
+        this->robotID[robotID] = robotID;
         this->velX[robotID] = limit_speed(velX); this->velY[robotID] = limit_speed(velY); this->velR[robotID] = limit_speed(velR);
         this->ctrl[robotID] = ctrl;
-        this->shootMode[robotID] = mode; this->shoot[robotID] = shoot; this->shootPowerLevel[robotID] = power > 127 ? 127 : power;
+        this->shootMode[robotID] = mode; this->shoot[robotID] = shoot; this->shootPowerLevel[robotID] = convertKickPower(robotID, mode, power);
         this->ctrlPowerLevel[robotID] = ctrlLevel;
     }
     //发送指令
     bool CActionModule::sendLegacy(int robotNum) {
         static int packetNum = 0;
         if (serial.portName() != "") {
-            std::sort(robotID, robotID + robotNum);
+            std::sort(robotID, robotID + PARAM::ROBOTMAXID);
             //qDebug()<<"robotNum"<<robotNum;
             for (int i = 0; i <= MAX_PACKET_NUM; i++) {
                 if (robotNum <= i * ROBOTS_PER_PACKET) {
@@ -153,6 +181,7 @@ namespace Owl {
                 //if (shoot[0]) qDebug() << shoot[0] << "command" << tx.toHex();
                 serial.write(tx.data(), TRANSMIT_PACKET_SIZE);
                 serial.flush();
+                //serial.waitForBytesWritten(TRANSMIT_PACKET_SIZE * 8.0 * 1000 / 115200 + 0.6); //ms 延时包括串口传输和发射机发送时间
             }
             std::fill_n(robotID, PARAM::ROBOTMAXID, PARAM::ROBOTMAXID);
             return true;

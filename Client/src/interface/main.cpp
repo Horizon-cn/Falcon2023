@@ -77,11 +77,13 @@ int main(int argc, char *argv[]) {
     Owl::LParamManager::Instance()->setFileName();
     Owl::SIParamManager::Instance()->setFileName();
     Owl::SKParamManager::Instance()->setFileName();
+    Owl::KParamManager::Instance()->setFileName();
     Owl::OParamManager::Instance()->loadParamFromFile();
     Owl::VParamManager::Instance()->loadParamFromFile();
     Owl::CParamManager::Instance()->loadParamFromFile();
     Owl::SIParamManager::Instance()->loadParamFromFile();
     Owl::SKParamManager::Instance()->loadParamFromFile();
+    Owl::KParamManager::Instance()->loadParamFromFile();
     Owl::LParamManager::Instance()->clear();
     GlobalData::Instance();
     // 注册QML接口

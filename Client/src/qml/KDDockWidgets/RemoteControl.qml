@@ -142,7 +142,9 @@ Page{
                                     if(crazyStart.ifStarted) crazyStart.handleClickEvent();
                                     interaction.connectSerialPort(ifConnected);
                                 }else{
-                                    interaction.connectSerialPort(ifConnected);
+                                    if(radioComboBox.currentText != ""){
+                                        interaction.connectSerialPort(ifConnected);
+                                    }
                                 }
                                 ifConnected = !ifConnected;
                             }
@@ -169,10 +171,11 @@ Page{
                                 property bool shoot : false;//Shoot
                                 property bool dribble : false;//Dribble
 
-                                property int velXStep : 20;//VxStep
-                                property int velYStep : 20;//VyStep
-                                property int velRStep : 20;//VrStep
-                                property bool mode : false;//KickMode
+                                property int velXStep : 15;//VxStep
+                                property int velYStep : 15;//VyStep
+                                property int velRStep : 15;//VrStep
+                                property int mode : 2;//KickMode
+                                property int modeTypes : 4;//num of KickMode
                                 property int dribbleLevel : 2;//DribLevel
                                 property int rushSpeed : 100;//RushSpeed
 
@@ -185,13 +188,14 @@ Page{
                                 property int velocityMax : 511;//最大速度
                                 property int dribbleMaxLevel : 3;//吸球最大等级
                                 property int kickPowerMax: 127;//最大踢球力量
+                                property int convertPowerMax: 800;//最大踢球力量
                                 
                                 property bool infrared: false;
                                 property bool autoShoot: false;
                                 property bool autoDribble: false;
                                 property bool rush: false;
                                 property bool back: false;
-                                property int itemWidth : 95;
+                                property int itemWidth : 99;
 
                                 ZText{ text:qsTr("Robot") }
                                 //最多12辆车
@@ -248,14 +252,24 @@ Page{
                                     }
                                 }
                                 ZText{ text:qsTr("KickMode [X]") }
-                                Control.Button{ text:(parent.mode?qsTr("chip"):qsTr("flat"));width:parent.itemWidth
+                                Control.Button{ text:selectMode();width:parent.itemWidth
                                     onClicked: {
-                                        parent.mode = !parent.mode
+                                        parent.mode = (parent.mode + 1) % parent.modeTypes;
+                                    }
+                                    function selectMode() {
+                                        if (parent.mode == 0) 
+                                            return "convert flat";
+                                        else if (parent.mode == 1)
+                                            return "convert chip";
+                                        else if (parent.mode == 2)
+                                            return "flat";
+                                        else 
+                                            return "chip";
                                     }
                                 }
                                 ZText{ text:qsTr("KickPower") }
                                 //KickPower:(1, kickPowerMax)
-                                ZSpinBox{ minimumValue:0; maximumValue:parent.kickPowerMax; value:parent.power;width:parent.itemWidth
+                                ZSpinBox{ minimumValue:0; maximumValue:parent.mode>1? parent.kickPowerMax:parent.convertPowerMax; value:parent.power;width:parent.itemWidth
                                     onEditingFinished:{parent.power = value;}}
                                 ZText{ text:qsTr("Dribble [Q]") }
                                 Control.Button{ text:(parent.dribble ? qsTr("true") : qsTr("false"));width:parent.itemWidth
@@ -263,8 +277,8 @@ Page{
                                         parent.dribble = !parent.dribble;
                                     }
                                 }
-                                ZText{ text:qsTr("DribLevel") }
-                                //DribLevel:(0, dribbleMaxLevel)
+                                ZText{ text:qsTr("DribbleLevel") }
+                                //DribbleLevel:(0, dribbleMaxLevel)
                                 ZSpinBox{ minimumValue:0; maximumValue:crazyShow.dribbleMaxLevel; value:parent.dribbleLevel;width:parent.itemWidth
                                     onEditingFinished:{parent.dribbleLevel = value;}}
                                 Rectangle{
@@ -293,12 +307,14 @@ Page{
                                 ZText{ text:qsTr("Rush") }
                                 Control.Button{ text:(parent.rush ? qsTr("true") : qsTr("false"));width:parent.itemWidth;
                                     onClicked: {
+                                        //parent.rush = !parent.rush;
                                         //crazyShow.updateRush();
                                     }
                                 }
                                 ZText{ text:qsTr("Back") }
                                 Control.Button{ text:(parent.back ? qsTr("true") : qsTr("false"));width:parent.itemWidth;
                                     onClicked: {
+                                        //parent.back = !parent.back;
                                         //crazyShow.updateBack();
                                     }
                                 }
@@ -323,11 +339,11 @@ Page{
                                     crazyShow.velR = parseInt(gamepad.axisRightX*10)/10.0*crazyShow.m_VELR*0.3;
                                     crazyShow.power = parseInt(gamepad.buttonL2*10)/10.0*crazyShow.kickPowerMax;
                                     if(gamepad.buttonX > 0){    
-                                        crazyShow.mode = true;
+                                        crazyShow.mode = 3;
                                         crazyShow.shoot = gamepad.buttonX;
                                     }
                                     else if(gamepad.buttonY > 0){
-                                        crazyShow.mode = false;
+                                        crazyShow.mode = 2;
                                         crazyShow.shoot = gamepad.buttonY;
                                     }
                                     else{
@@ -374,7 +390,7 @@ Page{
                                         crazyShow.velX = crazyShow.rushSpeed;
                                         crazyShow.velY = 0;
                                         crazyShow.velR = 0;
-                                        crazyShow.shoot = false;
+                                        crazyShow.shoot = false; // true;
                                         crazyShow.dribble = false;
                                         crazyShow.autoShoot = true;
                                         crazyShow.autoDribble = false;
@@ -412,7 +428,7 @@ Page{
                                 }
                                 function handleKeyboardEvent(e){
                                     switch(e){
-                                    case 'x':{crazyShow.mode = !crazyShow.mode;break;}
+                                    case 'x':{crazyShow.mode = (crazyShow.mode + 1) % crazyShow.modeTypes;break;}
                                     case 'a':{crazyShow.velY = crazyShow.limitVel(crazyShow.velY-crazyShow.velYStep,-crazyShow.m_VELY,crazyShow.m_VELY);
                                         break;}
                                     case 'd':{crazyShow.velY = crazyShow.limitVel(crazyShow.velY+crazyShow.velYStep,-crazyShow.m_VELY,crazyShow.m_VELY);
@@ -441,7 +457,7 @@ Page{
                                 }
                                 //interaction.updateCommandParams在C++中实现
                                 function updateCommand(){
-                                    interaction.updateCommandParams(0,crazyShow.robotID,crazyShow.velX,crazyShow.velY,crazyShow.velR,crazyShow.dribble,crazyShow.dribbleLevel,crazyShow.mode,crazyShow.shoot,crazyShow.power);
+                                    interaction.updateCommandParams(crazyShow.robotID,crazyShow.velX,crazyShow.velY,crazyShow.velR,crazyShow.dribble,crazyShow.dribbleLevel,crazyShow.mode,crazyShow.shoot,crazyShow.power);
                                 }
                                 function limitVel(vel,minValue,maxValue){
                                     if(vel>maxValue) return maxValue;
