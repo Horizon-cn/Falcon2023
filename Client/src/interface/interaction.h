@@ -63,7 +63,7 @@ class Interaction : public QObject {
     Q_INVOKABLE QStringList getSerialPortsList();
     Q_INVOKABLE int getFrequency();
     Q_INVOKABLE int getMaxFrequency();
-    Q_INVOKABLE void updateCommandParams(int, int, int, int, bool, int, bool, bool, int);
+    Q_INVOKABLE void updateCommandParams(int, int, int, int, bool, int, int, bool, int);
     Q_INVOKABLE bool sendCommand(int);
     Q_INVOKABLE bool getInfrared(int);
 

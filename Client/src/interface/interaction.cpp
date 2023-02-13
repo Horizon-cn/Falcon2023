@@ -483,14 +483,18 @@ int Interaction::getFrequency(){
 int Interaction::getMaxFrequency(){
     return Owl::ActionModule::Instance()->getMaxFrequency();
 }
-void Interaction::updateCommandParams(int robotID, int velX, int velY, int velR, bool dribble, int dribbleLevel, bool mode, bool shoot, int power) {
-    if (mode <= 1) {
-        Owl::KParamManager::Instance()->updateParam(Owl::KParamManager::Instance()->convertPower, "General/convertPower", true, true);
+void Interaction::updateCommandParams(int robotID, int velX, int velY, int velR, bool dribble, int dribbleLevel, int mode, bool shoot, int power) {
+    static int last_mode = -1;
+    if (mode != last_mode) {
+        last_mode = mode;
+        if (mode <= 1) {
+            Owl::KParamManager::Instance()->updateParam(Owl::KParamManager::Instance()->convertPower, "General/convertPower", true, true);
+        }
+        else {
+            Owl::KParamManager::Instance()->updateParam(Owl::KParamManager::Instance()->convertPower, "General/convertPower", false, true);        
+        }
     }
-    else {
-        Owl::KParamManager::Instance()->updateParam(Owl::KParamManager::Instance()->convertPower, "General/convertPower", false, true);
-        mode = mode % 2; // 处理RemoteControl里的特殊mode，actionmodule只接受0/1
-    }
+    mode = mode % 2; // 处理RemoteControl里的特殊mode，actionmodule只接受0/1
     Owl::ActionModule::Instance()->updateCommandParams(robotID, velX, velY, velR, dribble, dribbleLevel, mode, shoot, power);
 }
 bool Interaction::sendCommand(int robotNum) {

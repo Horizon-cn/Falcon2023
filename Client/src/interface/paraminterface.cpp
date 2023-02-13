@@ -61,7 +61,7 @@ bool ParamInterface::setData(const QModelIndex &index, const QVariant &value,int
     else if (current_pm == "kickparam")
         Owl::KParamManager::Instance()->updateParam(item->parentItem()->data(0), item->data(0), value, true);
     else
-        Owl::OParamManager::Instance()->updateParam(item->parentItem()->data(0),item->data(0),value,true);
+        Owl::OParamManager::Instance()->updateParam(item->parentItem()->data(0), item->data(0), value, true);
     qDebug() << item->parentItem()->data(0) << item->data(0) << value.toString();
     emit dataChanged(index, index);
     return true;
@@ -98,7 +98,7 @@ void ParamInterface::reload(){
         if (s.count() > 0) str = s[0];
         comboBox->addItem(str);
     }
-    comboBox->setCurrentIndex(0);
+    comboBox->setCurrentText(current_pm);
     form.addRow(comboBox);
     // Add Cancel and OK button
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);

@@ -4,7 +4,8 @@
 ::获取QT路径
 IF NOT EXIST package.txt (
    setlocal EnableDelayedExpansion
-   set /p var=Where is QT :
+   echo For the first time, you need to tell me
+   set /p var=Where is QT QML:
    ::echo !var! 
    echo !var!>>package.txt
    set /p qml=Where is Custom QML :
@@ -28,8 +29,8 @@ IF NOT EXIST package.txt (
 ::QT的脚本，Qt\5.15.2\msvc2019\bin下的qtenv2.bat
 echo Setting up environment for Qt usage...
 ::echo %var% 
-set PATH=%var%\bin;%PATH%
-cd /D %var%
+set PATH=%var%\..\bin;%PATH%
+cd /D %var%\..\
 ::echo %PATH%
 echo Remember to call vcvarsall.bat to complete environment setup!
 
@@ -37,7 +38,7 @@ echo Remember to call vcvarsall.bat to complete environment setup!
 echo Current dir is %~dp0%
 cd /D %~dp0%\base
 windeployqt -force Client.exe --qmldir %qml%
-::%var%\qml
+::%var%
 windeployqt -force Core.exe
 windeployqt -force grSim.exe
 
