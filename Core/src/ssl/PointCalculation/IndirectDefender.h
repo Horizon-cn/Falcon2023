@@ -22,14 +22,14 @@ class CVisionModule;
 using namespace std;
 /**
 @brief    防守对方定位球开球小车的站位点*/
-typedef struct{
+typedef struct KickOffArea {
 	CGeoPoint _Left;
 	CGeoPoint _Right;
 	double baseDir;
 	double radius;
 }KickOffArea;
 
-typedef struct{
+typedef struct TwoKickPos {
 	CGeoPoint onePos;
 	CGeoPoint anotherPos;
 	CGeoPoint getOnePos(){return onePos;}

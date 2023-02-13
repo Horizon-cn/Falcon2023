@@ -1,5 +1,5 @@
 IF (WIN32)
-    set(LIBPROTOBUF_DIR ${THIRDPARTY_LIB_DIR}/protobuf)
+    set(LIBPROTOBUF_DIR ${THIRDPARTY_LIB_DIR}/protobuf-3.17.2)
     list(APPEND CMAKE_PREFIX_PATH ${LIBPROTOBUF_DIR})
     message("Find Protobuf : ${LIBPROTOBUF_DIR}")
     # set(Protobuf_INCLUDE_DIR ${LIBPROTOBUF_DIR}/include)

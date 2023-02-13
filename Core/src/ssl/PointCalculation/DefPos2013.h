@@ -4,7 +4,7 @@
 #include <singleton.h>
 #include "DefendUtils.h"
 
-typedef struct  
+typedef struct defend2013
 {
 	CGeoPoint leftD;	///<左后卫站位点
 	CGeoPoint rightD;	///<右后卫站位点

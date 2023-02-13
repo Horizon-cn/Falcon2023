@@ -11,7 +11,7 @@ typedef int ourNum;
 typedef pair<oppNum,ourNum> _markPair;
 typedef vector<_markPair> _markList;        //盯人表,包括持球人的盯防
 
-typedef struct{ 		//动态形势下，对方离球最近的一个人的基本情况，我们这里称其为对手持球人
+typedef struct _ballKeeper { 		//动态形势下，对方离球最近的一个人的基本情况，我们这里称其为对手持球人
 	int num;			//对手持球人的号码
 	CGeoPoint pos;		//对手持球人的位置
 	double dir;			//对手持球人的朝向

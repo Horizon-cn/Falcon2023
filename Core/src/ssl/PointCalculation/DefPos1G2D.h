@@ -23,7 +23,7 @@
 
 /** 
 @brief  门将站位点和后卫站位点的结构体 */
-typedef struct  
+typedef struct defend3
 {
 	CGeoPoint leftD;	///<左后卫站位点
 	CGeoPoint rightD;	///<右后卫站位点
