@@ -210,19 +210,19 @@ namespace Owl {
             tx[i * 4 + 3] = tx[i * 4 + 3] | (ctrl[real_num] ? ((ctrlPowerLevel[real_num] & 0x03) << 4) : 0);
             // vx
             tx[i * 4 + 4] = ((velX[real_num] >= 0) ? 0 : 0x80) | (abs(velX[real_num]) & 0x7f);
-            if (tx[i * 4 + 4] == char(0x7F)) {
-                tx[i * 4 + 4] = 0x7E;
+            if (tx[i * 4 + 4] == char(0xFF)) {
+                tx[i * 4 + 4] = 0xFE;
             }
             //qDebug()<<"velX"<<velX[real_num];
             // vy 
             tx[i * 4 + 5] = ((velY[real_num] >= 0) ? 0 : 0x80) | (abs(velY[real_num]) & 0x7f);
-            if (tx[i * 4 + 5] == char(0x7F)) {
-                tx[i * 4 + 5] = 0x7E;
+            if (tx[i * 4 + 5] == char(0xFF)) {
+                tx[i * 4 + 5] = 0xFE;
             }
             // vr
             tx[i * 4 + 6] = ((velR[real_num] >= 0) ? 0 : 0x80) | (abs(velR[real_num]) & 0x7f);
-            if (tx[i * 4 + 6] == char(0x7F)) {
-                tx[i * 4 + 6] = 0x7E;
+            if (tx[i * 4 + 6] == char(0xFF)) {
+                tx[i * 4 + 6] = 0xFE;
             }
             tx[i * 1 + 15] = ((abs(velX[real_num]) & 0x180) >> 1) | ((abs(velY[real_num]) & 0x180) >> 3) | ((abs(velR[real_num]) & 0x180) >> 5);
             // kick pow
@@ -251,19 +251,19 @@ namespace Owl {
             tx[i * 4 + 3] = tx[i * 4 + 3] | (ctrl[real_num] ? ((ctrlPowerLevel[real_num] & 0x03) << 4) : 0);
             // vx
             tx[i * 4 + 4] = ((velX[real_num] >= 0) ? 0 : 0x80) | (abs(velX[real_num]) & 0x7f);
-            if (tx[i * 4 + 4] == char(0x7F)) {
-                tx[i * 4 + 4] = 0x7E;
+            if (tx[i * 4 + 4] == char(0xFF)) {
+                tx[i * 4 + 4] = 0xFE;
             }
             //qDebug()<<"velX"<<velX[real_num];
             // vy 
             tx[i * 4 + 5] = ((velY[real_num] >= 0) ? 0 : 0x80) | (abs(velY[real_num]) & 0x7f);
-            if (tx[i * 4 + 5] == char(0x7F)) {
-                tx[i * 4 + 5] = 0x7E;
+            if (tx[i * 4 + 5] == char(0xFF)) {
+                tx[i * 4 + 5] = 0xFE;
             }
             // vr
             tx[i * 4 + 6] = ((velR[real_num] >= 0) ? 0 : 0x80) | (abs(velR[real_num]) & 0x7f);
-            if (tx[i * 4 + 6] == char(0x7F)) {
-                tx[i * 4 + 6] = 0x7E;
+            if (tx[i * 4 + 6] == char(0xFF)) {
+                tx[i * 4 + 6] = 0xFE;
             }
             // high bits
             tx[i * 4 + 3] = tx[i * 4 + 3] | ((abs(velX[real_num]) & 0x180) >> 5) | ((abs(velY[real_num]) & 0x180) >> 7);

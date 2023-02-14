@@ -100,7 +100,7 @@ void Communicator::receiveCommand(int t) {
                     auto command = commands.command(i);
                     Owl::ActionModule::Instance()->updateCommandParams(command.robot_id(), command.velocity_x()*100, command.velocity_y()*100, 
                         command.velocity_r()*40, command.dribbler_spin()>0, command.dribbler_spin()*3, command.kick(), command.power()>0, command.power()*100);
-                }                
+                }
                 Owl::ActionModule::Instance()->sendLegacy(commands.command_size());
             }
             //if(opm->isSimulation) Owl::ZSimModule::Instance()->sendEmptySim();
