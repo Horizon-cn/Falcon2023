@@ -18,6 +18,11 @@
 #include <QCoreApplication>
 #include <ParamManagerNew.h>
 #include <QDir>
+#include "RobotSensor.h"
+
+//#ifdef WIN32
+//#include <windows.h>
+//#endif // WIN32
 
 ZSS::Protocol::Debug_Msgs guiDebugMsgs;
 
@@ -28,12 +33,12 @@ QMutex* _debug_mutex = 0;
 bool IS_SIMULATION = false;
 bool VERBOSE_MODE = false;
 
-// handle _vision_event;
+//HANDLE _vision_event;
 
 void run(){
     IS_SIMULATION = OParamManager::Instance()->isSimulation;
-    std::cout << "IS_SIMULATION : " << IS_SIMULATION << std::endl;
-    //_vision_event = CreateEvent(NULL, true, false, NULL);
+    qDebug() << "IS_SIMULATION : " << IS_SIMULATION;
+    //_vision_event = CreateEvent(NULL, TRUE, FALSE, NULL);
     initializeSingleton(); // init parammanager first
     CCtrlBreakHandler breakHandler;
     // SLEEP(1000);
@@ -50,8 +55,10 @@ void run(){
     _debug_mutex = new QMutex;
 	GPUBestAlgThread::Instance()->initialize(VISION_MODULE);
 	GameInfoT gameInfo;
+    DataReceiver4rbk::Instance();
+    RobotSensor::Instance();
     //SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-
+    
 	while (true) {
         //WaitForSingleObject(_vision_event, INFINITY);
 
@@ -77,6 +84,7 @@ void run(){
 
 int main(int argc, char* argv[]) {
     qDebug() << QDir::currentPath();
+    //SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
     QCoreApplication a(argc, argv);
 //    OParamManager::Instance()->setFileName();
     OParamManager::Instance()->update();

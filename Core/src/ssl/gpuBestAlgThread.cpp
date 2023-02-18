@@ -22,6 +22,8 @@
 #include "src_heatMap.pb.h"
 #include <time.h>
 #include <thread>
+#include "Semaphore.h"
+extern Semaphore vision_to_cuda;
 
 #define has_GPU false
 
@@ -391,6 +393,7 @@ bool CGPUBestAlgThread::isLastOneValid(const CGeoPoint& p) {
 void CGPUBestAlgThread::doBestCalculation() {
     startComm();
 	while (true) {
+		vision_to_cuda.Wait();
 		GPUBestAlgThread::Instance()->generatePointValue();
 		GPUBestAlgThread::Instance()->setPointValue();
         GPUBestAlgThread::Instance()->sendPointValue();

@@ -86,7 +86,7 @@ private:
     int isYellow;
     QUdpSocket* cmds_socket;
     ZSS::Protocol::Robots_Command ZSS_CMDS;
-	
+
 };
 
 #endif // ~_ACTION_MODULE_H_

@@ -2,6 +2,7 @@ set(TARGET_NAME Core)
 
 IF(WIN32)
     message(${CMAKE_C_FLAGS})
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
 ENDIF()
 
 set(libs)

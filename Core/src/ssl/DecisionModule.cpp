@@ -16,6 +16,9 @@
 #include <TaskMediator.h>
 #include <QDir>
 #include "LuaModule.h"
+#include "Semaphore.h"
+extern Semaphore vision_to_decision;
+Semaphore decision_to_action(0);
 namespace {
 	/// 是否状态化的策略库
 	bool USE_LUA_SCRIPTS = true;
@@ -23,6 +26,7 @@ namespace {
 
 CDecisionModule::CDecisionModule(const COptionModule* pOption, CVisionModule* pVision): _pOption(pOption),_pVision(pVision)
 {		
+	//LuaModule::Instance()->RunScript("../lua_scripts/test/Init.lua");
 		if(USE_LUA_SCRIPTS){
 			LuaModule::Instance()->RunScript("../lua_scripts/ssl/StartZeus.lua");
 		}
@@ -35,6 +39,7 @@ CDecisionModule::~CDecisionModule(void)
 
 void CDecisionModule::DoDecision(const bool visualStop)
 {
+	vision_to_decision.Wait();
 	/************************************************************************/
 	/* 清空上一周期的历史任务                                               */
 	/************************************************************************/
@@ -52,6 +57,7 @@ void CDecisionModule::DoDecision(const bool visualStop)
 	/************************************************************************/
 	PlanTasks();
 
+	decision_to_action.Signal();
 	return ;
 }
 

@@ -2,6 +2,7 @@ set(TARGET_NAME grSim)
 
 IF(WIN32)
     message(${CMAKE_C_FLAGS})
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
 ENDIF()
 
 # definitions for knowing the OS from the code

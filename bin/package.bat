@@ -8,7 +8,7 @@ IF NOT EXIST package.txt (
    set /p var=Where is QT QML:
    ::echo !var! 
    echo !var!>>package.txt
-   set /p qml=Where is Custom QML :
+   set /p qml=Where is Client QML :
    ::echo !qml! 
    echo !qml!>>package.txt) ELSE (
       @echo off & setlocal enabledelayedexpansion

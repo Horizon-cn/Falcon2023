@@ -1,4 +1,4 @@
-/************************************************************************/
+ï»¿/************************************************************************/
 /* Copyright (c) CSC-RL, Zhejiang University							*/
 /* Team:			SSL-ZJUNlict										*/
 /* HomePage: http://www.nlict.zju.edu.cn/ssl/WelcomePage.html			*/
@@ -19,6 +19,8 @@
 #include <CommandFactory.h>
 //#include <PathPlan/PathPlanner.h>
 #include <BallStatus.h>
+#include "Semaphore.h"
+extern Semaphore decision_to_action;
 
 CActionModule::CActionModule(const COptionModule* pOption,CVisionModule* pVision,const CDecisionModule* pDecision)
 : _pOption(pOption),_pVision(pVision),_pDecision(pDecision)
@@ -33,25 +35,26 @@ CActionModule::~CActionModule(void)
     cmds_socket = nullptr;
 }
 
-// ÓÃÓÚµ±³¡ÉÏÓĞµÄ³µºÅ´óÓÚ5µÄÇé¿ö
+// ç”¨äºå½“åœºä¸Šæœ‰çš„è½¦å·å¤§äº5çš„æƒ…å†µ
 bool CActionModule::sendAction(const GameInfoT& vInfo)
 {
+    decision_to_action.Wait();
 	rbk::protocol::SRC_Cmd cmds;
 
 	/************************************************************************/
-	/* µÚÒ»²½£º±éÀúĞ¡³µ£¬Ö´ĞĞ¸³ÓèµÄÈÎÎñ£¬Éú³É¶¯×÷Ö¸Áî                       */
+	/* ç¬¬ä¸€æ­¥ï¼šéå†å°è½¦ï¼Œæ‰§è¡Œèµ‹äºˆçš„ä»»åŠ¡ï¼Œç”ŸæˆåŠ¨ä½œæŒ‡ä»¤                       */
 	/************************************************************************/
 	for (int vecNum = 0; vecNum < Param::Field::MAX_PLAYER; ++ vecNum) {
 		rbk::protocol::Message_SSL_Command* ssl_cmd = nullptr;
-		// »ñÈ¡µ±Ç°Ğ¡³µÈÎÎñ
+		// è·å–å½“å‰å°è½¦ä»»åŠ¡
 		CPlayerTask* pTask = TaskMediator::Instance()->getPlayerTask(vecNum);
-		// Ã»ÓĞÈÎÎñ£¬Ìø¹ı
+		// æ²¡æœ‰ä»»åŠ¡ï¼Œè·³è¿‡
 		if (NULL == pTask) {
 			continue;
 		}
 
-		// Ö´ĞĞskill£¬ÈÎÎñ²ã²ãµ÷ÓÃÖ´ĞĞ£¬µÃµ½×îÖÕµÄÖ¸Áî£º<vx vy w> + <kick dribble>
-		// Ö´ĞĞµÄ½á¹û£ºÃüÁî½Ó¿Ú£¨·ÂÕæ-DCom£¬ÊµÎï-CommandSender£© + Ö¸Áî¼ÇÂ¼£¨ÔË¶¯-Vision£¬Ìß¿Ø-PlayInterface)
+		// æ‰§è¡Œskillï¼Œä»»åŠ¡å±‚å±‚è°ƒç”¨æ‰§è¡Œï¼Œå¾—åˆ°æœ€ç»ˆçš„æŒ‡ä»¤ï¼š<vx vy w> + <kick dribble>
+		// æ‰§è¡Œçš„ç»“æœï¼šå‘½ä»¤æ¥å£ï¼ˆä»¿çœŸ-DComï¼Œå®ç‰©-CommandSenderï¼‰ + æŒ‡ä»¤è®°å½•ï¼ˆè¿åŠ¨-Visionï¼Œè¸¢æ§-PlayInterface)
 		bool dribble = false;
 		CPlayerCommand* pCmd = NULL;
 		pCmd = pTask->execute(_pVision); 
@@ -59,10 +62,10 @@ bool CActionModule::sendAction(const GameInfoT& vInfo)
 		if (!pCmd) {
 			std::cout<<"PlayerCommand execute is Null "<<vecNum<<std::endl;
 		}
-		// ÅÜ£ºÓĞĞ§µÄÔË¶¯Ö¸Áî
+		// è·‘ï¼šæœ‰æ•ˆçš„è¿åŠ¨æŒ‡ä»¤
 		if (pCmd) {
 			dribble = pCmd->dribble() > 0;
-			// ÏÂ·¢ÔË¶¯ <vx vy w>
+			// ä¸‹å‘è¿åŠ¨ <vx vy w>
 			if(ssl_cmd == nullptr){
 				ssl_cmd = cmds.add_command();
 				//LogInfo("action module number in lua: " << pCmd->number());
@@ -72,22 +75,22 @@ bool CActionModule::sendAction(const GameInfoT& vInfo)
 			// for rbk
 			//pCmd->execute(IS_SIMULATION, robotIndex[vecNum-1]);
 			((CPlayerSpeedV2*)pCmd)->setSpeedtoSSLCmd(ssl_cmd);
-			// ¼ÇÂ¼Ö¸Áî
+			// è®°å½•æŒ‡ä»¤
 			_pVision->SetPlayerCommand(pCmd->number(), pCmd);
 		}
 
-		// Ìß£ºÓĞĞ§µÄÌß¿ØÖ¸Áî
+		// è¸¢ï¼šæœ‰æ•ˆçš„è¸¢æ§æŒ‡ä»¤
 		double kickPower = 0.0;
 		double chipkickDist = 0.0;
 		double passdist = 0.0;
 		if (KickStatus::Instance()->needKick(vecNum) && pCmd) {
-			// ¸üĞÂÌßÏà¹Ø²ÎÊı
+			// æ›´æ–°è¸¢ç›¸å…³å‚æ•°
 			kickPower = KickStatus::Instance()->getKickPower(vecNum);
 			chipkickDist = KickStatus::Instance()->getChipKickDist(vecNum);
 			passdist = KickStatus::Instance()->getPassDist(vecNum);
-			// Éæ¼°µ½Æ½/ÌôÉä·Öµµ£¬ÕâÀïÖ»¹ØÏµÏà¹Ø²ÎÊı£¬Êµ¼Ê·ÖµµÇë¹Ø×¢ CommandSender
+			// æ¶‰åŠåˆ°å¹³/æŒ‘å°„åˆ†æ¡£ï¼Œè¿™é‡Œåªå…³ç³»ç›¸å…³å‚æ•°ï¼Œå®é™…åˆ†æ¡£è¯·å…³æ³¨ CommandSender
 			CPlayerKickV2 kickCmd(vecNum, kickPower, chipkickDist, passdist, dribble);
-			// »ú¹¹¶¯×÷ <kick dribble>
+			// æœºæ„åŠ¨ä½œ <kick dribble>
 			//kickCmd.execute(IS_SIMULATION);
 			if(ssl_cmd == nullptr){
 				ssl_cmd = cmds.add_command();
@@ -96,21 +99,21 @@ bool CActionModule::sendAction(const GameInfoT& vInfo)
 			kickCmd.setKicktoSSLCmd(ssl_cmd);
 		}
 
-		// ¼ÇÂ¼ÃüÁî
+		// è®°å½•å‘½ä»¤
 		//std::cout << "kickPower: " << kickPower << std::endl;
 		BallStatus::Instance()->setCommand(vecNum, kickPower, chipkickDist, dribble, _pVision->Cycle());
 	}
 
-    sendToOwl(cmds);
+	sendToOwl(cmds);
 
 	/************************************************************************/
-	/* µÚ¶ş²½£ºÖ¸ÁîÇå¿Õ´¦Àí                                                 */
+	/* ç¬¬äºŒæ­¥ï¼šæŒ‡ä»¤æ¸…ç©ºå¤„ç†                                                 */
 	/************************************************************************/
-	// Çå³ıÉÏÒ»ÖÜÆÚµÄÉäÃÅÖ¸Áî
+	// æ¸…é™¤ä¸Šä¸€å‘¨æœŸçš„å°„é—¨æŒ‡ä»¤
 	KickStatus::Instance()->clearAll();
-	// Çå³ıÉÏÒ»ÖÜÆÚµÄ¿ØÇòÖ¸Áî
+	// æ¸…é™¤ä¸Šä¸€å‘¨æœŸçš„æ§çƒæŒ‡ä»¤
 	DribbleStatus::Instance()->clearDribbleCommand();
-	//// Çå³ıÉÏÒ»ÖÜÆÚµÄÕÏ°­Îï±ê¼Ç
+	//// æ¸…é™¤ä¸Šä¸€å‘¨æœŸçš„éšœç¢ç‰©æ ‡è®°
 	//CPathPlanner::resetObstacleMask();
 
 	return true;
@@ -121,14 +124,14 @@ bool CActionModule::sendNoAction(const GameInfoT& vInfo)
 	rbk::protocol::SRC_Cmd cmds;
 	//TODO: make num compatible!!!!!!!!2020-11-05!!!!!!!!!!!!!!!!!!!!
 	for (int vecNum = 0; vecNum < Param::Field::MAX_PLAYER - 10; ++ vecNum) {
-		// Éú³ÉÍ£Ö¹ÃüÁî
+		// ç”Ÿæˆåœæ­¢å‘½ä»¤
 		CPlayerCommand *pCmd = CmdFactory::Instance()->newCommand(CPlayerSpeedV2(vecNum,0,0,0,0));
-		// Ö´ĞĞÇÒÏÂ·¢
+		// æ‰§è¡Œä¸”ä¸‹å‘
 		//pCmd->execute(IS_SIMULATION);
 		rbk::protocol::Message_SSL_Command* ssl_cmd = cmds.add_command();
 		ssl_cmd->set_robot_id(vInfo.player[pCmd->number()].ID);
 		((CPlayerSpeedV2*)pCmd)->setSpeedtoSSLCmd(ssl_cmd);
-		// ¼ÇÂ¼Ö¸Áî
+		// è®°å½•æŒ‡ä»¤
 		_pVision->SetPlayerCommand(pCmd->number(), pCmd);
 	}
     sendToOwl(cmds);
@@ -167,7 +170,7 @@ void CActionModule::sendToOwl(const rbk::protocol::SRC_Cmd& cmds)
             zss_cmd->set_power(0);
         }
 	}
-    //·¢ËÍcmd//
+    //å‘é€cmd//
 	int port = isYellow ? CParamManager::Instance()->yellow_control : CParamManager::Instance()->blue_control;
     int size = ZSS_CMDS.ByteSize();
     QByteArray data(size, 0);

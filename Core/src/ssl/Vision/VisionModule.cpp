@@ -15,7 +15,9 @@
 #include <BallSpeedModel.h>
 #include "bayes/MatchState.h"
 #include "defence/DefenceInfo.h"
-
+#include "Semaphore.h"
+Semaphore vision_to_decision(0);
+Semaphore vision_to_cuda(0);
 ///
 /// @file   VisionModule.cpp
 /// @author Yonghai Wu <liunian@zju.edu.cn>
@@ -270,6 +272,8 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 		GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 6*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
 		GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 3*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
 	}
+	vision_to_decision.Signal();
+	vision_to_cuda.Signal();
 	return ;
 }
 

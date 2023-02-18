@@ -9,8 +9,11 @@
 #include <QNetworkProxy>
 #include <QNetworkInterface>
 #include "ParamManagerNew.h"
+#include "Semaphore.h"
 extern bool IS_SIMULATION;
+Semaphore visionEvent;
 namespace {
+    Vision_DetectionFrame rec_vision;
     std::thread* receive_vision_thread;
     std::thread* referee_thread;
     QMutex receive_vision_mutex;
@@ -70,100 +73,15 @@ CDataReceiver4rbk::~CDataReceiver4rbk(void) {
 
 void CDataReceiver4rbk::receiveVision() {
     QByteArray buffer;
-    int strategy_cycle = 0;
-    Vision_DetectionFrame vision;
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
         while (receive_vision_socket->state() == QUdpSocket::BoundState && receive_vision_socket->hasPendingDatagrams()) {
             buffer.resize(receive_vision_socket->pendingDatagramSize());
             receive_vision_socket->readDatagram(buffer.data(), buffer.size());
-            vision.ParseFromArray(buffer, buffer.size());
             receive_vision_mutex.lock();
-            visionInfo.cycle = ++strategy_cycle;
-            visionInfo.mode = m_play_mode;
-            visionInfo.ball.pos.valid = vision.has_balls();
-            if (visionInfo.ball.pos.valid) {
-                auto& ball = vision.balls();
-                visionInfo.ball.pos.x = msgX2InfoX(ball.x());
-                visionInfo.ball.pos.y = msgY2InfoY(ball.y());
-                visionInfo.ball.vel = CVector(msgX2InfoX(ball.vel_x()), msgY2InfoY(ball.vel_y()));
-                visionInfo.ball.chipPredict.x = msgX2InfoX(ball.chip_predict_x());
-                visionInfo.ball.chipPredict.y = msgY2InfoY(ball.chip_predict_y());
-            }
-            else {
-                visionInfo.ball.pos.x = 9999;
-                visionInfo.ball.pos.y = 9999;
-                visionInfo.ball.vel = CVector(0, 0);
-                visionInfo.ball.chipPredict.x = 9999;
-                visionInfo.ball.chipPredict.y = 9999;
-            }
-
-            for (int i = 0; i < Param::Field::MAX_PLAYER * 2; i++) { // init vision
-                visionInfo.player[i].dir = 0;
-                visionInfo.player[i].pos.valid = 0;
-                visionInfo.player[i].ID = -1;
-                visionInfo.player[i].isYellow = true;
-                visionInfo.player[i].pos.x = 9999;
-                visionInfo.player[i].pos.y = 9999;
-                visionInfo.player[i].vel = CVector(0, 0);
-                visionInfo.player[i].acc = CVector(0, 0);
-            }
-            if (isYellow == TEAM_BLUE){
-                for(int i=0;i<vision.robots_blue_size();i++){
-                    const Vision_DetectionRobot& robot = vision.robots_blue(i);
-                    if (!robot.valid()) continue;
-                    int id = robot.robot_id();
-                    visionInfo.player[id].dir = msgAngle2InfoAngle(robot.orientation());
-                    visionInfo.player[id].pos.valid = true;
-                    visionInfo.player[id].ID = robot.robot_id();
-                    visionInfo.player[id].isYellow = false;
-                    visionInfo.player[id].pos.x = msgX2InfoX(robot.x());
-                    visionInfo.player[id].pos.y = msgY2InfoY(robot.y());
-                    visionInfo.player[id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
-                    visionInfo.player[id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
-                }
-                for(int i=0;i<vision.robots_yellow_size();i++){
-                    const Vision_DetectionRobot& robot = vision.robots_yellow(i);
-                    if (!robot.valid()) continue;
-                    int id = robot.robot_id();
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].dir = msgAngle2InfoAngle(robot.orientation());
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].pos.valid = true;
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].ID = robot.robot_id();
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].isYellow = true;
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].pos.x = msgX2InfoX(robot.x());
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].pos.y = msgY2InfoY(robot.y());
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
-                }
-            }else{
-                for(int i=0;i<vision.robots_yellow_size();i++){
-                    const Vision_DetectionRobot& robot = vision.robots_yellow(i);
-                    if (!robot.valid()) continue;
-                    int id = robot.robot_id();
-                    visionInfo.player[id].dir = msgAngle2InfoAngle(robot.orientation());
-                    visionInfo.player[id].pos.valid = true;
-                    visionInfo.player[id].ID = robot.robot_id();
-                    visionInfo.player[id].isYellow = true;
-                    visionInfo.player[id].pos.x = msgX2InfoX(robot.x());
-                    visionInfo.player[id].pos.y = msgY2InfoY(robot.y());
-                    visionInfo.player[id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
-                    visionInfo.player[id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
-                }
-                for(int i=0;i<vision.robots_blue_size();i++){
-                    const Vision_DetectionRobot& robot = vision.robots_blue(i);
-                    if (!robot.valid()) continue;
-                    int id = robot.robot_id();
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].dir = msgAngle2InfoAngle(robot.orientation());
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].pos.valid = true;
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].ID = robot.robot_id();
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].isYellow = false;
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].pos.x = msgX2InfoX(robot.x());
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].pos.y = msgY2InfoY(robot.y());
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
-                    visionInfo.player[Param::Field::MAX_PLAYER+id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
-                }
-            }
+            rec_vision.ParseFromArray(buffer, buffer.size());
             receive_vision_mutex.unlock();
+            visionEvent.Signal();
         }
     }
 }
@@ -171,14 +89,103 @@ void CDataReceiver4rbk::receiveVision() {
 bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameInfoT& info){
 	/** GameInfo包括视觉信息和裁判信息，之后要�?上方差等信息,player的信息全部�?载进来，用于robot predictor **/
     static int last_cycle = 0;
+    static int strategy_cycle = 0;
     bool receive_new_vision = false;
+    static Vision_DetectionFrame vision;
     receive_vision_mutex.lock();
-    if (visionInfo.cycle > last_cycle) {
-        info = visionInfo;
-        last_cycle = visionInfo.cycle;
-        receive_new_vision = true;
-    }
+    vision = rec_vision;
     receive_vision_mutex.unlock();
+    visionInfo.cycle = ++strategy_cycle;
+    visionInfo.mode = m_play_mode;
+    visionInfo.ball.pos.valid = vision.has_balls();
+    if (visionInfo.ball.pos.valid) {
+        auto& ball = vision.balls();
+        visionInfo.ball.pos.x = msgX2InfoX(ball.x());
+        visionInfo.ball.pos.y = msgY2InfoY(ball.y());
+        visionInfo.ball.vel = CVector(msgX2InfoX(ball.vel_x()), msgY2InfoY(ball.vel_y()));
+        visionInfo.ball.chipPredict.x = msgX2InfoX(ball.chip_predict_x());
+        visionInfo.ball.chipPredict.y = msgY2InfoY(ball.chip_predict_y());
+    }
+    else {
+        visionInfo.ball.pos.x = 9999;
+        visionInfo.ball.pos.y = 9999;
+        visionInfo.ball.vel = CVector(0, 0);
+        visionInfo.ball.chipPredict.x = 9999;
+        visionInfo.ball.chipPredict.y = 9999;
+    }
+
+    for (int i = 0; i < Param::Field::MAX_PLAYER * 2; i++) { // init vision
+        visionInfo.player[i].dir = 0;
+        visionInfo.player[i].pos.valid = 0;
+        visionInfo.player[i].ID = -1;
+        visionInfo.player[i].isYellow = true;
+        visionInfo.player[i].pos.x = 9999;
+        visionInfo.player[i].pos.y = 9999;
+        visionInfo.player[i].vel = CVector(0, 0);
+        visionInfo.player[i].acc = CVector(0, 0);
+    }
+    if (isYellow == TEAM_BLUE) {
+        for (int i = 0; i < vision.robots_blue_size(); i++) {
+            const Vision_DetectionRobot& robot = vision.robots_blue(i);
+            if (!robot.valid()) continue;
+            int id = robot.robot_id();
+            visionInfo.player[id].dir = msgAngle2InfoAngle(robot.orientation());
+            visionInfo.player[id].pos.valid = true;
+            visionInfo.player[id].ID = robot.robot_id();
+            visionInfo.player[id].isYellow = false;
+            visionInfo.player[id].pos.x = msgX2InfoX(robot.x());
+            visionInfo.player[id].pos.y = msgY2InfoY(robot.y());
+            visionInfo.player[id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
+            visionInfo.player[id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
+        }
+        for (int i = 0; i < vision.robots_yellow_size(); i++) {
+            const Vision_DetectionRobot& robot = vision.robots_yellow(i);
+            if (!robot.valid()) continue;
+            int id = robot.robot_id();
+            visionInfo.player[Param::Field::MAX_PLAYER + id].dir = msgAngle2InfoAngle(robot.orientation());
+            visionInfo.player[Param::Field::MAX_PLAYER + id].pos.valid = true;
+            visionInfo.player[Param::Field::MAX_PLAYER + id].ID = robot.robot_id();
+            visionInfo.player[Param::Field::MAX_PLAYER + id].isYellow = true;
+            visionInfo.player[Param::Field::MAX_PLAYER + id].pos.x = msgX2InfoX(robot.x());
+            visionInfo.player[Param::Field::MAX_PLAYER + id].pos.y = msgY2InfoY(robot.y());
+            visionInfo.player[Param::Field::MAX_PLAYER + id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
+            visionInfo.player[Param::Field::MAX_PLAYER + id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
+        }
+    }
+    else {
+        for (int i = 0; i < vision.robots_yellow_size(); i++) {
+            const Vision_DetectionRobot& robot = vision.robots_yellow(i);
+            if (!robot.valid()) continue;
+            int id = robot.robot_id();
+            visionInfo.player[id].dir = msgAngle2InfoAngle(robot.orientation());
+            visionInfo.player[id].pos.valid = true;
+            visionInfo.player[id].ID = robot.robot_id();
+            visionInfo.player[id].isYellow = true;
+            visionInfo.player[id].pos.x = msgX2InfoX(robot.x());
+            visionInfo.player[id].pos.y = msgY2InfoY(robot.y());
+            visionInfo.player[id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
+            visionInfo.player[id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
+        }
+        for (int i = 0; i < vision.robots_blue_size(); i++) {
+            const Vision_DetectionRobot& robot = vision.robots_blue(i);
+            if (!robot.valid()) continue;
+            int id = robot.robot_id();
+            visionInfo.player[Param::Field::MAX_PLAYER + id].dir = msgAngle2InfoAngle(robot.orientation());
+            visionInfo.player[Param::Field::MAX_PLAYER + id].pos.valid = true;
+            visionInfo.player[Param::Field::MAX_PLAYER + id].ID = robot.robot_id();
+            visionInfo.player[Param::Field::MAX_PLAYER + id].isYellow = false;
+            visionInfo.player[Param::Field::MAX_PLAYER + id].pos.x = msgX2InfoX(robot.x());
+            visionInfo.player[Param::Field::MAX_PLAYER + id].pos.y = msgY2InfoY(robot.y());
+            visionInfo.player[Param::Field::MAX_PLAYER + id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
+            visionInfo.player[Param::Field::MAX_PLAYER + id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
+        }
+    }
+    info = visionInfo;
+    //if (visionInfo.cycle > last_cycle) {
+    //    last_cycle = visionInfo.cycle;
+        receive_new_vision = true;
+    //}
+    
     return receive_new_vision;
 }
 
@@ -286,7 +293,7 @@ bool CDataReceiver4rbk::getNewRefMsgs(GameInfoT& info){
 }
 
 bool CDataReceiver4rbk::getGameInfo(const COptionModule *pOption,GameInfoT& info){
-
+    visionEvent.Wait();
     //get rawvision into visualinfo
 	if (!rawVision2VisualInfo(pOption,info)){
 		return false;
