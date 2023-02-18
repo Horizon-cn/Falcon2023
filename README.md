@@ -1,7 +1,7 @@
 
 # Falcon_2023
 
-2023年开始使用的新AI框架，拥有良好的跨平台能力
+2023年开始使用的新AI框架，希望拥有良好的跨平台能力
 
 ## 框架组成
 
@@ -64,24 +64,30 @@
 - [ ] 放大画面的操作放大倍数超过一定数量时，跑Core时会crash，现在限制了放大倍数
 - [ ] 多线程之间的信号发射接收有时会有bug，visionmodule和rec_recorder之间
 - [ ] 实车视觉有时候接不上，特别是电脑开机时间较长时，只能重启
+- [x] 配置cuda后编过了打不开Core.exe：cuda版本不兼容
+- [x] 系统极依赖电脑性能，明显卡顿：线程内计算不合理，无视觉时应处于静默状态，不占用cpu资源，添加信号量后解决。且线程之间的运算复杂度需要平衡，视觉接收线程决定Core的帧率，不应安排复杂运算
 
 ## 编译工具
 
 - 软件
-	- [Qt≥5.10](https://www.qt.io/)
-	- [CMaket≥3.10](https://cmake.org/download/)
+	- [Qt ≥ 5.15](https://www.qt.io/)
+	- [CMake](https://cmake.org/download/)
+	- [Visual Studio](https://visualstudio.microsoft.com/zh-hans/?rr=https://www.microsoft.com/zh-cn/)
+		- Visual Studio 2019, CMake ≥ 3.14
+		- Visual Studio 2022, CMake = 3.22
 - 依赖库
-	- protubuf
-	- tolua++
-	- lua
-	- zlib
-	- ode
 	- Eigen
+	- kddockwidgets-1.5.0
+	- lua
+	- ODE
+	- protubuf-3.17.2
+	- tolua++
 	- vartypes
-
+	- zlib
+	
 ## 编译方法
 
-- Ubuntu : 具体编译方法见B站，搜索"Rocos环境配置",最后再加上下载Vartypes、KDDockWidgets
+- Ubuntu(未尝试) : 具体编译方法见B站，搜索"Rocos环境配置",最后再加上下载Vartypes、KDDockWidgets
 ```bash
 $ cd /tmp
 $ git clone https://github.com/jpfeltracco/vartypes.git
@@ -93,24 +99,32 @@ $ make
 $ sudo make install
 ```
 - Windows : 
-	- [编译视频](https://jbox.sjtu.edu.cn/l/c1CcEe)
-	- 注意检查是否有 3rdParty 
-	- 使用CMake Gui，输入源代码所在目录和编译目录（一般是源代码所在目录/build）
-	- 直接Configure，Qt需要输入路径，如D:\QT\Qt5.12.9\5.12.9\msvc2017_64\lib\cmake\Qt5，其他的都已设置好，无需手动输入
-	- 注意，KDDockWigets与QT版本有关联，QT版本需不低于5.15
+	- 注意检查是否有 3rdParty
+	- 建议先修改 cmake/GetThirdParty.cmake 中的QT部分，输入电脑上的QT路径
+		- set(CMAKE_PREFIX_PATH "D:/QT/5.15.2/msvc2019_64/lib/cmake/Qt5") 
+	- 使用CMake Gui，输入源代码所在目录和编译目录，如：
+		- Where is the source code : D:/Falcon_2023
+		- Where to build the binaries : D:/Falcon_2023/build
+	- 直接Configure
 	- 完成后点击Generate，再点击Open Project
-	- 在vs中选择Release x64模式，并设置Core项目属性，选择15工具集
+	- 在vs中选择Release x64模式
 	- 开始生成，没有报错则完成
-	- 如果需要使用GPU，按照相应教程设置vs工具和项目属性
-	- 运行bin/package.bat，首次编译或更换qt路径时需删除package.txt重新输入其他路径（如D:\QT\Qt5.12.9\5.12.9\msvc2017_64）
+	- 如果需要使用GPU，按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置
+	- 运行 bin/package.bat，首次编译或更换qt路径时需删除package.txt重新输入路径,如：
+		- Where is QT QML : D:\QT\5.15.2\msvc2019_64\qml
+   		- Where is Client QML : D:\Nest_Run_2023\Client\src\qml
 
 ## 使用方法
 
 - 启动run.bat
-- 调整界面排布到适合的形式
+- 拖动调整界面排布到适合的形式或直接读入更好的Layout
+- 开启新的分界面在Widget里面选择
+- 键盘快捷键“r”重新载入某一.ini文件参数
+- 其他操作与 [owl2操作手册](https://gitlab.com/src-ssl/src/-/wikis/Software/owl2操作手册) 中类似
 
 ## 常见问题
 
 - 如果软件不正常退出，重新打开后先Kill进程，杀掉未关闭的进程后再开启软件
 - 裁判盒指令无法接入，需核查网络配置，虚拟机需将网络设置为桥连模式
 - 下车的时候数字键/Ctrl+数字键，待软件反应后再做其他操作，否则容易崩溃
+- 当分界面脱离主界面时，一些键盘快捷键会失效，需要将分界面拖回主界面

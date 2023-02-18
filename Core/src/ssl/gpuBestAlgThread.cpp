@@ -171,8 +171,8 @@ bool CGPUBestAlgThread::isClose(const CGeoPoint pos1, const CGeoPoint pos2, floa
 }
 
 void CGPUBestAlgThread::generatePointValue() {
-	if (_pVision->Cycle() != _lastGPUCycle) {
-		_lastGPUCycle = _pVision->Cycle();
+	//if (_pVision->Cycle() != _lastGPUCycle) {
+		//_lastGPUCycle = _pVision->Cycle();
 		/************************************************************************/
 		/* 数据算法数据传入：车球位置信息                                       */
 		/************************************************************************/
@@ -233,11 +233,11 @@ void CGPUBestAlgThread::generatePointValue() {
 		memcpy(_PointPotential, _PointPotentialOrigin, getMapSize());
 		processPointValue();
 		_value_getter_mutex->unlock();
-	}
-	else {
-        std::this_thread::sleep_for(std::chrono::microseconds(10000));
+	//}
+	//else {
+    //    std::this_thread::sleep_for(std::chrono::microseconds(10000));
 		//cout << "not in cycle" << endl;
-	}
+	//}
 	// cout << "genarate time" << ends - start << endl;
 }
 
