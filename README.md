@@ -109,6 +109,13 @@ $ sudo make install
 	- 完成后点击Generate，再点击Open Project
 	- 在vs中选择Release x64模式
 	- 开始生成，没有报错则完成
+	- 如果觉得生成过慢，可以更改 cmake/Utils.cmake，下述用了4核并行编译，可以查看电脑有几核，适当设置多些，但不建议给满
+	```bash
+	ProcessorCount(N)
+    if(N GREATER_EQUAL 4)
+    	set(N 4)
+    endif()
+    ```
 	- 如果需要使用GPU，按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置
 	- 运行 bin/package.bat，首次编译或更换qt路径时需删除package.txt重新输入路径,如：
 		- Where is QT QML : D:\QT\5.15.2\msvc2019_64\qml
@@ -121,6 +128,9 @@ $ sudo make install
 - 开启新的分界面在Widget里面选择
 - 键盘快捷键“r”重新载入某一.ini文件参数
 - 其他操作与 [owl2操作手册](https://gitlab.com/src-ssl/src/-/wikis/Software/owl2操作手册) 中类似
+- git push 前，注意将以下配置归为默认值：
+	- gpuBestAlgThread.cpp中，#define has_GPU false
+	- 并行编译所用核数为4
 
 ## 常见问题
 

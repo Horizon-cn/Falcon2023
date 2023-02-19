@@ -10,8 +10,8 @@ import com.kdab.dockwidgets 1.0 as KDDW
 
 ApplicationWindow {
     id:roots;
-    width: roots.screen.width;
-    height: roots.screen.height - 100;
+    width: screen.width;
+    height: screen.height - 100;
     visible: true
     title: qsTr("Client")
 

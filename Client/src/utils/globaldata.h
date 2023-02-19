@@ -38,8 +38,8 @@ class CGlobalData {
     bool ctrlC;
     QMutex ctrlCMutex;
     int refereeMode;
-    bool updateSimVision;//about internal sim
-    QByteArray simVision;
+    QMutex visionMutex;
+    QByteArray rec_vision;
 
   private:
     void setCameraMatrixA();

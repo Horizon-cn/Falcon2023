@@ -14,13 +14,16 @@
 #include <QFile>
 #include "staticparams.h"
 #include "networkinterfaces.h"
-
+#include "Semaphore.h"
+Semaphore visionEvent;
 namespace {
     std::thread* visionReceiveThread = nullptr;
+    std::thread* visionParseThread = nullptr;
     auto GS = GlobalSettings::Instance();
     auto opm = Owl::OParamManager::Instance();
     auto vpm = Owl::VParamManager::Instance();
     auto cpm = Owl::CParamManager::Instance();
+    int vision_port; //= opm->isSimulation ? opm->VisionSim : opm->VisionReal;
 }
 /**
  * @brief CVisionModule consturctor
@@ -48,7 +51,6 @@ void CVisionModule::setIfEdgeTest(bool isEdgeTest) {
  */
 void CVisionModule::udpSocketConnect() {
     GlobalData::Instance()->initVision();
-    int vision_port; //= opm->isSimulation ? opm->VisionSim : opm->VisionReal;
     int grsimInterface = ZCommunicator::Instance()->getGrsimInterfaceIndex();
     if (!opm->isSimulation) {
         vision_port = opm->VisionReal;
@@ -61,15 +63,17 @@ void CVisionModule::udpSocketConnect() {
     }
     if (!opm->isSimulation || grsimInterface != 0 || !opm->useSimInside) {
         //qDebug() << "VisionPort : " << vision_port;
+        
         udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress);
         //udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address));
         udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address), NetworkInterfaces::Instance()->getFromIndex(_interface));
         connect(&udpReceiveSocket, SIGNAL(readyRead()), this, SLOT(storeData()), Qt::DirectConnection);
-        //if(udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)
-        //    && udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address))){
-        //    visionReceiveThread = new std::thread([=] {receiveVision();});
-        //    visionReceiveThread->detach();
-        //}
+        /**
+        visionReceiveThread = new std::thread([=] {receiveVision();});
+        visionReceiveThread->detach();
+        visionParseThread = new std::thread([=] {parseVision(); });
+        visionParseThread->detach();
+        **/
     }
     else {
 
@@ -98,6 +102,8 @@ void CVisionModule::udpSocketDisconnect() {
     udpResendSocket.abort();
     delete visionReceiveThread;
     visionReceiveThread = nullptr;
+    delete visionParseThread;
+    visionParseThread = nullptr;
 }
 /**
  * @brief CVisionModule::storeData
@@ -115,16 +121,21 @@ void CVisionModule::storeData() {
     }
 }
 void CVisionModule::receiveVision(){
-    static QByteArray datagram;
-    while (udpReceiveSocket.state() == QUdpSocket::BoundState) {
-        if(udpReceiveSocket.hasPendingDatagrams()) {
+    auto& datagram = GlobalData::Instance()->rec_vision;
+    udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
+    udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address), NetworkInterfaces::Instance()->getFromIndex(_interface));
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::microseconds(500));
+        while (udpReceiveSocket.state() == QUdpSocket::BoundState && udpReceiveSocket.hasPendingDatagrams()) {
+            GlobalData::Instance()->visionMutex.lock();
             datagram.resize(udpReceiveSocket.pendingDatagramSize());
             udpReceiveSocket.readDatagram(datagram.data(),datagram.size());
             if(GlobalData::Instance()->refereeMode){
                 udpResendSocket.writeDatagram(datagram.data(), datagram.size(), QHostAddress(cpm->ssl_address), cpm->VisionAutoRef);
                 qDebug()<<"resend to autoref";
             }
-            parse((void*)datagram.data(), datagram.size());
+            GlobalData::Instance()->visionMutex.unlock();
+            visionEvent.Signal();
         }
     }
 }
@@ -141,6 +152,16 @@ bool CVisionModule::dealWithData() {
     //qDebug("dealing after robot");
     Maintain::Instance()->run();
     return true;
+}
+void CVisionModule::parseVision() {
+    static QByteArray datagram;
+    while (true) {
+        visionEvent.Wait();
+        GlobalData::Instance()->visionMutex.lock();
+        datagram = GlobalData::Instance()->rec_vision;
+        GlobalData::Instance()->visionMutex.unlock();
+        parse((void*)datagram.data(), datagram.size());
+    }
 }
 /**
  * @brief parse camera vision message

@@ -365,7 +365,7 @@ QStringList Interaction::getGrsimInterfaces() {
 void Interaction::getBasicInfo() {
     QDialog dialog;
     QFormLayout form(&dialog);
-    form.addRow(new QLabel("Falcon - AI framework developed by SRC team\nmainly used for controlling and debugging robots\ncreated in " + cpm->version));
+    form.addRow(new QLabel("Falcon - AI framework for RoboCup SSL\n\ndeveloped by SRC team since 2023\nsupporting modes of Simulation and Real\nmainly used for controlling and debugging robots\n\ncreated in " + cpm->version));
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok, Qt::Horizontal, &dialog);
     form.addRow(&buttonBox);
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));

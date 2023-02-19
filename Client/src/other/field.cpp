@@ -122,6 +122,8 @@ bool isRecord = true;
 //draw heat map
 std::thread* blueHeatMapThread = nullptr;
 std::thread* yellowHeatMapThread = nullptr;
+
+QElapsedTimer _timer;
 }
 namespace MiddleEvent {
 QPoint start;
@@ -157,15 +159,16 @@ Field::Field(QQuickItem *parent)
     setAcceptedMouseButtons(Qt::LeftButton | Qt::RightButton | Qt::MiddleButton);
     //setAcceptHoverEvents(true);
     triggerDraw();
-    connect(GS, SIGNAL(needRepaint()), this, SLOT(repaint()));
-    connect(VisionModule::Instance(), SIGNAL(needDraw()), this, SLOT(repaint()));
+    connect(GS, SIGNAL(needRepaint()), this, SLOT(updateScreen())); //repaint()
+    connect(VisionModule::Instance(), SIGNAL(needDraw()), this, SLOT(updateScreen())); //repaint()
     resetAfterMouseEvent();
     //draw heat map
     blueHeatMapThread = new std::thread([=] {receiveBlue();});
     blueHeatMapThread->detach();
     yellowHeatMapThread = new std::thread([=] {receiveYellow();});
     yellowHeatMapThread->detach();
-
+    
+    _timer.start();
     //lastTabType = tabType = _type;
     //paintOffCar();
 }
@@ -634,7 +637,6 @@ void Field::triggerDraw() { //滚轮触发一次更新一次
 void Field::repaint() {//change here!!!!!!! 每帧视觉都更新
 //    if(repaint_mutex.try_lock()){
     if(!_draw) return;
-    this->update(area); // 清空绘制区域
     pixmap->fill(COLOR_DARKGREEN);
     switch(_type) {
     case 1:
@@ -665,8 +667,15 @@ void Field::repaint() {//change here!!!!!!! 每帧视觉都更新
         break;
     }
     drawBallLine();
+    this->update(area); // 清空绘制区域
 //        repaint_mutex.unlock();
 //    }
+}
+void Field::updateScreen() {
+    if (_timer.elapsed() > 1000.0 / sipm->DesiredFPS) {
+        _timer.restart();
+        repaint();
+    }
 }
 void Field::paintInit() {
     drawCtrlC();
