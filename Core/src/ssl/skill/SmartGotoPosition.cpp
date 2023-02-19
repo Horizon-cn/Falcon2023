@@ -1,3 +1,8 @@
+
+/************************************************************************/
+/* 23.2.18 fixed commentary by Yuhong Tan                                                          */
+/************************************************************************/
+
 #include "SmartGotoPosition.h"
 #include "skill/Factory.h"
 #include <utils.h>
@@ -18,7 +23,7 @@ namespace {
 
     const double SlowFactor = 0.5;
     const double FastFactor = 1.2;
-    /// ????????????? ?? ???????????????????
+    // 底层运动控制参数 ： 默认增大平动的控制性能
     double MAX_TRANSLATION_SPEED = 200;
     double MAX_TRANSLATION_ACC = 200;
     double MAX_ROTATION_SPEED = 15;
@@ -29,21 +34,21 @@ namespace {
     double TRANSLATION_SPEED_LIMIT = 200;
     double TRANSLATION_ROTATE_ACC_LIMIT = 15;
 
-    /// ????????
+    // 守门员专用运动参数
     double MAX_TRANSLATION_SPEED_GOALIE = 200;
     double MAX_TRANSLATION_ACC_GOALIE = 200;
     double MAX_TRANSLATION_DEC_GOALIE = 200;
     double MAX_ROTATION_ACC_GOALIE = 15;
     double MAX_ROTATION_SPEED_GOALIE = 15;
 
-    /// ???????
+    /// 后卫专用
     double MAX_TRANSLATION_SPEED_BACK = 200;
     double MAX_TRANSLATION_ACC_BACK = 200;
     double MAX_TRANSLATION_DEC_BACK = 200;
     double MAX_ROTATION_ACC_BACK = 200;
     double MAX_ROTATION_SPEED_BACK = 200;
 
-    /// ?????滮
+    // 避碰规划
     const double safeVelFactorFront = 1.0;
     const double safeVelFactorBack = 1.0;
 
@@ -57,7 +62,7 @@ namespace {
     vector < stateNew > viaPoint[Param::Field::MAX_PLAYER];
 
     CGeoPoint lastPoint[Param::Field::MAX_PLAYER];
-    const double TEAMMATE_AVOID_DIST = Param::Vehicle::V2::PLAYER_SIZE + 4.0f; // 2014/03/13 ??????????stop????????????? yys
+    const double TEAMMATE_AVOID_DIST = Param::Vehicle::V2::PLAYER_SIZE + 4.0f;// 2014/03/13 修改，为了减少stop的时候卡住的概率 yys
     const double OPP_AVOID_DIST = Param::Vehicle::V2::PLAYER_SIZE + 5.5f;
     const double BALL_AVOID_DIST = Param::Field::BALL_SIZE + 5.0f;
 }
@@ -72,20 +77,21 @@ CSmartGotoPosition::CSmartGotoPosition()
     DRAW_PENALTY_DEBUG_MSG = paramManager->DRAW_PENALTY_DEBUG_MSG;
 
     {
+        // 守门员单独控制平动参数
         MAX_TRANSLATION_SPEED_GOALIE = ParamManager::Instance()->MAX_TRANSLATION_SPEED_GOALIE;
         MAX_TRANSLATION_ACC_GOALIE = ParamManager::Instance()->MAX_TRANSLATION_ACC_GOALIE;
         MAX_TRANSLATION_DEC_GOALIE = ParamManager::Instance()->MAX_TRANSLATION_DEC_GOALIE;
         MAX_ROTATION_ACC_GOALIE = ParamManager::Instance()->MAX_ROTATION_ACC_GOALIE;
         MAX_ROTATION_SPEED_GOALIE = ParamManager::Instance()->MAX_ROTATION_SPEED_GOALIE;
 
-        // ???????????????????
+        // 后卫单独控制平动参数
         MAX_TRANSLATION_SPEED_BACK = ParamManager::Instance()->MAX_TRANSLATION_SPEED_BACK;
         MAX_TRANSLATION_ACC_BACK = ParamManager::Instance()->MAX_TRANSLATION_ACC_BACK;
         MAX_TRANSLATION_DEC_BACK = ParamManager::Instance()->MAX_TRANSLATION_DEC_BACK;
         MAX_ROTATION_ACC_BACK = ParamManager::Instance()->MAX_ROTATION_ACC_BACK;
         MAX_ROTATION_SPEED_BACK = ParamManager::Instance()->MAX_ROTATION_SPEED_BACK;
 
-        // ???????????????
+        // 其他车的平动参数
         MAX_TRANSLATION_SPEED = ParamManager::Instance()->MAX_TRANSLATION_SPEED;
         MAX_TRANSLATION_ACC = ParamManager::Instance()->MAX_TRANSLATION_ACC;
         MAX_TRANSLATION_DEC = ParamManager::Instance()->MAX_TRANSLATION_DEC;
@@ -99,30 +105,30 @@ CSmartGotoPosition::CSmartGotoPosition()
     }
 }
 
-// ??????????
+// 调试信息显示
 void CSmartGotoPosition::toStream(std::ostream& os) const
 {
     os << "Smart going to " << task().player.pos;
 }
 
-/// ?滮???
+/// 规划接口
 void CSmartGotoPosition::plan(const CVisionModule* pVision)
 {
     /************************************************************************/
-    /* ????????????                                                          */
+    /* 任务参数解析                                                          */
     /************************************************************************/
-    // ???????????
+    // 获取任务参数
     playerFlag = task().player.flag;
     const bool isDribble = task().player.needdribble;
     const int vecNumber = task().executor;
     CGeoPoint finalTargetPos = task().player.pos;
 
-    // ??????????
+    // 接入视觉信息
     const PlayerVisionT& self = pVision->OurPlayer(vecNumber);
     CGeoPoint myPos = self.Pos();
     CGeoPoint ballPos = pVision->Ball().Pos();
 
-    // ???λ???ж??????????????????
+    // 标志位，判断是否为后卫或者守门员
     const bool isGoalie = (vecNumber == TaskMediator::Instance()->goalie());
     const bool isBack =
     (
@@ -135,19 +141,19 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     );
     const bool isAdvancer = (vecNumber == TaskMediator::Instance()->advancer());
 
-    // ???λ???ж????????????????????????????????
+    // 判断为，判断需要躲避的指定区域，包括圆圈和放球椭圆
     bool avoidBallCircle = (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") || (playerFlag & PlayerStatus::AVOID_STOP_BALL_CIRCLE);
     bool avoidOurBallPlacementArea = (WorldModel::Instance()->CurrentRefereeMsg() == "ourBallPlacement");
     bool avoidTheirBallPlacementArea = (WorldModel::Instance()->CurrentRefereeMsg() == "theirBallPlacement");
     bool shrinkTheirPenalty = Utils::InTheirPenaltyArea(finalTargetPos, 40) || Utils::InTheirPenaltyArea(myPos, 40);
 
-    // ???????????
+    // 运动参数设置
     _capability = setCapability(pVision);
 
     /************************************************************************/
-    /* ????????????                                                          */
+    /* 避障区域生成                                                          */
     /************************************************************************/
-    // ????????Χ
+    // 确定避障范围
     double buffer = 1.5;
     if (self.Vel().mod() < 200) {
         buffer = 1.5;
@@ -170,17 +176,20 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     if (pVision->GetCurrentRefereeMsg() == "ourIndirectKick" || pVision->GetCurrentRefereeMsg() == "ourDirectKick" || pVision->GetCurrentRefereeMsg() == "ourKickOff")
         avoidBallFix = 1.5;
 
-    // ???????????
+    // 生成避障区域
     ObstaclesNew obsNew(avoidLength);
     obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
 //    if (isAdvancer || isBack || isGoalie)
 //        obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
 //    else
 //        obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
+    
+
     /************************************************************************/
-    /* ?????????                                                            */
+    /* 目标点更新                                                            */
     /************************************************************************/
-    // ?????????????????????????????????????50cm???
+
+    // 在己方放球或对方放球需要避开开球到放球点之间半径为50cm的圆
     int leaderNumber = paramManager->PlACEBALL_PLAYER_NUM;
     // ObstaclesNew obsNewNew(avoidLength);
     // obsNewNew.addLongCircle(segP1, segP2, CVector(0.0, 0.0), ballPlacementDist, OBS_LONG_CIRCLE_NEW, false, true);
@@ -193,10 +202,10 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         if (DRAW_BALLPLACE_AREA) obsNew.drawLongCircle(segP1, segP2, ballPlacementDist);
     }
 
-    // ?????????????????????????????????????????
+    // 在正常模式下需要保证最终点在禁区外，场地内，车身外
     else {
         validateFinalTarget(finalTargetPos, pVision, shrinkTheirPenalty, avoidLength, isGoalie);
-        // ????stop???е????
+        // 躲避stop状态中的球圈
         if (avoidBallCircle) {
             CGeoPoint ballPos = pVision->Ball().Pos();
             finalTargetPos = Utils::MakeOutOfCircle(ballPos, stopBallAvoidDist, finalTargetPos, avoidLength);
@@ -204,26 +213,26 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     }
 
     /************************************************************************/
-    /* ????·????                                                          */
+    /* 确定下发速度                                                         */
     /************************************************************************/
-    // ????????????????????????????????????????????????
+    // 处理非零速时的末速度，避免车因为非零速冲进禁区或冲出场外
     CVector velNew = validateFinalVel(isGoalie, self.Pos(), finalTargetPos, task().player.vel);
 
-    // ??????????
+    // 申明新任务
     TaskT newTask(task());
     newTask.player.pos = finalTargetPos;
     newTask.player.vel = velNew;
 
-    // ???????????????
+    // 发球时添加避球标签
     if (pVision->GetCurrentRefereeMsg() == "ourIndirectKick" || pVision->GetCurrentRefereeMsg() == "ourDirectKick" || pVision->GetCurrentRefereeMsg() == "ourKickOff")
         newTask.player.flag = newTask.player.flag & (PlayerStatus::DODGE_BALL);
 
     /************************************************************************/
-    /* ????滮·??                                                          */
+    /* 开始规划路径                                                        */
     /************************************************************************/
     stateNew startNew, targetNew;
 
-    // ?????滮????
+    // 处理规划起点
     startNew.pos = myPos;
     int stuckBuffer = 0;
     int stuckTres = 10;
@@ -232,58 +241,58 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         startNew.pos = Utils::MakeOutOfTheirPenaltyArea(myPos, 100);
         stuckBuffer++; }
 
-    // ?????滮???
+    // 处理规划终点
     targetNew.pos = finalTargetPos;
     CGeoPoint middlePoint = finalTargetPos;
 
-    // ?????м??????о????????·??????????
+    // 到达中间点的判据，让整条路径更加连贯
     double arrivedDist = self.Vel().mod() * 0.1 + 5;
 
-    // ????????????????????????
+    // 第一种情况：可以直接到目标点
     if (obsNew.check(startNew.pos, targetNew.pos) || obsNew.check(self.Pos(), targetNew.pos) ||
         self.Pos().dist(finalTargetPos) < Param::Vehicle::V2::PLAYER_SIZE * 2) {
         middlePoint = finalTargetPos;
     }
-    // ?????????????ι滮???м??????????????????е????м???
+    // 第二种情况：上次规划的中间点仍然可以用，且还没有到达中间点
     else if (obsNew.check(startNew.pos, lastPoint[vecNumber]) && (lastPoint[vecNumber] - self.Pos()).mod() > arrivedDist) {
         middlePoint = lastPoint[vecNumber];
     }
-    // ????????????????????????滮
+    // 第三种情况：其它，则重新规划
     else {
         planner[vecNumber].initPlanner(250, 15, 20, 0.05, 0.55, Param::Vehicle::V2::PLAYER_SIZE);
         planner[vecNumber].planPath(&obsNew, startNew, targetNew);
         viaPoint[vecNumber] = planner[vecNumber].getPathPoints();
 
-        // ?滮??????????????м??????????????м?????
+        // 规划成功的情况则给中间点赋值，一般都是有中间点的
         if (viaPoint[vecNumber].size() > 2) middlePoint = viaPoint[vecNumber][1].pos;
     }
     // GDebugEngine::Instance()->gui_debug_x(middlePoint, 0);
-    // ????м??????????ι滮????
+    // 记录中间点，作为下一次规划基础
     lastPoint[vecNumber] = middlePoint;
-    bool needRush2Ball = Utils::InTheirPenaltyArea(ballPos, 10) && !Utils::InTheirPenaltyArea(ballPos, 0); // ???????????????????????????
+    bool needRush2Ball = Utils::InTheirPenaltyArea(ballPos, 10) && !Utils::InTheirPenaltyArea(ballPos, 0); // 球在禁区外且很靠近禁区，直接冲击
     if (!isGoalie && !(playerFlag & PlayerStatus::NOT_DODGE_PENALTY) && !needRush2Ball) {
         //middlePoint = dealPlanFail(self.Pos(), middlePoint, avoidLength, shrinkTheirPenalty);
-        while (Utils::InTheirPenaltyArea(middlePoint, 10)) { // ?滮?????????????????
+        while (Utils::InTheirPenaltyArea(middlePoint, 10)) { // 规划的点会闯入禁区，修正
             middlePoint = middlePoint + Utils::Polar2Vector(1, (middlePoint - CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0)).dir());
         }
-        while (Utils::InOurPenaltyArea(middlePoint, 10)) { // ?滮?????????????????
+        while (Utils::InOurPenaltyArea(middlePoint, 10)) { // 规划的点会闯入禁区，修正
             middlePoint = middlePoint + Utils::Polar2Vector(1, (middlePoint - CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0)).dir());
         }
         lastPoint[vecNumber] = middlePoint;
     }
     newTask.player.pos = middlePoint;
     //GDebugEngine::Instance()->gui_debug_x(middlePoint);
-    // ????????м???????????????????????????
+    // 零速到达中间点，非零速只有在可以直接到时才执行
     if (middlePoint.dist(task().player.pos) > 1e-8) newTask.player.vel = CVector(0.0, 0.0);
 
 
-    // ????????????
+    // 控制吸球力度
     if (isDribble || (playerFlag & PlayerStatus::DRIBBLING)) DribbleStatus::Instance()->setDribbleCommand(vecNumber, 2);
 
     /************************************************************************/
-    /* ??????????                                                          */
+    /* 调试信息显示                                                           */
     /************************************************************************/
-    // ????????????????λ????????????????????????
+    // 信息输出：画出当前位置点，初始目标点，处理过的目标点
     if (DRAW_TRAJ) {
         GDebugEngine::Instance()->gui_debug_x(myPos, COLOR_PURPLE);
         GDebugEngine::Instance()->gui_debug_arc(self.Pos(), avoidLength, 0, 360, 1);
@@ -291,7 +300,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         GDebugEngine::Instance()->gui_debug_x(finalTargetPos, COLOR_YELLOW);
     }
 
-    // ?????????????RRT???????滮??Χ??????
+    // 信息输出：画出RRT撒点，看规划范围是否正确
     if (DRAW_RRT && vecNumber == 1) {
         tree[vecNumber] = planner[vecNumber].getNodes();
         for (size_t i = 0; viaPoint[vecNumber].size() > 0 && i < viaPoint[vecNumber].size() - 1; i++) {
@@ -306,7 +315,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     }
 
     /************************************************************************/
-    /* ?????????                                                            */
+    /* 下达子任务                                                            */
     /************************************************************************/
     setSubTask(TaskFactoryV2::Instance()->GotoPosition(newTask));
     _lastCycle = pVision->Cycle();
@@ -327,60 +336,60 @@ PlayerCapabilityT CSmartGotoPosition::setCapability(const CVisionModule* pVision
     const int playerFlag = task().player.flag;
     PlayerCapabilityT capability;
 
-    /// ????????????????????
+    /// 设置平动参数和转动参数
     if (isGoalie) {
-        // Traslation ?????????????
+        // Traslation 确定平动运动参数
         capability.maxSpeed = MAX_TRANSLATION_SPEED_GOALIE;
         capability.maxAccel = MAX_TRANSLATION_ACC_GOALIE;
         capability.maxDec = MAX_TRANSLATION_DEC_GOALIE;
-        // Rotation	  ?????????????
+        // Rotation	  确定转动运动参数
         capability.maxAngularSpeed = MAX_ROTATION_SPEED_GOALIE;
         capability.maxAngularAccel = MAX_ROTATION_ACC_GOALIE;
         capability.maxAngularDec = MAX_ROTATION_ACC_GOALIE;
     }
     else if (isBack || isMultiBack) {
-        // Traslation ?????????????
+        // Traslation 确定平动运动参数
         capability.maxSpeed = MAX_TRANSLATION_SPEED_BACK;
         capability.maxAccel = MAX_TRANSLATION_ACC_BACK;
         capability.maxDec = MAX_TRANSLATION_DEC_BACK;
-        // Rotation	  ?????????????
+        // Rotation	  确定转动运动参数
         capability.maxAngularSpeed = MAX_ROTATION_SPEED_BACK;
         capability.maxAngularAccel = MAX_ROTATION_ACC_BACK;
         capability.maxAngularDec = MAX_ROTATION_ACC_BACK;
     }
     else {
-        // Traslation ?????????????
+        // Traslation 确定平动运动参数
         capability.maxSpeed = MAX_TRANSLATION_SPEED;
         capability.maxAccel = MAX_TRANSLATION_ACC;
         capability.maxDec = MAX_TRANSLATION_DEC;
-        // Rotation	  ?????????????
+        // Rotation	  确定转动运动参数
         capability.maxAngularSpeed = MAX_ROTATION_SPEED;
         capability.maxAngularAccel = MAX_ROTATION_ACC;
         capability.maxAngularDec = MAX_ROTATION_ACC;
     }
 
 
-    //?????????????
+    // 指定加速度上限；
     /*if (task().player.max_acceleration > 1e-8 && !(isBack && !Utils::InOurPenaltyArea(mePos, 40))) {*/
     if (task().player.max_acceleration > 1e-8) {
         capability.maxAccel = task().player.max_acceleration > TRANSLATION_ACC_LIMIT ? TRANSLATION_ACC_LIMIT : task().player.max_acceleration;
         capability.maxDec = capability.maxAccel;
     }
-    //??????????
+    // 指定速度上限
     if (task().player.max_speed > 1e-8) {
         capability.maxSpeed = task().player.max_speed > TRANSLATION_SPEED_LIMIT ? TRANSLATION_SPEED_LIMIT : task().player.max_speed;
     }
-    //????????????????
+    // 最大转动加速度上限
     if (task().player.max_rot_acceleration > 1e-8) {
         capability.maxAngularAccel = task().player.max_rot_acceleration > TRANSLATION_ROTATE_ACC_LIMIT ? TRANSLATION_ROTATE_ACC_LIMIT : task().player.max_rot_acceleration;
         capability.maxAngularDec = capability.maxAngularAccel;
     }
-    //???????????----????????
+    // 最大转速上限----其实没什么用
     if (task().player.max_rot_speed > 1e-8) {
         capability.maxAngularSpeed = task().player.max_rot_speed;
     }
 
-    //GameStop?????????
+    // GameStop状态不能超速
     if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") {
         capability.maxSpeed = 140;
         capability.maxAccel = 200;
@@ -390,9 +399,9 @@ PlayerCapabilityT CSmartGotoPosition::setCapability(const CVisionModule* pVision
     return capability;
 }
 
-// ??????Ч?????: ???????????????????????. Modified by HXY.
+// 处理无效目标点: 在禁区内、在车身内、在场地外. Modified by HXY.
 void CSmartGotoPosition::validateFinalTarget(CGeoPoint& finalTarget, const CVisionModule* pVision, bool shrinkTheirPenalty, double avoidLength, bool isGoalie) {
-    // ??λ?? (FREE_KICK) ??????????????????20????.
+    // 定位球 (FREE_KICK) 的时候需要多避对方禁区20厘米.
     double theirPenaltyAvoidLength = avoidLength;
     if (playerFlag & PlayerStatus::FREE_KICK) {
         theirPenaltyAvoidLength += 20.0;
@@ -400,7 +409,7 @@ void CSmartGotoPosition::validateFinalTarget(CGeoPoint& finalTarget, const CVisi
     else if (!shrinkTheirPenalty) {
         theirPenaltyAvoidLength += Param::Vehicle::V2::PLAYER_SIZE;
     }
-    // ?????????????????? NOT_DODGE_PENALTY ???λ???????????????????
+    // 同时满足不是放球而且不带 NOT_DODGE_PENALTY 标志位的情况下才会更正目标点
     if  (WorldModel::Instance()->CurrentRefereeMsg() != "ourBallPlacement" && !(playerFlag & PlayerStatus::NOT_DODGE_PENALTY)) {
         finalTarget = Utils::MakeInField(finalTarget, -1*Param::Field::FIELD_WALL_DIST);
         if (!isGoalie && Utils::InOurPenaltyArea(finalTarget, avoidLength))
@@ -454,7 +463,7 @@ bool CSmartGotoPosition::validateStartPoint(CGeoPoint& startPoint, double avoidL
     }
 }
 
-// ????????????????λ????????????????????????????λ??????
+// 考虑到点后的速度对末位置的漂移影响，速度在垂直于轨迹线方向对初始位置的影响
 CVector CSmartGotoPosition::validateFinalVel(const bool isGoalie, const CGeoPoint& startPos, const CGeoPoint &targetPos, const CVector &targetVel) {
 
     if (targetVel.mod() < 1e-8) return CVector(0.0, 0.0);
@@ -506,7 +515,7 @@ CVector CSmartGotoPosition::validateFinalVel(const bool isGoalie, const CGeoPoin
     return velNew;
 }
 
-// ?????????????й??滮???????
+// 单独处理禁区有关的规划失败问题
 CGeoPoint CSmartGotoPosition::dealPlanFail(CGeoPoint startPoint, CGeoPoint nextPoint, double avoidLength, bool shrinkTheirPenalty) {
     CGeoRectangle theirPenalty(CGeoPoint(Param::Field::PITCH_LENGTH / 2 -Param::Field::PENALTY_AREA_DEPTH, -Param::Field::PENALTY_AREA_WIDTH / 2), CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2));
     CGeoRectangle ourPenalty(CGeoPoint(-Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2), CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH, Param::Field::PENALTY_AREA_WIDTH / 2));
@@ -609,7 +618,7 @@ CGeoPoint CSmartGotoPosition::finalPointBallPlacement(const CGeoPoint &startPoin
     double avoidBuffer = 60;
     canDirect = true;
 
-    ///????1????????????????????????????????????????????
+    ///情况1：自己和目标都在区域内，把自己移出区域并作为新的目标点；
     if (obsSegment.dist2Point(startPoint) < obsRadius + avoidLength /*&&
             obsSegment.dist2Point(target) < obsRadius + avoidLength*/) {
         GDebugEngine::Instance()->gui_debug_msg(startPoint, "Me In, Target In", COLOR_ORANGE);
@@ -649,7 +658,7 @@ CGeoPoint CSmartGotoPosition::finalPointBallPlacement(const CGeoPoint &startPoin
         canDirect = false;
     }
 
-    ///????2?? ????????????????????????????????????????????
+    ///情况2： 自己在区域外，目标在区域内，将目标移动到己方区域边界
     else if (obsSegment.dist2Point(startPoint) > obsRadius + avoidLength &&
         obsSegment.dist2Segment(pathLine) < obsRadius + avoidLength) {
         GDebugEngine::Instance()->gui_debug_msg(startPoint, "Me Out, Target In", COLOR_ORANGE);
@@ -671,7 +680,7 @@ CGeoPoint CSmartGotoPosition::finalPointBallPlacement(const CGeoPoint &startPoin
         canDirect = false;
     }
 
-    ///????3?????????????????????????????????????????????????????????????????
+    //情况3：自己和目标点都在区域外，且分居区域两侧，将自己尽可能向靠近目标点的区域外同侧移动
     else if (obsSegment.dist2Point(startPoint) > obsRadius + avoidLength && obsSegment.dist2Point(target) > obsRadius + avoidLength && obsSegment.dist2Segment(CGeoSegment(startPoint, target)) < obsRadius + avoidLength) {
         GDebugEngine::Instance()->gui_debug_msg(startPoint, "Me Out, Target Out", 0);
         targetNew = startPoint;
@@ -696,7 +705,7 @@ CGeoPoint CSmartGotoPosition::finalPointBallPlacement(const CGeoPoint &startPoin
 
     }
 
-    ///????4????????????????????????????????????????????????????????????????
+    //情况4：自己在区域内，目标在区域外，新目标点为目标点向自己方向移动的区域边界对应点
     else if (obsSegment.dist2Point(startPoint) < obsRadius + avoidLength && obsSegment.dist2Point(target) > obsRadius + avoidLength) {
         GDebugEngine::Instance()->gui_debug_msg(startPoint, "Me In, Target Out", 0);
         targetNew = target;

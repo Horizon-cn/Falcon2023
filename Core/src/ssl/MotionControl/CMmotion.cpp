@@ -614,6 +614,8 @@ void goto_point_omni( const PlayerVisionT& start,
     //     ang_v = -max_angle_speed;
     // }
 
+    /* added wheel constraint -> v and ang_v*/
+
     float WHEEL_CENTER_OFFSET = 0.082f; /* ÂÖ×Ó¾à³µÖÐÐÄ¾àÀë(m) */
     float D_WHEEL_ANGLE_FRONT = 55; /* Ç°ÂÖÓëÖáÏß½Ç¶È(¶È) Ç°ÂÖÂÖ×ÓÖáÏßÓëÐ¡³µÇ°ºóÖáÏß½Ç¶È*/
     float D_WHEEL_ANGLE_BACK_2013 = 125; /* ºóÂÖÓëÖáÏß½Ç¶È(¶È) */
