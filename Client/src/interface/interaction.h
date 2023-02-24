@@ -63,11 +63,17 @@ class Interaction : public QObject {
     Q_INVOKABLE QStringList getSerialPortsList();
     Q_INVOKABLE int getFrequency();
     Q_INVOKABLE int getMaxFrequency();
+    Q_INVOKABLE QStringList getFrequencyList();
     Q_INVOKABLE void updateCommandParams(int, int, int, int, bool, int, int, bool, int);
     Q_INVOKABLE bool sendCommand(int);
     Q_INVOKABLE bool getInfrared(int);
 
     Q_INVOKABLE void startRecordCommands(bool);
+
+    Q_INVOKABLE void updatePlayList();
+    Q_INVOKABLE QStringList getPlayList();
+    Q_INVOKABLE void changeReadyPlay(int);
+    Q_INVOKABLE void defineScriptsSetting();
 
 private:
     QString RBKpath[PARAM::TEAMS];

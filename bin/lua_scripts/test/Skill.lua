@@ -1,13 +1,13 @@
 gSkillTable = {}
 
-for _, value in ipairs(gSkill) do
+for _, value in pairs(gSkill) do
 	local filename = LUA_SCRIPTS_SKILL_PATH ..value..".lua"
-	dofile(filename)
+	local skill = dofile(filename)
+	if skill ~= nil then
+		gSkillTable[value] = skill
+	end
 end
 
 function gSkillTable.CreateSkill(spec)
-	assert(type(spec.name) == "string")
-	--print("Init Skill: "..spec.name)	
-	gSkillTable[spec.name] = spec
 	return spec
 end

@@ -119,7 +119,7 @@ $ sudo make install
 	- 如果需要使用GPU，按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置
 	- 运行 bin/package.bat，首次编译或更换qt路径时需删除package.txt重新输入路径,如：
 		- Where is QT QML : D:\QT\5.15.2\msvc2019_64\qml
-   		- Where is Client QML : D:\Nest_Run_2023\Client\src\qml
+   		- Where is Client QML : D:\Falcon_2023\Client\src\qml
 
 ## 使用方法
 

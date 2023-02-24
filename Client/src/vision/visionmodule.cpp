@@ -63,7 +63,7 @@ void CVisionModule::udpSocketConnect() {
     }
     if (!opm->isSimulation || grsimInterface != 0 || !opm->useSimInside) {
         //qDebug() << "VisionPort : " << vision_port;
-        
+
         udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress);
         //udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address));
         udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address), NetworkInterfaces::Instance()->getFromIndex(_interface));

@@ -26,8 +26,8 @@ namespace {
 
 CDecisionModule::CDecisionModule(const COptionModule* pOption, CVisionModule* pVision): _pOption(pOption),_pVision(pVision)
 {		
-	//LuaModule::Instance()->RunScript("../lua_scripts/test/Init.lua");
 		if(USE_LUA_SCRIPTS){
+			//LuaModule::Instance()->RunScript("../lua_scripts/test/Init.lua");
 			LuaModule::Instance()->RunScript("../lua_scripts/ssl/StartZeus.lua");
 		}
 }
@@ -81,6 +81,7 @@ void CDecisionModule::DoTeamMode()
 {
 	// 两种策略库进行决策规划
 	if (USE_LUA_SCRIPTS){
+		//LuaModule::Instance()->RunScript("../lua_scripts/test/SelectPlay.lua");
 		LuaModule::Instance()->RunScript("../lua_scripts/ssl/SelectPlay.lua");
 	} else {
         qDebug()<<"other decision yet to be implemented, plz use lua";

@@ -24,6 +24,7 @@
 #include "game.h"
 #include "shellapi.h"
 #include "remotesim.h"
+#include "scriptsinterfaces.h"
 namespace {
 QProcess *blueRBKProcess = nullptr;
 QProcess *yellowRBKProcess = nullptr;
@@ -483,6 +484,12 @@ int Interaction::getFrequency(){
 int Interaction::getMaxFrequency(){
     return Owl::ActionModule::Instance()->getMaxFrequency();
 }
+QStringList Interaction::getFrequencyList() {
+    QStringList frequencyList;
+    for(int i = 0; i <= Owl::ActionModule::Instance()->getMaxFrequency(); i++)
+       frequencyList.append(QString(i));
+    return frequencyList;
+}
 void Interaction::updateCommandParams(int robotID, int velX, int velY, int velR, bool dribble, int dribbleLevel, int mode, bool shoot, int power) {
     static int last_mode = -1;
     if (mode != last_mode) {
@@ -506,4 +513,15 @@ bool Interaction::getInfrared(int robotID) {
 void Interaction::startRecordCommands(bool start){
     ZCommunicator::Instance()->startRecordCommands(start);
 }
-
+void Interaction::updatePlayList() {
+    ScriptsInterfaces::Instance()->updatePlayList();
+}
+QStringList Interaction::getPlayList() {
+    return ScriptsInterfaces::Instance()->getPlayList();
+}
+void Interaction::changeReadyPlay(int currentIndex) {
+    ScriptsInterfaces::Instance()->changeReadyPlay(currentIndex);
+}
+void Interaction::defineScriptsSetting() {
+    ScriptsInterfaces::Instance()->writeJsonFile();
+}

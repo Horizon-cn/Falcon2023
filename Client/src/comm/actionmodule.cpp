@@ -181,7 +181,8 @@ namespace Owl {
                 //if (shoot[0]) qDebug() << shoot[0] << "command" << tx.toHex();
                 serial.write(tx.data(), TRANSMIT_PACKET_SIZE);
                 serial.flush();
-                //serial.waitForBytesWritten(TRANSMIT_PACKET_SIZE * 8.0 * 1000 / 115200 + 0.6); //ms 延时包括串口传输和发射机发送时间
+                serial.waitForBytesWritten(TRANSMIT_PACKET_SIZE * 8.0 * 1000 / 115200 + 0.6); //ms 延时包括串口传输和发射机发送时间
+                //std::this_thread::sleep_for(std::chrono::milliseconds(4));
             }
             std::fill_n(robotID, PARAM::ROBOTMAXID, PARAM::ROBOTMAXID);
             return true;
