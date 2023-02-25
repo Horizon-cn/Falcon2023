@@ -30,7 +30,7 @@ ApplicationWindow {
 //    minimumWidth: width;
 //    maximumHeight: 16777215; //height;
 //    maximumWidth: 16777215; //width;
-    color:"#e8e8e8";
+    color: "#484848";
 //    flags:Qt.FramelessWindowHint
     Timer{
         id:fpsTimer;
@@ -63,7 +63,7 @@ ApplicationWindow {
         Menu{
             title: "Widget"
             Repeater{
-                model: [dock1.uniqueName, dock2.uniqueName, dock3.uniqueName, dock4.uniqueName, dock5.uniqueName, dock6.uniqueName, dock7.uniqueName, dock8.uniqueName];
+                model: [dock1.uniqueName, dock2.uniqueName, dock3.uniqueName, dock4.uniqueName, dock5.uniqueName, dock6.uniqueName, dock7.uniqueName]; //, dock8.uniqueName];
                 MenuItem{
                     text: modelData;
                     onTriggered: {
@@ -385,11 +385,11 @@ ApplicationWindow {
             uniqueName: "RemoteControl"
             RemoteControl{}
         }
-        KDDW.DockWidget {
-            id: dock8
-            uniqueName: "Scripts"
-            Scripts{}
-        }
+        //KDDW.DockWidget {
+        //    id: dock8
+        //    uniqueName: "Scripts"
+        //    Scripts{}
+        //}
 
         Component.onCompleted: {
             // Add dock1 to the Bottom location
@@ -402,6 +402,7 @@ ApplicationWindow {
             addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnBottom, dock5);
             //dock5.addDockWidgetToContainingWindow(dock6, KDDW.KDDockWidgets.Location_OnRight);
             //dock5.addDockWidgetAsTab(dock6);
+            layoutSaver.reloadLayout("better");
         }
         function createWidget(index) {
             if (index == 0)
@@ -418,8 +419,8 @@ ApplicationWindow {
                 addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnBottom);
             else if (index == 6)
                 addDockWidget(dock7, KDDW.KDDockWidgets.Location_OnBottom);
-            else if (index == 7)
-                addDockWidget(dock8, KDDW.KDDockWidgets.Location_OnBottom);
+            //else if (index == 7)
+            //    addDockWidget(dock8, KDDW.KDDockWidgets.Location_OnBottom);
         }
     }
     property variant controlRobotShortCut:["`","1","2","3","4","5","6","7","8","9","0","-","=","i","o","p","[","Ctrl+`","Ctrl+1","Ctrl+2","Ctrl+3","Ctrl+4","Ctrl+5","Ctrl+6","Ctrl+7","Ctrl+8","Ctrl+9","Ctrl+0","Ctrl+-","Ctrl+=","Ctrl+i","Ctrl+o","Ctrl+p","Ctrl+["];

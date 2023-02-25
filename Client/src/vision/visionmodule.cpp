@@ -171,7 +171,9 @@ void CVisionModule::parseVision() {
 void CVisionModule::parse(void * ptr, int size) {
     static SSL_WrapperPacket packet;
     Owl::ReceiveVisionMessage message;
-    packet.ParseFromArray(ptr, size);  
+    packet.ParseFromArray(ptr, size);
+    if (packet.has_login_name() && opm->LoginName.toStdString() != packet.login_name())
+        return;
     if (packet.has_geometry() && opm->updateGeometry) {
         const SSL_GeometryFieldSize& field = packet.geometry().field();
         
@@ -182,7 +184,6 @@ void CVisionModule::parse(void * ptr, int size) {
     if (packet.has_detection()) {
         //t = QTime::currentTime();
         const SSL_DetectionFrame& detection = packet.detection();
-        if(opm->isSimulation && opm->LoginName != detection.login_name()) return;
         message.camID = detection.camera_id();
         if (message.camID >= opm->total_cameras || message.camID < 0 || !GlobalData::Instance()->cameraControl[message.camID]) {
             qDebug() << "get invalid camera id : " << message.camID;

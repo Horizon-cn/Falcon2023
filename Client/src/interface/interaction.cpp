@@ -128,16 +128,15 @@ void Interaction::chooseCraypath() {
     }
 }**/
 bool Interaction::controlBlueRBK(bool control) {
-    if(control == false) {
-        if (blueRBKProcess != nullptr) {
-            if (blueRBKProcess->isOpen()) {
-                blueRBKProcess->close();
-            }
-            delete blueRBKProcess;
-            blueRBKProcess = nullptr;
-            QTextStream(stdout) << "\n------------------------------------\nexit blue rbk\n------------------------------------\n";
+    if (blueRBKProcess != nullptr) {
+        if (blueRBKProcess->isOpen()) {
+            blueRBKProcess->close();
         }
-    } else {
+        delete blueRBKProcess;
+        blueRBKProcess = nullptr;
+        QTextStream(stdout) << "\n------------------------------------\nexit blue rbk\n------------------------------------\n";
+    }
+    if (control) {
         blueRBKProcess = new QProcess();
         // 告诉要打开的APP他的路径
         blueRBKProcess->setWorkingDirectory(RBKdirectory[PARAM::BLUE]); //"../RBK_RUN_2015/bin");
@@ -154,16 +153,15 @@ bool Interaction::controlBlueRBK(bool control) {
     return true;
 }
 bool Interaction::controlYellowRBK(bool control) {
-    if(control == false) {
-        if (yellowRBKProcess != nullptr) {
-            if (yellowRBKProcess->isOpen()) {
-                yellowRBKProcess->close();
-            }
-            delete yellowRBKProcess;
-            yellowRBKProcess = nullptr;
-            QTextStream(stdout) << "\n------------------------------------\nexit yellow rbk\n------------------------------------\n";
+    if (yellowRBKProcess != nullptr) {
+        if (yellowRBKProcess->isOpen()) {
+            yellowRBKProcess->close();
         }
-    } else {
+        delete yellowRBKProcess;
+        yellowRBKProcess = nullptr;
+        QTextStream(stdout) << "\n------------------------------------\nexit yellow rbk\n------------------------------------\n";
+    }
+    if (control) {
         yellowRBKProcess = new QProcess();
         yellowRBKProcess->setWorkingDirectory(RBKdirectory[PARAM::YELLOW]); //"../RBK_RUN_2015/bin");
         yellowRBKProcess->setCreateProcessArgumentsModifier(
@@ -178,16 +176,15 @@ bool Interaction::controlYellowRBK(bool control) {
     return true;
 }
 bool Interaction::controlSim(bool control, bool show) {
-    if(control == false) {
-        if (simProcess != nullptr) {
-            if (simProcess->isOpen()) {
-                simProcess->close();
-            }
-            delete simProcess;
-            simProcess = nullptr;
-            QTextStream(stdout) << "\n------------------------------------\nexit Sim\n------------------------------------\n";
+    if (simProcess != nullptr) {
+        if (simProcess->isOpen()) {
+            simProcess->close();
         }
-    } else {
+        delete simProcess;
+        simProcess = nullptr;
+        QTextStream(stdout) << "\n------------------------------------\nexit Sim\n------------------------------------\n";
+    }
+    if (control) {
         simProcess = new QProcess();
         QString name =  QString("\"").append(SIMpath).append("\"");
         QStringList args;
@@ -220,16 +217,15 @@ bool Interaction::controlCray(bool control) {
     return true;
 }**/
 bool Interaction::controlMonitor(bool control) {
-    if(control == false) {
-        if (monitorProcess != nullptr) {
-            if (monitorProcess->isOpen()) {
-                monitorProcess->close();
-            }
-            delete monitorProcess;
-            monitorProcess = nullptr;
-            QTextStream(stdout) << "\n------------------------------------\nexit Monitor\n------------------------------------\n";
+    if (monitorProcess != nullptr) {
+        if (monitorProcess->isOpen()) {
+            monitorProcess->close();
         }
-    } else {
+        delete monitorProcess;
+        monitorProcess = nullptr;
+        QTextStream(stdout) << "\n------------------------------------\nexit Monitor\n------------------------------------\n";
+    }
+    if (control) {
         monitorProcess = new QProcess();
         QString name = "sh ProcessAlive.sh"; //"./ProcessAlive.exe";
         monitorProcess->start(name);

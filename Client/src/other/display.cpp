@@ -20,8 +20,8 @@ float MAP_HEIGHT;
 float MAXIMUM;
 qreal zoomRatio = 1;
 const static qreal zoomStep = 0.05;
-const static qreal zoomMax = 20;
-const static qreal zoomMin = 0.1;
+const static qreal zoomMax = 10;
+const static qreal zoomMin = 0.5;
 int pressed = -1;
 QPoint start, end;
 float ax(float a) {return limitRange(a, 0.0f, 1.0f) * MAP_WIDTH;}
@@ -378,6 +378,8 @@ void Display::wheelEvent(QWheelEvent* e) {
     zoomRatio = limitRange(zoomRatio, zoomMin, zoomMax);
     qDebug() << "zoomRatio" << zoomRatio;
     pixmapPainter.setRenderHint(QPainter::Antialiasing, zoomRatio > 0.5);
+    if (!display)
+        repaint();
 }
 #endif
 

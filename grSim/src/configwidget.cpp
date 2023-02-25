@@ -45,7 +45,7 @@ ConfigWidget::ConfigWidget()
   this->setModel(tmodel);
   use_vars = VarListPtr(new VarList("User"));
   world.push_back(use_vars); 
-  ADD_VALUE(use_vars,Double,LoginName,opm->value("Alert", "LoginName", 0).toDouble(),"LoginName")
+  ADD_VALUE(use_vars,String,LoginName,opm->value("Alert", "LoginName", "SRC").toString().toStdString(),"LoginName")
   geo_vars = VarListPtr(new VarList("Geometry"));
   world.push_back(geo_vars);  
   robot_settings = new QSettings;

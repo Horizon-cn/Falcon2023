@@ -15,6 +15,7 @@ Page{
         running:!scriptsSetting.definedSetting; //true;
         repeat:true;
         onTriggered: {
+            console.log("updateModel");
             playSettingComboBox.updateModel();
         }
     }

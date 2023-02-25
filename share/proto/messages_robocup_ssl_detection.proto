@@ -35,5 +35,4 @@ message SSL_DetectionFrame {
   repeated SSL_DetectionBall  balls         = 5;
   repeated SSL_DetectionRobot robots_yellow = 6;
   repeated SSL_DetectionRobot robots_blue   = 7;
-  optional double             login_name    = 8;
 }
