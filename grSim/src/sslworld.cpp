@@ -416,7 +416,8 @@ void SSLWorld::step(dReal dt)
         dt = customDT;
     const auto ratio = m_parent->devicePixelRatio();
     g->initScene(m_parent->width()*ratio,m_parent->height()*ratio,0,0.7,1);
-    for (int kk=0;kk<5;kk++)
+    int ballCollisionTry = 4; // 5;
+    for (int kk=0;kk<ballCollisionTry;kk++)
     {
         const dReal* ballvel = dBodyGetLinearVel(ball->body);
         dReal ballspeed = ballvel[0]*ballvel[0] + ballvel[1]*ballvel[1] + ballvel[2]*ballvel[2];
@@ -443,7 +444,7 @@ void SSLWorld::step(dReal dt)
         else last_dt = dt;
 
         selected = -1;
-        p->step(dt*0.2);
+        p->step(dt * 1.0 / ballCollisionTry);
     }	
 	dReal ball_x = dBodyGetPosition(ball->body)[0], ball_y = dBodyGetPosition(ball->body)[1];
 	if (closeWallSimulation && (touchGoal(ball_x, ball_y, cfg->BallRadius()) || OutofField(ball_x, ball_y, cfg->BallRadius())))

@@ -51,7 +51,7 @@ void RefereeBox::multicastCommand(){
 
     ssl_referee.set_command_timestamp(0);//todo
     Referee_TeamInfo *yellow = ssl_referee.mutable_yellow();
-    yellow->set_name(opm->blueTeam.toStdString());
+    yellow->set_name(opm->yellowTeam);
     yellow->set_score(0);//todo
     yellow->set_red_cards(0);//todo
     //yellow->set_yellow_card_times(0,0); //todo
@@ -60,7 +60,7 @@ void RefereeBox::multicastCommand(){
     yellow->set_timeout_time(0.0);//todo
     yellow->set_goalkeeper(0); //todo
     Referee_TeamInfo *blue = ssl_referee.mutable_blue();
-    blue->set_name(opm->yellowTeam.toStdString());
+    blue->set_name(opm->blueTeam);
     blue->set_score(0);//todo
     blue->set_red_cards(0);//todo
     //blue->set_yellow_card_times(0,0); //todo

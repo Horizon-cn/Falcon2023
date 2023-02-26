@@ -40,9 +40,9 @@
 - [ ] Client界面优化
 	- [x] 采用KDDockWidgets
 	- [x] 优化界面的初始化排布，分界面可恢复
-	- [ ] 优化各种显示物体的大小，画面整洁易观察
+	- [x] 优化各种显示物体的大小，画面整洁易观察
 	- [ ] Fields初始大小有时会有问题，填充不满
-	- [ ] 裁判盒优化，恢复next command
+	- [x] 裁判盒优化，恢复next command
 	- [ ] 解决关于KDDockWidgets的Warning
 	- [ ] 分图层绘制，防止Fields崩溃
 	- [ ] 与视觉模块解耦，分线程运行
@@ -70,6 +70,7 @@
 
 - 软件
 	- [Qt ≥ 5.15](https://www.qt.io/)
+		- 需要用在线下载器下载，[在线下载器](https://jbox.sjtu.edu.cn/l/q1w86N)
 	- [CMake](https://cmake.org/download/)
 	- [Visual Studio](https://visualstudio.microsoft.com/zh-hans/?rr=https://www.microsoft.com/zh-cn/)
 		- Visual Studio 2019, CMake ≥ 3.14
@@ -99,7 +100,7 @@ $ sudo make install
 ```
 - Windows : 
 	- 注意检查是否有 3rdParty
-	- 建议先修改 cmake/GetThirdParty.cmake 中的QT部分，输入电脑上的QT路径
+	- **电脑上有多个版本QT，特别是有anaconda的同学**，先修改 cmake/GetThirdParty.cmake 中的QT部分，输入电脑上的QT路径
 		- set(CMAKE_PREFIX_PATH "D:/QT/5.15.2/msvc2019_64/lib/cmake/Qt5") 
 	- 使用CMake Gui，输入源代码所在目录和编译目录，如：
 		- Where is the source code : D:/Falcon_2023
@@ -115,7 +116,7 @@ $ sudo make install
     	set(N 4)
     endif()
     ```
-	- 如果需要使用GPU，按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置
+	- 如果需要使用GPU，按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置，[cuda 12.0下载](https://jbox.sjtu.edu.cn/l/I1f4um)
 	- 运行 bin/package.bat，首次编译或更换qt路径时需删除package.txt重新输入路径,如：
 		- Where is QT QML : D:\QT\5.15.2\msvc2019_64\qml
    		- Where is Client QML : D:\Falcon_2023\Client\src\qml
@@ -130,6 +131,14 @@ $ sudo make install
 - git push 前，注意将以下配置归为默认值：
 	- gpuBestAlgThread.cpp中，#define has_GPU false
 	- 并行编译所用核数为4
+	- 关闭Client的Debug信息，在Client/CMakeLists.txt中都不要注释
+	```bash
+	if (WIN32)
+    message(${CMAKE_C_FLAGS})
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+	endif()
+	```
 
 ## 常见问题
 

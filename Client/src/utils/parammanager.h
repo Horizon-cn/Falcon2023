@@ -131,7 +131,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     int penalty_radius, penalty_area_l;
     int field_wall_dist;
     //Team
-    QString blueTeam, yellowTeam;
+    std::string blueTeam, yellowTeam;
     int KeeperID;
     //Camera Settings
     int total_cameras;
