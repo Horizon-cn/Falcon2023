@@ -141,7 +141,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     bool frared = (RobotSensor::Instance()->IsInfraredOn(vecNumber));// || isVisionHasBall(pVision, task().executor);
 
 
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("frared Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("Frared Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
 
     if (!frared)
     {
@@ -153,25 +153,11 @@ void CBreak::plan(const CVisionModule* pVision) {
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), ("Dribble Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
 
 
-
-
     TaskT grabTask(task());
-    cout<<me2enemy_dist<<endl;
-   if(me2enemy_dist<20 && alphaangle<60 * Param::Math::PI / 180.0&&!isPenalty )
-//    if(true)
-    //if(isSpin&& false)
-    {
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 100), ("Spin" + to_string(0)).c_str(), COLOR_YELLOW);
-
-        cout<<"SPIN!"<<endl;
-        grabTask.player.angle=holdBallDir(pVision,vecNumber);
-
-    }
 
 
-    else{
-       grabTask.player.angle = finalDir;
-   }
+    grabTask.player.angle = finalDir;
+   
 
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
     if (pVision->Cycle() % 60== 0 ) {
@@ -180,9 +166,6 @@ void CBreak::plan(const CVisionModule* pVision) {
     else {
         calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     }
-
-
-
 
     if (DEBUG) GDebugEngine::Instance()->gui_debug_line(dribblePoint, move_point, COLOR_PURPLE);
     grabTask.player.max_acceleration=120;
@@ -206,12 +189,6 @@ void CBreak::plan(const CVisionModule* pVision) {
     }
 
 
-
-
-
-
-
-
     GDebugEngine::Instance()->gui_debug_x(move_point, COLOR_RED);
     GDebugEngine::Instance()->gui_debug_x(passTarget, COLOR_RED);
     grabTask.player.flag |= PlayerStatus::ALLOW_DSS;
@@ -227,22 +204,13 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
 
-    if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 50
-        //vel_vertical_target < 5
-        //	)
-        //|| (me.Pos()-dribblePoint).mod()>=100
-        ) {
+    if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 50) {
         cout << "shoot!!!" << endl;
         DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
         KickStatus::Instance()->setKick(vecNumber, power);//力度可调
 
     }
-
-
-
     DribbleStatus::Instance()->setDribbleCommand(vecNumber, 3);
-
-
 
     _lastCycle = pVision->Cycle();
     return CStatedTask::plan(pVision);
