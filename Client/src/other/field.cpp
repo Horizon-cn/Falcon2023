@@ -625,6 +625,8 @@ void Field::wheelEvent (QWheelEvent *e) {
 void Field::setSize(int width, int height) {
     opm->updateParam(opm->canvasHeight, "Canvas/canvasHeight", height, true);
     opm->updateParam(opm->canvasWidth, "Canvas/canvasWidth", width, true);
+    // 自动保持场地的正常尺寸
+    opm->updateParam(opm->param_canvasHeight, "Canvas/param_canvasHeight", height * 1.0 / width * opm->param_canvasWidth, true);
     GlobalSettings::Instance()->needRepaint();
 }
 void Field::triggerDraw() { //滚轮触发一次更新一次
@@ -948,6 +950,8 @@ void Field::drawDebugMessages(int team) {
     }
 //    qDebug() << "FUCK DEBUG MESSAGE SIZE" << msgs.ByteSize();
     GlobalData::Instance()->debugMutex.unlock();
+    if (msgs.has_login_name() && msgs.login_name() != opm->LoginName)
+        return;
 //    qDebug() << "FUCK DEBUG SIZE" << msgs.msgs_size();
     pixmapPainter.setFont(QFont("Helvetica [Cronyx]", ::w(130), QFont::Normal)); //QFont::Bold));
     pixmapPainter.setBrush(QBrush(DEBUG_BRUSH_COLOR));
@@ -1068,6 +1072,8 @@ void Field::receiveBlue(){
             datagram.resize(receiverBlue->pendingDatagramSize());
             receiverBlue->readDatagram(datagram.data(),datagram.size());
             blueHeatMap.ParseFromArray(datagram.data(), datagram.size());
+            if (blueHeatMap.has_login_name() && blueHeatMap.login_name() != opm->LoginName)
+                break;
             auto size = blueHeatMap.points_size();
             for(int i = 0; i < size; i++) {
                 auto heatPoints = blueHeatMap.points(i);
@@ -1111,6 +1117,8 @@ void Field::receiveYellow(){
             datagram.resize(receiverYellow->pendingDatagramSize());
             receiverYellow->readDatagram(datagram.data(),datagram.size());
             yellowHeatMap.ParseFromArray(datagram.data(), datagram.size());
+            if (yellowHeatMap.has_login_name() && yellowHeatMap.login_name() != opm->LoginName)
+                break;
             auto size = yellowHeatMap.points_size();
             for(int i = 0; i < size; i++) {
                 auto heatPoints = yellowHeatMap.points(i);

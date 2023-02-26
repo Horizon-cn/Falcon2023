@@ -187,6 +187,7 @@ void CGDebugEngine::gui_debug_add(const net_gdebug& new_debug)
 void CGDebugEngine::send(bool teamIsBlue){
     static QByteArray data;
     _debug_mutex->lock();
+	guiDebugMsgs.set_login_name(OParamManager::Instance()->LoginName);
     int size = guiDebugMsgs.ByteSize();
     data.resize(size);
     guiDebugMsgs.SerializeToArray(data.data(),size);

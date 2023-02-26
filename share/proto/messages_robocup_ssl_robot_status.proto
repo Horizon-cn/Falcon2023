@@ -9,4 +9,5 @@ message Robot_Status {
   required bool infrared   = 2;
   required bool flat_kick  = 3;
   required bool chip_kick  = 4;
+  optional string login_name = 5;
 }

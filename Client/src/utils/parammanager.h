@@ -101,7 +101,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     }
   public:
     //Global Settings
-    QString LoginName;
+    std::string LoginName;
     bool isSimulation, isYellow, isRight;
     QString field;
     bool updateGeometry;

@@ -95,6 +95,8 @@ bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameIn
     receive_vision_mutex.lock();
     vision = rec_vision;
     receive_vision_mutex.unlock();
+    if (vision.has_login_name() && vision.login_name() != OParamManager::Instance()->LoginName) // ´®ÆµÎÊÌâ
+        return false;
     info.cycle = ++strategy_cycle;
     info.mode = m_play_mode;
     info.ball.pos.valid = vision.has_balls();
@@ -201,6 +203,8 @@ void CDataReceiver4rbk::receiveRefMsgs() {
             datagram.resize(referee_socket.pendingDatagramSize());
             referee_socket.readDatagram(datagram.data(), datagram.size());
             ssl_referee.ParseFromArray((void*)datagram.data(), datagram.size());
+            if (ssl_referee.has_login_name() && ssl_referee.login_name() != OParamManager::Instance()->LoginName)
+                break;
             PlayMode next_play_mode = PMNone; // avoid next command is none
             if (ssl_referee.has_next_command()) { // check next command first
                 Referee_Command next_command = ssl_referee.next_command();

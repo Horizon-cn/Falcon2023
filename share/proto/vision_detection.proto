@@ -39,4 +39,5 @@ message Vision_DetectionFrame {
   required Vision_DetectionBall  balls         = 1;
   repeated Vision_DetectionRobot robots_yellow = 2;
   repeated Vision_DetectionRobot robots_blue   = 3;
+  optional string login_name = 4;
 }

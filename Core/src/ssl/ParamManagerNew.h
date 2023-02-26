@@ -26,7 +26,7 @@ public:
     }
 public:
     //Global Settings
-    QString LoginName;
+    std::string LoginName;
     bool isSimulation, isYellow, isRight;
     //Useful Ports
     int refereePortToBlue, refereePortToYellow;

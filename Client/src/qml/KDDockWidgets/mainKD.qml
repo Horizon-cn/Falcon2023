@@ -285,15 +285,35 @@ ApplicationWindow {
 //                  color:"#11ffffff";
 //                  visible: false;
 //              }
+                Rectangle{
+                    property int lineWidth:1;
+                    id:mouseXRectangle;
+                    width:parent.width;
+                    height:lineWidth;
+                    x:0;
+                    color:"white";
+                    visible: true;
+                }
+                Rectangle{
+                    property int lineWidth:1;
+                    id:mouseYRectangle;
+                    width:lineWidth;
+                    height:parent.height;
+                    y:0;
+                    color:"white";
+                    visible: true;
+                }
                 MouseArea{
                     anchors.fill: parent;
                     hoverEnabled: true;
                     acceptedButtons: Qt.NoButton;
                     onPositionChanged: {
-                        positionLeftDisplay.strX = (interaction4field.getRealX(mouseX)).toString();
+                        mouseXRectangle.y = mouseY - mouseXRectangle.lineWidth / 2;
+                        mouseYRectangle.x = mouseX - mouseYRectangle.lineWidth / 2;
+                        positionLeftDisplay.strX = interaction4field.getRealX(mouseX).toString();
                         positionLeftDisplay.strY = (-interaction4field.getRealY(mouseY)).toString();
                         positionRightDisplay.strX = (-interaction4field.getRealX(mouseX)).toString();
-                        positionRightDisplay.strY = (interaction4field.getRealY(mouseY)).toString();
+                        positionRightDisplay.strY = interaction4field.getRealY(mouseY).toString();
                     }
                 }
 

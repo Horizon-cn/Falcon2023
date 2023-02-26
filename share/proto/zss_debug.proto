@@ -85,6 +85,7 @@ message Debug_Msg {
 }
 message Debug_Msgs{
 	repeated Debug_Msg msgs= 1;
+	optional string login_name = 2;
 }
 
 message Debug_Score{

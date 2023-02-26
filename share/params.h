@@ -17,6 +17,7 @@ namespace Falcon {
         bool loadParam(int&, const QString&, int d = 0);
         bool loadParam(double&, const QString&, double d = 0);
         bool loadParam(QString&, const QString&, QString d = "");
+        bool loadParam(std::string&, const QString&, QString d = "");
         bool loadParam(bool&, const QString&, bool d = false);
         bool loadParam(double* value, const QString& key1, const QString& key2, double* defaultValue, const int size);
         bool changeParam(const QString&, const QVariant&);

@@ -12,6 +12,7 @@ message Heat_Points{
 }
 message Heat_Map{
 	repeated Heat_Points points = 1;
+	optional string login_name = 2;
 }
 message Heat_Points_New{
     required int32 color = 1;
@@ -19,5 +20,6 @@ message Heat_Points_New{
 }
 message Heat_Map_New{
 	repeated Heat_Points_New points = 1;
+	optional string login_name = 2;
 }
 

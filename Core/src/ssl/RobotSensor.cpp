@@ -60,6 +60,8 @@ void CRobotSensor::receiveRobotStatus()
             datagram.resize(robot_status_socket->pendingDatagramSize());
             robot_status_socket->readDatagram(datagram.data(), datagram.size());
             robot_status.ParseFromArray(datagram, datagram.size());
+            if (robot_status.has_login_name() && robot_status.login_name() != OParamManager::Instance()->LoginName)
+                break;
             if (!robot_status.has_robot_id()) {
                 qDebug()<<"no robot status";
                 continue;

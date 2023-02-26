@@ -126,6 +126,8 @@ void RemoteSim::readBlueData() {
             //qDebug()<<"size"<<robotsPacket.robots_status_size()<<i;
             //i++;
             for (int i = 0; i < robotsPacket.robots_status_size(); ++i) {
+                if (robotsPacket.robots_status(i).has_login_name() && robotsPacket.robots_status(i).login_name() != opm->LoginName)
+                    break;
                 int id = robotsPacket.robots_status(i).robot_id();
                 bool infrared = robotsPacket.robots_status(i).infrared();
                 bool isFlatKick = robotsPacket.robots_status(i).flat_kick();
@@ -153,8 +155,10 @@ void RemoteSim::readYellowData() {
             datagram.resize(yellowReceiveSocket.pendingDatagramSize());
             yellowReceiveSocket.readDatagram(datagram.data(), datagram.size());
             robotsPacket.ParseFromArray(datagram, datagram.size());
-            qDebug()<<"receive";
+            //qDebug()<<"receive";
             for (int i = 0; i < robotsPacket.robots_status_size(); ++i) {
+                if (robotsPacket.robots_status(i).has_login_name() && robotsPacket.robots_status(i).login_name() != opm->LoginName)
+                    break;
                 int id = robotsPacket.robots_status(i).robot_id();
                 bool infrared = robotsPacket.robots_status(i).infrared();
                 bool isFlatKick = robotsPacket.robots_status(i).flat_kick();
@@ -179,6 +183,8 @@ void RemoteSim::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
     grSim_Packet& grsim_packet = (t == 0 ? grsim_packet_blue : grsim_packet_yellow);
     grSim_Commands * grsim_commands = (t == 0 ? grsim_commands_blue : grsim_commands_yellow);
     grSim_Robot_Command **grsim_robots = (t == 0 ? grsim_robots_blue : grsim_robots_yellow);
+    // 线上赛仿真器如果用grSim，下一行要注掉
+    grsim_packet.set_login_name(opm->LoginName);
     grsim_commands->set_isteamyellow(t == 0 ? false : true);
     grsim_commands->set_timestamp(0);
     int command_size = command.command_size();

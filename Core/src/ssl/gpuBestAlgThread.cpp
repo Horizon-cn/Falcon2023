@@ -425,6 +425,7 @@ void CGPUBestAlgThread::sendPointValue() {
     //Heat_Map msgs;
     OWL::Protocol::Heat_Map_New msgs;
 	for (int m = gpuCalcArea::Color_Size - 1; m >= 0; m--) { //先把重要的点发过去
+		msgs.set_login_name(OParamManager::Instance()->LoginName);
 		auto points = msgs.add_points();
 		for (int n = m * point_size / gpuCalcArea::Color_Size; n < (m + 1) * point_size / gpuCalcArea::Color_Size; n++) {
 			points->add_pos(pointValueList.at(n).pos);

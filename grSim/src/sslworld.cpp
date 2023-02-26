@@ -522,6 +522,7 @@ void SSLWorld::step(dReal dt)
 void SSLWorld::addRobotStatus(Robots_Status& robotsPacket, int robotID, int team, bool infrared, KickStatus kickStatus)
 {
     Robot_Status* robot_status = robotsPacket.add_robots_status();
+    robot_status->set_login_name(cfg->LoginName());
     robot_status->set_robot_id(robotID);
 
     if (infrared)
@@ -574,6 +575,8 @@ void SSLWorld::recvActions()
         if (size > 0)
         {
             packet.ParseFromArray(in_buffer, size);
+            if (packet.has_login_name() && packet.login_name() != cfg->LoginName())
+                break;
             int team=0;
             if (packet.has_commands())
             {

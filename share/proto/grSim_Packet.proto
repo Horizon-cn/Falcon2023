@@ -8,4 +8,6 @@ message grSim_Packet {
 
     optional float noise = 3;
     optional float vanish = 4;
+
+    optional string login_name = 5;
 }

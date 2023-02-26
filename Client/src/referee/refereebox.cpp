@@ -73,6 +73,8 @@ void RefereeBox::multicastCommand(){
     point->set_y(GlobalSettings::Instance()->ballPlacementY);
     // add test for next_command
     ssl_referee.set_next_command(Referee_Command(nextCommand));
+    if (GlobalData::Instance()->refereeMode == 0)
+        ssl_referee.set_login_name(opm->LoginName);
     int size = ssl_referee.ByteSize();
     QByteArray buffer(size,0);
     ssl_referee.SerializeToArray(buffer.data(), buffer.size());

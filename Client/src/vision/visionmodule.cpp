@@ -172,7 +172,7 @@ void CVisionModule::parse(void * ptr, int size) {
     static SSL_WrapperPacket packet;
     Owl::ReceiveVisionMessage message;
     packet.ParseFromArray(ptr, size);
-    if (packet.has_login_name() && opm->LoginName.toStdString() != packet.login_name())
+    if (packet.has_login_name() && opm->LoginName != packet.login_name())
         return;
     if (packet.has_geometry() && opm->updateGeometry) {
         const SSL_GeometryFieldSize& field = packet.geometry().field();
@@ -264,6 +264,7 @@ void CVisionModule::checkCommand() {
 void  CVisionModule::udpSend() {
     //udp start
     static QUdpSocket udpSendSocket;
+    detectionFrame.set_login_name(opm->LoginName);
     auto detectionBall = detectionFrame.mutable_balls();
     Owl::ReceiveVisionMessage result = GlobalData::Instance()->maintain[0];
     if (result.ballSize > 0) {

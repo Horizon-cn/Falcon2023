@@ -112,8 +112,9 @@ void SimModule::readBlueData() {
             datagram.resize(blueReceiveSocket.pendingDatagramSize());
             blueReceiveSocket.readDatagram(datagram.data(), datagram.size());
             robotsPacket.ParseFromArray(datagram, datagram.size());
-
             for (int i = 0; i < robotsPacket.robots_status_size(); ++i) {
+                if (robotsPacket.robots_status(i).has_login_name() && robotsPacket.robots_status(i).login_name() != opm->LoginName)
+                    break;
                 int id = robotsPacket.robots_status(i).robot_id();
                 bool infrared = robotsPacket.robots_status(i).infrared();
                 bool isFlatKick = robotsPacket.robots_status(i).flat_kick();
@@ -142,6 +143,8 @@ void SimModule::readYellowData() {
             yellowReceiveSocket.readDatagram(datagram.data(), datagram.size());
             robotsPacket.ParseFromArray(datagram, datagram.size());
             for (int i = 0; i < robotsPacket.robots_status_size(); ++i) {
+                if (robotsPacket.robots_status(i).has_login_name() && robotsPacket.robots_status(i).login_name() != opm->LoginName)
+                    break;
                 int id = robotsPacket.robots_status(i).robot_id();
                 bool infrared = robotsPacket.robots_status(i).infrared();
                 bool isFlatKick = robotsPacket.robots_status(i).flat_kick();
@@ -160,6 +163,8 @@ void SimModule::readYellowData() {
 
 void SimModule::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
 //void SimModule::sendSim(int t, rbk::protocol::SRC_Cmd& command) {
+    // 线上赛仿真器如果用grSim，下一行要注掉
+    grsim_packet.set_login_name(opm->LoginName);
     grsim_commands->set_timestamp(0);
     if (t == 0) {
         grsim_commands->set_isteamyellow(false);

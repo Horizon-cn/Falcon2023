@@ -483,7 +483,7 @@ int Interaction::getMaxFrequency(){
 QStringList Interaction::getFrequencyList() {
     QStringList frequencyList;
     for(int i = 0; i <= Owl::ActionModule::Instance()->getMaxFrequency(); i++)
-       frequencyList.append(QString(i));
+       frequencyList.append(QString::number(i));
     return frequencyList;
 }
 void Interaction::updateCommandParams(int robotID, int velX, int velY, int velR, bool dribble, int dribbleLevel, int mode, bool shoot, int power) {
