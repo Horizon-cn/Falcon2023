@@ -1,4 +1,3 @@
-
 # Falcon_2023
 
 2023年开始使用的新AI框架，希望拥有良好的跨平台能力
@@ -74,7 +73,7 @@
 	- [CMake](https://cmake.org/download/)
 	- [Visual Studio](https://visualstudio.microsoft.com/zh-hans/?rr=https://www.microsoft.com/zh-cn/)
 		- Visual Studio 2019, CMake ≥ 3.14
-		- Visual Studio 2022, CMake = 3.22
+		- Visual Studio 2022, [CMake = 3.22](https://github.com/Kitware/CMake/releases/download/v3.22.0/cmake-3.22.0-windows-x86_64.msi)
 - 依赖库
 	- Eigen
 	- kddockwidgets-1.5.0

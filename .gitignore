@@ -297,3 +297,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+/bin/Layout/111.json
+/.gitignore
+/bin/config
