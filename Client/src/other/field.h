@@ -33,6 +33,7 @@ public:
     double getpredict_y();
 
 private slots:
+    void updateScreen();
     void repaint();
 //paint
 private:

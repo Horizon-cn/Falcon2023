@@ -16,6 +16,7 @@ public:
     void update()
     {
         //Global Settings
+        loadParam(LoginName, "Alert/LoginName", "SRC");
         loadParam(isSimulation, "Alert/isSimulation", true);
         loadParam(isYellow, "Alert/isYellow", false);
         loadParam(isRight, "Alert/isRight", false);
@@ -25,6 +26,7 @@ public:
     }
 public:
     //Global Settings
+    QString LoginName;
     bool isSimulation, isYellow, isRight;
     //Useful Ports
     int refereePortToBlue, refereePortToYellow;

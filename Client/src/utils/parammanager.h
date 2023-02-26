@@ -25,7 +25,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     void loadParamFromFile() {
       qDebug() << "load" + filename;
       //Global Settings
-      loadParam(LoginName, "Alert/LoginName", 0);
+      loadParam(LoginName, "Alert/LoginName", "SRC");
       loadParam(isSimulation, "Alert/isSimulation", true);
       loadParam(isYellow, "Alert/isYellow", false);
       loadParam(isRight, "Alert/isRight", false);
@@ -101,7 +101,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     }
   public:
     //Global Settings
-    int LoginName;
+    QString LoginName;
     bool isSimulation, isYellow, isRight;
     QString field;
     bool updateGeometry;

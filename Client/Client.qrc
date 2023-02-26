@@ -8,6 +8,7 @@
         <file>src/qml/KDDockWidgets/ViewerKD.qml</file>
         <file>src/qml/KDDockWidgets/ToolKitKD.qml</file>
         <file>src/qml/KDDockWidgets/RemoteControl.qml</file>
+        <file>src/qml/KDDockWidgets/Scripts.qml</file>
         <file>src/qml/Widgets/main.qml</file>
         <file>src/qml/Widgets/ControlBoard.qml</file>
         <file>src/qml/Widgets/RefereeBox.qml</file>

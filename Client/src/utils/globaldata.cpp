@@ -32,7 +32,6 @@ void CGlobalData::initVision() {
     processRobot.clear();
     ballrecords.clear();
     lastTouch = -1;
-    updateSimVision = false;
     for (int i = 0; i < PARAM::CAMERA; i++) {
         camera[i].clear();
     }

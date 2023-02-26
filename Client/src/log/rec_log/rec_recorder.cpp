@@ -28,8 +28,10 @@ RecRecorder::RecRecorder(QQuickItem *parent): QQuickItem(parent) {
     connect(VisionModule::Instance(), SIGNAL(recvPacket()), this, SLOT(markNewPacket()));
 }
 RecRecorder::~RecRecorder() {
-    stop();
-    delete recIO;
+    if (filename != NULL) {
+        stop();
+        delete recIO;
+    }
 }
 void RecRecorder::start() {
     isRun = true;

@@ -28,6 +28,7 @@ class CVisionModule : public QObject {
     void storeData();
   private:
     void receiveVision();
+    void parseVision();
     void edgeTest();
     void udpSend();
     void checkCommand();

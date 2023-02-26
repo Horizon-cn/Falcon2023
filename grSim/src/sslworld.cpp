@@ -742,7 +742,7 @@ SSL_WrapperPacket* SSLWorld::generatePacket(int cam_id)
     SSL_WrapperPacket* packet = new SSL_WrapperPacket;
     dReal x,y,z,dir,k;
     ball->getBodyPosition(x,y,z);
-    packet->mutable_detection()->set_login_name(cfg->LoginName());   
+    packet->set_login_name(cfg->LoginName());   
     packet->mutable_detection()->set_camera_id(cam_id);
     packet->mutable_detection()->set_frame_number(framenum);    
     dReal t_elapsed = timer->elapsed()/1000.0;
