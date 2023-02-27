@@ -42,7 +42,7 @@ class Interaction : public QObject {
     Q_INVOKABLE void setTestMode(bool isTesting, bool runTestingScripts);
 
     Q_INVOKABLE void getBasicInfo();
-    Q_INVOKABLE void getMoreInfo();
+    //Q_INVOKABLE void getMoreInfo();
     //Q_INVOKABLE void showCurrentGrade(int);
     //Q_INVOKABLE void setChallengeMode(int);
     //Q_INVOKABLE void endChallenge();

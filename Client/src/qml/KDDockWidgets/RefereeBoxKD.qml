@@ -117,7 +117,7 @@ ScrollView {
         anchors.horizontalCenter: parent.horizontalCenter;
         property int itemWidth : (width - (columns-1) * columnSpacing - 2*padding)/columns;
         ZGroupBox{
-            title:qsTr("Referee Setting");
+            title:qsTr("Referee Setting")+translator.emptyString;
             property bool visionGetter : false;
             Grid{
                 columns: 1;
@@ -130,7 +130,7 @@ ScrollView {
                 property int itemWidth : width - 2*padding;
                 Button{
                     id:refBoxSwitch;
-                    text:(refBoxSwitch.refereeSwitch ? qsTr("Stop") : qsTr("Send"));
+                    text:(refBoxSwitch.refereeSwitch ? qsTr("Stop") : qsTr("Send"))+translator.emptyString;
                     width:parent.itemWidth;
                     property bool refereeSwitch: false;
                     onClicked: changeState();
@@ -149,7 +149,7 @@ ScrollView {
                 }
                 Button{
                     id:refBoxModeSwitch;
-                    text:(refBoxModeSwitch.refereeAutoMode ? qsTr("Auto") : qsTr("Manual"));
+                    text:(refBoxModeSwitch.refereeAutoMode ? qsTr("Auto") : qsTr("Manual"))+translator.emptyString;
                     width:parent.itemWidth;
                     property int refereeAutoMode: 0;
                     visible:refBoxSwitch.refereeSwitch;
@@ -177,7 +177,7 @@ ScrollView {
         visible: refBoxModeSwitch.refereeAutoMode!=2;
         enabled: (refBoxModeSwitch.refereeAutoMode!=2)&&refBoxSwitch.refereeSwitch;
         ZGroupBox{
-            title:qsTr("Control Command");
+            title:qsTr("Control Command")+translator.emptyString;
             Grid{
                 width:parent.width;
                 columns:2;
@@ -188,32 +188,32 @@ ScrollView {
                 padding: 0;
                 ZRefButton{
                     property int index : Client.RefBoxCommand.HALT;
-                    text:qsTr("Halt");
+                    text:qsTr("Halt")+translator.emptyString;
                     onClicked:getButtonsCommand(index);
                     enabled: haltGame;
                 }
                 ZRefButton{
                     property int index : Client.RefBoxCommand.STOP_GAME;
-                    text:qsTr("Stop Game");
+                    text:qsTr("Stop Game")+translator.emptyString;
                     onClicked:getButtonsCommand(index);
                     enabled: stopGame;
                 }
                 ZRefButton{
                     property int index : Client.RefBoxCommand.FORCE_START;
-                    text:qsTr("Force Start");
+                    text:qsTr("Force Start")+translator.emptyString;
                     onClicked:getButtonsCommand(index);
                     enabled: forceStart;
                 }
                 ZRefButton{
                     property int index : Client.RefBoxCommand.NORMAL_START;
-                    text:qsTr("Normal Start");
+                    text:qsTr("Normal Start")+translator.emptyString;
                     onClicked:getButtonsCommand(index);
                     enabled: normalStart;
                 }
             }
         }
         ZGroupBox{
-            title:qsTr("Yellow Team Control");
+            title:qsTr("Yellow Team Control")+translator.emptyString;
             enabled: teamControl;
             Grid{
                 width:parent.width;
@@ -228,13 +228,13 @@ ScrollView {
                     property int buttonWidth : (width - (columns-1) * columnSpacing - 2*padding)/columns;
                     Repeater{
                         model:[
-                            {cmd_type:2,cmd_num:Client.RefBoxCommand.KICKOFF_YELLOW,cmd_str:"Kick off"},
-                            {cmd_type:2,cmd_num:Client.RefBoxCommand.PENALTY_YELLOW,cmd_str:"Penalty"},
-                            {cmd_type:2,cmd_num:Client.RefBoxCommand.DIRECT_KICK_YELLOW,cmd_str:"Direct Kick"},
-                            {cmd_type:2,cmd_num:Client.RefBoxCommand.INDIRECT_KICK_YELLOW,cmd_str:"Indirect Kick"},
-                            {cmd_type:2,cmd_num:Client.RefBoxCommand.TIMEOUT_YELLOW,cmd_str:"Timeout"},
-                            {cmd_type:2,cmd_num:Client.RefBoxCommand.BALL_PLACEMENT_YELLOW,cmd_str:"Ball Placement"},
-                            {cmd_type:2,cmd_num:Client.RefBoxCommand.GOAL_YELLOW,cmd_str:"Goal"}
+                            {cmd_type:2,cmd_num:Client.RefBoxCommand.KICKOFF_YELLOW,cmd_str:qsTr("Kick off")+translator.emptyString},
+                            {cmd_type:2,cmd_num:Client.RefBoxCommand.PENALTY_YELLOW,cmd_str:qsTr("Penalty")+translator.emptyString},
+                            {cmd_type:2,cmd_num:Client.RefBoxCommand.DIRECT_KICK_YELLOW,cmd_str:qsTr("Direct Kick")+translator.emptyString},
+                            {cmd_type:2,cmd_num:Client.RefBoxCommand.INDIRECT_KICK_YELLOW,cmd_str:qsTr("Indirect Kick")+translator.emptyString},
+                            {cmd_type:2,cmd_num:Client.RefBoxCommand.TIMEOUT_YELLOW,cmd_str:qsTr("Timeout")+translator.emptyString},
+                            {cmd_type:2,cmd_num:Client.RefBoxCommand.BALL_PLACEMENT_YELLOW,cmd_str:qsTr("Ball Placement")+translator.emptyString},
+                            {cmd_type:2,cmd_num:Client.RefBoxCommand.GOAL_YELLOW,cmd_str:qsTr("Goal")+translator.emptyString}
                         ]
                         ZRefButton{
                             property int index : modelData.cmd_num;
@@ -250,7 +250,7 @@ ScrollView {
             }
         }
         ZGroupBox{
-            title:qsTr("Blue Team Control");
+            title:qsTr("Blue Team Control")+translator.emptyString;
             enabled: teamControl;
             Grid{
                 width:parent.width;
@@ -265,13 +265,13 @@ ScrollView {
                     property int buttonWidth : (width - (columns-1) * columnSpacing - 2*padding)/columns;
                     Repeater{
                         model:[
-                            {cmd_type:1,cmd_num:Client.RefBoxCommand.KICKOFF_BLUE,cmd_str:"Kick off"},
-                            {cmd_type:1,cmd_num:Client.RefBoxCommand.PENALTY_BLUE,cmd_str:"Penalty"},
-                            {cmd_type:1,cmd_num:Client.RefBoxCommand.DIRECT_KICK_BLUE,cmd_str:"Direct Kick"},
-                            {cmd_type:1,cmd_num:Client.RefBoxCommand.INDIRECT_KICK_BLUE,cmd_str:"Indirect Kick"},
-                            {cmd_type:1,cmd_num:Client.RefBoxCommand.TIMEOUT_BLUE,cmd_str:"Timeout"},
-                            {cmd_type:1,cmd_num:Client.RefBoxCommand.BALL_PLACEMENT_BLUE,cmd_str:"Ball Placement"},
-                            {cmd_type:1,cmd_num:Client.RefBoxCommand.GOAL_BLUE,cmd_str:"Goal"}
+                            {cmd_type:1,cmd_num:Client.RefBoxCommand.KICKOFF_BLUE,cmd_str:qsTr("Kick off")+translator.emptyString},
+                            {cmd_type:1,cmd_num:Client.RefBoxCommand.PENALTY_BLUE,cmd_str:qsTr("Penalty")+translator.emptyString},
+                            {cmd_type:1,cmd_num:Client.RefBoxCommand.DIRECT_KICK_BLUE,cmd_str:qsTr("Direct Kick")+translator.emptyString},
+                            {cmd_type:1,cmd_num:Client.RefBoxCommand.INDIRECT_KICK_BLUE,cmd_str:qsTr("Indirect Kick")+translator.emptyString},
+                            {cmd_type:1,cmd_num:Client.RefBoxCommand.TIMEOUT_BLUE,cmd_str:qsTr("Timeout")+translator.emptyString},
+                            {cmd_type:1,cmd_num:Client.RefBoxCommand.BALL_PLACEMENT_BLUE,cmd_str:qsTr("Ball Placement")+translator.emptyString},
+                            {cmd_type:1,cmd_num:Client.RefBoxCommand.GOAL_BLUE,cmd_str:qsTr("Goal")+translator.emptyString}
                         ]
                         ZRefButton{
                             property int index : modelData.cmd_num;
@@ -287,7 +287,7 @@ ScrollView {
             }
         }
         ZGroupBox{
-            title:qsTr("Next Command");
+            title:qsTr("Next Command")+translator.emptyString;
             Grid{
                 width:parent.width;
                 columns:2;
@@ -298,12 +298,12 @@ ScrollView {
                 padding: 0;
                 Repeater{
                     model: [
-                        {cmd_type:0,cmd_str:"Stop Game",cmd_num:Client.RefBoxCommand.STOP_GAME},
-                        {cmd_type:0,cmd_str:"Force Start",cmd_num:Client.RefBoxCommand.FORCE_START},
-                        {cmd_type:2,cmd_str:"Direct Yellow",cmd_num:Client.RefBoxCommand.DIRECT_KICK_YELLOW},
-                        {cmd_type:1,cmd_str:"Direct Blue",cmd_num:Client.RefBoxCommand.DIRECT_KICK_BLUE},
-                        {cmd_type:2,cmd_str:"Indirect Yellow",cmd_num:Client.RefBoxCommand.INDIRECT_KICK_YELLOW},
-                        {cmd_type:1,cmd_str:"Indirect Blue",cmd_num:Client.RefBoxCommand.INDIRECT_KICK_BLUE},
+                        {cmd_type:0,cmd_str:qsTr("Stop Game")+translator.emptyString,cmd_num:Client.RefBoxCommand.STOP_GAME},
+                        {cmd_type:0,cmd_str:qsTr("Force Start")+translator.emptyString,cmd_num:Client.RefBoxCommand.FORCE_START},
+                        {cmd_type:2,cmd_str:qsTr("Direct Yellow")+translator.emptyString,cmd_num:Client.RefBoxCommand.DIRECT_KICK_YELLOW},
+                        {cmd_type:1,cmd_str:qsTr("Direct Blue")+translator.emptyString,cmd_num:Client.RefBoxCommand.DIRECT_KICK_BLUE},
+                        {cmd_type:2,cmd_str:qsTr("Indirect Yellow")+translator.emptyString,cmd_num:Client.RefBoxCommand.INDIRECT_KICK_YELLOW},
+                        {cmd_type:1,cmd_str:qsTr("Indirect Blue")+translator.emptyString,cmd_num:Client.RefBoxCommand.INDIRECT_KICK_BLUE},
                     ]
                     ZRefButton{
                         property int index : modelData.cmd_num;

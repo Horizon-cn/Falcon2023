@@ -109,7 +109,11 @@ $ sudo make install
 	- 完成后点击Generate，再点击Open Project
 	- 在vs中选择Release x64模式
 	- 开始生成，没有报错则完成
-	- 如果觉得生成过慢，可以更改 cmake/Utils.cmake，下述用了4核并行编译，可以查看电脑有几核，适当设置多些，但不建议给满
+	- 运行 bin/package.bat，首次编译或更换qt路径时需删除package.txt重新输入路径,如：
+		- Where is QT QML : D:\QT\5.15.2\msvc2019_64\qml
+   		- Where is Client QML : D:\Falcon_2023\Client\src\qml
+	- 如果发现cmake载入路径有误，则先点击菜单栏中的File/Delete Cache，做有必要的调整后再重新Configure和Generate
+	- 如果觉得生成过慢，可以更改 cmake/Utils.cmake，之后重新Configure和Generate。下述用了4核并行编译，可以查看电脑有几核，适当设置多些，但不建议给满
 	```bash
 	ProcessorCount(N)
     if(N GREATER_EQUAL 4)
@@ -117,9 +121,7 @@ $ sudo make install
     endif()
     ```
 	- 如果需要使用GPU，按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置，[cuda 12.0下载](https://jbox.sjtu.edu.cn/l/I1f4um)
-	- 运行 bin/package.bat，首次编译或更换qt路径时需删除package.txt重新输入路径,如：
-		- Where is QT QML : D:\QT\5.15.2\msvc2019_64\qml
-   		- Where is Client QML : D:\Falcon_2023\Client\src\qml
+	
 
 ## 使用方法
 

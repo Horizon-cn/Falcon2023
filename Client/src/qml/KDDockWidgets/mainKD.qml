@@ -13,7 +13,7 @@ ApplicationWindow {
     width: screen.width;
     height: screen.height - 100;
     visible: true
-    title: qsTr("Client")
+    title: qsTr("Client")+translator.emptyString;
 
     onScreenChanged: {
         width = screen.width;
@@ -46,6 +46,7 @@ ApplicationWindow {
     property var filename : "default";
     Owl.Interaction4Field { id : interaction4field; }
     Owl.Interaction { id : interaction }
+    Owl.Translator { id : translator }
     KDDW.LayoutSaver { 
         id: layoutSaver 
         function saveLayout(){
@@ -61,7 +62,7 @@ ApplicationWindow {
     menuBar: MenuBar {
         height: 25;
         Menu{
-            title: "Widget"
+            title: qsTr("Widget")+translator.emptyString;
             Repeater{
                 model: [dock1.uniqueName, dock2.uniqueName, dock3.uniqueName, dock4.uniqueName, dock5.uniqueName, dock6.uniqueName, dock7.uniqueName]; //, dock8.uniqueName];
                 MenuItem{
@@ -73,13 +74,13 @@ ApplicationWindow {
             }
         }
         Menu{
-            title: "Layout"
+            title: qsTr("Layout")+translator.emptyString;
             MenuItem{
-                text: "Save As";
+                text: qsTr("Save As")+translator.emptyString;
                 onTriggered: layoutSaver.saveLayout();
             }
             Menu{
-                title: "Load"
+                title: qsTr("Load")+translator.emptyString;
                 Repeater{
                     id: loadLayout;
                     model: interaction4field.getLayoutFileName();
@@ -94,13 +95,13 @@ ApplicationWindow {
             }
         }
         Menu{
-            title: "Formation"
+            title: qsTr("Formation")+translator.emptyString;
             MenuItem{
-                text: "Save As";
+                text: qsTr("Save As")+translator.emptyString;
                 onTriggered: interaction4field.saveFormation();
             }
             Menu{
-                title: "Load"
+                title: qsTr("Load")+translator.emptyString;
                 Repeater{
                     id: loadFormation;
                     model: interaction4field.getFormationFileName();
@@ -166,16 +167,28 @@ ApplicationWindow {
         }
         **/
         Menu{
-            title: "Help"
+            title: qsTr("Help")+translator.emptyString;
             MenuItem{
-                text: "About";
+                text: qsTr("About")+translator.emptyString;
                 onTriggered: interaction.getBasicInfo();
             }
-            MenuSeparator{}
-            MenuItem{
-                text: "Get More";
-                onTriggered: interaction.getMoreInfo();
+            Menu{
+                title: qsTr("Language")+translator.emptyString;
+                Repeater{
+                    model:[qsTr("English")+translator.emptyString, qsTr("Chinese")+translator.emptyString];
+                    MenuItem{
+                        text:modelData;
+                        onTriggered: {
+                            translator.selectLanguage(modelData);
+                        }
+                    }
+                }
             }
+            //MenuSeparator{}
+            //MenuItem{
+            //    text: "Get More";
+            //    onTriggered: interaction.getMoreInfo();
+            //}
         }
     }
 
@@ -188,7 +201,8 @@ ApplicationWindow {
         uniqueName: "MainWindow"
         KDDW.DockWidget {
             id: dock1
-            uniqueName: "Fields" // Each dock widget needs a unique id
+            uniqueName: qsTr("Fields")+translator.emptyString; // Each dock widget needs a unique id
+            title: qsTr("Fields")+translator.emptyString;
             TabView{
                 id:fields;
                 width:(roots.height)*4/3;
@@ -207,12 +221,24 @@ ApplicationWindow {
                     Tab{
 //                    TabButton {
                         anchors.fill: parent;
-                        title: modelData;
+                        title: printTitle(index)+translator.emptyString;
                         Rectangle{
                             border.color: "#555";
                             border.width: 1;
                             color: "#303030";
                             anchors.fill: parent;
+                        }
+                        function printTitle(index) {
+                            switch (index) {
+                                case 0:
+                                return qsTr("Origin");
+                                case 1:
+                                return qsTr("Filtered B");
+                                case 2:
+                                return qsTr("Filtered Y");
+                                default:
+                                break;
+                            }
                         }
                     }
                 }
@@ -242,7 +268,7 @@ ApplicationWindow {
                 }
                 Text{
                    id : fpsWord;
-                   text : qsTr("FPS");
+                   text : qsTr("FPS")+translator.emptyString;
                    x:parent.width - 70;
                    y:5;
                    color:"white";
@@ -263,7 +289,7 @@ ApplicationWindow {
                     property string strX : "0";
                     property string strY : "0";
                     id:positionLeftDisplay;
-                    text:qsTr("Left : " + "( " + strX + " , " + strY + " )");
+                    text:qsTr("Left")+translator.emptyString+" : " + "( " + strX + " , " + strY + " )";
                     font.pointSize: 10;
                     font.weight:  Font.Bold;
                 }
@@ -272,7 +298,7 @@ ApplicationWindow {
                     property string strX : "0";
                     property string strY : "0";
                     id:positionRightDisplay;
-                    text:qsTr("Right : " + "( " + strX + " , " + strY + " )");
+                    text:qsTr("Right")+translator.emptyString+" : " + "( " + strX + " , " + strY + " )";
                     font.pointSize: 10;
                     font.weight:  Font.Bold;
                 }
@@ -373,7 +399,8 @@ ApplicationWindow {
 
         KDDW.DockWidget {
             id: dock2
-            uniqueName: "ControlBoard"
+            uniqueName: qsTr("ControlBoard")+translator.emptyString;
+            title: qsTr("ControlBoard")+translator.emptyString;
             ControlBoardKD{
                 //id:controlBoard;
                 //width:roots.width - fields.width;
@@ -382,27 +409,32 @@ ApplicationWindow {
         }
         KDDW.DockWidget {
             id: dock3
-            uniqueName: "RefereeBox"
+            uniqueName: qsTr("RefereeBox")+translator.emptyString;
+            title: qsTr("RefereeBox")+translator.emptyString;
             RefereeBoxKD{}
         }
         KDDW.DockWidget {
             id: dock4
-            uniqueName: "Viewer"
+            uniqueName: qsTr("Viewer")+translator.emptyString;
+            title: qsTr("Viewer")+translator.emptyString;
             ViewerKD{}
         }
         KDDW.DockWidget {
             id: dock5
-            uniqueName: "ToolKit"
+            uniqueName: qsTr("ToolKit")+translator.emptyString;
+            title: qsTr("ToolKit")+translator.emptyString;
             ToolKitKD{}
         }
         KDDW.DockWidget {
             id: dock6
-            uniqueName: "Settings"
+            uniqueName: qsTr("Settings")+translator.emptyString;
+            title: qsTr("Settings")+translator.emptyString;
             SettingsKD{}
         }
         KDDW.DockWidget {
             id: dock7
-            uniqueName: "RemoteControl"
+            uniqueName: qsTr("RemoteControl")+translator.emptyString;
+            title: qsTr("RemoteControl")+translator.emptyString;
             RemoteControl{}
         }
         //KDDW.DockWidget {
@@ -430,7 +462,7 @@ ApplicationWindow {
             else if (index == 1)
                 addDockWidget(dock2, KDDW.KDDockWidgets.Location_OnBottom);
             else if (index == 2)
-                addDockWidget(dock2, KDDW.KDDockWidgets.Location_OnBottom);
+                addDockWidget(dock3, KDDW.KDDockWidgets.Location_OnBottom);
             else if (index == 3)
                 addDockWidget(dock4, KDDW.KDDockWidgets.Location_OnBottom);
             else if (index == 4)

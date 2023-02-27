@@ -87,7 +87,7 @@ void CDataReceiver4rbk::receiveVision() {
 }
 
 bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameInfoT& info){
-	/** GameInfo鍖呮嫭瑙嗚淇℃伅鍜岃鍒や俊鎭紝涔嬪悗瑕佸?涓婃柟宸瓑淇℃伅,player鐨勪俊鎭叏閮ㄥ?杞借繘鏉ワ紝鐢ㄤ簬robot predictor **/
+	/** GameInfo包括视觉信息和裁判信息，之后要加上方差等信息,player的信息全部加载进来，用于robot predictor **/
     static int last_cycle = 0;
     static int strategy_cycle = 0;
     bool receive_new_vision = false;
@@ -218,7 +218,7 @@ void CDataReceiver4rbk::receiveRefMsgs() {
             }
             unsigned long command_counter = ssl_referee.command_counter();
             if (command_counter == former_cmd_index) continue;
-            former_cmd_index = command_counter;	// 锟斤拷锟斤拷锟斤拷一锟斤拷指锟斤拷帽锟街局?
+            former_cmd_index = command_counter;	// 更新上一次指令得标志值
             //update refereemsg
             unsigned long long packet_timestamp = ssl_referee.packet_timestamp();
             Referee_Stage stage = ssl_referee.stage();
@@ -279,7 +279,7 @@ PlayMode CDataReceiver4rbk::translateRefMsgs(Referee_Command command){
     PlayMode play_mode = PMNone;
     for( int pm = PMStop; pm <= PMNone; ++pm ) {
         if( playModePair[pm].ch == cmd ) {
-            // 寻锟斤拷匹锟斤拷锟街革拷锟斤拷锟斤拷锟?
+            // 寻找匹配的指令名字
             play_mode = playModePair[pm].mode;
             break;
         }

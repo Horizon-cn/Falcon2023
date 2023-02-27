@@ -26,7 +26,7 @@ IF(WIN32)
     set(CMAKE_PREFIX_PATH "D:/QT/5.15.2/msvc2019_64/lib/cmake/Qt5")
     #message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}")
 ENDIF()
-find_package(Qt5 COMPONENTS Core Quick QuickControls2 SerialPort Widgets Network Gui Qml OpenGL Gamepad REQUIRED)
+find_package(Qt5 COMPONENTS Core Quick QuickControls2 SerialPort Widgets Network Gui Qml OpenGL Gamepad LinguistTools REQUIRED)
 
 ## KDDockWidgets
 include(${CMAKE_SOURCE_DIR}/cmake/GetKDDockWidgets.cmake)

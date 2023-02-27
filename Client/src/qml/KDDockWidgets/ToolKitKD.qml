@@ -51,7 +51,7 @@ ScrollView {
         columns:1;
         property int itemWidth : width - 2*padding;
         ZGroupBox{
-            title: qsTr("Rec")
+            title: qsTr("Rec")+translator.emptyString;
             Grid{
                 id:rec;
                 width:parent.width;
@@ -61,7 +61,7 @@ ScrollView {
                 CheckBox{
                     width:parent.itemWidth;
                     checked: true;
-                    text: "Contain Raw Vision(Suggest)"
+                    text: qsTr("Contain Raw Vision(Suggest)")+translator.emptyString;
                     onCheckedChanged: {
                         parent.recordRawVision = !parent.recordRawVision;
                         interaction.setRecordRawVision(parent.recordRawVision);
@@ -94,7 +94,7 @@ ScrollView {
             }
         }
         ZGroupBox{
-            title: qsTr("RecReplay")
+            title: qsTr("RecReplay")+translator.emptyString;
             Column{
                 width:parent.width;
                 height:parent.height;
@@ -112,7 +112,7 @@ ScrollView {
                     CheckBox{
                         width:parent.itemWidth;
                         checked: true;
-                        text: "If Play Raw Vision(Suggest But Must Contain)"
+                        text: qsTr("If Play Raw Vision(Suggest But Must Contain)")+translator.emptyString;
                         onCheckedChanged: {
                             interaction.setPlayerRawVision(parent.playRawVision);
                         }
@@ -138,7 +138,7 @@ ScrollView {
                     }
                     Label {
                         id: labelsr
-                        text: qsTr("")
+                        text: ""
                         height: 25
                         anchors.left:openBtnr.right
                         anchors.leftMargin: 10
@@ -169,11 +169,11 @@ ScrollView {
                     **/
                     FileDialog {
                         id:fdrs
-                        title: "Please select"
+                        title: qsTr("Please select")+translator.emptyString;
                         selectExisting: true
                         selectFolder: false
                         selectMultiple: false
-                        nameFilters: ["Rec files (*.log)"]
+                        nameFilters: [qsTr("Rec files")+translator.emptyString+" (*.log)"]
                         onAccepted: {
                             if (isReplaying) Owl.RecSlider.toggleStopped();
                             isReplaying = false;
@@ -186,7 +186,7 @@ ScrollView {
                             isRecFile = true;
                             isRecoring = false;
                             if (Owl.RecSlider.currentFrame > Owl.RecSlider.getMaxFrame()){
-                                Owl.RecSlider.recName = "Import Error File";
+                                Owl.RecSlider.recName = qsTr("Import Error File")+translator.emptyString;
                                 isRecFile = false;
                             }
                         }
@@ -238,7 +238,7 @@ ScrollView {
                         }
                     }
                     Text{
-                        text: "Steps:";
+                        text: qsTr("Steps:")+translator.emptyString;
                         color: "white";
                     }
                     SpinBox {
@@ -272,7 +272,7 @@ ScrollView {
                                 isReplaying  = false;
                                 rectimer.running = false;
                                 Owl.RecSlider.setStopped(true);
-                                Owl.RecSlider.recName = "Done";
+                                Owl.RecSlider.recName = qsTr("Done")+translator.emptyString;
                             }
                             else
                                 Owl.RecSlider.recName = Owl.RecSlider.getFilename();
@@ -310,7 +310,7 @@ ScrollView {
             }
         }
         ZGroupBox{
-            title: qsTr("WorldCupLog")
+            title: qsTr("WorldCupLog")+translator.emptyString;
             Column{
                 width:parent.width;
                 height:parent.height;
@@ -334,7 +334,7 @@ ScrollView {
                     }
                     Label {
                         id: labels
-                        text: qsTr("")
+                        text: ""
                         height: 25
                         anchors.left:openBtn.right
                         anchors.leftMargin: 10
@@ -342,12 +342,12 @@ ScrollView {
 
                     FileDialog {
                         id:fds
-                        title: "Please select"
+                        title: qsTr("Please select")+translator.emptyString;
                         //folder: shortcuts.desktop
                         selectExisting: true
                         selectFolder: false
                         selectMultiple: false
-                        nameFilters: ["Log files (*.log *.log.gz)"]
+                        nameFilters: [qsTr("Log files")+translator.emptyString+" (*.log *.log.gz)"]
                         onAccepted: {
                             console.log("You chose: " + fds.fileUrl + " "+fds.folder);
                             log.loadFile(fds.fileUrl);
@@ -440,7 +440,7 @@ ScrollView {
             }
         }
         ZGroupBox{
-            title: qsTr("RecEventLabel")
+            title: qsTr("RecEventLabel")+translator.emptyString;
             Column{
                 width:parent.width;
                 height:parent.height;
@@ -464,18 +464,18 @@ ScrollView {
                     }
                     Label {
                         id: labelstart
-                        text: qsTr("")
+                        text: ""
                         height: 25
                         anchors.left:openLogBtn.right
                         anchors.leftMargin: 10
                     }
                     FileDialog {
                         id:openLog
-                        title: "Please select"
+                        title: qsTr("Please select")+translator.emptyString;
                         selectExisting: true
                         selectFolder: false
                         selectMultiple: false
-                        nameFilters: ["Rec files (*.log)"]
+                        nameFilters: [qsTr("Rec files")+translator.emptyString+" (*.log)"]
                         onAccepted: {
                             console.log("You chose: " + openLog.fileUrl);
                             Owl.RecEventLabel.loadFile(openLog.fileUrl);
@@ -539,7 +539,7 @@ ScrollView {
             }
         }
         ZGroupBox{
-            title: qsTr("Camera Edge Test")
+            title: qsTr("Camera Edge Test")+translator.emptyString;
             Grid{
                 width:parent.width;
                 verticalItemAlignment: Grid.AlignVCenter;
@@ -559,7 +559,7 @@ ScrollView {
             }
         }
         ZGroupBox{
-            title: qsTr("State Estimation Test")
+            title: qsTr("State Estimation Test")+translator.emptyString;
             Grid{
                 width:parent.width;
                 property int itemWidth : width - 2*padding;
@@ -567,7 +567,7 @@ ScrollView {
                 columns: 1;
                 CheckBox{
                     width:parent.itemWidth;
-                    text: "Record BallSpeed" //"Run Texting Scripts"
+                    text: qsTr("Record BallSpeed")+translator.emptyString; //"Run Texting Scripts"
                     checked: true;
                     onCheckedChanged: {
                         parent.runTestingScripts = !parent.runTestingScripts;

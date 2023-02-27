@@ -338,13 +338,13 @@ void Field::leftDoubleClickEvent(QMouseEvent * e){
     if (pressedBall) {
         QDialog dialog;
         QFormLayout form(&dialog);
-        form.addRow(new QLabel("Set ball pos:"));
-        QString value1 = QString("x: ");
+        form.addRow(new QLabel(tr("Set ball pos:")));
+        QString value1 = QString(tr("x: "));
         QDoubleSpinBox *spinbox1 = new QDoubleSpinBox(&dialog);
         spinbox1->setRange(std::numeric_limits<double>::lowest(), 1000000);
         spinbox1->setValue(GlobalData::Instance()->maintain[0].ball[0].pos.x()*0.1);
         form.addRow(value1, spinbox1);
-        QString value2 = QString("y: ");
+        QString value2 = QString(tr("y: "));
         QDoubleSpinBox *spinbox2 = new QDoubleSpinBox(&dialog);
         spinbox2->setRange(std::numeric_limits<double>::lowest(), 1000000);
         spinbox2->setValue(GlobalData::Instance()->maintain[0].ball[0].pos.y()*0.1);
@@ -470,18 +470,18 @@ void Field::rightDoubleClickEvent(QMouseEvent * e){
     if (pressedRobot) {
         QDialog dialog;
         QFormLayout form(&dialog);
-        form.addRow(new QLabel("Set robot pose:"));
-        QString value1 = QString("x: ");
+        form.addRow(new QLabel(tr("Set robot pose:")));
+        QString value1 = QString(tr("x: "));
         QDoubleSpinBox *spinbox1 = new QDoubleSpinBox(&dialog);
         spinbox1->setRange(std::numeric_limits<double>::lowest(), 1000000);
         spinbox1->setValue(GlobalData::Instance()->maintain[0].robot[robotTeam][robotID].pos.x()*0.1);
         form.addRow(value1, spinbox1);
-        QString value2 = QString("y: ");
+        QString value2 = QString(tr("y: "));
         QDoubleSpinBox *spinbox2 = new QDoubleSpinBox(&dialog);
         spinbox2->setRange(std::numeric_limits<double>::lowest(), 1000000);
         spinbox2->setValue(-GlobalData::Instance()->maintain[0].robot[robotTeam][robotID].pos.y()*0.1);
         form.addRow(value2, spinbox2);
-        QString value3 = QString("dir: ");
+        QString value3 = QString(tr("dir: "));
         QDoubleSpinBox *spinbox3 = new QDoubleSpinBox(&dialog);
         spinbox3->setRange(std::numeric_limits<double>::lowest(), 1000000);
         spinbox3->setValue(GlobalData::Instance()->maintain[0].robot[robotTeam][robotID].angle*180/M_PI);
