@@ -56,7 +56,7 @@
     <message>
         <location filename="src/qml/Widgets/ControlBoard.qml" line="771"/>
         <source>WorldCupLog</source>
-        <translation type="unfinished">录像回放（世界赛格式）</translation>
+        <translation type="unfinished">录像回放(世界赛格式)</translation>
     </message>
     <message>
         <location filename="src/qml/Widgets/ControlBoard.qml" line="901"/>
@@ -253,7 +253,7 @@
 <context>
     <name>Interaction</name>
     <message>
-        <location filename="src/interface/interaction.cpp" line="365"/>
+        <location filename="src/interface/interaction.cpp" line="367"/>
         <source>Falcon - AI framework for RoboCup SSL
 
 developed by SRC team since 2023
@@ -626,12 +626,12 @@ created in </source>
     <message>
         <location filename="src/qml/KDDockWidgets/RemoteControl.qml" line="261"/>
         <source>convert flat</source>
-        <translation>平踢（标定后）</translation>
+        <translation>平踢(标定后)</translation>
     </message>
     <message>
         <location filename="src/qml/KDDockWidgets/RemoteControl.qml" line="263"/>
         <source>convert chip</source>
-        <translation>挑球（标定后）</translation>
+        <translation type="unfinished">挑球(标定后)</translation>
     </message>
     <message>
         <location filename="src/qml/KDDockWidgets/RemoteControl.qml" line="265"/>
@@ -829,7 +829,7 @@ created in </source>
     <message>
         <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="64"/>
         <source>Contain Raw Vision(Suggest)</source>
-        <translation>包含裸视觉（建议）</translation>
+        <translation>包含裸视觉(建议)</translation>
     </message>
     <message>
         <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="97"/>
@@ -839,7 +839,7 @@ created in </source>
     <message>
         <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="115"/>
         <source>If Play Raw Vision(Suggest But Must Contain)</source>
-        <translation>是否播放裸视觉（建议但必须包含）</translation>
+        <translation>是否播放裸视觉(建议但必须包含)</translation>
     </message>
     <message>
         <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="141"/>
@@ -877,7 +877,7 @@ created in </source>
     <message>
         <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="313"/>
         <source>WorldCupLog</source>
-        <translation>录像回放（世界赛格式）</translation>
+        <translation>录像回放(世界赛格式)</translation>
     </message>
     <message>
         <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="350"/>

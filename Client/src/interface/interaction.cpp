@@ -240,6 +240,8 @@ bool Interaction::changeRBKSettings(bool color, bool side) {
 }
 bool Interaction::connectRadio(bool sw, int color, int frq) {
     if(sw) {
+        // 保证实车跑决策算法时用标定后的力度
+        Owl::KParamManager::Instance()->updateParam(Owl::KParamManager::Instance()->convertPower, "General/convertPower", true, true);
         ZCommunicator::Instance()->disconnectMedusa(color);
         ZCommunicator::Instance()->connectMedusa(color);
         Debugger::Instance()->start(color);
