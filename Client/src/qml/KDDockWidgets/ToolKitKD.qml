@@ -274,8 +274,8 @@ ScrollView {
                                 Owl.RecSlider.setStopped(true);
                                 Owl.RecSlider.recName = qsTr("Done")+translator.emptyString;
                             }
-                            else
-                                Owl.RecSlider.recName = Owl.RecSlider.getFilename();
+                            //else
+                                //Owl.RecSlider.recName = Owl.RecSlider.getFilename();
                         }
                     }
                     Text{
@@ -303,7 +303,7 @@ ScrollView {
                     Text{
                         id:recname
                         width: parent.width - 180;
-                        text: Owl.RecSlider.recName;
+                        text: isRecFile ? Owl.RecSlider.recName : qsTr("No rec file is playing.")+translator.emptyString;
                         color: "white";
                     }
                 }
@@ -433,7 +433,7 @@ ScrollView {
                     Text{
                         id:logname
                         width: parent.width - 180;
-                        text: log.logName;
+                        text: fds.fileUrl == "" ? qsTr("No log file is playing.")+translator.emptyString : log.logName;
                         color: "white";
                     }
                 }
@@ -532,7 +532,7 @@ ScrollView {
                     Text{
                         id:labelname
                         width: parent.width - 180;
-                        text: Owl.RecEventLabel.logName;
+                        text: openLog.fileUrl == "" ? qsTr("No log is loaded.")+translator.emptyString : Owl.RecEventLabel.logName;
                         color: "white";
                     }
                 }

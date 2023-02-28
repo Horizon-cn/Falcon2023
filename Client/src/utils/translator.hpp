@@ -3,7 +3,6 @@
 #include <QTranslator>
 #include <QCoreApplication>
 #include <QtDebug>
-#include <QQmlEngine>
 class Translator : public QObject
 {
   Q_OBJECT

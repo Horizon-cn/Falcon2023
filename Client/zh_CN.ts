@@ -284,6 +284,13 @@ created in </source>
     </message>
 </context>
 <context>
+    <name>LogSlider</name>
+    <message>
+        <source>No log file is playing.</source>
+        <translation type="vanished">没有录像正在播放.</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>No rec file is playing.</source>
@@ -349,6 +356,16 @@ created in </source>
     <message>
         <source>No log is loaded.</source>
         <translation type="vanished">没有加载录像.</translation>
+    </message>
+    <message>
+        <location filename="src/log/rec_log/rec_eventlabel.cpp" line="45"/>
+        <source>Import Error File</source>
+        <translation type="unfinished">引入错误文件</translation>
+    </message>
+    <message>
+        <location filename="src/log/rec_log/rec_eventlabel.cpp" line="56"/>
+        <source>Process Done</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -631,7 +648,7 @@ created in </source>
     <message>
         <location filename="src/qml/KDDockWidgets/RemoteControl.qml" line="263"/>
         <source>convert chip</source>
-        <translation type="unfinished">挑球(标定后)</translation>
+        <translation>挑球(标定后)</translation>
     </message>
     <message>
         <location filename="src/qml/KDDockWidgets/RemoteControl.qml" line="265"/>
@@ -875,6 +892,11 @@ created in </source>
         <translation>播放完成</translation>
     </message>
     <message>
+        <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="306"/>
+        <source>No rec file is playing.</source>
+        <translation>没有录像正在播放.</translation>
+    </message>
+    <message>
         <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="313"/>
         <source>WorldCupLog</source>
         <translation>录像回放(世界赛格式)</translation>
@@ -885,9 +907,19 @@ created in </source>
         <translation>录像</translation>
     </message>
     <message>
+        <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="436"/>
+        <source>No log file is playing.</source>
+        <translation>没有录像正在播放.</translation>
+    </message>
+    <message>
         <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="443"/>
         <source>RecEventLabel</source>
         <translation>重要事件标注</translation>
+    </message>
+    <message>
+        <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="535"/>
+        <source>No log is loaded.</source>
+        <translation>没有加载录像.</translation>
     </message>
     <message>
         <location filename="src/qml/KDDockWidgets/ToolKitKD.qml" line="542"/>
@@ -908,7 +940,7 @@ created in </source>
 <context>
     <name>Translator</name>
     <message>
-        <location filename="src/utils/translator.hpp" line="22"/>
+        <location filename="src/utils/translator.hpp" line="21"/>
         <source>Chinese</source>
         <translation>简体中文</translation>
     </message>
@@ -1114,6 +1146,13 @@ created in </source>
         <location filename="src/qml/KDDockWidgets/mainKD.qml" line="437"/>
         <source>RemoteControl</source>
         <translation>远程遥控</translation>
+    </message>
+</context>
+<context>
+    <name>rec_slider</name>
+    <message>
+        <source>No rec file is playing.</source>
+        <translation type="vanished">没有录像正在播放.</translation>
     </message>
 </context>
 </TS>
