@@ -30,6 +30,8 @@ Client/qrc_*.cpp
 Client/ui_*.h
 Client/Makefile*
 Client/*build*
+Client/*.ts
+Client/*.qm
 
 # Qt unit tests
 Client/target_wrapper.*
