@@ -48,6 +48,7 @@ const static QColor COLOR_DARKGREEN(48, 48, 48);
 const static QColor COLOR_RED(220, 53, 47);
 const static QColor COLOR_LIGHTWHITE(255, 255, 255, 20);
 const static qreal zoomStep = 0.05;
+const static qreal zoomMax = 2;
 const static qreal zoomMin = 0.35; //0.1;
 const int ballRatio = 3;
 
@@ -575,8 +576,8 @@ void Field::middleNoModifierPressEvent(QMouseEvent *e) {
 }
 void Field::middleNoModifierMoveEvent(QMouseEvent *e) {
     auto t = MiddleEvent::zoomStart + zoomRatio * (MiddleEvent::start - QPoint(e->x(), e->y()));
-    zoomStart.setX(limitRange(t.x(), 0, int(area.width() * (1 - zoomRatio))));
-    zoomStart.setY(limitRange(t.y(), 0, int(area.height() * (1 - zoomRatio))));
+    zoomStart.setX(limitRange(t.x(), 0, int(area.width() * (zoomMax - zoomRatio))));
+    zoomStart.setY(limitRange(t.y(), 0, int(area.height() * (zoomMax - zoomRatio))));
     triggerDraw();
 }
 void Field::middleNoModifierReleaseEvent(QMouseEvent *e) {}
@@ -613,11 +614,11 @@ void Field::middleCtrlModifierReleaseEvent(QMouseEvent *e) {
 void Field::wheelEvent (QWheelEvent *e) {
     qreal oldRatio = zoomRatio;
     zoomRatio += (e->delta() < 0 ? zoomStep : -zoomStep);
-    zoomRatio = limitRange(zoomRatio, zoomMin, 1.0);
+    zoomRatio = limitRange(zoomRatio, zoomMin, zoomMax); //1.0
     qDebug()<<"zoomRatio"<<zoomRatio;
     zoomStart -= e->pos() * (zoomRatio - oldRatio);
-    zoomStart.setX(limitRange(zoomStart.x(), 0, int(area.width() * (1 - zoomRatio))));
-    zoomStart.setY(limitRange(zoomStart.y(), 0, int(area.height() * (1 - zoomRatio))));
+    zoomStart.setX(limitRange(zoomStart.x(), 0, int(area.width() * (zoomMax - zoomRatio))));
+    zoomStart.setY(limitRange(zoomStart.y(), 0, int(area.height() * (zoomMax - zoomRatio))));
     pixmapPainter.setRenderHint(QPainter::Antialiasing, zoomRatio>0.5);
     triggerDraw();
 }

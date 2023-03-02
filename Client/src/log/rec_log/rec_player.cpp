@@ -9,15 +9,22 @@
 #include <QTime>
 #include <QtDebug>
 #include "staticparams.h"
+#include <iostream>
+#include <fstream>
 namespace  {
     auto opm = Owl::OParamManager::Instance();
     auto GS = GlobalSettings::Instance();
+    //std::ofstream outFile;
 }
 CRecPlayer::CRecPlayer() {
     udpSendSocket = nullptr;
+    //outFile.open("test.csv", std::ios::out | std::ios::trunc);
+    // 写入标题行
+    //outFile << "team" << "," << "id" << "," << "x" << "," << "y" << std::endl;
 }
 
 CRecPlayer::~CRecPlayer() {
+    //outFile.close();
     stop();
     //delete replayFile;
     //replayFile = nullptr;
@@ -167,6 +174,10 @@ void CRecPlayer::sendMessage(const ZSS::Protocol::RecMessage& recMsg) {
                             recMsg.maintainvision().processmsg(color).robot(j).posx(),
                             recMsg.maintainvision().processmsg(color).robot(j).posy(),
                             recMsg.maintainvision().processmsg(color).robot(j).angle());
+            //std::string team = color == 0 ? "BLUE" : "YELLOW";
+            //outFile << team << "," << std::to_string(recMsg.maintainvision().processmsg(color).robot(j).id()) << ","
+            //    << std::to_string(recMsg.maintainvision().processmsg(color).robot(j).posx()) << ","
+            //    << std::to_string(recMsg.maintainvision().processmsg(color).robot(j).posy()) << std::endl;
         }
     }
     GlobalData::Instance()->processRobot.push(result);
