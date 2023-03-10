@@ -8,9 +8,10 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_Run"
+		--return "Test_NormalAttack"
+		return "Test_Circle"
 	else
-		return "Test_NormalMiddleDefend"
+		return "Test_Circle"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -78,6 +79,7 @@ gSkill = {
 	--展示
 	"GoAroundBall",
 	"GoAroundRobot",
+	"GoPIDCircle",
 	--放球
 	"FetchBall",
 	--停止
@@ -196,5 +198,6 @@ gTestPlayTable = {
 	"Test_NormalAttack",
 	"Test_NormalDefend",
 	"Test_AvoidFoulDefend",
-	"Test_NormalMiddleDefend"
+	"Test_NormalMiddleDefend",
+	"Test_Circle"
 }

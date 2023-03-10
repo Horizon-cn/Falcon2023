@@ -246,7 +246,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     CGeoPoint middlePoint = finalTargetPos;
 
     // 到达中间点的判据，让整条路径更加连贯
-    double arrivedDist = self.Vel().mod() * 0.1 + 5;
+    double arrivedDist = self.Vel().mod();// *0.1 + 15;
 
     // 第一种情况：可以直接到目标点
     if (obsNew.check(startNew.pos, targetNew.pos) || obsNew.check(self.Pos(), targetNew.pos) ||
@@ -283,7 +283,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     newTask.player.pos = middlePoint;
     //GDebugEngine::Instance()->gui_debug_x(middlePoint);
     // 零速到达中间点，非零速只有在可以直接到时才执行
-    if (middlePoint.dist(task().player.pos) > 1e-8) newTask.player.vel = CVector(0.0, 0.0);
+    //if (middlePoint.dist(task().player.pos) > 1e-8) newTask.player.vel = CVector(0.0, 0.0);
 
 
     // 控制吸球力度

@@ -278,7 +278,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			/*如果球在对方禁区*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "ball in their PEN", COLOR_ORANGE);
 			KickStatus::Instance()->setKick(_executor, KICKPOWER);
-			setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir, ShootNotNeedDribble));
+			//setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir, ShootNotNeedDribble));
 		}
 		else {
 			/*正常KICK阶段  需要区分是否方向已经转向成功  此处尚未完备可能存在BUG*/
@@ -286,7 +286,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick isDirOK", COLOR_ORANGE);
 				KickStatus::Instance()->setKick(_executor, KICKPOWER);
-				setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
+				//setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
 			}
 			else {
 				//setSubTask(PlayerRole::makeItGoAndTurnKickV4(_executor, kickDir));
@@ -308,7 +308,7 @@ void CAdvance::plan(const CVisionModule* pVision)
                 KickStatus::Instance()->setKick(_executor, GetFPassPower(me.Pos(), PassPos));
                 KickStatus::Instance()->setAdvancerPassTo(PassPos);
                 LastPassDirToJudge = KickorPassDir;
-                setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
+                //setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
                 if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "FLAT isDirOK", COLOR_ORANGE);
             }
             else {
@@ -323,7 +323,7 @@ void CAdvance::plan(const CVisionModule* pVision)
                 KickStatus::Instance()->setChipKick(_executor, GetCPassPower(me.Pos(), PassPos));
                 KickStatus::Instance()->setAdvancerPassTo(PassPos);
                 LastPassDirToJudge = KickorPassDir;
-                setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
+                //setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
                 if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHIP isDirOK", COLOR_ORANGE);
             }
             else {
@@ -382,7 +382,7 @@ void CAdvance::plan(const CVisionModule* pVision)
             KickStatus::Instance()->setChipKick(_executor, GetCPassPower(me.Pos(), PassPos));
             KickStatus::Instance()->setAdvancerPassTo(PassPos);
             LastPassDirToJudge = KickorPassDir;
-			setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
+			//setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir));
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHIP isDirOK", COLOR_ORANGE);
 		}
         else {

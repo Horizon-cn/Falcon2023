@@ -1183,6 +1183,13 @@ end
 function continue()
 	return {["name"] = "continue"}
 end
+
+function goPIDCircle(p, r, o)
+	local mexe, mpos = GoPIDCircle{ pos = p, rad = r, opt = o }
+	return {mexe, mpos}
+end
+
+
 ----------------------------------------------------------------------------------------------
 
 ------------------------------------ 测试相关的skill ------------------------------------------

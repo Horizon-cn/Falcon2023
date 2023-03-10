@@ -383,6 +383,19 @@ extern "C" int Skill_GoSupport(lua_State * L)
 	return 0;
 }
 
+extern "C" int Skill_GoPIDCircle(lua_State * L)
+{
+	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
+	double posx = LuaModule::Instance()->GetNumberArgument(2, NULL);
+	double posy = LuaModule::Instance()->GetNumberArgument(3, NULL);
+	double r = LuaModule::Instance()->GetNumberArgument(4, NULL);
+	bool opt = LuaModule::Instance()->GetNumberArgument(5, NULL);
+	CGeoPoint pos(posx, posy);
+	CPlayerTask* pTask = PlayerRole::makeItGoPIDCircle(runner, pos, r, opt);
+	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
+	return 0;
+}
+
 extern "C" int Skill_ShootBall(lua_State *L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
@@ -1193,6 +1206,7 @@ extern "C" int FUNC_GetMarkingTouchPos(lua_State* L) {
 luaDef GUIGlue[] =
 {
 	//Œª÷√“∆∂Ø
+	{"CGoPIDCircle",		Skill_GoPIDCircle},
 	{"CPenaltyKickV2",      Skill_PenaltyKickV2},
 	{"SimpleGotoPos",		Skill_SimpleGotoPoint},
 	{"CGoCmuRush",			Skill_GoCmuRush},

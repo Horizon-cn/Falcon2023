@@ -70,6 +70,7 @@
 #include "InterceptBallV2.h"
 #include "GoSupport.h"
 #include "GoTechChalPos.h"
+#include "GoPIDCircle.h"
 
 /************************************************************************/
 /*                      TaskFactoryV2                                    */
@@ -103,6 +104,9 @@ CPlayerTask* CTaskFactoryV2::Break(const TaskT& task)
 
 //////////////////////////////////////////////////////////////////////////
 // current now debugged skill for game
+CPlayerTask* CTaskFactoryV2::GoPIDCircle(const TaskT& task) {
+    return MakeTask< CGoPIDCircle >(task);
+}
 CPlayerTask* CTaskFactoryV2::GotoPosition(const TaskT& task) {
     return MakeTask< CGotoPosition >(task);
 }
@@ -744,6 +748,15 @@ namespace PlayerRole {
         playerTask.executor = num;
         playerTask.player.left_or_right = leftOrRight;
         return TaskFactoryV2::Instance()->GoSupport(playerTask);
+    }
+    CPlayerTask* makeItGoPIDCircle(const int runner, const CGeoPoint pos, const double r, const bool opt)
+    {
+        static TaskT playerTask;
+        playerTask.executor = runner;
+        playerTask.player.left_or_right = opt;
+        playerTask.player.pos = pos;
+        playerTask.player.GoRadius = r;
+        return TaskFactoryV2::Instance()->GoPIDCircle(playerTask);
     }
     CPlayerTask* makeItShootBall(const int num, const double dir, const bool ischipkick, const double precision, const double kp, const double cp, const int flags)
     {

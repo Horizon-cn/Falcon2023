@@ -11,6 +11,7 @@
 class CPlayerTask;
 class CTaskFactoryV2 {
 public:
+	CPlayerTask* GoPIDCircle(const TaskT& task);
     CPlayerTask* Break(const TaskT& task);
     //ÅÜÎ»µÄSkill. by HXY
     CPlayerTask* GotoPosition(const TaskT& task);
@@ -164,6 +165,7 @@ namespace PlayerRole {
 	CPlayerTask* makeItDribbleTurn(const int num, const double finalDir, const double pre = Param::Math::PI / 90);
 	CPlayerTask* makeItDribbleTurnKick(const int num, const double finalDir, const double turnRotVel, const double kickPower);
 	CPlayerTask* makeItGoSupport(const int num, const bool leftOrRight);
+	CPlayerTask* makeItGoPIDCircle(const int runner, const CGeoPoint pos, const double r, const bool opt);
 }
 
 #endif // _TASK_FACTORY_V2_H_
