@@ -116,7 +116,11 @@ function DoRolePosMatch(curPlay, isPlaySwitched, isStateSwitched)
 				end
 				curPlay[gRealState][rolename].name = "continue"
 			end
-			gRolePos[rolename] = curPlay[gRealState][rolename][2]()
+			if type(rolename) == "function" then
+				gRolePos[rolename()] = curPlay[gRealState][rolename][2]()
+			else
+				gRolePos[rolename] = curPlay[gRealState][rolename][2]()
+			end
 		end
 	end
 	UpdateRole(curPlay[gRealState].match, isPlaySwitched, isStateSwitched)

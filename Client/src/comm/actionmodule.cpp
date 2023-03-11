@@ -27,7 +27,7 @@ namespace Owl {
             power = fabs(power); // ·ÀÖ¹ÀëÆ×µÄ´íÎó²ÎÊý
             if (kpm->convertPower) {
                 if (mode == 0) {
-                    power = (int)(0.00001 * kpm->flat_a[num] * power * power + kpm->flat_b[num] * power + kpm->flat_c[num]);
+                    power = (int)(1e-9 * kpm->flat_a[num] * power * power + kpm->flat_b[num] * power + kpm->flat_c[num]);
                     if (power > kpm->flat_max[num]) {
                         power = kpm->flat_max[num];
                     }

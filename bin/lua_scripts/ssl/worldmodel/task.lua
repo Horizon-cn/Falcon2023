@@ -112,6 +112,8 @@ function passToPos(p, c)
 	local ipower
 	if type(c)== "number" and c ~= nil then
 		ipower=kp.specified(c)
+	elseif type(c) == "function" then -- 自定义力度
+		ipower = c
 	else
 		ipower=kp.toTargetNormalPlay(p)
 	end
@@ -1076,7 +1078,8 @@ end
 
 function getBall(p)
 	-- local mexe, mpos = GetBall{ pos = pos.backBall(p), dir = dir.backBall(p)}
-	local mexe, mpos = GetBall{ pos = ball.backPos(p), dir = ball.backDir(p)}
+	-- local mexe, mpos = GetBall{ pos = ball.backPos(p), dir = ball.backDir(p)}
+	local mexe, mpos = GetBall{ pos = ball.backPos(p), dir = player.toPointDir(p)}
 	return {mexe, mpos}
 end
 
