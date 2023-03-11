@@ -1078,7 +1078,8 @@ end
 
 function getBall(p)
 	-- local mexe, mpos = GetBall{ pos = pos.backBall(p), dir = dir.backBall(p)}
-	local mexe, mpos = GetBall{ pos = ball.backPos(p), dir = ball.backDir(p)}
+	-- local mexe, mpos = GetBall{ pos = ball.backPos(p), dir = ball.backDir(p)}
+	local mexe, mpos = GetBall{ pos = ball.backPos(p), dir = player.toPointDir(p)}
 	return {mexe, mpos}
 end
 

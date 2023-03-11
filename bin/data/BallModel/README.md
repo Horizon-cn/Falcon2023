@@ -6,3 +6,4 @@
 - loan_model_x_50/y_50:预测50帧后位置
 - loan_model_x_20_fixY/y_20_fixY:添加y方向大速度，降低y方向误差
 - model_x_20_fixY_kick/y_20_fixY_kick:用踢出第7~10帧的平均速度作为踢球初速
+- model_x_20_fixY_kick_avg10:减少了特征数量，不再输入前10帧速度，用前10帧速度和差速均值代替

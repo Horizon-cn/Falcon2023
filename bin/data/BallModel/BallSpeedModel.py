@@ -8,11 +8,12 @@ import datetime
 
 TRAIN_PATH = ['BallSpeed2023-03-05-13-24-08.txt', 'BallSpeed2023-03-05-23-40-30.txt', 'BallSpeed2023-03-06-11-39-31.txt']
 TEST_PATH = ['BallSpeed2023-03-05-21-01-03.txt']  # 'TestTimeCost.txt'
-MODEL = ['model_x_20_fixY_kick.pkl', 'loan_model_y_20_fixY.pkl', 'loan_model_x_20_fixY.pkl', 'model_y_20_fixY_kick.pkl',
-         'loan_model_x_20.pkl', 'loan_model_y_20.pkl', 'loan_model_x.pkl', 'loan_model_y.pkl']
+MODEL = ['model_x_20_fixY_kick_avg10.pkl', 'loan_model_y_20_fixY_avg10.pkl', 'model_x_20_fixY_kick.pkl', 'loan_model_y_20_fixY.pkl',
+         'loan_model_x_20_fixY.pkl', 'model_y_20_fixY_kick.pkl', 'loan_model_x_20.pkl', 'loan_model_y_20.pkl', 'loan_model_x.pkl',
+         'loan_model_y.pkl']
 predicted_time = 20
-TRAIN_VX = False
-TRAIN_VY = False
+TRAIN_VX = True
+TRAIN_VY = True
 
 def process_train_file(PATH, limit):
     data = {'time': [], 'vx': [], 'kick_vx': [], 'vy': [], 'kick_vy': [], 'x': [], 'y': []}
@@ -70,6 +71,19 @@ def process_dataFrame(data, limit, train_data_vx, train_data_vy):
     temp_train_data = temp_train_data[~temp_train_data['x+'].isnull()]
     temp_train_data = temp_train_data[~temp_train_data['y+'].isnull()]
     temp_train_data = temp_train_data[~temp_train_data['time+'].isnull()]
+    temp_avg_vx = temp_train_data['vx-1']
+    temp_avg_vy = temp_train_data['vy-1']
+    temp_avg_delta_vx = temp_train_data['vx'] - temp_train_data['vx-1']
+    temp_avg_delta_vy = temp_train_data['vy'] - temp_train_data['vy-1']
+    for i in range(2, 11, 1):
+        temp_avg_vx = temp_avg_vx + temp_train_data['vx-{}'.format(i)]
+        temp_avg_vy = temp_avg_vy + temp_train_data['vy-{}'.format(i)]
+        temp_avg_delta_vx = temp_avg_delta_vx + temp_train_data['vx-{}'.format(i-1)] - temp_train_data['vx-{}'.format(i)]
+        temp_avg_delta_vy = temp_avg_delta_vy + temp_train_data['vy-{}'.format(i-1)] - temp_train_data['vy-{}'.format(i)]
+    temp_train_data['avg_vx'] = temp_avg_vx * 0.1
+    temp_train_data['avg_vy'] = temp_avg_vy * 0.1
+    temp_train_data['avg_delta_vx'] = temp_avg_delta_vx * 0.1
+    temp_train_data['avg_delta_vy'] = temp_avg_delta_vy * 0.1
     temp_train_data['delta_x+'] = temp_train_data['x+'] - temp_train_data['x']
     temp_train_data['delta_y+'] = temp_train_data['y+'] - temp_train_data['y']
     temp_train_data_vx = temp_train_data
@@ -113,19 +127,32 @@ def process_dataFrame(data, limit, train_data_vx, train_data_vy):
     return train_data_vx, train_data_vy
 
 train_data_vx, train_data_vy = process_train_file(TRAIN_PATH, True)
-print(train_data_vx, train_data_vy)
 test_data, _ = process_train_file(TEST_PATH, False)
-print(test_data)
+
+# 写入txt
+def write_to_txt(filename, data):
+    file = open(filename, mode='w')
+    for i in range(0, data.shape[0], 1):
+        file.writelines([str(data['time'][i]), ' ', str(data['kick_vx'][i]), ' ', str(data['vx'][i]), ' ',
+                         str(data['avg_vx'][i]), ' ', str(data['avg_delta_vx'][i]), ' ', str(data['delta_x+'][i]), '\n'])
+    file.close()
+
+# write_to_txt('train_vx.txt', train_data_vx)
+# write_to_txt('test_vx.txt', test_data)
+# train_data_vx1 = train_data_vx[['time', 'kick_vx', 'vx', 'avg_vx', 'avg_delta_vx', 'delta_x+']]
+# test_data1 = test_data[['time', 'kick_vx', 'vx', 'avg_vx', 'avg_delta_vx', 'delta_x+']]
+# train_data_vx1.to_csv('train_vx.csv', index=False, header=False)
+# test_data1.to_csv('test_vx.csv', index=False, header=False)
 
 # 选择机器学习训练需要的数据
-feature_cols_vx = ['time', 'kick_vx', 'vx']
-for i in range(1, 11, 1):
-    feature_cols_vx.append('time-{}'.format(i))
-    feature_cols_vx.append('vx-{}'.format(i))
-feature_cols_vy = ['time', 'kick_vy', 'vy']
-for i in range(1, 11, 1):
-    feature_cols_vy.append('time-{}'.format(i))
-    feature_cols_vy.append('vy-{}'.format(i))
+feature_cols_vx = ['time', 'kick_vx', 'vx', 'avg_vx', 'avg_delta_vx']
+# for i in range(1, 11, 1):
+#     feature_cols_vx.append('time-{}'.format(i))
+#     feature_cols_vx.append('vx-{}'.format(i))
+feature_cols_vy = ['time', 'kick_vy', 'vy', 'avg_vy', 'avg_delta_vy']
+# for i in range(1, 11, 1):
+#     feature_cols_vy.append('time-{}'.format(i))
+#     feature_cols_vy.append('vy-{}'.format(i))
 # 规定输出模型的数据类型
 target_cols_vx = ['delta_x+']
 target_cols_vy = ['delta_y+']
@@ -141,10 +168,12 @@ X_vy = train_data_vy[feature_cols_vy].values
 Y_vy = train_data_vy[target_cols_vy].values
 X_test_vy = test_data[feature_cols_vy].values
 # 训练参数
-params = {'boosting_type': 'gbdt',
+params = {'boosting_type': 'goss',  # 'gbdt',
           # 'learning_rate': 0.01,  #1.5,  # 0.1
-          'objective': 'mae',
-          'metric': 'mae',
+          'objective': 'mape',  # 'mae',
+          'metric': 'mape',  # 'mae',
+          'num_threads': 6,
+          # 'device': 'gpu',
           'bagging_freq': 5,
           'num_leaves': 9,  # 3,
           'verbose': -1,  # 0,
@@ -159,9 +188,9 @@ P_tst_vx = np.zeros((X_test_vx.shape[0], output_dim_vx), dtype=float)
 if TRAIN_VX:
     reg.fit(X_vx, Y_vx)
     # 模型存储
-    joblib.dump(reg, MODEL[0])
+    #joblib.dump(reg, MODEL[0])
 # 模型加载
-reg = joblib.load(MODEL[0])
+#reg = joblib.load(MODEL[0])
 print('start to predict vx')
 s = datetime.datetime.now()
 P_tst_vx = reg.predict(X_test_vx)
@@ -174,9 +203,9 @@ P_tst_vy = np.zeros((X_test_vy.shape[0], output_dim_vy), dtype=float)
 if TRAIN_VY:
     reg.fit(X_vy, Y_vy)
     # 模型存储
-    joblib.dump(reg, MODEL[1])
+    #joblib.dump(reg, MODEL[1])
 # 模型加载
-reg = joblib.load(MODEL[1])
+#reg = joblib.load(MODEL[1])
 print('start to predict vy')
 s = datetime.datetime.now()
 P_tst_vy = reg.predict(X_test_vy)

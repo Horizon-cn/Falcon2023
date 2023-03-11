@@ -294,13 +294,13 @@ public:
         loadParam(convertPower, "General/convertPower", true);
         for (int i = 0; i < PARAM::ROBOTMAXID; i++) {
             loadParam(flat_a[i], QString("Robot%1/flat_a").arg(i), 0);
-            loadParam(flat_b[i], QString("Robot%1/flat_b").arg(i), 18.14);
-            loadParam(flat_c[i], QString("Robot%1/flat_c").arg(i), 100);
+            loadParam(flat_b[i], QString("Robot%1/flat_b").arg(i), 0.1814);
+            loadParam(flat_c[i], QString("Robot%1/flat_c").arg(i), 0);
             loadParam(chip_a[i], QString("Robot%1/chip_a").arg(i), 0);
-            loadParam(chip_b[i], QString("Robot%1/chip_b").arg(i), 32);
+            loadParam(chip_b[i], QString("Robot%1/chip_b").arg(i), 0.32);
             loadParam(chip_c[i], QString("Robot%1/chip_c").arg(i), 0);
             loadParam(flat_max[i], QString("Robot%1/flat_max").arg(i), 127);
-            loadParam(flat_min[i], QString("Robot%1/flat_min").arg(i), 60);
+            loadParam(flat_min[i], QString("Robot%1/flat_min").arg(i), 0);
             loadParam(chip_max[i], QString("Robot%1/chip_max").arg(i), 127);
             loadParam(chip_min[i], QString("Robot%1/chip_min").arg(i), 30);
         }

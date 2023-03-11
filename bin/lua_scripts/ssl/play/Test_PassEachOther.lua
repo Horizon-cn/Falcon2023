@@ -2,26 +2,32 @@ local record_file = "../data/BallModel/BallSpeed"..os.date("%Y-%m-%d-%H-%M-%S").
 local pass_cnt = 0
 local min_player_num = 0
 local anti_pos = 1
-local init_x = 300 -- 565
-local pass_power = function()
-	local power = 650 - pass_cnt
-	if power <= 0 then
-		power = 0
-	end
-	return power
-end
+local init_x = 500 -- 565 -- 300
+local max_speed = 127 -- 标定的时候0~127，测试球速时意义为预期踢出的球速(cm/s)
 local getKickerNum = function()
 	return pass_cnt % 2 + min_player_num
 end
 local getReceiverNum = function()
 	return (pass_cnt + 1) % 2 + min_player_num
 end
-local getReceiverPos = function()
-	if getReceiverNum() % 2 == 1 then
-		return CGeoPoint:new_local(init_x, 415 * anti_pos) -- 定死，不随球移动
-	elseif getReceiverNum() % 2 == 0 then
-		return CGeoPoint:new_local(600 - init_x, -415 * anti_pos)
+local pass_power = function()
+	local temp1, temp2 = math.modf(pass_cnt / 2) -- 每个力度踢一次
+	local power = max_speed - temp1
+	if power <= 0 then
+		power = 0
 	end
+	return power
+end
+local getReceiverPos = function()
+	if getReceiverNum() % 2 == 1 then -- 415
+		return CGeoPoint:new_local(init_x, 370 * anti_pos) -- 定死，不随球移动
+	elseif getReceiverNum() % 2 == 0 then
+		return CGeoPoint:new_local(param.pitchLength/2 - init_x, -370 * anti_pos)
+	end
+end
+local getKickerPos = function()
+	local pos = getReceiverPos()
+	return CGeoPoint:new_local(param.pitchLength/2 - pos:x(), -pos:y())
 end
 local getEndNum1 = function()
 	local EndNum = min_player_num - 1
@@ -39,8 +45,14 @@ local getEndNum2 = function()
 		return EndNum
 	end
 end
-local End_Pos_1 = CGeoPoint:new_local(600, 20)
-local End_Pos_2 = CGeoPoint:new_local(600, -20)
+local receive_dir = function(num)
+	return (player.pos(getKickerNum()) - player.pos(num)):dir()
+end
+local kick_dir = function(num)
+	return (player.pos(getReceiverNum()) - player.pos(num)):dir()
+end
+local End_Pos_1 = CGeoPoint:new_local(param.pitchLength/2, 20)
+local End_Pos_2 = CGeoPoint:new_local(param.pitchLength/2, -20)
 -- local SHOOT_POS = pos.passForTouch(getReceiverPos)
 local MOVE_FLAG = flag.not_dodge_penalty + flag.dodge_ball
 
@@ -57,8 +69,8 @@ firstState = "init",
 			if ball.posY() > 0 then
 				anti_pos = -1
 			end
-			if ball.posX() > 300 then 
-				init_x = 600 - init_x
+			if ball.posX() > param.pitchLength/4 then 
+				init_x = param.pitchLength/2 - init_x
 			end
 			return "getready"
 		end
@@ -76,7 +88,7 @@ firstState = "init",
 		end
 	end,
 	[getKickerNum] = task.getBall(getReceiverPos), -- SHOOT_POS -- 传入函数才能保证每一周期都更新
-	[getReceiverNum] = task.goCmuRush(getReceiverPos, _, _, MOVE_FLAG),
+	[getReceiverNum] = task.goCmuRush(getReceiverPos, receive_dir, _, MOVE_FLAG),
 	[getEndNum1] = task.goCmuRush(End_Pos_1, _, _, MOVE_FLAG), -- 退场
 	[getEndNum2] = task.goCmuRush(End_Pos_2, _, _, MOVE_FLAG),
 	match = ""
@@ -93,22 +105,22 @@ firstState = "init",
 		end
 	end,
 	[getKickerNum] = task.passToPos(getReceiverPos, pass_power),
-	[getReceiverNum] = task.goCmuRush(getReceiverPos, _, _, MOVE_FLAG),
+	[getReceiverNum] = task.goCmuRush(getReceiverPos, receive_dir, _, MOVE_FLAG),
 	match = ""
 },
 
 ["receive"] = {
     switch = function ()
-    	debugEngine:gui_debug_msg(CGeoPoint:new_local(300, 0), pass_power())
+    	debugEngine:gui_debug_msg(CGeoPoint:new_local(param.pitchLength/4, 0), pass_power())
     	file = io.open(record_file, "a")
     	file:write(string.format("%d",getKickerNum())," ",pass_power()," ",ball.velMod()," ",ball.velX()," ",ball.velY()," ",ball.posX()," ",ball.posY(),"\n")
 		file:close()
-		if bufcnt(ball.toPlayerHeadDist(getReceiverNum()) < 10, "fast") then
+		if bufcnt(ball.toPlayerHeadDist(getReceiverNum()) < 5, "fast") then
 			pass_cnt = pass_cnt + 1
 			return "getready"
 		end
 	end,
-	[getKickerNum] = task.stop(),
+	[getKickerNum] = task.goCmuRush(getKickerPos, kick_dir, _, MOVE_FLAG),
 	[getReceiverNum] = task.receive(ball.pos()),
 	match = ""
 },
