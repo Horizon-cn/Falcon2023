@@ -56,7 +56,7 @@ void CBallStatus::UpdateBallStatus(const CVisionModule* pVision)
 
 void CBallStatus::UpdateBallMoving(const CVisionModule* pVision)
 {
-    const BallVisionT& ball = pVision->Ball(); // ??
+    const BallVisionT& ball = pVision->Ball(); // 球
     isNearPlayer = false;
     for (int i=0; i<Param::Field::MAX_PLAYER*2; i++){
         if (pVision->AllPlayer(i).Valid() && pVision->AllPlayer(i).Pos().dist(ball.Pos())< Param::Field::MAX_PLAYER_SIZE/2+5){
@@ -65,18 +65,18 @@ void CBallStatus::UpdateBallMoving(const CVisionModule* pVision)
         }
     }
     if (false == isNearPlayer && ball.Vel().mod()>2){
-        // ??е?????????????,??????????????????????; ??????????????,?????????0;
+        // 只有当球不在车附近时,才使用预测后的球速来更新; 以免球在车附近时,将球速设为0;
         _ballMovingVel = ball.Vel();
     }
     else{
-        // ???????????????????????????
+        // 保留球速，方向使用稳定可靠的方向
         double ballspeed = max(1.0, ball.Vel().mod());
         _ballMovingVel = Utils::Polar2Vector(ballspeed, _ballMovingVel.dir());
         //std::cout<<"BallStatus: Ball Near Player"<<endl;
     }
 }
 
-// ??PlayInterface???????????????
+// 从PlayInterface中移出的球状态部分
 void CBallStatus::initializeCmdStored()
 {
     for (int i=0; i<Param::Field::MAX_PLAYER; i++){
@@ -112,16 +112,16 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
     for (int num=0; num < Param::Field::MAX_PLAYER; num++){
 
         /************************************************************************/
-        /*  ???????????????? [6/16/2011 cliffyin]		                    */
+        /*  优先利用双向通讯信息 [6/16/2011 cliffyin]		                    */
         /************************************************************************/
-        // ???: ?????????????
-        // ???????????????÷??淽???????ж?
+        // 实物: 优先检测上传信息
+        // 实车通信不稳定，也使用仿真方法进行判断
         if (! IS_SIMULATION && false) {
             bool sensorValid = RobotSensor::Instance()->IsInfoValid(num);
             bool isBallInFoot = RobotSensor::Instance()->IsInfraredOn(num);
             int isKickDeviceOn = RobotSensor::Instance()->IsKickerOn(num);
             // std::cout << "sensorValid: " << sensorValid << ", isBallInFoot: " << isBallInFoot << ", isKickDeviceOn: " << isKickDeviceOn << ".\n";
-            // ????????????????????????????????
+            // 用于双向通迅出现问题时，且此时红外正常
             if (sensorValid && isKickDeviceOn > 0) {
                 _kickerNum = num;
                 _isKickedOut = true;
@@ -131,7 +131,7 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
                 break;
             }
         }
-        // ????: ???????????????ж?
+        // 仿真: 完全按照图像进行判断
         else{
             bool isKickCmdSent = false;
             for (int i=0; i < MAX_CMD_STORED; i++){
@@ -141,7 +141,7 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
                 }
                 else if (kickCmd.chipKick()>0){
                     isKickCmdSent = true;
-                    _isChipKickOut = true; // ??????????
+                    _isChipKickOut = true; // 记录挑球标签
                 }
             }
             //std::cout << "isKickCmdSent: " << isKickCmdSent << std::endl;
@@ -157,7 +157,7 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
             double ballLeavingAngle = fabs(Utils::Normalize(ballSpeedDir - player2ball.dir()));
             double ballFleeingRelDir = fabs(Utils::Normalize(ballSpeedDir - player.Dir()));
 
-            // ?????????????????????С????????
+            // 球离去的方向与车球朝向应该小于一定角度
             //std::cout << "isKick:" << (ballLeavingAngle < Param::Math::PI / 3) << " " << (ball.Vel().mod() > 100) << " " << (ballFleeingRelDir < Param::Math::PI / 12) << "\n";
             if (ballLeavingAngle < Param::Math::PI / 3 && ball.Vel().mod() > 100
                 &&  ballFleeingRelDir < Param::Math::PI/12){
@@ -169,9 +169,9 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
 
 
         ///************************************************************************/
-        ///*  ???????ж? ??????б????                                         */
+        ///*  然后图像判断 球是否有被踢出                                         */
         ///************************************************************************/
-        //// ?ж??????????????:
+        //// 判断球踢出的几个标准:
         //const BallVisionT& ball = pVision->Ball();
         //const PlayerVisionT& player = pVision->OurPlayer(num);
         //CVector player2ball;
@@ -179,14 +179,14 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
         //	player2ball = ball.Pos()-player.Pos();
         //}
         //else{
-        //	// ???????????
+        //	// 车或球找不到
         //	_isKickedOut = false;
         //	continue;
         //}
 
-        //// 0. ???????????,?????????????
+        //// 0. 一定历史时间内,车是否发过射门指令
         //bool isKickCmdSent = false;
-        //_isChipKickOut = false; // ???????????
+        //_isChipKickOut = false; // 重置挑球标签
         //for (int i=0; i<MAX_CMD_STORED; i++){
         //	CSendCmd kickCmd = getKickCommand( num, (pVision->Cycle()+MAX_CMD_STORED-i) % MAX_CMD_STORED );
         //	if (kickCmd.normalKick()>0){
@@ -194,7 +194,7 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
         //	}
         //	else if (kickCmd.chipKick()>0){
         //		isKickCmdSent = true;
-        //		_isChipKickOut = true; // ??????????
+        //		_isChipKickOut = true; // 记录挑球标签
         //	}
         //}
         //if (false == isKickCmdSent){
@@ -205,7 +205,7 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
         //	//std::cout<<"Chk KickOut Ball: kick cmd from player: "<<num<<endl;
         //}
 
-        //// 1.???????
+        //// 1.球离车而去
         //bool ballFleeing = false;
         //double ballSpeedDir = ball.Vel().dir();
         //double ballLeavingAngle = Utils::Normalize(ballSpeedDir - player2ball.dir());
@@ -213,11 +213,11 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
         //	ballFleeing = true;
         //}
 
-        //// 2. ?????????????????λ????
+        //// 2. 球不是从身体其他部位碰出
 
         //double ballFleeingRelDir = Utils::Normalize(ballSpeedDir - player.Dir());
         //if ( (false == ballFleeing || std::abs(ballFleeingRelDir) > Param::Math::PI/12) && !isKickingNow){
-        //	// ???????????,??????????浯??.
+        //	// 球不是离车而去,或从车非正面弹出.
         //	//		std::cout<<"num:"<<num<<" ball not fleeing"<<endl;
         //	_isKickedOut = false;
         //	continue;
@@ -235,7 +235,7 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
         //	continue;
         //}
 
-        //// ??????????,????????????
+        //// 的确踢出球了,重置变量与标签
         ////cout<<"VisionOut    :  "<<num<<endl;
         //_isKickedOut = true;
         //_kickerNum = num;
@@ -305,9 +305,9 @@ string CBallStatus::checkBallState(const CVisionModule* pVision,int meNum){
     const double dist2ball=self2ball.mod();
     const double distHe2ball=he2ball.mod();
 
-    const double dAngleMeBall2BallVelDir = fabs(Utils::Normalize(ball2self.dir() - ballVelDir));	//????????????????н?
+    const double dAngleMeBall2BallVelDir = fabs(Utils::Normalize(ball2self.dir() - ballVelDir));	//球车向量与球速线夹角
     const CGeoSegment ballMovingSeg = CGeoSegment(rawBallPos+Utils::Polar2Vector(10,Utils::Normalize(ballVelDir)),rawBallPos+Utils::Polar2Vector(800,Utils::Normalize(ballVelDir)));
-    const CGeoPoint projMe = ballMovingSeg.projection(me.Pos());					//С??????????????????
+    const CGeoPoint projMe = ballMovingSeg.projection(me.Pos());					//小车在球移动线上的投影点
     double projDist = projMe.dist(me.Pos());
 
     const CGeoSegment balltoMeSeg = CGeoSegment(rawBallPos+Utils::Polar2Vector(20,Utils::Normalize(ballVelDir)),rawBallPos+Utils::Polar2Vector(dist2ball+30,Utils::Normalize(ballVelDir)));

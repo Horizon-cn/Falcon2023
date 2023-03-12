@@ -1,6 +1,6 @@
 /*
 ** Lua binding: zeus
-** Generated automatically by tolua++-1.0.92 on Sun Mar 12 18:06:11 2023.
+** Generated automatically by tolua++-1.0.92 on Sun Mar 12 18:25:10 2023.
 */
 
 #ifndef __cplusplus
@@ -12819,6 +12819,30 @@ static int tolua_set_supportPos2022_ptr(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: robotSensor */
+#ifndef TOLUA_DISABLE_tolua_get_robotSensor_ptr
+static int tolua_get_robotSensor_ptr(lua_State* tolua_S)
+{
+   tolua_pushusertype(tolua_S,(void*)robotSensor,"CRobotSensor");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: robotSensor */
+#ifndef TOLUA_DISABLE_tolua_set_robotSensor_ptr
+static int tolua_set_robotSensor_ptr(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_isusertype(tolua_S,2,"CRobotSensor",0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  robotSensor = ((CRobotSensor*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: initializeSingleton */
 #ifndef TOLUA_DISABLE_tolua_zeus_initializeSingleton00
 static int tolua_zeus_initializeSingleton00(lua_State* tolua_S)
@@ -22163,6 +22187,7 @@ TOLUA_API int tolua_zeus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"indirectDefender",tolua_get_indirectDefender_ptr,tolua_set_indirectDefender_ptr);
   tolua_variable(tolua_S,"supportPos",tolua_get_supportPos_ptr,tolua_set_supportPos_ptr);
   tolua_variable(tolua_S,"supportPos2022",tolua_get_supportPos2022_ptr,tolua_set_supportPos2022_ptr);
+  tolua_variable(tolua_S,"robotSensor",tolua_get_robotSensor_ptr,tolua_set_robotSensor_ptr);
   tolua_function(tolua_S,"initializeSingleton",tolua_zeus_initializeSingleton00);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"CGuardPos","CGuardPos","",tolua_collect_CGuardPos);

@@ -22,4 +22,5 @@ CChipBallJudge* chipBallJudge;
 CIndirectDefender* indirectDefender;
 CSupportPos* supportPos;
 CSupportPos2022* supportPos2022;
+CRobotSensor* robotSensor;
 void initializeSingleton();
