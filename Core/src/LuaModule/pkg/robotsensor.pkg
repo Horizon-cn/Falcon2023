@@ -1,0 +1,11 @@
+$#include "RobotSensor.h"
+
+class CRobotSensor{
+	CRobotSensor();
+    ~CRobotSensor();
+	void Update(int cycle);
+	bool IsInfoValid(int num);
+	bool IsInfraredOn(int num);
+    void ResetInraredOn(int num);
+	int IsKickerOn(int num);
+};

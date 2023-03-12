@@ -27,10 +27,10 @@ list(APPEND libs ${LUA_LIBRARIES})
 ## tolua++
 list(APPEND incs ${TOLUAPP_INCLUDE_DIR})
 list(APPEND libs ${TOLUAPP_LIBRARIES})
-# EXECUTE_PROCESS(
-#    COMMAND ${TOLUAPP_EXECUTABLE} -n zeus -o ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/lua_zeus.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/zeus.pkg
-#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule
-# )
+EXECUTE_PROCESS(
+    COMMAND ${TOLUAPP_EXECUTABLE} -n zeus -o ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/lua_zeus.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/pkg/zeus.pkg
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/pkg
+)
 ## Eigen
 # list(APPEND incs ${EIGEN3_INCLUDE_DIR})
 

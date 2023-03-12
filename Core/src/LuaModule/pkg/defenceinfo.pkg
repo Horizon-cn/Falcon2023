@@ -1,0 +1,52 @@
+$#include "DefenceInfo.h"
+
+class CVisionModule;
+class CAttributeSet;
+class CTrigger;
+
+struct MarkField{
+    MarkField(CGeoPoint upLeft, CGeoPoint downRight);
+    CGeoPoint _upLeft;
+    CGeoPoint _downRight;
+    int markTouchNum;
+};
+
+struct AttackerStruct{
+    AttackerStruct(int n, int pri,double subV);
+    int num;
+    int prioirty;
+    double subValue;
+};
+
+class CDefenceInfo
+{
+    CDefenceInfo();
+    ~CDefenceInfo();
+    void initialization();
+    void updateDefenceInfo(const CVisionModule *pVision);
+    void setNoChangeFlag();
+    void clearNoChangeFlag();
+    void setNoMarkingField(CGeoPoint upLeft, CGeoPoint downRight);
+    void clearNoMarkingField(CGeoPoint upLeft, CGeoPoint downRight);
+    void clearAll();
+    void changeAttrSet(CAttributeSet& as);
+    void setNoMarkingNum(int enemyNum);
+    void resetMarkingInfo();
+    int getOppoNum();
+    int getAttackNum();
+    int getAttackOppNumByPri(int i);
+    int getSteadyAttackOppNumByPri(int i);
+    bool queryMarked(int i);
+    int getOurMarkDenfender(const int enemyNum);
+    bool getMarkMode(const int enemy);
+    bool getTriggerState();
+    COppPlayer* getOppPlayerByNum(int i);
+    bool getBallTaken();
+    vector<MarkField> getMarkFieldList();
+    bool checkInRecArea(int enemyNum, const CVisionModule* pVision,MarkField markField);
+    bool checkOurInRecArea(int myNum, const CVisionModule* pVision,MarkField markField);
+    int getMarkingTouchNum(CGeoPoint upLeft,CGeoPoint downRight);
+    void setMarkList(const CVisionModule* pVision,int myNum,int enemyNum);
+    void setMarkingTouchInfo(const CVisionModule* pVision,int myNum,CGeoPoint upLeft,CGeoPoint rightDown);
+    void setMarkMode(int myNum,int enemyNum,bool mode);
+};

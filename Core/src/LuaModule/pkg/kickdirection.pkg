@@ -1,0 +1,20 @@
+$#include "KickDirection.h"
+
+class CVisionModule;
+
+class CKickDirection{
+	CKickDirection(); 
+	void GenerateShootDir(const int player , const CGeoPoint pos);
+	bool getKickValid ();
+	bool getCompensate ();
+	double getRawKickDir ();
+	double getCompensateDir ();
+	double getRealKickDir ();
+	double getIsKickValid();
+	double getRawDir();
+	double calCompensate(double x, double y);
+	double calGussiFuncA(double x1,double y1,double x2,double y2);
+	double calGussiFuncB(double x1,double y1,double x2,double y2);
+	double getPointShootDir(const CVisionModule* pVision, CGeoPoint startPoint);
+	CGeoPoint GetTheShootPoint(const CVisionModule* pVision, CGeoPoint startPoint);
+};

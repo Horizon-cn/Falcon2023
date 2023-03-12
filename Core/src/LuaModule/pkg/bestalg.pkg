@@ -1,0 +1,47 @@
+$#include "gpuBestAlgThread.h"
+
+struct PointValueStruct {
+	float pos_x;
+	float pos_y;
+	float pos;
+	float value;
+	PointValueStruct();
+	bool operator == (const PointValueStruct& p) const;
+};
+
+struct AreaStruct {
+	CGeoPoint _pos;
+	float _value;
+	int _area_idx;
+	bool _conflict;
+	AreaStruct(CGeoPoint& pos, float& value, int& area_idx, bool conflict);
+	bool operator == (const AreaStruct& area) const;
+};
+
+struct FieldRectangle {
+	FieldRectangle(CGeoPoint ld, CGeoPoint ru);
+	FieldRectangle centerArea();
+	CGeoPoint getCenter();
+	double _rangeX, _rangeY;
+	CGeoPoint _leftDownPos;
+	CGeoPoint _rightUpPos;
+	CGeoPoint _leftUpPos;
+	CGeoPoint _rightDownPos;
+	CGeoPoint _centerPos;
+};
+
+class CGPUBestAlgThread {
+	CGPUBestAlgThread();
+	~CGPUBestAlgThread();
+	void initialize(CVisionModule* _pVision);
+	CGeoPoint getBestPointFromArea(int area_idx);
+	void generatePointValue();
+	bool isLastOneValid(const CGeoPoint& p);
+	void setSendPoint(const CGeoPoint passPoint);
+	double getPosPotential(const CGeoPoint p);
+	int getMapSize();
+	void startComm();
+	void setPointValue();
+	void sendPointValue();
+    void doBestCalculation();
+};

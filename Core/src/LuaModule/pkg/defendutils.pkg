@@ -1,0 +1,37 @@
+$#include "DefendUtils.h"
+
+enum posSide{
+	POS_SIDE_LEFT = 0,
+	POS_SIDE_RIGHT,
+	POS_SIDE_MIDDLE
+};
+
+namespace DefendUtils{
+	int getPenaltyFronter();
+	bool isPosInOurPenaltyArea(const CGeoPoint& pos);
+	CGeoPoint reversePoint(const CGeoPoint& p);
+	double calcBlockAngle(const CGeoPoint& target,const CGeoPoint& player);
+	bool leftCirValid(const CGeoPoint& p);
+	bool rightCirValid(const CGeoPoint& p);
+	int getEnemyShooter();
+	CGeoLine getDefenceTargetAndLine(CGeoPoint& RdefenceTarget,double& RdefendDir);
+	CGeoPoint calcDefenderPoint(const CGeoPoint Rtarget,const double Rdir,posSide Rside);
+	CGeoLine getSideBackTargetAndLine(CGeoPoint& RSideTarget,double& RSideDir);
+	CGeoPoint calcDefenderPointV2(const CGeoPoint Rtarget,const double Rdir,const posSide Rside,int mode = 0,double ratio=-1.0);
+	CGeoPoint calcDefenderPointV3(const CGeoPoint& RTarget, double RDir, posSide RSide, int mode);
+	CGeoPoint calcGoaliePointV2(const CGeoPoint Rtarget,const double Rdir,const posSide Rside,CGeoPoint laststoredpoint,int mode = 0);
+	CGeoPoint calcGoaliePointV3(const CGeoPoint& RTarget, double RDir, posSide RSide, const CGeoPoint& lastpoint, int mode);
+	CGeoPoint calcPenaltyLinePoint(const double dir, const posSide side,double ratio);
+	bool isBallShotToTheGoal();
+	bool BallIsToPenaltyArea();
+	bool inHalfCourt(CGeoPoint target,double dir,int sideFactor);
+	bool getBallShooted();
+	bool getEnemyPass();
+	CGeoPoint getCornerAreaPos();
+	CGeoPoint getMiddleAreaPos();
+	CGeoPoint getDeDribblePos();
+	CGeoPoint getIndirectDefender(double radius ,CGeoPoint leftUp ,CGeoPoint rightDown,int mode);
+	CGeoPoint getMiddleDefender(double bufferX);
+	CGeoPoint getDefaultPos(int index);
+	bool checkInDeadArea();
+}

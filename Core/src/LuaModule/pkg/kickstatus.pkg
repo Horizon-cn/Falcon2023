@@ -1,6 +1,4 @@
-$#include <param.h>
-$#include <singleton.h>
-$#include "WorldModel/KickStatus.h"
+$#include "KickStatus.h"
 
 class CKickStatus {
 	CKickStatus();
@@ -18,7 +16,7 @@ class CKickStatus {
 	void updateForceClose(int currentCycle);
 	bool isForceClosed();
 	CGeoPoint getAdvancerPassTo() const;
-	int getNextAdvancer() const;
-	void setAdvancerPassTo(CGeoPoint pos);
+    void setAdvancerPassTo(CGeoPoint pos);	
 	void resetAdvancerPassTo();
+    int getNextAdvancer() const;
 };
