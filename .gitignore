@@ -101,7 +101,7 @@ Core/CMakeLists.txt.user*
 # Protobuf
 Core/*.pb.*
 Core/*_pb2.py
-# Core/src/LuaModule/lua_zeus.cpp
+Core/src/LuaModule/lua_zeus.cpp
 Core/share/proto/cpp/
 
 ZBin/*
