@@ -1,0 +1,20 @@
+$#include "TandemPos.h"
+
+class CTandemPos
+{
+	CTandemPos();
+	~CTandemPos();	
+	void generatePos();
+   	enum TandemState{
+		Special = 1,
+	    BallMovingtoTheirHalf,
+	    BallMovingtoOurHalf,
+	    OurChance,
+	    TheirChance
+    };
+    CGeoPoint getTandemPos();
+    void analyzeSituation(int teamnum,int oppnnum);
+    void planAssistAttack(int teamnum,int oppnum);
+    void planBlock(int teamnnum,int oppnum);
+    void planAssistGetBall(int teamnum,int oppnum);
+};

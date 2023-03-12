@@ -20,6 +20,7 @@
 #include "PointCalculation/GuardPos.h"
 #include "ParamManagerNew.h"
 #include "PointCalculation/SupportPos2022.h"
+#include "RobotSensor.h"
 
 extern CParamManagerSkill* paramManager;
 extern ParamManagerOwl* oParamManager;
@@ -43,5 +44,6 @@ extern CChipBallJudge* chipBallJudge;
 extern CIndirectDefender* indirectDefender;
 extern CSupportPos* supportPos;
 extern CSupportPos2022* supportPos2022;
+extern CRobotSensor* robotSensor;
 void initializeSingleton();
 #endif

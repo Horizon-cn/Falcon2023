@@ -1,0 +1,26 @@
+$#include <BestPlayer.h>
+
+class CBestPlayer
+{
+	struct ToBallPotentialPair { 
+		ToBallPotentialPair(int n, double p);
+		int num;
+		double potential;
+	};
+	CBestPlayer();
+	~CBestPlayer();
+	void update(const CVisionModule *pVision);
+	int getCurMesurementZ();
+	double getOurPotential(int num);
+	double getTheirPotential(int num) const;
+	bool withBall() const;
+	bool oppWithBall() const;
+	bool isOurBestPlayerChanged();
+	int getOurBestPlayer();
+	bool isTheirBestPlayerChanged();
+	int getTheirBestPlayer();
+	bool isOurPlayerStrictControlBall(int num);
+	bool isOurPlayerLooseControlBall(int num);
+	bool isTheirPlayerStrictControlBall(int num);
+	bool isTheirPlayerLooseControlBall(int num);
+};

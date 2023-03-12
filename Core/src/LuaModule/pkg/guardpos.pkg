@@ -1,6 +1,4 @@
-$#include "Vision/VisionModule.h"
-$#include "singleton.h"
-$#include "PointCalculation/GuardPos.h"
+$#include "GuardPos.h"
 
 class CGuardPos
 {

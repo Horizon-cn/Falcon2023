@@ -1,0 +1,20 @@
+$#include "matrix.h"
+
+class Matrix {
+	TOLUA_TEMPLATE_BIND(T,double)
+	Matrix();
+	Matrix(int rows, int columns);
+	Matrix(const Matrix<T> &other);
+	~Matrix();
+	void resize(int rows, int columns);
+	void identity(void);
+	void clear(void);
+	void setValue(int x, int y , double value);
+	double getValue(int x, int y);
+	T trace(void);
+	Matrix<T>& transpose(void);
+	Matrix<T> product(Matrix<T> &other);
+	int minsize(void);
+	int columns(void);
+	int rows(void);
+};
