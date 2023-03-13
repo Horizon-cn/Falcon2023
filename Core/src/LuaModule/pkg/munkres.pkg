@@ -1,5 +1,7 @@
 $#include "munkres.h"
 
 class Munkres {
+	Munkres();
+	~Munkres();
 	void solve(Matrix<double> &m);
 };

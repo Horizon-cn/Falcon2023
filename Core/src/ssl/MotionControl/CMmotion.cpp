@@ -274,15 +274,15 @@ void compute_motion_1d(double x0, double v0, double v1,
         }
     }
 
-    if (accel_dist_to_v1 > fabs(x0) && fabs(v0) < fabs(v1)) {
+    if (accel_dist_to_v1 > fabs(x0) && fabs(v0) < fabs(v1)) { // 需要持续加速，还达不到终速
         traj_time_acc = (sqrt(2 * a_max * fabs(x0) + v0 * v0) - fabs(v0)) / a_max;
         traj_time_flat = 0;
         traj_time_dec = 0;
-    } else if (decel_dist_to_v1 > fabs(x0) && fabs(v0) > fabs(v1)) {
+    } else if (decel_dist_to_v1 > fabs(x0) && fabs(v0) > fabs(v1)) { // 持续减速，还达不到终速
         traj_time_acc = 0;
         traj_time_flat = 0;
         traj_time_dec = (fabs(v0) - sqrt(v0 * v0 - 2 * d_max * fabs(x0))) / d_max;
-    } else {
+    } else { // 先加速到最大速度，后减速到终速
         double v_max_dist = (v_max * v_max - v0 * v0) / (2 * a_max) + (v_max * v_max - v1 * v1) / (2 * d_max);
         if (v_max_dist > fabs(x0)) {
             double v_m = sqrt((2 * a_max * d_max * fabs(x0) + d_max * v0 * v0 + a_max * v1 * v1) / (a_max + d_max));
@@ -635,7 +635,7 @@ void goto_point_omni( const PlayerVisionT& start,
     for( int i = 0; i < 4; i++ )
     {
         double angle = wheel_angle[i] / 180.0f * (float)Param::Math::PI;
-        wheel_speed[i] = ( sin(angle) * vx + cos(angle) * vy + vz )* 74037;
+        wheel_speed[i] = fabs((sin(angle) * vx + cos(angle) * vy + vz) * 74037);
 
         if (wheel_speed[i] > largest_wheel_speed)
         {

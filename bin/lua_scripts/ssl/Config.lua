@@ -8,7 +8,7 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_PassEachOther" --"Test_Run"
+		return "Test_Advance" --"Test_Run"
 	else
 		return "Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
@@ -21,10 +21,10 @@ gSwitchNum = {
 }
 
 gRoleFixNum = {
-	["Kicker"]   = {4},
-	["Goalie"]   = {0},
+	["Kicker"]   = {1},
+	["Goalie"]   = {4},
 	["Tier"]	 = {3},
-	["Receiver"] = {1}
+	["Receiver"] = {0}
 }
 
 -- 用来进行定位球的保持
