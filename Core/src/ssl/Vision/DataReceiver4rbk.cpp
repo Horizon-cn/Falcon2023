@@ -99,7 +99,7 @@ bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameIn
         return false;
     info.cycle = ++strategy_cycle;
     info.mode = m_play_mode;
-    info.ball.pos.valid = vision.has_balls();
+    info.ball.pos.valid = vision.has_balls() ? vision.balls().valid() : false;
     if (info.ball.pos.valid) {
         auto& ball = vision.balls();
         info.ball.pos.x = msgX2InfoX(ball.x());

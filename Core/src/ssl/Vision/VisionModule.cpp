@@ -187,7 +187,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	// 特殊情况一
 	// 一些特殊比赛状态下，对于球的特殊处理，与场地的尺寸参数相关
 	// 一般要求球看不到才予以处理
-    //if (!IS_SIMULATION) {
+    /**if (!IS_SIMULATION) {
 		if (_gameState.kickoff()) {				// 开球时
 			if (!Ball().Valid() || Ball().Pos().dist(CGeoPoint(0,0)) > 20) {
 				_ballPredictor.setPos(Cycle(),CGeoPoint(0,0));
@@ -211,7 +211,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 				}
 			}
 		}
-    //}
+    }**/
     /**
 	// 特殊情况二：
 	// 红外有信息，若球没看到，则予以位置修正，球若看到则检查红外信号，用以替换owl2中的处理 zyj
@@ -236,7 +236,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 				}
 			}
 		}
-    }**/
+    }**//**
     double ball_size = 2.15;
 	bool sensorBall = false;
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i ++) {
@@ -253,7 +253,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 
 			break;
 		}
-	}
+	}**/
 	/////////////////////////////////////////////////////////////////////////////
 	/// @brief Step 7: 向调试面板中显示一些必要的信息
 	/////////////////////////////////////////////////////////////////////////////
@@ -268,11 +268,11 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	// 	GDebugEngine::Instance()->gui_debug_robot(OurPlayer(i).Pos(), OurPlayer(i).Dir());
 	// }
 	// 输出我方小车的红外信号
-	if (sensorBall) {
-		//LogInfo("received infrared");
-		GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 6*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
-		GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 3*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
-	}
+	// if (sensorBall) {
+		//qDebug() << "received infrared";
+	// 	 GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 6*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
+	// 	 GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 3*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
+	// }
 	vision_to_decision.Signal();
 	vision_to_cuda.Signal();
 	return ;

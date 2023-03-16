@@ -3,6 +3,7 @@
 #include "parammanager.h"
 #include "crc.h"
 #include "globaldata.h"
+#include "communicator.h"
 namespace Owl {
     namespace {
         const int TRANSMIT_PACKET_SIZE = 25;
@@ -295,7 +296,8 @@ namespace Owl {
                     change_num = data[i + 4] & 0xff;
                     change_cnt = data[i + 5] & 0x0f;
                     GlobalData::Instance()->robotInfoMutex.unlock();
-                    emit receiveRobotInfo(opm->isYellow, id);
+                    ZCommunicator::Instance()->sendCommand(opm->isYellow, id);
+                    //emit receiveRobotInfo(opm->isYellow, id);
                 }
             }
         }
