@@ -238,7 +238,7 @@ void CDealBall::choseBall() {
 }
 
 //void CDealBall::checkInfrared(ReceiveVisionMessage& result) {
-void CDealBall::checkInfrared(Owl::Ball ball) {/**
+void CDealBall::checkInfrared(Owl::Ball& ball) {/**
     infraredcnt = 0;
     Owl::Ball infraredBall;
     Owl::ReceiveVisionMessage maintain = GlobalData::Instance()->maintain[0];
@@ -296,8 +296,8 @@ void CDealBall::checkInfrared(Owl::Ball ball) {/**
                     }
                 }
                 else {				// 球看不到，根据红外信号纠正球的位置
-                    ball.pos = robot.pos + CVector((sipm->RobotRadius + sipm->BallRadius) * cos(robot.angle), 
-                        (sipm->RobotRadius + sipm->BallRadius) * sin(robot.angle));
+                    double guessDist = sipm->CenterFromKicker + sipm->BallRadius; //sipm->RobotRadius + sipm->BallRadius;
+                    ball.pos = robot.pos + CVector(guessDist * cos(robot.angle), guessDist * sin(robot.angle));
                     ball.velocity = robot.velocity.vxy;
                     validBall = 2;
                     break;

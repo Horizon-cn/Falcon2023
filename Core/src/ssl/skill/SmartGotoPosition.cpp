@@ -266,7 +266,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         // 规划成功的情况则给中间点赋值，一般都是有中间点的
         if (viaPoint[vecNumber].size() > 2) middlePoint = viaPoint[vecNumber][1].pos;
     }
-    // GDebugEngine::Instance()->gui_debug_x(middlePoint, 0);
+    GDebugEngine::Instance()->gui_debug_x(middlePoint, 0);
     // 记录中间点，作为下一次规划基础
     lastPoint[vecNumber] = middlePoint;
     bool needRush2Ball = Utils::InTheirPenaltyArea(ballPos, 10) && !Utils::InTheirPenaltyArea(ballPos, 0); // 球在禁区外且很靠近禁区，直接冲击

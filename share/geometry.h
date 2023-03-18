@@ -68,6 +68,12 @@ class CVector {
     double operator *(CVector b) const {
         return double(_x * b.x() + _y * b.y());    //向量点乘
     }
+    double operator ^(CVector b) const {
+        return double(_x * b.y() - _y * b.x());    //向量叉乘返回模长,signed
+    }
+    CVector operator ^(double b) const {
+        return CVector(copysign(_y, b), -copysign(_x, b));    //与竖直向量叉乘返回向量//
+    }
     CVector operator /(double a) const {
         return CVector(_x / a, _y / a);
     }

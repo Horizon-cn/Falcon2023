@@ -269,6 +269,28 @@ extern "C" int Skill_SmartGotoPoint(lua_State *L)
 	return 0;
 }
 
+extern "C" int Skill_BezierRush(lua_State * L)
+{
+	TaskT playerTask;
+	playerTask.player.is_specify_ctrl_method = true;
+	playerTask.player.specified_ctrl_method = CMU_TRAJ;
+	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
+	playerTask.executor = runner;
+	double x = LuaModule::Instance()->GetNumberArgument(2, NULL);
+	double y = LuaModule::Instance()->GetNumberArgument(3, NULL);
+	playerTask.player.pos = CGeoPoint(x, y);
+	playerTask.player.angle = LuaModule::Instance()->GetNumberArgument(4, NULL);
+	playerTask.player.flag = LuaModule::Instance()->GetNumberArgument(5, NULL);
+	playerTask.ball.Sender = LuaModule::Instance()->GetNumberArgument(6, NULL);
+	playerTask.player.max_acceleration = LuaModule::Instance()->GetNumberArgument(7, NULL);
+	playerTask.player.needdribble = LuaModule::Instance()->GetNumberArgument(8, NULL);
+
+	CPlayerTask* pTask = TaskFactoryV2::Instance()->GotoPositionNew(playerTask);
+	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
+
+	return 0;
+}
+
 extern "C" int Skill_GoCmuRush(lua_State *L)
 {
 	TaskT playerTask;
@@ -1197,6 +1219,7 @@ luaDef GUIGlue[] =
 	{"SimpleGotoPos",		Skill_SimpleGotoPoint},
 	{"CGoCmuRush",			Skill_GoCmuRush},
 	{"SmartGotoPos",		Skill_SmartGotoPoint},
+	{"CBezierRush",			Skill_BezierRush},
 	{"CGoAroundRobot",		Skill_GoAroundRobot},
     {"CGoTechChalPos",      Skill_GoTechChalPos},
 	//ÆäËû
