@@ -1,10 +1,10 @@
 local DSS = flag.dodge_ball--bit:_or(flag.allow_dss,flag.dodge_ball)
-local TargetPos1  = CGeoPoint:new_local(400,260)
-local TargetPos2  = CGeoPoint:new_local(400,-260)
-local TargetPos3  = CGeoPoint:new_local(-400,-260)
-local TargetPos4  = CGeoPoint:new_local(-400,260)
+local TargetPos1  = CGeoPoint:new_local(250,260)
+local TargetPos2  = CGeoPoint:new_local(250,-260)
+local TargetPos3  = CGeoPoint:new_local(100,-260)
+local TargetPos4  = CGeoPoint:new_local(100,260)
 local distThreshold = 10
-local DIR  = 0
+local DIR  = 1.57
 local ACC = nil
 -- local BALL_PLACE_FLAG = flag.dodge_ball+flag.allow_dss+flag.their_baLL_placement
 
@@ -38,7 +38,7 @@ firstState = "run1",
 ["run2"] = {
 	switch = function ()
 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 10, 1000) then --and player.toTargetDist("Receiver") < distThreshold then
-			return "run1";
+			return "run3";
 		end
 	end,
 	Kicker  = MOVE_TASK(TargetPos2, DIR, ACC, DSS),

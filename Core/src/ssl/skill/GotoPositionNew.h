@@ -14,6 +14,32 @@
 
 struct PlayerCapabilityT;
 
+struct PID {
+public:
+	void init(double p, double i, double d) {
+		this->p = p;
+		this->i = i;
+		this->d = d;
+		a = p + i + d;
+		b = p + 2 * d;
+		c = d;
+		e1 = e2 = e3 = 0;
+		output = 0;
+	}
+	double step(double error) {
+		e3 = e2;
+		e2 = e1;
+		e1 = error;
+		output += (a * e1 - b * e2 + c * e3);
+		return output;
+	}
+private:
+	double p, i, d;
+	double a, b, c;
+	double e1, e2, e3;
+	double output;
+};
+
 class CGotoPositionNew : public CPlayerTask {
 public:
 	CGotoPositionNew();
@@ -23,6 +49,7 @@ protected:
 private:
 	CGeoPoint _target;
 	int playerFlag;
+	PID anglePID;
 	CGeoPoint finalPointBallPlacement(const CGeoPoint &startPoint, const CGeoPoint &target, const CGeoPoint &segPoint1, const CGeoPoint &segPoint2, const double avoidLength, ObstaclesNew& obst, bool& canDirect);
 	void validateFinalTarget(CGeoPoint& finalTarget, const CVisionModule* pVision, bool shrinkTheirPenalty, double avoidLength, bool isGoalie);
 	PlayerCapabilityT setCapability(const CVisionModule* pVision);

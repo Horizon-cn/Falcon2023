@@ -16,12 +16,16 @@ public:
 		_p = p;
 		_pdot = pdot;
 		_pddot = pddot;
-		_curva = pow(pdot.mod(), 3) / (abs(pdot^pddot));
+		double result = (fabs(pdot ^ pddot));
+		result = result < 0.01 ? 0.01 : result;
+		_curva = pdot.mod() * pdot.mod() * pdot.mod() / result;
 		_alpha = pdot.unit();
 		_gamma = pdot ^ pddot;
 		_beta = _alpha ^ _gamma;
 	}
-	CVector Vel() const { return _pdot * _udot; }
+	CVector Vel() const {
+		return _pdot * _udot; 
+	}
 	double U() const { return _u; }
 	double Udot() const { return _udot; }
 	CGeoPoint P() const { return _p; }
@@ -30,7 +34,8 @@ public:
 	CVector CurvaVec() const { return _beta * _curva; }
 	double Curva() const { return _curva; }
 	void setUdot(const CVector& vel) {
-		_udot = vel * _pdot / _pdot.mod();
+		_udot = vel * _pdot / _pdot.mod() / _pdot.mod();
+		//_udot = vel * _pdot / _pdot.mod();
 		//double ctheta = _udot/vel.mod();
 		//LogInfo("costheta: "<<ctheta);
 	}
@@ -62,6 +67,7 @@ public:
 	~BSplineCurver() {}
 	void initCurver(int k, vector<CGeoPoint> wayPts, bool PASS_PTS);
 	void addCurverPoints(const CVector& start, const CVector& final);
+	void addCurverPoints(const CVector& start, const double timeStep);
 	void setVelConstr(double maxVel) {
 		_maxVel = maxVel;
 	}
@@ -108,6 +114,7 @@ public:
 	~BSplinePlanner() {}
 	void initPlanner( vector<CGeoPoint> wayPts, const PlayerCapabilityT& cap, bool PASS_PTS);
 	void smoothPath(const CVector& start, const CVector& final,double lowerBnd,int iteration,bool drawTraj);
+	void smoothPath(const CVector& start, const double timeStep, double lowerBnd, int iteration, bool drawTraj);
 	stateNew getNextState();
 private:
 	BSplineCurver _curver;

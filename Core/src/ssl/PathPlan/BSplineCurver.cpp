@@ -90,7 +90,7 @@ vector<CGeoPoint> BSplineCurver::OnWayPts(int k, const vector<CGeoPoint> wayPts,
 	}
 	else
 	{
-		std::string sep = "\n----------------------------------------\n";
+		//std::string sep = "\n----------------------------------------\n";
 		//qDebug() << QString::fromStdString(sep);
 		IOFormat HeavyFmt(FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
 		//_CopyWayPts.clear();
@@ -207,6 +207,34 @@ void BSplineCurver::addCurverPoints(const CVector& start, const CVector& final)
 	_curverPts.end()->setUdot(final);
 }
 
+void BSplineCurver::addCurverPoints(const CVector& start, const double timeStep)
+{
+	vector<CurverPoint> temp_curverPts;
+	temp_curverPts.push_back(*_curverPts.begin());
+	vector<double> u = { 0.01 }; //(_curverPts.begin() + 1)->U() / 2
+/**	for (double temp_u = 1.0 / _numSegments / 2; temp_u <= 1.0; temp_u += 1.0 / _numSegments / 2)
+	{
+		u.push_back(temp_u);
+	}**/
+	for (int i = 0; i < u.size(); i++)
+	{
+		CGeoPoint tempPos = getPos(u[i]);
+		CVector tempVel = getVel(u[i]);
+		CVector tempAcc = getAcc(u[i]);
+		CurverPoint tempPoint(u[i], tempPos, tempVel, tempAcc);
+		try
+		{
+			temp_curverPts.push_back(tempPoint);
+		}
+		catch (const std::exception& e)
+		{
+			qDebug() << e.what();
+		}
+	}
+	temp_curverPts.push_back(*(_curverPts.begin() + 1));
+	_curverPts = temp_curverPts;
+}
+
 void BSplineCurver::drawCurverPoints()
 {
 	for (CurverPoint i : _curverPts)
@@ -214,6 +242,8 @@ void BSplineCurver::drawCurverPoints()
 		//LogInfo("checkPoint4."<<i.U());
 		GDebugEngine::Instance()->gui_debug_arc(i.P(), 10, 0, 360, COLOR_RED);
 		GDebugEngine::Instance()->gui_debug_line(i.P(), i.P() + i.Pdot()*0.1, COLOR_WHITE);
+		if (i.U() != 0)
+			GDebugEngine::Instance()->gui_debug_msg(i.P(), QString::number(i.Vel().mod()).toStdString().c_str(), COLOR_BLUE);
 		//GDebugEngine::Instance()->gui_debug_line(i.P(), i.P() + i.Pddot() * 0.1, COLOR_YELLOW);
 		//GDebugEngine::Instance()->gui_debug_arc(i.P() + i.CurvaVec(), i.CurvaVec().mod(), 0, 360, COLOR_YELLOW);
 	}
@@ -239,6 +269,14 @@ void BSplinePlanner::smoothPath(const CVector& start, const CVector& final,doubl
 		_curver.drawCurverPoints();
 }
 
+void BSplinePlanner::smoothPath(const CVector& start, const double timeStep, double lowerBnd, int iteration, bool drawTraj)
+{
+	_curver.addCurverPoints(start, timeStep);
+	_curver.forwardScan(lowerBnd, iteration);
+	if (drawTraj)
+		_curver.drawCurverPoints();
+}
+
 void BSplineCurver::forwardScan(double lowerBnd,int iteration)
 {
 	int MAX_ITERATION = iteration;
@@ -246,14 +284,21 @@ void BSplineCurver::forwardScan(double lowerBnd,int iteration)
 	for (vector <CurverPoint>::iterator i = _curverPts.begin() + 1; i <= _curverPts.begin() + 2; i++)
 	{
 		int iteration = 0;
+		double lastUdot = i->Udot();
 		while (!forwardNewUdot(i))
 		{
 			iteration++;
 			(i - 1)->reduceUdot(lowerBnd);
 			if (iteration >= MAX_ITERATION)
 			{
+				//qDebug() << "MAX_ITERATION, BREAK";
 				break;
 			}
+			else if (lastUdot == i->Udot()) {
+				//qDebug() << "no change, break";
+				break;
+			}				
+			lastUdot = i->Udot();
 		}
 	}
 }
@@ -262,11 +307,17 @@ bool BSplineCurver::forwardNewUdot(vector <CurverPoint>::iterator i)
 {
 	//LogInfo("last udot: " << (i-1)->Udot());
 	//LogInfo("current udot: " << i->Udot());
+	CGeoPoint posU = i->P();
 	CVector velU = i->Pdot();
 	CVector accU = i->Pddot();
 	double curva = i->Curva();
 	double du = i->U() - (i - 1)->U();
 	double lastUdot = (i - 1)->Udot();
+
+	CGeoPoint lastPosU = (i - 1)->P();
+	CVector lastVelU = (i - 1)->Vel(); //(i - 1)->Pdot();
+	CVector lastAccU = (i - 1)->Pddot();
+	CVector averageAccU = (lastAccU * lastUdot + accU) / 2;
 
 	//Vel constraints
 	double scale = velU.mod2();
@@ -278,9 +329,14 @@ bool BSplineCurver::forwardNewUdot(vector <CurverPoint>::iterator i)
 	double udotsqr5 = 0.0;//lower bnd
 	double udotsqr6 = 0.0;//lower bnd
 	//Acc constraints
-	double scale4a_x = velU.x() / 2 / du;
-	double udotsqrXup = (_maxAcc + scale4a_x * lastUdot * lastUdot) / (scale4a_x + accU.x());
-	double udotsqrXlo = (-_maxDec + scale4a_x * lastUdot * lastUdot) / (scale4a_x + accU.x());
+	//double scale4a_x = velU.x() / 2 / du;
+	//double udotsqrXup = (_maxAcc + scale4a_x * lastUdot * lastUdot) / (scale4a_x + accU.x());
+	//double udotsqrXlo = (-_maxDec + scale4a_x * lastUdot * lastUdot) / (scale4a_x + accU.x());
+	double vx2 = velU.x() * velU.x();
+	double lastVx2 = lastVelU.x() * lastVelU.x();
+	double x = fabs(lastPosU.x() - posU.x());
+	double udotsqrXup = fabs((lastVx2 + 2 * _maxAcc * x) / vx2); //fabs((lastVx2 + 2 * _maxAcc * x) / (lastVx2 + 2 * averageAccU.x() * x)); 
+	double udotsqrXlo = fabs((lastVx2 - 2 * _maxDec * x) / vx2); //fabs((lastVx2 - 2 * _maxDec * x) / (lastVx2 + 2 * averageAccU.x() * x));
 	if (udotsqrXup > udotsqrXlo)
 	{
 		udotsqr3 = udotsqrXup;
@@ -292,9 +348,14 @@ bool BSplineCurver::forwardNewUdot(vector <CurverPoint>::iterator i)
 		udotsqr5 = udotsqrXup;
 	}
 
-	double scale4a_y = accU.y() + velU.y() / 2 / du;
-	double udotsqrYup = (_maxAcc + scale4a_y * lastUdot * lastUdot) / (scale4a_y + accU.y());
-	double udotsqrYlo = (-_maxDec + scale4a_y * lastUdot * lastUdot) / (scale4a_y + accU.y());
+	//double scale4a_y = velU.y() / 2 / du; //accU.y() + 
+	//double udotsqrYup = (_maxAcc + scale4a_y * lastUdot * lastUdot) / (scale4a_y + accU.y());
+	//double udotsqrYlo = (-_maxDec + scale4a_y * lastUdot * lastUdot) / (scale4a_y + accU.y());
+	double vy2 = velU.y() * velU.y();
+	double lastVy2 = lastVelU.y()* lastVelU.y();
+	double y = fabs(lastPosU.y() - posU.y());
+	double udotsqrYup = fabs((lastVy2 + 2 * _maxAcc * y) / vy2); //fabs((lastVy2 + 2 * _maxAcc * y) / (lastVy2 + 2 * averageAccU.y() * y)); 
+	double udotsqrYlo = fabs((lastVy2 - 2 * _maxDec * y) / vy2); //fabs((lastVy2 - 2 * _maxDec * y) / (lastVy2 + 2 * averageAccU.y() * y));
 	if (udotsqrYup > udotsqrYlo)
 	{
 		udotsqr4 = udotsqrYup;
@@ -313,12 +374,14 @@ bool BSplineCurver::forwardNewUdot(vector <CurverPoint>::iterator i)
 	if (udotsqrup >= udotsqrlo)
 	{
 		newUdot = sqrt(udotsqrup);
+		//qDebug() << "have a solution_____________________" << newUdot << udotsqrup << udotsqr1 << udotsqr2 << udotsqr3 << udotsqr4;
 		i->setUdot(newUdot);
 		return true;
 	}
 	else//no feasible solution
 	{
 		newUdot = sqrt(udotsqrup);
+		//qDebug() << "no feasible solution_____________________" << newUdot << udotsqrup << udotsqr1 << udotsqr2 << udotsqr3 << udotsqr4;
 		i->setUdot(newUdot);
 		return false;
 	}
@@ -337,6 +400,10 @@ stateNew BSplineCurver::getNextCurverPoint()
 	//printUdot();
 	nextState.pos = (_curverPts.begin() + 1)->P();
 	nextState.vel = (_curverPts.begin() + 1)->Vel();
+	//std::cout << "pdot: " << (_curverPts.begin() + 1)->Pdot() << " " << (_curverPts.begin() + 1)->Pdot().mod() 
+	//	<< " " << (_curverPts.begin() + 1)->Udot() << std::endl;
+	//std::cout << "vel: " << nextState.vel << " " << nextState.vel.mod() << std::endl;
+	//std::cout << std::endl;
 	return nextState;
 }
 

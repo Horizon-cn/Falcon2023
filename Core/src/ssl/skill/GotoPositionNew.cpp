@@ -134,6 +134,7 @@ CGotoPositionNew::CGotoPositionNew() {
 
 		TRANSLATION_ACC_LIMIT = ParamManager::Instance()->TRANSLATION_ACC_LIMIT;
 	}
+	anglePID.init(2, 0, 0);
 }
 
 void CGotoPositionNew::toStream(std::ostream& os) const {
@@ -215,7 +216,7 @@ void CGotoPositionNew::plan(const CVisionModule* pVision) {
 	const double dist = player2target.mod();
 
 	//    CVector realVel((me.Pos().x() - meLast.Pos().x()) * Param::Vision::FRAME_RATE, (me.Pos().y() - meLast.Pos().y()) * Param::Vision::FRAME_RATE);
-	stateNew start(me.Pos(), vecDir, me.Vel(), me.RotVel());
+	stateNew start(me.Pos(), vecDir, me.Vel(), me.RotVel()); // nextState[vecNumber].vel, 
 	stateNew startForRRT(startPosForRRT, vecDir, me.Vel(), me.RotVel());
 	stateNew target(targetPos, targetDir, task().player.vel, task().player.rotvel);
 
@@ -231,11 +232,11 @@ void CGotoPositionNew::plan(const CVisionModule* pVision) {
 		lastTarget[vecNumber] = targetPos;
 	}
 	//第一种情况：可以直接到目标//
-	if (obs->check(start.pos, target.pos) ||
-		(me.Pos().dist(targetPos) < Param::Vehicle::V2::PLAYER_SIZE * 2)) {
-		nextState[vecNumber] = target;
-	}
-	else {
+	//if (obs->check(start.pos, target.pos) ||
+	//	(me.Pos().dist(targetPos) < Param::Vehicle::V2::PLAYER_SIZE * 2)) {
+	//	nextState[vecNumber] = target;
+	//}
+	//else {
 		bool planned = false;
 		//if (isBack) {
 		//	viaPoints[vecNumber].clear();
@@ -251,20 +252,20 @@ void CGotoPositionNew::plan(const CVisionModule* pVision) {
 		//	planned = !viaBack.empty();
 		//	viaPoints[vecNumber].push_back(targetPos);
 		//}
-		if (!firstplaned) {
-			if (countplan <= COUNTPLAN_THRESHOLD && obs->check(me.Pos(), nextState[vecNumber].pos) && me.Pos().dist(nextState[vecNumber].pos) >= 15 && copyviaPoints[vecNumber].size() != 0) //当前状态与下一状态之间无障碍物,距离大于一个车（防止在下一状态处停滞）且已有备份路径，不用重新规划
-			{
-				planned = true;
-				countplan += 1;
-			}
-			else
-			{
-				planned = false;
-				countplan = 0;
-			}
-		}
+		//if (!firstplaned) {
+		//	if (countplan <= COUNTPLAN_THRESHOLD && obs->check(me.Pos(), nextState[vecNumber].pos) && me.Pos().dist(nextState[vecNumber].pos) >= 15 && copyviaPoints[vecNumber].size() != 0) //当前状态与下一状态之间无障碍物,距离大于一个车（防止在下一状态处停滞）且已有备份路径，不用重新规划
+		//	{
+		//		planned = true;
+		//		countplan += 1;
+		//	}
+		//	else
+		//	{
+		//		planned = false;
+		//		countplan = 0;
+		//	}
+		//}
 		if (!planned) {
-			if (!plannerNew[vecNumber].plannerInitted())
+			//if (!plannerNew[vecNumber].plannerInitted())
 				plannerNew[vecNumber].initPlanner(400, 20, 15, 0.05, 0.55, Param::Field::MAX_PLAYER_SIZE);
 			plannerNew[vecNumber].planPath(obs, startForRRT, target);
 			vector < stateNew > path = plannerNew[vecNumber].getPathPoints();
@@ -298,32 +299,73 @@ void CGotoPositionNew::plan(const CVisionModule* pVision) {
 		drawPath(DRAW_RRT, false, DRAW_TRAJ, vecNumber);
 		if (viaPoints[vecNumber].size() < 3)//Bspline only deal with multiple-points motion planning
 		{
-			if (DRAW_TRAJ)
-				GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -Param::Field::PITCH_WIDTH / 2), "GO_STRAIGHT", COLOR_CYAN);
-			nextState[vecNumber] = target;
+		//	if (DRAW_TRAJ)
+		//		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -Param::Field::PITCH_WIDTH / 2), "GO_STRAIGHT", COLOR_CYAN);
+		//	nextState[vecNumber] = target;
+			CGeoPoint middlePoint = viaPoints[vecNumber][0].midPoint(viaPoints[vecNumber][1]);
+			viaPoints[vecNumber].push_back(middlePoint);
 		}
-		else
-		{
+		//else
+		//{
+			// 自适应加速度
+		static double lastPlayerVel = -1;
+		static CGeoPoint lastPlayerPos;
+		if (lastPlayerVel >= 0) {
+			double currentDist = me.Pos().dist(lastPlayerPos);
+			double currentDiff4V2 = me.Vel().mod() * me.Vel().mod() - lastPlayerVel * lastPlayerVel;
+			double currentAcc = currentDiff4V2 / 2 / currentDist;
+			double targetDist = nextState[vecNumber].pos.dist(lastPlayerPos);
+			double targetDiff4V2 = nextState[vecNumber].vel.mod() * nextState[vecNumber].vel.mod() - lastPlayerVel * lastPlayerVel;
+			double targetAcc = targetDiff4V2 / 2 / targetDist;
+			if (targetAcc >= 0) {
+				capability.maxAccel *= fabs(targetAcc / currentAcc);
+				qDebug() << "has changed acc" << capability.maxAccel;
+			}	
+			else {
+				capability.maxDec *= fabs(targetAcc / currentAcc);
+				qDebug() << "has changed dec" << capability.maxDec;
+			}			
+		}
+		lastPlayerPos = me.Pos();
+		lastPlayerVel = me.Vel().mod();
 			trajPlanner[vecNumber].initPlanner(viaPoints[vecNumber], capability, PASS_PTS);
 			trajPlanner[vecNumber].smoothPath(start.vel, target.vel, LOWER_BND_UDOT, MAX_SEARCH_ITERATION, DRAW_TRAJ);
+			trajPlanner[vecNumber].smoothPath(start.vel, 0.005, LOWER_BND_UDOT, MAX_SEARCH_ITERATION, DRAW_TRAJ);
 			nextState[vecNumber] = trajPlanner[vecNumber].getNextState();
-		}
-	}
+		//}
+	//}
 
 
 	if (DRAW_TRAJ) {
 		GDebugEngine::Instance()->gui_debug_x(nextState[vecNumber].pos, COLOR_CYAN);
-		GDebugEngine::Instance()->gui_debug_line(nextState[vecNumber].pos, nextState[vecNumber].pos + nextState[vecNumber].vel, COLOR_BLUE);
-		GDebugEngine::Instance()->gui_debug_msg(nextState[vecNumber].pos, QString::number(nextState[vecNumber].vel.mod()).toStdString().c_str(), COLOR_BLUE);
+		//GDebugEngine::Instance()->gui_debug_line(nextState[vecNumber].pos, nextState[vecNumber].pos + nextState[vecNumber].vel, COLOR_BLUE);
+		//GDebugEngine::Instance()->gui_debug_msg(nextState[vecNumber].pos, QString::number(nextState[vecNumber].vel.mod()).toStdString().c_str(), COLOR_BLUE);
 	}
 	firstplaned = false;
 
 	//设置新的子任务//
 	TaskT newTask(task());
-	newTask.player.pos = nextState[vecNumber].pos;
-	newTask.player.vel = nextState[vecNumber].vel;
-	setSubTask(TaskFactoryV2::Instance()->GotoPosition(newTask));
-
+	//newTask.player.pos = nextState[vecNumber].pos;
+	//newTask.player.vel = nextState[vecNumber].vel;
+	//setSubTask(TaskFactoryV2::Instance()->GotoPosition(newTask));
+	
+	newTask.player.speed_x = nextState[vecNumber].vel.x();
+	newTask.player.speed_y = nextState[vecNumber].vel.y();
+	// 角度环PID控制
+	newTask.player.rotate_speed = anglePID.step(Utils::Normalize(task().player.angle - me.Dir()));
+	if (newTask.player.rotate_speed > MAX_ROTATION_SPEED)
+		newTask.player.rotate_speed = MAX_ROTATION_SPEED;
+	else if (newTask.player.rotate_speed < -MAX_ROTATION_SPEED)
+		newTask.player.rotate_speed = -MAX_ROTATION_SPEED;
+	double rotAcc = Utils::Normalize(newTask.player.rotate_speed - me.RotVel());
+	if (rotAcc > MAX_ROTATION_ACC)
+		rotAcc = MAX_ROTATION_ACC;
+	else if (rotAcc < -MAX_ROTATION_ACC)
+		rotAcc = -MAX_ROTATION_ACC;
+	newTask.player.rotate_speed = 0; // me.RotVel() + rotAcc;
+	//std::cout << diff_angle << " " << newTask.player.rotate_speed << std::endl;
+	setSubTask(TaskFactoryV2::Instance()->Speed(newTask));
+	
 	CPlayerTask::plan(pVision);
 	return;
 }
@@ -379,6 +421,7 @@ PlayerCapabilityT CGotoPositionNew::setCapability(const CVisionModule* pVision) 
 			capability.maxSpeed = 150;
 		}
 	}
+
 	return capability;
 }
 
