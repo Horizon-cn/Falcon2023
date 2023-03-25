@@ -18,26 +18,13 @@ local ACC = nil
 gPlayTable.CreatePlay{
 
 firstState = "run1",
-
-["run0"] = {
-	switch = function ()
-		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 100) then
-			return "run0";
-		end
-	end,
-    Kicker = task.marking("First"),
-    --Kicker = task.goSimplePos(TargetPos1, DIR2),
-    --Kicker = task.goCmuRush(TargetPos2, DIR, ACC, DSS),
-    match = ""
-},
-
 ["run1"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 100) then
+		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 100) then
 			return "run2";
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos2),
+	Goalie = task.goCmuRush(TargetPos2),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
@@ -45,11 +32,11 @@ firstState = "run1",
 
 ["run2"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 300) then
-			return "run3";
+		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 300) then
+			return "run1";
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos3),
+	Goalie = task.goCmuRush(TargetPos3),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
@@ -57,11 +44,11 @@ firstState = "run1",
 
 ["run3"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 300) then
+		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 300) then
 			return "run1";
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos4),
+	Goalie = task.goCmuRush(TargetPos4),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
