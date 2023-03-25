@@ -313,6 +313,31 @@ function shootV2Pass(p, c)
 	return {mexe, mpos, kick.flat, idir, pre.middle, ipower, cp.full, flag.nothing}
 end
 
+function justKick(mode, power, flag)
+	local imode,ipower,iflag
+	if mode ~= "chip" then
+		imode="kick"
+	else
+		imode="chip"
+	end
+	if power==nil then
+		if imode=="kick" then
+			ipower=kp.full()()
+		else
+			ipower=cp.full()()
+		end
+	else
+		ipower=power
+	end
+	if flag==nil then
+		iflag=0
+	else
+		iflag=flag
+	end
+	local mexe, mpos = JustKick{ mode=imode, power=ipower, flag=iflag }
+	return {mexe, mpos}
+end
+
 ---------------------------------------- WaitKick ------------------------------------------
 
 function waitTouch(p1,p2,style)

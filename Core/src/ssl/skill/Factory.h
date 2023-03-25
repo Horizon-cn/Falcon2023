@@ -36,6 +36,8 @@ public:
 	CPlayerTask* DriftKick(const TaskT& task);
 	CPlayerTask* DribbleTurnKick(const TaskT& task);
 
+	CPlayerTask* JustKick(const TaskT& task);
+
 	CPlayerTask* WaitTouch(const TaskT& task);
 	CPlayerTask* TouchKick(const TaskT& task);
 
@@ -158,6 +160,7 @@ namespace PlayerRole {
 	CPlayerTask* makeItShootoutGoalie(const int num, const int flag = 0);
 	CPlayerTask* makeItShootoutGoalieV2(const int num, const int flag = 0);
 	CPlayerTask* makeItInterceptBall(const int num, const double add_angle);
+	CPlayerTask* makeItJustKick(const int num, const int mode=0, const double power=550, const int flag=0);
 	CPlayerTask* makeItWaitTouch(const int num, const CGeoPoint& target, const double dir, const double angle, const int flag = 0);
 	CPlayerTask* makeItPenaltyKick2013(const int num, const int flag = 0);
 	CPlayerTask* makeItPenaltyKick2014(const int num, const int flag = 0);

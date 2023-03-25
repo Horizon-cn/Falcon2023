@@ -41,6 +41,7 @@
 #include "Advance.h"
 #include "PenaltyKickV2.h"
 #include "Tandem.h"
+#include "JustKick.h"
 #include "WaitTouch.h"
 #include "GetBallV3.h"
 #include "SlowGetBall.h"
@@ -302,6 +303,10 @@ CPlayerTask* CTaskFactoryV2::InterceptBall(const TaskT& task)
 CPlayerTask* CTaskFactoryV2::InterceptBallV4(const TaskT& task)
 {
     return MakeTask< CInterceptBallV4 >(task);
+}
+
+CPlayerTask* CTaskFactoryV2::JustKick(const TaskT& task) {
+    return MakeTask<CJustKick>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::WaitTouch(const TaskT& task) {
@@ -825,6 +830,15 @@ namespace PlayerRole {
         playerTask.executor = num;
         playerTask.player.angle = add_angle;
         return TaskFactoryV2::Instance()->InterceptBall(playerTask);
+    }
+
+    CPlayerTask* makeItJustKick(const int num, const int mode, const double power, const int flag) {
+        static TaskT playerTask;
+        playerTask.executor = num;
+        playerTask.player.ischipkick = mode;
+        playerTask.player.kickpower = power;
+        playerTask.player.flag = flag;
+        return TaskFactoryV2::Instance()->JustKick(playerTask);
     }
 
     CPlayerTask* makeItWaitTouch(const int num, const CGeoPoint& target, const double dir, const double angle, const int flag /* = 0 */) {

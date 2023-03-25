@@ -50,6 +50,7 @@ gSkill = {
 	"RunMultiPosVel",
 	"GoTechChalPos",
 	--踢球
+	"JustKick",
 	"WaitKick",
 	"TouchKick",
 	"ShootBall",
