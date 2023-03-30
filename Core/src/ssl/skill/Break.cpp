@@ -13,6 +13,7 @@
 #include <string>
 #include <ctime>
 #include <algorithm>
+#include <math.h>
 
 
 //****************************/
@@ -160,13 +161,19 @@ void CBreak::plan(const CVisionModule* pVision) {
    
 
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
-    if (pVision->Cycle() % 60== 0 ) {
+    /*if (pVision->Cycle() % 60 == 0) {
         move_point = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     }
     else {
         calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
+    }*/
+    CGeoPoint target = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
+    if (isSetPoint(pVision, point, target)) {
+        move_point = target;
     }
-
+    index += 1;
+    index %= 5;
+    point[index]= target;
     if (DEBUG) GDebugEngine::Instance()->gui_debug_line(dribblePoint, move_point, COLOR_PURPLE);
     grabTask.player.max_acceleration=120;
     grabTask.player.max_deceleration=120;
@@ -257,6 +264,7 @@ CGeoPoint CBreak::makeInCircle(const CGeoPoint& point, const CGeoPoint& center, 
 //算点
 
     //解耦路径规划与射门判断
+
 CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, const CGeoPoint& target, const CGeoPoint& dribblePoint, const bool isChip, bool& canShoot, bool& needBreakThrough) {
 
 
@@ -432,7 +440,20 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
 
 }
+bool CBreak::isSetPoint(const CVisionModule* pVision,const CGeoPoint* point, const CGeoPoint& target) {
+    int i = 0;
+    double x = 0, y = 0;
+    for (i = 0; i < 5; i++) {
+        x += point[i].x();
+        y += point[i].y();
+    }
+    x /= 5; y /= 5;
+    if(sqrt(pow(x-target.x(),2)+pow(y-target.y(),2))>5)
+		return true;
+	else
+		return false;
 
+}
 
 double CBreak::holdBallDir(const CVisionModule *pVision, int robotNum){
     static const int DIS_THRESHOLD = 800;
@@ -467,7 +488,8 @@ double CBreak::holdBallDir(const CVisionModule *pVision, int robotNum){
         double d_angle2 = abs(targetAngle-anotherAngle) < Param::Math::PI ? fabs(targetAngle-anotherAngle) : 2*Param::Math::PI - fabs(targetAngle-anotherAngle);
         diff2 += d_angle2/enemy2me.mod();
     }
-    if(diff1 > diff2)finalAngle = anotherAngle;
+    if(diff1 > diff2)finalAngle = anotherAngle;         
     return finalAngle;
 }
+
 
