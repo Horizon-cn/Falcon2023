@@ -440,7 +440,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
 
 }
-bool CBreak::isSetPoint(const CVisionModule* pVision,const CGeoPoint* point, const CGeoPoint& target) {
+bool CBreak::isSetPoint(const CVisionModule* pVision, const CGeoPoint* point, const CGeoPoint& target) {
     int i = 0;
     double x = 0, y = 0;
     for (i = 0; i < 5; i++) {
@@ -448,10 +448,10 @@ bool CBreak::isSetPoint(const CVisionModule* pVision,const CGeoPoint* point, con
         y += point[i].y();
     }
     x /= 5; y /= 5;
-    if(sqrt(pow(x-target.x(),2)+pow(y-target.y(),2))>5)
-		return true;
-	else
-		return false;
+    if (sqrt(pow(x - target.x(), 2) + pow(y - target.y(), 2)) > 5)
+        return true;
+    else
+        return false;
 
 }
 
