@@ -601,8 +601,9 @@ void goto_point_omni( const PlayerVisionT& start,
         //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-60*10), QString("rotateVel:      %1").arg(ang_v).toLatin1());
         //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-80*10), QString("nextRotateVel:  %1").arg(ang_v + ang_a * FRAME_PERIOD).toLatin1());
     }
-
+    //std::cout << "vel: " << v << std::endl;
     v = v + a * FRAME_PERIOD;
+    //std::cout << "acc: " << a << " " << v << std::endl;
     ang_v += ang_a * FRAME_PERIOD;
 
     // if (v.mod() > max_speed) {

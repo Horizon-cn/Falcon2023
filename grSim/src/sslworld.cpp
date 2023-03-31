@@ -549,6 +549,12 @@ void SSLWorld::addRobotStatus(Robots_Status& robotsPacket, int robotID, int team
             robot_status->set_chip_kick(0);
             break;
     }
+
+    int id = robotIndex(robotID, team);
+    robot_status->set_wheel1(robots[id]->wheels[0]->speed);
+    robot_status->set_wheel2(robots[id]->wheels[1]->speed);
+    robot_status->set_wheel3(robots[id]->wheels[2]->speed);
+    robot_status->set_wheel4(robots[id]->wheels[3]->speed);
 }
 
 void SSLWorld::sendRobotStatus(Robots_Status& robotsPacket, QHostAddress sender, int team)
@@ -578,6 +584,27 @@ void SSLWorld::recvActions()
             packet.ParseFromArray(in_buffer, size);
             if (packet.has_login_name() && packet.login_name() != cfg->LoginName())
                 break;
+            // send robot status
+            for (int team = 0; team < 2 - closeYellowSimulation; ++team)
+            {
+                Robots_Status robotsPacket;
+                bool updateRobotStatus = false;
+                for (int i = 0; i < this->cfg->Robots_Count(); ++i)
+                {
+                    int id = robotIndex(i, team);
+                    bool isInfrared = robots[id]->kicker->isTouchingBall();
+                    KickStatus kicking = robots[id]->kicker->isKicking();
+                    if (isInfrared != lastInfraredState[team][i] || kicking != lastKickState[team][i] || this->cfg->wheelSpeedCallBack())
+                    {
+                        updateRobotStatus = true;
+                        addRobotStatus(robotsPacket, i, team, isInfrared, kicking);
+                        lastInfraredState[team][i] = isInfrared;
+                        lastKickState[team][i] = kicking;
+                    }
+                }
+                if (updateRobotStatus)
+                    sendRobotStatus(robotsPacket, sender, team);
+            }
             int team=0;
             if (packet.has_commands())
             {
@@ -676,28 +703,6 @@ void SSLWorld::recvActions()
 					dBodySetAngularVel(ball->body, 0, 0, 0);
                 }
             }
-        }
-
-        // send robot status
-        for (int team = 0; team < 2-closeYellowSimulation; ++team)
-        {
-            Robots_Status robotsPacket;
-            bool updateRobotStatus = false;
-            for (int i = 0; i < this->cfg->Robots_Count(); ++i)
-            {
-                int id = robotIndex(i, team);
-                bool isInfrared = robots[id]->kicker->isTouchingBall();
-                KickStatus kicking = robots[id]->kicker->isKicking();
-                if (isInfrared != lastInfraredState[team][i] || kicking != lastKickState[team][i])
-                {
-                    updateRobotStatus = true;
-                    addRobotStatus(robotsPacket, i, team, isInfrared, kicking);
-                    lastInfraredState[team][i] = isInfrared;
-                    lastKickState[team][i] = kicking;
-                }
-            }
-            if (updateRobotStatus)
-                sendRobotStatus(robotsPacket, sender, team);
         }
     }
 }

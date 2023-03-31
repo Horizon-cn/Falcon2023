@@ -137,6 +137,10 @@ void RemoteSim::readBlueData() {
                 //qDebug()<<"infrared"<<infrared;
                 GlobalData::Instance()->robotInformation[PARAM::BLUE][id].flat = isFlatKick;
                 GlobalData::Instance()->robotInformation[PARAM::BLUE][id].chip = isChipKick;
+                GlobalData::Instance()->robotInformation[PARAM::BLUE][id].wheelSpeed[0] = robotsPacket.robots_status(i).wheel1();
+                GlobalData::Instance()->robotInformation[PARAM::BLUE][id].wheelSpeed[1] = robotsPacket.robots_status(i).wheel2();
+                GlobalData::Instance()->robotInformation[PARAM::BLUE][id].wheelSpeed[2] = robotsPacket.robots_status(i).wheel3();
+                GlobalData::Instance()->robotInformation[PARAM::BLUE][id].wheelSpeed[3] = robotsPacket.robots_status(i).wheel4();
                 GlobalData::Instance()->robotInfoMutex.unlock();
                 ZCommunicator::Instance()->sendCommand(PARAM::BLUE, id);
                 //emit receiveRemoteInfo(PARAM::BLUE, id);
@@ -167,6 +171,10 @@ void RemoteSim::readYellowData() {
                 GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].infrared = infrared;
                 GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].flat = isFlatKick;
                 GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].chip = isChipKick;
+                GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].wheelSpeed[0] = robotsPacket.robots_status(i).wheel1();
+                GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].wheelSpeed[1] = robotsPacket.robots_status(i).wheel2();
+                GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].wheelSpeed[2] = robotsPacket.robots_status(i).wheel3();
+                GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].wheelSpeed[3] = robotsPacket.robots_status(i).wheel4();
                 GlobalData::Instance()->robotInfoMutex.unlock();
                 ZCommunicator::Instance()->sendCommand(PARAM::YELLOW, id);
                 //emit receiveRemoteInfo(PARAM::YELLOW, id);
