@@ -27,7 +27,7 @@ class ChipPosT {
 	void SetChipPredict(double x, double y);
 };
 
-struct RotationT {
+class RotationT {
 	RotationT();
 	double Dir() const;
 	void SetDir(double d);
@@ -36,11 +36,16 @@ struct RotationT {
 };
 
 class PlayerVisionT : public TranslationT, public RotationT {
-
+	double Dir() const;
+	void SetDir(double d);
+	double RotVel() const;
+	void SetRotVel(double d);
 };
 
 class BallVisionT : public TranslationT, public ChipPosT {
-
+	const CGeoPoint& ChipPredictPos() const;
+	void SetChipPredict(const CGeoPoint& chipPos);
+	void SetChipPredict(double x, double y);
 };
 
 struct PlayerCapabilityT {

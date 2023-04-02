@@ -32,7 +32,7 @@ EXECUTE_PROCESS(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/pkg
 )
 ## Eigen
-# list(APPEND incs ${EIGEN3_INCLUDE_DIR})
+list(APPEND incs ${EIGEN3_INCLUDE_DIR})
 
 set(PROTO_LIST
     grSim_Commands
@@ -65,6 +65,7 @@ set(PROJECT_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl
     ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl/bayes
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl/cmu
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl/cornell
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl/defence
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl/MotionControl
@@ -96,6 +97,7 @@ aux_source_directory(./src DIR_SRCS)
 aux_source_directory(./src/LuaModule DIR_LUAMODULE_SRCS)
 aux_source_directory(./src/ssl DIR_SSL_SRCS)
 aux_source_directory(./src/ssl/bayes DIR_SSL_BAYES_SRCS)
+aux_source_directory(./src/ssl/cmu DIR_SSL_CMU_SRCS)
 aux_source_directory(./src/ssl/cornell DIR_SSL_CORNELL_SRCS)
 aux_source_directory(./src/ssl/defence DIR_SSL_DEFENCE_SRCS)
 aux_source_directory(./src/ssl/rolematch DIR_SSL_ROLEMATCH_SRCS)
@@ -119,6 +121,7 @@ source_group("src\\ssl" FILES ${DIR_SSL_SRCS})
 source_group("include\\ssl\\bayes" FILES ${SSL_BAYES_HEADERS})
 source_group("src\\ssl\\bayes" FILES ${DIR_SSL_BAYES_SRCS})
 source_group("include\\ssl\\cmu" FILES ${SSL_CMU_HEADERS})
+source_group("src\\ssl\\cmu" FILES ${DIR_SSL_CMU_SRCS})
 source_group("include\\ssl\\cornell" FILES ${SSL_CORNELL_HEADERS})
 source_group("src\\ssl\\cornell" FILES ${DIR_SSL_CORNELL_SRCS})
 source_group("include\\ssl\\defence" FILES ${SSL_DEFENCE_HEADERS})
@@ -148,6 +151,7 @@ add_executable(${TARGET_NAME}
 		${DIR_LUAMODULE_SRCS}
 		${DIR_SSL_SRCS}
 		${DIR_SSL_BAYES_SRCS}
+		${DIR_SSL_CMU_SRCS}
 		${DIR_SSL_CORNELL_SRCS}
 		${DIR_SSL_DEFENCE_SRCS}
 		${DIR_SSL_ROLEMATCH_SRCS}

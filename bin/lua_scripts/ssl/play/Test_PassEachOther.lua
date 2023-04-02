@@ -20,14 +20,14 @@ local pass_power = function()
 end
 local getReceiverPos = function()
 	if getReceiverNum() % 2 == 1 then -- 415
-		return CGeoPoint:new_local(init_x, 370 * anti_pos) -- 定死，不随球移动
+		return CGeoPoint:new_local(param.pitchLength/2 - init_x, 370 * anti_pos) -- 定死，不随球移动
 	elseif getReceiverNum() % 2 == 0 then
 		return CGeoPoint:new_local(param.pitchLength/2 - init_x, -370 * anti_pos)
 	end
 end
 local getKickerPos = function()
 	local pos = getReceiverPos()
-	return CGeoPoint:new_local(param.pitchLength/2 - pos:x(), -pos:y())
+	return CGeoPoint:new_local(pos:x(), -pos:y()) -- param.pitchLength/2 - 
 end
 local getEndNum1 = function()
 	local EndNum = min_player_num - 1

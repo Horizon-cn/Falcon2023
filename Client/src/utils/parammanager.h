@@ -335,19 +335,23 @@ public:
         loadParam(Gravity, "World/Gravity", 9.8);
         BallRadius = value("Ball/BallRadius", 0.0215).toDouble() * 1000;
         loadParam(DesiredFPS, "World/DesiredFPS", 75);
+        loadParam(wheelSpeedCallBack, "Communication/wheelSpeedCallBack", false);
         team = value("Team", "blueTeam", "SRC").toString();
         robot_settings = new QSettings(qApp->applicationDirPath()+ QString("/../data/config/") + QString("%1.ini").arg(team), QSettings::IniFormat);
         CenterFromKicker = robot_settings->value("Geometery/CenterFromKicker", 0.073).toDouble() * 1000;
         RobotRadius = robot_settings->value("Geometery/Radius", 0.09).toDouble() * 1000;
+        WheelRadius = robot_settings->value("Geometery/WheelRadius", 0.0325).toDouble() * 1000;
     }
 public:
     double Gravity;
     double BallRadius;
     double DesiredFPS;
+    bool wheelSpeedCallBack;
     QString team;
     QSettings* robot_settings;
     double CenterFromKicker;
     double RobotRadius;
+    double WheelRadius;
 };
 class ParamManagerSkill : public Falcon::ParamManager {
 public:

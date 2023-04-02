@@ -269,7 +269,7 @@ extern "C" int Skill_SmartGotoPoint(lua_State * L)
 	return 0;
 }
 
-extern "C" int Skill_GoCmuRush(lua_State * L)
+extern "C" int Skill_GoCmuRush(lua_State *L)
 {
 	TaskT playerTask;
 	playerTask.player.is_specify_ctrl_method = true;
@@ -1207,6 +1207,7 @@ luaDef GUIGlue[] =
 	{"SimpleGotoPos",		Skill_SimpleGotoPoint},
 	{"CGoCmuRush",			Skill_GoCmuRush},
 	{"SmartGotoPos",		Skill_SmartGotoPoint},
+	{"CBezierRush",			Skill_BezierRush},
 	{"CGoAroundRobot",		Skill_GoAroundRobot},
 	{"CGoTechChalPos",      Skill_GoTechChalPos},
 	//ÆäËû

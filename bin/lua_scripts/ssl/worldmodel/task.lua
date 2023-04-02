@@ -40,6 +40,18 @@ function goCmuRush(p, d, a, f)
 	return {mexe, mpos}
 end
 
+function goBezierRush(p, d, a, f)
+	local idir
+	if d ~= nil then
+		idir = d
+	else
+		idir = dir.shoot()
+	end
+
+	local mexe, mpos = BezierRush{pos = p, dir = idir, acc = a, flag = f}
+	return {mexe, mpos}
+end
+
 ------------------------------------- 射门相关的skill ---------------------------------------
 
 function testBreak()

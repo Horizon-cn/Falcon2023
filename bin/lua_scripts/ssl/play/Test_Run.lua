@@ -17,7 +17,7 @@ local ACC = nil
 
 gPlayTable.CreatePlay{
 
-firstState = "run1",
+firstState = "run0",
 
 ["run0"] = {
 	switch = function ()
@@ -25,8 +25,8 @@ firstState = "run1",
 			return "run0";
 		end
 	end,
-    Kicker = task.marking("First"),
-    --Kicker = task.goSimplePos(TargetPos1, DIR2),
+    --Kicker = task.marking("First"),
+    Kicker = task.goSimplePos(TargetPos1, DIR2),
     --Kicker = task.goCmuRush(TargetPos2, DIR, ACC, DSS),
     match = ""
 },
@@ -34,7 +34,7 @@ firstState = "run1",
 ["run1"] = {
 	switch = function ()
 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 100) then
-			return "run2";
+			return "run0";
 		end
 	end,
 	Kicker = task.goCmuRush(TargetPos2),

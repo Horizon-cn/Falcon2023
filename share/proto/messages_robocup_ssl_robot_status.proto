@@ -10,4 +10,8 @@ message Robot_Status {
   required bool flat_kick  = 3;
   required bool chip_kick  = 4;
   optional string login_name = 5;
+  optional float wheel1 = 6;
+  optional float wheel2 = 7;
+  optional float wheel3 = 8;
+  optional float wheel4 = 9;
 }

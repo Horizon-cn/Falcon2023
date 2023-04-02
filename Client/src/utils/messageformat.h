@@ -17,7 +17,10 @@ struct RobotInformation {
     bool chip;
     double battery;
     double capacitance;
-    RobotInformation(): infrared(false), flat(false), chip(false), battery(0), capacitance(0) {}
+    double wheelSpeed[4];
+    RobotInformation(): infrared(false), flat(false), chip(false), battery(0), capacitance(0) {
+        std::fill_n(wheelSpeed, 4, 0);
+    }
     bool fill(bool infrared, bool flat, bool chip, double battery, double capacitance){
         this->infrared = infrared;
         this->flat = flat;

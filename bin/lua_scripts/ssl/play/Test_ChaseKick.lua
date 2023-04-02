@@ -10,7 +10,7 @@ firstState = "chase",
 
 ["chase"] = {
 	switch = function ()
-		if bufcnt(ball.toPlayerHeadDist("Kicker") < 2, 50,200)then
+		if bufcnt(robotSensor:IsInfraredOn(1), 5)then
 			return "break";
 		end
 	end,
@@ -20,11 +20,11 @@ firstState = "chase",
 },
 ["break"] = {
 	switch = function ()
-		if bufcnt(ball.toPlayerHeadDist("Kicker") > 10, "fast")then
+		if bufcnt(not robotSensor:IsInfraredOn(1), 10)then
 			return "chase";
 		end
 	end,
-    Kicker = task.Break(),
+    Kicker = task.testBreak(),
     match = ""
 },
 

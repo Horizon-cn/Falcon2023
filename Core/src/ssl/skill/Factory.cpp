@@ -71,6 +71,7 @@
 #include "InterceptBallV2.h"
 #include "GoSupport.h"
 #include "GoTechChalPos.h"
+#include "GotoPositionNew.h"
 
 /************************************************************************/
 /*                      TaskFactoryV2                                    */
@@ -110,6 +111,10 @@ CPlayerTask* CTaskFactoryV2::GotoPosition(const TaskT& task) {
 
 CPlayerTask* CTaskFactoryV2::SmartGotoPosition(const TaskT& task) {
     return MakeTask< CSmartGotoPosition >(task);
+}
+
+CPlayerTask* CTaskFactoryV2::GotoPositionNew(const TaskT& task) {
+    return MakeTask< CGotoPositionNew >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::StopRobot(const TaskT& task) {

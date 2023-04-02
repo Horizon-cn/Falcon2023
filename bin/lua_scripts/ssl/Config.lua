@@ -8,9 +8,9 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_PassEachOther" --"Test_Run"
+		return "Test_Advance" --"Test_Run"
 	else
-		return "Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "Test_BezierRun" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -21,8 +21,8 @@ gSwitchNum = {
 }
 
 gRoleFixNum = {
-	["Kicker"]   = {4},
-	["Goalie"]   = {0},
+	["Kicker"]   = {5},
+	["Goalie"]   = {4},
 	["Tier"]	 = {3},
 	["Receiver"] = {1}
 }
@@ -44,6 +44,7 @@ gSkill = {
 	"SmartGoto",
 	"GoCmuRush",
 	"SimpleGoto",
+	"BezierRush",
 	"GotoMatchPos",
 	"RunMultiPos",
 	"RunMultiPosV2",
@@ -178,6 +179,7 @@ gBayesPlayTable = {
 gTestPlayTable = {
 
 	"Test_Run",
+	"Test_BezierRun",
 	"Test_GetBall",
 	"Test_ChaseKick",
 	"Test_PassNormal",

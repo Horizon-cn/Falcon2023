@@ -15,6 +15,7 @@ public:
     //ÅÜÎ»µÄSkill. by HXY
     CPlayerTask* GotoPosition(const TaskT& task);
     CPlayerTask* SmartGotoPosition(const TaskT& task);
+	CPlayerTask* GotoPositionNew(const TaskT& task);
 
 	CPlayerTask* GoAroundRobot(const TaskT& task);
     CPlayerTask* GoTechChalPos(const TaskT& task);
