@@ -42,6 +42,10 @@ dReal randn_notrig(dReal mu=0.0, dReal sigma=1.0);
 dReal randn_trig(dReal mu=0.0, dReal sigma=1.0);
 dReal rand0_1();
 
+namespace {
+    QHostAddress sender;
+}
+
 dReal fric(dReal f)
 {
     if (f==-1) return dInfinity;
@@ -573,18 +577,19 @@ void SSLWorld::sendRobotStatus(Robots_Status& robotsPacket, QHostAddress sender,
 
 void SSLWorld::recvActions()
 {
-    QHostAddress sender;
+    //QHostAddress sender;
     quint16 port;
     grSim_Packet packet;
     while (commandSocket->hasPendingDatagrams())
     {
-        int size = commandSocket->readDatagram(in_buffer, 65536, &sender, &port);
+        int size = commandSocket->readDatagram(in_buffer, 65536, &::sender, &port);
         if (size > 0)
         {
             packet.ParseFromArray(in_buffer, size);
             if (packet.has_login_name() && packet.login_name() != cfg->LoginName())
                 break;
             // send robot status
+            /**
             for (int team = 0; team < 2 - closeYellowSimulation; ++team)
             {
                 Robots_Status robotsPacket;
@@ -604,7 +609,7 @@ void SSLWorld::recvActions()
                 }
                 if (updateRobotStatus)
                     sendRobotStatus(robotsPacket, sender, team);
-            }
+            }**/
             int team=0;
             if (packet.has_commands())
             {
@@ -940,6 +945,26 @@ SendingPacket::SendingPacket(SSL_WrapperPacket* _packet,int _t)
 
 void SSLWorld::sendVisionBuffer()
 {
+    for (int team = 0; team < 2 - closeYellowSimulation; ++team)
+    {
+        Robots_Status robotsPacket;
+        bool updateRobotStatus = false;
+        for (int i = 0; i < this->cfg->Robots_Count(); ++i)
+        {
+            int id = robotIndex(i, team);
+            bool isInfrared = robots[id]->kicker->isTouchingBall();
+            KickStatus kicking = robots[id]->kicker->isKicking();
+            if (isInfrared != lastInfraredState[team][i] || kicking != lastKickState[team][i] || this->cfg->wheelSpeedCallBack())
+            {
+                updateRobotStatus = true;
+                addRobotStatus(robotsPacket, i, team, isInfrared, kicking);
+                lastInfraredState[team][i] = isInfrared;
+                lastKickState[team][i] = kicking;
+            }
+        }
+        if (updateRobotStatus)
+            sendRobotStatus(robotsPacket, ::sender, team);
+    }
     int t = timer->elapsed();
     if(cfg->NumOfCam()==1) 
         sendQueue.push_back(new SendingPacket(generatePacket(0), t));

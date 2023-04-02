@@ -19,12 +19,12 @@ end
 
 gPlayTable.CreatePlay{
 
-firstState = "run2",
+firstState = "run1",
 
 ["run1"] = {
 	switch = function ()
 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 50, 1000) then -- and player.toTargetDist("Receiver") < distThreshold then
-			return "run3";
+			return "run2";
 		end
 	end,
 
@@ -38,10 +38,10 @@ firstState = "run2",
 ["run2"] = {
 	switch = function ()
 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 50, 1000) then --and player.toTargetDist("Receiver") < distThreshold then
-			return "run4";
+			return "run3";
 		end
 	end,
-	Kicker  = MOVE_TASK(TargetPos2, DIR, ACC, DSS),
+	Kicker  = MOVE_TASK(TargetPos2, -DIR, ACC, DSS),
 	-- Receiver = task.goCmuRush(TargetPos3, DIR, ACC, DSS),
 	-- Goalie = task.goalie(),
 	match = ""
@@ -50,7 +50,7 @@ firstState = "run2",
 ["run3"] = {
 	switch = function ()
 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 50, 1000)then --and player.toTargetDist("Receiver") < distThreshold then
-			return "run1";
+			return "run4";
 		end
 	end,
 	Kicker  = MOVE_TASK(TargetPos3, DIR, ACC, DSS),
@@ -62,10 +62,10 @@ firstState = "run2",
 ["run4"] = {
 	switch = function ()
 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 50, 1000) then --and player.toTargetDist("Receiver") < distThreshold then
-			return "run2";
+			return "run1";
 		end
 	end,
-	Kicker  = MOVE_TASK(TargetPos4, DIR, ACC, DSS),
+	Kicker  = MOVE_TASK(TargetPos4, -DIR, ACC, DSS),
 	-- Receiver = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 	-- Goalie = task.goalie(),
 	match = ""

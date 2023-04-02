@@ -159,7 +159,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	/////////////////////////////////////////////////////////////////////////////
 	// 【#TODO】 球状态模块更新状态, 这部分到时仍需要再细致调试下
 	BallStatus::Instance()->UpdateBallStatus(this);
-	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), BallStatus::Instance()->checkBallState(this, 0).c_str());
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), BallStatus::Instance()->checkBallState(this, 0).c_str());
 
 	// 【#TODO】 更新敌我双方对于球的势能，越小越有利于拿球，贝叶斯滤波中有使用
 	BestPlayer::Instance()->update(this); 

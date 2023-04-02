@@ -14,4 +14,4 @@
     - 函数模板必须指定 T 的类型，如**TOLUA_TEMPLATE_BIND(T,double)**，无法解析 template 语法
     - 类的继承中只保证第一个继承类正常使用
 - 需要生成接口的 pkg 写进 Zeus.pkg，**$pfile "xxx.pkg"**，生成 lua_zeus.cpp
-- 在 Lua 中调用，Class 或 Struct 定义的为 xxx : f()，需要在 global 里定义了单例指针，xxx 用指针的名称，可完成实例化；namespace 定义的为 xxx . f()，xxx 为类型和名字空间的名称
+- 在 Lua 中调用，Class 或 Struct 定义的为 xxx : f()，需要在 global 里定义了单例指针，xxx 用指针的名称，可完成实例化；namespace 定义的为 xxx . f()，xxx 为类型和名字空间的名称；如果在lua里实例化 xxx : new_local() 则需要提供构造和析构函数，即使C++里没写
