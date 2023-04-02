@@ -269,6 +269,25 @@ extern "C" int Skill_SmartGotoPoint(lua_State * L)
 	return 0;
 }
 
+extern "C" int Skill_BezierRush(lua_State * L)
+{
+	TaskT playerTask;
+	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
+	playerTask.executor = runner;
+	double x = LuaModule::Instance()->GetNumberArgument(2, NULL);
+	double y = LuaModule::Instance()->GetNumberArgument(3, NULL);
+	playerTask.player.pos = CGeoPoint(x, y);
+	playerTask.player.angle = LuaModule::Instance()->GetNumberArgument(4, NULL);
+	playerTask.player.flag = LuaModule::Instance()->GetNumberArgument(5, NULL);
+	playerTask.ball.Sender = LuaModule::Instance()->GetNumberArgument(6, NULL);
+	playerTask.player.max_acceleration = LuaModule::Instance()->GetNumberArgument(7, NULL);
+
+	CPlayerTask* pTask = TaskFactoryV2::Instance()->GotoPositionNew(playerTask);
+	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
+
+	return 0;
+}
+
 extern "C" int Skill_GoCmuRush(lua_State *L)
 {
 	TaskT playerTask;
