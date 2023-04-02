@@ -141,7 +141,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 		_ourPlayerPredictor[i].updateVision(vInfo.cycle, ourPlayer, thisBall, invert);
 		_theirPlayerPredictor[i].updateVision(vInfo.cycle, theirPlayer, thisBall, invert);
 		//GDebugEngine::Instance()->gui_debug_line(OurPlayer(i).Pos(), OurPlayer(i).Pos() + OurPlayer(i).Vel());
-	} 
+	}
 	GDebugEngine::Instance()->gui_debug_line(Ball().Pos() , Ball().Pos() + Ball().Vel());
 
 	//【#TODO】更新双方当前在场上的球员数量，我方排除门将，对方全部
