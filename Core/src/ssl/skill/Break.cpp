@@ -161,7 +161,7 @@ void CBreak::plan(const CVisionModule* pVision) {
    
 
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
-   /* if (pVision->Cycle() % 60 == 0) {
+   /*if (pVision->Cycle() % 60 == 0) {
         move_point = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     }
     else {
