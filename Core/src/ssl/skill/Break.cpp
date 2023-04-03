@@ -52,7 +52,8 @@ namespace {
 
 
 }
-
+int CBreak::index;
+CGeoPoint CBreak::point[5];
 CBreak::CBreak() {
 
     SHOOT_ACCURACY = paramManager->BREAK_SHOOT_ACCURACY;
@@ -71,9 +72,7 @@ CBreak::CBreak() {
     MAX_VEL = 100;
     MAX_ROT_ACC = 20;
     MAX_ROT_SPEED = 2000;
-
-
-
+  
     lastFrameposition = CGeoPoint(-9999, -9999);
 
 }
@@ -180,6 +179,9 @@ void CBreak::plan(const CVisionModule* pVision) {
     index += 1;
     index %= 5;
     point[index]= target;
+    for (int i = 0; i < 5; i++) {
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -400+20*i), ("point[" + to_string(i) + "] (" + to_string(point[i].x()) + "," + to_string(point[i].y()) + ")").c_str(), COLOR_YELLOW);
+    }
     if (DEBUG) GDebugEngine::Instance()->gui_debug_line(dribblePoint, move_point, COLOR_PURPLE);
     grabTask.player.max_acceleration=120;
     grabTask.player.max_deceleration=120;
