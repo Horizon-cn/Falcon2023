@@ -309,12 +309,12 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         needBreakThrough = false;
         for (auto test_enemy : enemy_points) {
             auto projection = test_seg.projection(test_enemy);
-            auto projection_dist = (projection - test_enemy).mod();
+            float projection_dist = (projection - test_enemy).mod();
             auto to_projection_dist = (projection - test_point).mod();
             auto straight_dist = (test_enemy - test_point).mod();
 
-            //if ((test_seg.IsPointOnLineOnSegment(projection) && (projection_dist/to_projection_dist) < (120/Param::Vehicle::V2::PLAYER_SIZE*2))) {
-            if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {
+            if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist/to_projection_dist) < (15*Param::Math::PI/180.0))||(to_projection_dist<15&&projection_dist<15))) {
+            /*if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {*/
                 canShoot = false;
                 needBreakThrough = true;
                 break;
