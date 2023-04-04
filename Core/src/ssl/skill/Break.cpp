@@ -175,9 +175,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     else if (pVision->Cycle() % 60 == 0) {
         move_point = target;
     }
-    else {
-        calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
-    }
+    
     index += 1;
     index %= 5;
     point[index]= target;
@@ -191,7 +189,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     if (isPenalty)
     {
-        cout<<"isPenalty"<<endl;
+        //cout<<"isPenalty"<<endl;
         penaltyX=me.Pos().x()+10.0;
         penaltyY=move_point.y()/*>0?-DRIBBLE_DIST:DRIBBLE_DIST*/;
         grabTask.player.pos=CGeoPoint(penaltyX,penaltyY);
@@ -219,10 +217,10 @@ void CBreak::plan(const CVisionModule* pVision) {
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("Canshoot:" + to_string(canShoot)).c_str(), COLOR_YELLOW);
     auto vel_vertical_target = std::sin(me.Vel().dir() - me2target.dir()) * me.Vel().mod();
 
-    cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
+    //cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
 
     if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 50) {
-        cout << "shoot!!!" << endl;
+        //cout << "shoot!!!" << endl;
         DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
         KickStatus::Instance()->setKick(vecNumber, power);//力度可调
 
@@ -309,12 +307,12 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         needBreakThrough = false;
         for (auto test_enemy : enemy_points) {
             auto projection = test_seg.projection(test_enemy);
-            auto projection_dist = (projection - test_enemy).mod();
+            float projection_dist = (projection - test_enemy).mod();
             auto to_projection_dist = (projection - test_point).mod();
             auto straight_dist = (test_enemy - test_point).mod();
 
-            //if ((test_seg.IsPointOnLineOnSegment(projection) && (projection_dist/to_projection_dist) < (120/Param::Vehicle::V2::PLAYER_SIZE*2))) {
-            if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {
+            if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist/to_projection_dist) < (15*Param::Math::PI/180.0))||(to_projection_dist<15&&projection_dist<15))) {
+            /*if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {*/
                 canShoot = false;
                 needBreakThrough = true;
                 break;
@@ -415,9 +413,9 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                 }
 
                 near_score = 1/(near_score);
-                cout<<"dist_score"<<dist_score;
+                /*cout<<"dist_score"<<dist_score;
                 cout<<"  block_score"<<block_score;
-                cout<<"  near_score"<<near_score<<endl;
+                cout<<"  near_score"<<near_score<<endl;*/
                 double overall_score = COEF_BLOCKSCORE * block_score + COEF_DISTSCORE * dist_score + COEF_NEARSCORE * near_score;
                 point_score_list.push_back(overall_score);
                 point_list.push_back(test_point);
@@ -433,7 +431,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             }
             if(point_score_list.empty()||point_list.empty())
             {
-                cout<<"error";
+                //cout<<"error";
                 return me.Pos();
             }
             else
@@ -457,7 +455,7 @@ bool CBreak::isSetPoint(const CVisionModule* pVision, const CGeoPoint* point, co
         x += point[i].x();
         y += point[i].y();
     }
-    x /= 5; y /= 5;
+    x /= 5.0; y /= 5.0;
     if (sqrt(pow(x - target.x(), 2) + pow(y - target.y(), 2)) > 5)
         return true;
     else

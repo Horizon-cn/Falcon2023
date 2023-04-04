@@ -10,7 +10,7 @@ firstState = "chase",
 
 ["chase"] = {
 	switch = function ()
-		if bufcnt(ball.toPlayerHeadDist("Kicker") < 2, 50,200)then
+		if bufcnt(ball.toPlayerHeadDist("Kicker") < 5)then
 			return "break";
 		end
 	end,
@@ -24,7 +24,7 @@ firstState = "chase",
 			return "chase";
 		end
 	end,
-    Kicker = task.Break(),
+    Kicker = task.testBreak(),
     match = ""
 },
 
