@@ -349,19 +349,30 @@ void CDealRobot::updateVel(int team, Owl::ReceiveVisionMessage& result) {
         }
         else lastRobot[team][robot.id] = robot;
         //lastRobot[team][robot.id].accelerate = (GlobalData::Instance()->robotCommand[team][0].robotSpeed[robot.id].vxy - lastRobot[team][robot.id].velocity.vxy) / lastValid[team][robot.id];
-                
+ 
         if (sipm->wheelSpeedCallBack && ((team == opm->isYellow && !opm->isSimulation) || opm->isSimulation)) {
             GlobalData::Instance()->robotInfoMutex.lock();
             auto robotWheelSpeed = GlobalData::Instance()->robotInformation[team][robot.id].wheelSpeed;
             double wheelSpeed[4] = { 0, 0, 0, 0 };
             int round_num = opm->isSimulation ? 1000.0 / sipm->WheelRadius : 74037;
             for (int i = 0; i < 4; i++)
-                wheelSpeed[i] = robotWheelSpeed[i] * 1000.0 / round_num; // mm/s
-            float vx = 0.3498 * wheelSpeed[0] - 0.3498 * wheelSpeed[1] - 0.3019 * wheelSpeed[2] + 0.3019 * wheelSpeed[3];
-            float vy = 0.3904 * wheelSpeed[0] + 0.3904 * wheelSpeed[1] - 0.3904 * wheelSpeed[2] - 0.3904 * wheelSpeed[3];
+                wheelSpeed[i] = robotWheelSpeed[i] / round_num;
+            float vx = (-0.3498 * wheelSpeed[0] - 0.3019 * wheelSpeed[1] + 0.3019 * wheelSpeed[2] + 0.3498 * wheelSpeed[3]) * 1000; // mm/s
+            float vy = (0.3904 * wheelSpeed[0] - 0.3904 * wheelSpeed[1] - 0.3904 * wheelSpeed[2] + 0.3904 * wheelSpeed[3]) * 1000; // mm/s
+            // std::cout << "robot.angle: " << robot.angle << std::endl; // 仿真中角度是准确的
+            // 这里可能有问题 from csy，速度测试不正常
+            if (robot.id == 5) {
+                std::cout << "in robot v: " << vx << " " << vy << std::endl;
+            }
             CVector vxy = CVector(vx, vy).rotate(robot.angle);
-            float vr = 0.337 * wheelSpeed[0] + 0.337 * wheelSpeed[1] + 0.273 * wheelSpeed[2] + 0.273 * wheelSpeed[3];
+            float vr = (3.3667 * wheelSpeed[0] + 2.7309 * wheelSpeed[1] + 2.7309 * wheelSpeed[2] + 3.3667 * wheelSpeed[3])*40; // rad/s?????可能还有问题
             robot.velocity = Owl::RobotSpeed(vxy.x(), vxy.y(), vr);
+            if (robot.id == 5) {
+                std::cout << "in field v: " << vxy.x() << " " << vxy.y() << std::endl;
+            }
+            //if (team == 0 && robot.id == 0) {
+            //    std::cout << "vx: " << vx << "\tvy: " << vy << std::endl;
+            //}
             GlobalData::Instance()->robotInfoMutex.unlock();
         }
     }

@@ -65,7 +65,7 @@ const Matrix2d& KalmanFilter::update(double px, double py) {
         init(px, py, 0, 0);
     }
     z = Matrix2d(2, 1, { px, py });
-    x_ = A * x;
+    x_ = A * x;   // 因为update一直跟着predict，所以不用考虑输入 ？？？？
     P_ = A * P * A.transpose() + Q;
     K  = P_ * H.transpose() * ((H * P_ * H.transpose() + R).inverse());
     x  = x_ + K * (z - H * x_);

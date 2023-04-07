@@ -75,6 +75,9 @@ class PosFilter : public KalmanFilter{
     void update2(CGeoPoint p){
         update2(p.x(), p.y());
     }
+    void update4(CGeoPoint p, CGeoPoint v) {
+
+    }
 
     const Matrix2d & postEstimatedState() const{return x;} 
     CGeoPoint postEstimatedPos() const{return CGeoPoint(x(0,0),x(1,0));}
