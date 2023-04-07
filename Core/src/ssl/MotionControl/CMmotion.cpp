@@ -613,10 +613,10 @@ void goto_point_omni( const PlayerVisionT& start,
     CVector delta_v = a * FRAME_PERIOD * 2;
     v = v + delta_v;
     //last_csy_command = v;
-    std::cout << "start pos: " << start.Pos().x() << " " << start.Pos().y() << "\ttarget pos: " << target_pos.x() << " " << target_pos.y() << std::endl;
-    std::cout << "start vel : " << start.Vel().x() << " " << start.Vel().y() << "\ta: " << a.x() << " " << a.y() << "\tvel : " << v.x() << " " << v.y() << std::endl;
+    //std::cout << "start pos: " << start.Pos().x() << " " << start.Pos().y() << "\ttarget pos: " << target_pos.x() << " " << target_pos.y() << std::endl;
+    //std::cout << "start vel : " << start.Vel().x() << " " << start.Vel().y() << "\ta: " << a.x() << " " << a.y() << "\tvel : " << v.x() << " " << v.y() << std::endl;
     //std::cout << "acc: " << a << " " << v << std::endl;
-    ang_v += ang_a * FRAME_PERIOD;
+    ang_v += ang_a * FRAME_PERIOD * 2;
 
     // if (v.mod() > max_speed) {
     //     v = v * max_speed / v.mod();
@@ -632,6 +632,7 @@ void goto_point_omni( const PlayerVisionT& start,
     float WHEEL_CENTER_OFFSET = 0.082f; /* ÂÖ×Ó¾à³µÖÐÐÄ¾àÀë(m) */
     float D_WHEEL_ANGLE_FRONT = 55; /* Ç°ÂÖÓëÖáÏß½Ç¶È(¶È) Ç°ÂÖÂÖ×ÓÖáÏßÓëÐ¡³µÇ°ºóÖáÏß½Ç¶È*/
     float D_WHEEL_ANGLE_BACK_2013 = 125; /* ºóÂÖÓëÖáÏß½Ç¶È(¶È) */
+    CVector v_in_wheel = v.rotate(-start.Dir());
     float vx = v.x() / 100;
     float vy = v.y() / 100;    //µ¥Î»[m/s]
     float vz = ang_v * 0.025f * WHEEL_CENTER_OFFSET; //V=2*pi*r/t = w*r µ¥Î»[m/s]
@@ -643,16 +644,27 @@ void goto_point_omni( const PlayerVisionT& start,
          D_WHEEL_ANGLE_BACK_2013     //×óºóÂÖÂÖ
     };
 
+    float cur_wheel_speed[4] = { 0,0,0,0 };
     float wheel_speed[4] = {0,0,0,0};
+    float vz_max_4[4] = {0,0,0,0};
+    float vz_min_4[4] = {0,0,0,0};
+    float vz_max = paramManager->MAX_WHEEL_SPEED;
+    float vz_min = -paramManager->MAX_WHEEL_SPEED;
+    CVector cur_v = start.Vel();
+    cur_v = cur_v.rotate(-start.Dir());
+    float cur_vx = cur_v.x() / 100;
+    float cur_vy = cur_v.y() / 100;    //µ¥Î»[m/s]
+    float cur_vz = start.RotVel() * 0.025f * WHEEL_CENTER_OFFSET; //V=2*pi*r/t = w*r µ¥Î»[m/s]
     double largest_wheel_speed = 0;
-    for( int i = 0; i < 4; i++ )
-    {
-        double angle = wheel_angle[i] / 180.0f * (float)Param::Math::PI;
-        wheel_speed[i] = fabs((sin(angle) * vx + cos(angle) * vy + vz) * 74037);
 
-        if (wheel_speed[i] > largest_wheel_speed)
+    for (int i = 0; i < 4; i++) { 
+        // 先计算在满足xy移动是vz的范围
+        double angle = wheel_angle[i] / 180.0f * (float)Param::Math::PI;
+        wheel_speed[i] = (sin(angle) * vx + cos(angle) * vy + vz) * 74037;
+        cur_wheel_speed[i] = (sin(angle) * cur_vx + cos(angle) * cur_vy + cur_vz) * 74037;
+        if (fabs(wheel_speed[i]) > largest_wheel_speed)
         {
-            largest_wheel_speed = wheel_speed[i];
+            largest_wheel_speed = fabs(wheel_speed[i]);
         }
     }
     
@@ -663,8 +675,34 @@ void goto_point_omni( const PlayerVisionT& start,
         v = v * slow_ratio;
         ang_v *= slow_ratio;
     }
-    
 
+    for (int i = 0; i < 4; i++) {
+        double angle = wheel_angle[i] / 180.0f * (float)Param::Math::PI;
+        vz_max_4[i] = (cur_wheel_speed[i] + 500) / 74037 - (sin(angle) * cur_vx + cos(angle) * cur_vy);
+        vz_min_4[i] = (cur_wheel_speed[i] - 500) / 74037 - (sin(angle) * cur_vx + cos(angle) * cur_vy);
+    }
+
+    for (int i = 0; i < 4; i++) {
+        if (vz_max_4[i] < vz_max) {
+            vz_max = vz_max_4[i];
+        }
+        if (vz_min_4[i] > vz_min) {
+            vz_min = vz_min_4[i];
+        }
+    }
+    std::cout << "vz_max: " << vz_max << "vz_min: " << vz_min << std::endl;
+    if (vz_min < vz_max) {
+        if (vz < 0) {
+            vz = vz_min;
+        }
+        else {
+            vz = vz_max;
+        }
+        //ang_v = vz / 0.025 / WHEEL_CENTER_OFFSET;
+    }
+    std::cout << "vz: " << vz << std::endl;
+    
+    
     CGeoPoint next_pos = start.Pos() + Utils::Polar2Vector(v.mod() * FRAME_PERIOD, v.dir());
     double next_angle = start.Dir() + ang_v * FRAME_PERIOD;
 
