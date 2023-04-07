@@ -28,8 +28,8 @@ TOLUA_API int  tolua_zeus_open(lua_State* tolua_S);
 extern "C" {
 	typedef struct
 	{
-		const char *name;
-		int(*func)(lua_State *);
+		const char* name;
+		int(*func)(lua_State*);
 	}luaDef;
 }
 
@@ -46,7 +46,7 @@ CLuaModule::CLuaModule()
 	InitLuaGlueFunc();
 	//	RunScript("../lua_scripts/ssl/StartZeus.lua");
 
-    pOption = new COptionModule();
+	pOption = new COptionModule();
 }
 
 void CLuaModule::InitLuaGlueFunc()
@@ -60,45 +60,45 @@ CLuaModule::~CLuaModule()
 {
 	if (m_pScriptContext)
 		lua_close(m_pScriptContext);
-    delete pOption;
+	delete pOption;
 }
 
-static std::string findScript(const char *pFname)
+static std::string findScript(const char* pFname)
 {
-	FILE *fTest;
+	FILE* fTest;
 
 #if defined(_WIN32)
-    char drive[_MAX_DRIVE];
-    char dir[_MAX_DIR];
-    char fname[_MAX_FNAME];
-    char ext[_MAX_EXT];
-    _splitpath(pFname, drive, dir, fname, ext);
-    std::string strTestFile = (std::string) drive + dir + "Scripts\\" + fname + ".LUB";
+	char drive[_MAX_DRIVE];
+	char dir[_MAX_DIR];
+	char fname[_MAX_FNAME];
+	char ext[_MAX_EXT];
+	_splitpath(pFname, drive, dir, fname, ext);
+	std::string strTestFile = (std::string)drive + dir + "Scripts\\" + fname + ".LUB";
 #else
-    std::string pname = pFname;
-    int l = pname.length();
-    char name[l+1];
-    strcpy(name,pname.c_str());
-    std::string drive = "";
-    std::string dir = "";//dirname(name);
-    std::string fname = basename(name);// Mark : not work /error
-    std::string ext = "";
-    std::string scriptsString = "Scripts/";
-    std::string strTestFile(pFname);
+	std::string pname = pFname;
+	int l = pname.length();
+	char name[l + 1];
+	strcpy(name, pname.c_str());
+	std::string drive = "";
+	std::string dir = "";//dirname(name);
+	std::string fname = basename(name);// Mark : not work /error
+	std::string ext = "";
+	std::string scriptsString = "Scripts/";
+	std::string strTestFile(pFname);
 #endif
 
 	fTest = fopen(strTestFile.c_str(), "r");
 	if (fTest == NULL)
-    {
+	{
 		//not that one...
-		strTestFile = (std::string) drive + dir + "Scripts\\" + fname + ".LUA";
+		strTestFile = (std::string)drive + dir + "Scripts\\" + fname + ".LUA";
 		fTest = fopen(strTestFile.c_str(), "r");
 	}
 
 	if (fTest == NULL)
 	{
 		//not that one...
-		strTestFile = (std::string) drive + dir + fname + ".LUB";
+		strTestFile = (std::string)drive + dir + fname + ".LUB";
 		fTest = fopen(strTestFile.c_str(), "r");
 	}
 
@@ -106,7 +106,7 @@ static std::string findScript(const char *pFname)
 	{
 		//not that one...
 		//not that one...
-		strTestFile = (std::string) drive + dir + fname + ".LUA";
+		strTestFile = (std::string)drive + dir + fname + ".LUA";
 		fTest = fopen(strTestFile.c_str(), "r");
 	}
 
@@ -118,10 +118,10 @@ static std::string findScript(const char *pFname)
 	return strTestFile;
 }
 
-bool CLuaModule::RunScript(const char *pFname)
+bool CLuaModule::RunScript(const char* pFname)
 {
 	std::string strFilename = findScript(pFname);
-	const char *pFilename = strFilename.c_str();
+	const char* pFilename = strFilename.c_str();
 
 	if (0 != luaL_loadfile(m_pScriptContext, pFilename))
 	{
@@ -130,13 +130,13 @@ bool CLuaModule::RunScript(const char *pFname)
 			char buf[256];
 			sprintf(buf, "Lua Error - Script Load\nScript Name:%s\nError Message:%s\n", pFilename, luaL_checkstring(m_pScriptContext, -1));
 			m_pErrorHandler(buf);
-        }
-        int invert = pOption->MySide() == Param::Field::POS_SIDE_RIGHT? -1 : 1;
-        double x = -650 * invert;
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -100 * invert), "Lua Error - Script Load", COLOR_RED);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -50 * invert), pFilename, COLOR_RED);
+		}
+		int invert = pOption->MySide() == Param::Field::POS_SIDE_RIGHT ? -1 : 1;
+		double x = -650 * invert;
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -100 * invert), "Lua Error - Script Load", COLOR_RED);
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -50 * invert), pFilename, COLOR_RED);
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 0), luaL_checkstring(m_pScriptContext, 1), COLOR_RED);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 50 * invert), luaL_checkstring(m_pScriptContext, -1), COLOR_RED);
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 50 * invert), luaL_checkstring(m_pScriptContext, -1), COLOR_RED);
 		return false;
 	}
 	if (0 != lua_pcall(m_pScriptContext, 0, LUA_MULTRET, 0))
@@ -146,13 +146,13 @@ bool CLuaModule::RunScript(const char *pFname)
 			char buf[256];
 			sprintf(buf, "Lua Error - Script Run\nScript Name:%s\nError Message:%s\n", pFilename, luaL_checkstring(m_pScriptContext, -1));
 			m_pErrorHandler(buf);
-        }
-        int invert = pOption->MySide() == Param::Field::POS_SIDE_RIGHT? -1 : 1;
-        double x = -650 * invert;
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -100 * invert), "Lua Error - Script Compile", COLOR_RED);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -50 * invert), pFilename, COLOR_RED);
+		}
+		int invert = pOption->MySide() == Param::Field::POS_SIDE_RIGHT ? -1 : 1;
+		double x = -650 * invert;
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -100 * invert), "Lua Error - Script Compile", COLOR_RED);
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, -50 * invert), pFilename, COLOR_RED);
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 0), luaL_checkstring(m_pScriptContext, 1), COLOR_RED);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 50 * invert), luaL_checkstring(m_pScriptContext, -1), COLOR_RED);
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(x, 50 * invert), luaL_checkstring(m_pScriptContext, -1), COLOR_RED);
 		return false;
 	}
 
@@ -160,7 +160,7 @@ bool CLuaModule::RunScript(const char *pFname)
 
 }
 
-bool CLuaModule::RunString(const char *pCommand)
+bool CLuaModule::RunString(const char* pCommand)
 {
 	if (0 != luaL_loadbuffer(m_pScriptContext, pCommand, strlen(pCommand), NULL))
 	{
@@ -187,19 +187,19 @@ bool CLuaModule::RunString(const char *pCommand)
 	return true;
 }
 
-const char *CLuaModule::GetErrorString(void)
+const char* CLuaModule::GetErrorString(void)
 {
 	return luaL_checkstring(m_pScriptContext, -1);
 }
 
 
-bool CLuaModule::AddFunction(const char *pFunctionName, LuaFunctionType pFunction)
+bool CLuaModule::AddFunction(const char* pFunctionName, LuaFunctionType pFunction)
 {
 	lua_register(m_pScriptContext, pFunctionName, pFunction);
 	return true;
 }
 
-const char *CLuaModule::GetStringArgument(int num, const char *pDefault)
+const char* CLuaModule::GetStringArgument(int num, const char* pDefault)
 {
 	return luaL_optstring(m_pScriptContext, num, pDefault);
 
@@ -220,7 +220,7 @@ CGeoPoint* CLuaModule::GetPointArgument(int num)
 	return (CGeoPoint*)(lua_touserdata(m_pScriptContext, num));
 }
 
-void CLuaModule::PushString(const char *pString)
+void CLuaModule::PushString(const char* pString)
 {
 	lua_pushstring(m_pScriptContext, pString);
 }
@@ -248,7 +248,7 @@ extern "C" int Skill_Break(lua_State * L)
 
 	return 0;
 }
-extern "C" int Skill_SmartGotoPoint(lua_State *L)
+extern "C" int Skill_SmartGotoPoint(lua_State * L)
 {
 	TaskT playerTask;
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
@@ -317,7 +317,7 @@ extern "C" int Skill_GoCmuRush(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_SimpleGotoPoint(lua_State *L)
+extern "C" int Skill_SimpleGotoPoint(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double x = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -330,7 +330,7 @@ extern "C" int Skill_SimpleGotoPoint(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_Stop(lua_State *L)
+extern "C" int Skill_Stop(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	CPlayerTask* pTask = PlayerRole::makeItStop(runner);
@@ -339,7 +339,7 @@ extern "C" int Skill_Stop(lua_State *L)
 	return 0;
 }
 
-extern "C" int Register_Role(lua_State *L)
+extern "C" int Register_Role(lua_State * L)
 {
 	int num = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	string role = LuaModule::Instance()->GetStringArgument(2, NULL);
@@ -347,7 +347,7 @@ extern "C" int Register_Role(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_Test(lua_State *L)
+extern "C" int Skill_Test(lua_State * L)
 {
 	cout << lua_type(L, -1) << endl;
 	CVector* pos;
@@ -356,7 +356,7 @@ extern "C" int Skill_Test(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_TouchKick(lua_State *L)
+extern "C" int Skill_TouchKick(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -365,7 +365,7 @@ extern "C" int Skill_TouchKick(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_MarkingTouch(lua_State *L)
+extern "C" int Skill_MarkingTouch(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -381,7 +381,7 @@ extern "C" int Skill_MarkingTouch(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_MarkingFront(lua_State *L)
+extern "C" int Skill_MarkingFront(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int markNum = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -402,7 +402,7 @@ extern "C" int Skill_GoSupport(lua_State * L)
 	return 0;
 }
 
-extern "C" int Skill_ShootBall(lua_State *L)
+extern "C" int Skill_ShootBall(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -415,7 +415,7 @@ extern "C" int Skill_ShootBall(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_ShootBallV2(lua_State *L)
+extern "C" int Skill_ShootBallV2(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -423,7 +423,7 @@ extern "C" int Skill_ShootBallV2(lua_State *L)
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
-extern "C" int Skill_GetBall(lua_State *L)
+extern "C" int Skill_GetBall(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -432,7 +432,7 @@ extern "C" int Skill_GetBall(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_GoAndTurnKickV4(lua_State *L)
+extern "C" int Skill_GoAndTurnKickV4(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -441,7 +441,7 @@ extern "C" int Skill_GoAndTurnKickV4(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_StaticGetBall(lua_State *L)
+extern "C" int Skill_StaticGetBall(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -451,7 +451,7 @@ extern "C" int Skill_StaticGetBall(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_GoAndTurnKick(lua_State *L)
+extern "C" int Skill_GoAndTurnKick(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -474,7 +474,7 @@ extern "C" int Skill_GoAndTurnKick(lua_State *L)
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
-extern "C" int Skill_GoAndTurn(lua_State *L)
+extern "C" int Skill_GoAndTurn(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	CPlayerTask* pTask = PlayerRole::makeItGoAndTurn(runner, 0, 0, 0);
@@ -483,7 +483,7 @@ extern "C" int Skill_GoAndTurn(lua_State *L)
 }
 
 
-extern "C" int Skill_CircleBall(lua_State *L)
+extern "C" int Skill_CircleBall(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -492,7 +492,7 @@ extern "C" int Skill_CircleBall(lua_State *L)
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
-extern "C" int Skill_GoAndTurnKickV3(lua_State *L)
+extern "C" int Skill_GoAndTurnKickV3(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -510,7 +510,7 @@ extern "C" int Skill_GoAndTurnKickV3(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_SlowGetBall(lua_State *L)
+extern "C" int Skill_SlowGetBall(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -519,7 +519,7 @@ extern "C" int Skill_SlowGetBall(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_ForceStartRush(lua_State *L)
+extern "C" int Skill_ForceStartRush(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -528,7 +528,7 @@ extern "C" int Skill_ForceStartRush(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_ChaseKick(lua_State *L)
+extern "C" int Skill_ChaseKick(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -538,7 +538,7 @@ extern "C" int Skill_ChaseKick(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_ChaseKickV2(lua_State *L)
+extern "C" int Skill_ChaseKickV2(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -548,7 +548,7 @@ extern "C" int Skill_ChaseKickV2(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_DriftKick(lua_State *L)
+extern "C" int Skill_DriftKick(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -557,7 +557,7 @@ extern "C" int Skill_DriftKick(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_InterKick(lua_State *L)
+extern "C" int Skill_InterKick(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -567,7 +567,7 @@ extern "C" int Skill_InterKick(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_InterKickV2(lua_State *L)
+extern "C" int Skill_InterKickV2(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -577,7 +577,7 @@ extern "C" int Skill_InterKickV2(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_ProtectBall(lua_State *L)
+extern "C" int Skill_ProtectBall(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -587,7 +587,7 @@ extern "C" int Skill_ProtectBall(lua_State *L)
 }
 
 // 现在使用新的抢球，by dxh 2013.5.20
-extern "C" int Skill_AdvanceBallV2(lua_State *L)
+extern "C" int Skill_AdvanceBallV2(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -607,7 +607,7 @@ extern "C" int Skill_Advance(lua_State * L)
 	return 0;
 }
 
-extern "C" int Skill_AdvanceBallV3(lua_State *L)
+extern "C" int Skill_AdvanceBallV3(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -635,7 +635,7 @@ extern "C" int Skill_PenaltyKickV2(lua_State * L)
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
-extern "C" int Skill_DribbleTurn(lua_State *L)
+extern "C" int Skill_DribbleTurn(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -646,7 +646,7 @@ extern "C" int Skill_DribbleTurn(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_DribbleTurnKick(lua_State *L)
+extern "C" int Skill_DribbleTurnKick(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double finalDir = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -657,7 +657,7 @@ extern "C" int Skill_DribbleTurnKick(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_AdvanceBallV1(lua_State *L)
+extern "C" int Skill_AdvanceBallV1(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -666,7 +666,7 @@ extern "C" int Skill_AdvanceBallV1(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_ReceivePass(lua_State *L)
+extern "C" int Skill_ReceivePass(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -676,10 +676,10 @@ extern "C" int Skill_ReceivePass(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_FetchBall(lua_State *L)    //-----------------------------------------
+extern "C" int Skill_FetchBall(lua_State * L)    //-----------------------------------------
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
-    paramManager->PlACEBALL_PLAYER_NUM = runner;
+	paramManager->PlACEBALL_PLAYER_NUM = runner;
 	double targetPosX = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double targetPosY = LuaModule::Instance()->GetNumberArgument(3, NULL);
 	double kickPower = LuaModule::Instance()->GetNumberArgument(4, NULL);
@@ -690,7 +690,7 @@ extern "C" int Skill_FetchBall(lua_State *L)    //------------------------------
 	return 0;
 }
 
-extern "C" int Skill_Goalie2013(lua_State *L)
+extern "C" int Skill_Goalie2013(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -698,7 +698,7 @@ extern "C" int Skill_Goalie2013(lua_State *L)
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
-extern "C" int Skill_Goalie2022(lua_State *L)
+extern "C" int Skill_Goalie2022(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -706,7 +706,7 @@ extern "C" int Skill_Goalie2022(lua_State *L)
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
-extern "C" int Skill_ShootoutGoalie(lua_State *L)
+extern "C" int Skill_ShootoutGoalie(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -714,7 +714,7 @@ extern "C" int Skill_ShootoutGoalie(lua_State *L)
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
-extern "C" int Skill_ShootoutGoalieV2(lua_State *L)
+extern "C" int Skill_ShootoutGoalieV2(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -723,7 +723,7 @@ extern "C" int Skill_ShootoutGoalieV2(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_PenaltyGoalie(lua_State *L)
+extern "C" int Skill_PenaltyGoalie(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -732,7 +732,7 @@ extern "C" int Skill_PenaltyGoalie(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_Speed(lua_State *L)
+extern "C" int Skill_Speed(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double speedX = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -743,7 +743,7 @@ extern "C" int Skill_Speed(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_SpeedLocalVersion(lua_State *L)
+extern "C" int Skill_SpeedLocalVersion(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double speedX = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -754,7 +754,7 @@ extern "C" int Skill_SpeedLocalVersion(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_Marking(lua_State *L)
+extern "C" int Skill_Marking(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int pri = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -776,7 +776,7 @@ extern "C" int Skill_Marking(lua_State *L)
 	return 0;
 }
 
-extern "C" int Skill_Blocking(lua_State *L)
+extern "C" int Skill_Blocking(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int pri = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -791,7 +791,7 @@ extern "C" int Skill_Blocking(lua_State *L)
 	return 0;
 }
 
-extern "C" int FUNC_GetMarkingPos(lua_State *L)
+extern "C" int FUNC_GetMarkingPos(lua_State * L)
 {
 	int pri = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	bool front = LuaModule::Instance()->GetBoolArgument(2);
@@ -841,7 +841,7 @@ extern "C" int FUNC_GetMarkingPos(lua_State *L)
 	return 2;
 }
 
-extern "C" int FUNC_GetBlockingPos(lua_State *L)
+extern "C" int FUNC_GetBlockingPos(lua_State * L)
 {
 	int pri = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	CGeoPoint p = MarkingPosV2::Instance()->getMarkingPosByAbsolutePri(vision, pri);
@@ -850,7 +850,7 @@ extern "C" int FUNC_GetBlockingPos(lua_State *L)
 	return 2;
 }
 
-extern "C" int FUNC_TimeOut(lua_State* L)
+extern "C" int FUNC_TimeOut(lua_State * L)
 {
 	bool cond = LuaModule::Instance()->GetBoolArgument(1);
 	int buf = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -869,7 +869,7 @@ extern "C" int FUNC_TimeOut(lua_State* L)
 	return 1;
 }
 
-extern "C" int FUNC_GetIsSimulation(lua_State* L)
+extern "C" int FUNC_GetIsSimulation(lua_State * L)
 {
 	LuaModule::Instance()->PushBool(IS_SIMULATION);
 	return 1;
@@ -913,7 +913,7 @@ extern "C" int FUNC_GetFieldParam(lua_State * L)
 	return 1;
 }
 
-extern "C" int FUNC_GetKickOffDefPos(lua_State* L)
+extern "C" int FUNC_GetKickOffDefPos(lua_State * L)
 {
 	string str = LuaModule::Instance()->GetStringArgument(1, NULL);
 	CGeoPoint pos;
@@ -934,7 +934,7 @@ extern "C" int FUNC_GetKickOffDefPos(lua_State* L)
 	return 2;
 }
 
-extern "C" int FUNC_CalCompensate(lua_State*L) {
+extern "C" int FUNC_CalCompensate(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double targetX = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double targetY = LuaModule::Instance()->GetNumberArgument(3, NULL);
@@ -944,7 +944,7 @@ extern "C" int FUNC_CalCompensate(lua_State*L) {
 	return 1;
 }
 
-extern "C" int FUNC_AddPenaltyCleaner(lua_State*L) {
+extern "C" int FUNC_AddPenaltyCleaner(lua_State * L) {
 	string role = LuaModule::Instance()->GetStringArgument(1, NULL);
 	int num = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double targetX = LuaModule::Instance()->GetNumberArgument(3, NULL);
@@ -953,7 +953,7 @@ extern "C" int FUNC_AddPenaltyCleaner(lua_State*L) {
 	return 0;
 }
 
-extern "C" int FUNC_GetPenaltyCleaner(lua_State*L) {
+extern "C" int FUNC_GetPenaltyCleaner(lua_State * L) {
 	string role = LuaModule::Instance()->GetStringArgument(1, NULL);
 	CGeoPoint p = PenaltyPosCleaner::Instance()->get(role);
 	LuaModule::Instance()->PushNumber(p.x());
@@ -961,11 +961,11 @@ extern "C" int FUNC_GetPenaltyCleaner(lua_State*L) {
 	return 2;
 }
 
-extern "C" int FUNC_CleanPenalty(lua_State*L) {
+extern "C" int FUNC_CleanPenalty(lua_State * L) {
 	PenaltyPosCleaner::Instance()->clean(vision);
 	return 0;
 }
-extern "C" int FUNC_ChipBallJudge(lua_State*L) {
+extern "C" int FUNC_ChipBallJudge(lua_State * L) {
 	double  ballMovingDir = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double ballStartPosX = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double ballStartPosY = LuaModule::Instance()->GetNumberArgument(3, NULL);
@@ -978,7 +978,7 @@ extern "C" int FUNC_ChipBallJudge(lua_State*L) {
 	return 4;
 }
 
-extern "C" int FUNC_GetResetGroup(lua_State*L) {
+extern "C" int FUNC_GetResetGroup(lua_State * L) {
 	GroupStatus* status = PenaltyPosCleaner::Instance()->getGroupStatus();
 	char str[20] = "";
 
@@ -994,7 +994,17 @@ extern "C" int FUNC_GetResetGroup(lua_State*L) {
 	return 1;
 }
 
-extern "C" int Skill_WaitTouch(lua_State*L) {
+extern "C" int Skill_JustKick(lua_State * L) {
+	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
+	int mode = LuaModule::Instance()->GetNumberArgument(2, NULL);
+	double power = LuaModule::Instance()->GetNumberArgument(3, NULL);
+	int flag = LuaModule::Instance()->GetNumberArgument(4, NULL);
+	CPlayerTask* pTask = PlayerRole::makeItJustKick(runner, mode, power, flag);
+	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
+	return 0;
+}
+
+extern "C" int Skill_WaitTouch(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double x = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double y = LuaModule::Instance()->GetNumberArgument(3, NULL);
@@ -1006,7 +1016,7 @@ extern "C" int Skill_WaitTouch(lua_State*L) {
 	return 0;
 }
 
-extern "C" int Skill_TouchBetweenPos(lua_State*L) {
+extern "C" int Skill_TouchBetweenPos(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double x1 = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double y1 = LuaModule::Instance()->GetNumberArgument(3, NULL);
@@ -1034,7 +1044,7 @@ extern "C" int Skill_TouchBetweenPos(lua_State*L) {
 	return 0;
 }
 
-extern "C" int Skill_MarkingField(lua_State*L) {
+extern "C" int Skill_MarkingField(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double x1 = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double y1 = LuaModule::Instance()->GetNumberArgument(3, NULL);
@@ -1064,21 +1074,21 @@ extern "C" int Skill_MarkingField(lua_State*L) {
 	return 0;
 }
 
-extern "C" int Skill_PenaltyKick2013(lua_State*L) {
+extern "C" int Skill_PenaltyKick2013(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	CPlayerTask* pTask = PlayerRole::makeItPenaltyKick2013(runner, 0);
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
 
-extern "C" int Skill_PenaltyKick2014(lua_State*L) {
+extern "C" int Skill_PenaltyKick2014(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	CPlayerTask* pTask = PlayerRole::makeItPenaltyKick2014(runner, 0);
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
 
-extern "C" int Skill_CrazyPush(lua_State*L) {
+extern "C" int Skill_CrazyPush(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double faceDir = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	CPlayerTask* pTask = PlayerRole::makeItCrazyPush(runner, faceDir);
@@ -1086,21 +1096,21 @@ extern "C" int Skill_CrazyPush(lua_State*L) {
 	return 0;
 };
 
-extern "C" int FUNC_CGetDefNumByRolename(lua_State* L) {
+extern "C" int FUNC_CGetDefNumByRolename(lua_State * L) {
 	string rolename = LuaModule::Instance()->GetStringArgument(1, NULL);
 	string str = EnemyDefendTacticAnalys::Instance()->doAnalys(rolename, vision);
 	LuaModule::Instance()->PushString(str.c_str());
 	return 1;
 }
 
-extern "C" int FUNC_CGetDefRolenameByNum(lua_State* L) {
+extern "C" int FUNC_CGetDefRolenameByNum(lua_State * L) {
 	int num = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	string str = EnemyDefendTacticAnalys::Instance()->doAnalys(num, vision);
 	LuaModule::Instance()->PushString(str.c_str());
 	return 1;
 }
 
-extern "C" int FUNC_EnemyHasReceiver(lua_State* L) {
+extern "C" int FUNC_EnemyHasReceiver(lua_State * L) {
 	bool istrue = false;
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
 		if (DefenceInfo::Instance()->getOppPlayerByNum(i)->isTheRole("RReceiver")) {
@@ -1111,7 +1121,7 @@ extern "C" int FUNC_EnemyHasReceiver(lua_State* L) {
 	return 1;
 }
 
-extern "C" int Skill_GoAroundRobot(lua_State* L) {
+extern "C" int Skill_GoAroundRobot(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double x = LuaModule::Instance()->GetNumberArgument(3, NULL);
@@ -1122,14 +1132,14 @@ extern "C" int Skill_GoAroundRobot(lua_State* L) {
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
-extern "C" int Skill_GoTechChalPos(lua_State* L) {
-    int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
-    int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
-    CPlayerTask* pTask = PlayerRole::makeItGoTechChalPos(runner, flag);
-    TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
-    return 0;
+extern "C" int Skill_GoTechChalPos(lua_State * L) {
+	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
+	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
+	CPlayerTask* pTask = PlayerRole::makeItGoTechChalPos(runner, flag);
+	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
+	return 0;
 }
-extern "C" int Skill_SpeedInRobot(lua_State* L) {
+extern "C" int Skill_SpeedInRobot(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double speedX = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double speedY = LuaModule::Instance()->GetNumberArgument(3, NULL);
@@ -1151,14 +1161,14 @@ extern "C" int Skill_TimeDelayTest(lua_State * L) {
 }
 
 //当出现receiver时，找到离球最近的receiver，并看他是否被绕前盯人
-extern "C" int FUNC_IsNearestBallReceiverBeDenied(lua_State* L) {
+extern "C" int FUNC_IsNearestBallReceiverBeDenied(lua_State * L) {
 	bool bl = MarkingPosV2::Instance()->isNearestBallReceiverBeDenied(vision);
 	LuaModule::Instance()->PushBool(bl);
 	return 1;
 }
 
 //在NormalPlay中MarkingX值最靠前的车的匹配点
-extern "C" int FUNC_MarkingXFirstPos(lua_State* L) {
+extern "C" int FUNC_MarkingXFirstPos(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	CGeoPoint pos = MarkingPosV2::Instance()->getMarkingPosByNum(vision, runner);
 
@@ -1169,7 +1179,7 @@ extern "C" int FUNC_MarkingXFirstPos(lua_State* L) {
 }
 
 //在NormalPlay中Markingx值最靠前的车
-extern "C" int FUNC_MarkingXFirstNum(lua_State* L) {
+extern "C" int FUNC_MarkingXFirstNum(lua_State * L) {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	int enemy = LuaModule::Instance()->GetNumberArgument(2, NULL);
 
@@ -1180,14 +1190,14 @@ extern "C" int FUNC_MarkingXFirstNum(lua_State* L) {
 }
 
 // 从Lua中注册开球车朝向供Touch使用，防止球看不见时车会上前拿球
-extern "C" int FUNC_SetPassDir(lua_State* L) {
+extern "C" int FUNC_SetPassDir(lua_State * L) {
 	double dir = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	TouchKickPos::Instance()->setPassDir(vision->Cycle(), dir);
 
 	return 0;
 }
 
-extern "C" int FUNC_GetMarkingTouchPos(lua_State* L) {
+extern "C" int FUNC_GetMarkingTouchPos(lua_State * L) {
 	int mAreaNum = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double x1 = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	double y1 = LuaModule::Instance()->GetNumberArgument(3, NULL);
@@ -1218,7 +1228,7 @@ luaDef GUIGlue[] =
 	{"SmartGotoPos",		Skill_SmartGotoPoint},
 	{"CBezierRush",			Skill_BezierRush},
 	{"CGoAroundRobot",		Skill_GoAroundRobot},
-    {"CGoTechChalPos",      Skill_GoTechChalPos},
+	{"CGoTechChalPos",      Skill_GoTechChalPos},
 	//其他
 	{"CGoSupport",          Skill_GoSupport},
 	{"CStopRobot",			Skill_Stop},
@@ -1269,6 +1279,7 @@ luaDef GUIGlue[] =
 	{"CGetPenaltyCleaner",  FUNC_GetPenaltyCleaner},
 	{"CCleanPenalty",       FUNC_CleanPenalty},
 	{"CGetResetMatchStr",	FUNC_GetResetGroup},
+	{"CJustKick",			Skill_JustKick},
 	{"CWaitTouch",			Skill_WaitTouch},
 	{"CPenaltyKick2013",	Skill_PenaltyKick2013},
 	{"CPenaltyKick2014",	Skill_PenaltyKick2014},

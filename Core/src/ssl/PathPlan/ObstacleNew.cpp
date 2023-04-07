@@ -367,7 +367,8 @@ void ObstaclesNew::addObs(const CVisionModule * pVision, const TaskT & task, boo
                         (rolenum == TaskMediator::Instance()->rightBack()) ||
                         (rolenum == TaskMediator::Instance()->singleBack()) ||
                         (rolenum == TaskMediator::Instance()->sideBack()) ||
-                        (rolenum == TaskMediator::Instance()->defendMiddle());
+                        (rolenum == TaskMediator::Instance()->defendMiddle()) ||
+                        (TaskMediator::Instance()->isMultiBack(rolenum));
     bool notAvoidOurBack = (isBack && Utils::InOurPenaltyArea(myPos, 40));
     
     //后卫只有在禁区边界才允许撞车

@@ -203,10 +203,11 @@ void DirFilter::predict2(double ur){
 }
 
 void DirFilter::update2(double ang){
-//    double temp = ang > x(0,0) ? -2 * M_PI : 2 * M_PI;
-//    while (std::abs(ang - x(0,0)) > M_PI) ang += temp;
+    double temp = ang > x(0,0) ? -2 * M_PI : 2 * M_PI;
+    while (std::abs(ang - x(0,0)) > M_PI) ang += temp;
     z = Matrix2d(ctrlNum, 1, {ang});
     _update2(z);
+    x(0, 0) = normalize(x(0, 0));
 }
 
 /**double DirFilter::predictedDir(double t) const{
