@@ -20,7 +20,7 @@ gPlayTable.CreatePlay{
 firstState = "run1",
 ["run1"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 100) then
+		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 50) then
 			return "run2";
 		end
 	end,
@@ -32,8 +32,8 @@ firstState = "run1",
 
 ["run2"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 300) then
-			return "run1";
+		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 50) then
+			return "run3";
 		end
 	end,
 	Goalie = task.goCmuRush(TargetPos3),
@@ -44,7 +44,7 @@ firstState = "run1",
 
 ["run3"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 300) then
+		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 50) then
 			return "run1";
 		end
 	end,

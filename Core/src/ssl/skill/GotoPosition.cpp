@@ -236,7 +236,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	}
 
 	if (RECORD_COMMAND && vecNumber == paramManager->RECORD_NUM) {
-		velCommandData << vecPos.x() << "  " << vecPos.y() <<"  "<< self.Dir() << "  " << globalVel.x() << " " << globalVel.y()<<"  "<< rotVel << std::endl;
+		//velCommandData << vecPos.x() << "  " << vecPos.y() <<"  "<< self.Dir() << "  " << globalVel.x() << " " << globalVel.y()<<"  "<< rotVel << std::endl;
 	}
 
     if(NOT_MOVE)

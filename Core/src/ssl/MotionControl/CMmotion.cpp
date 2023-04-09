@@ -10,23 +10,23 @@ using namespace std;
 extern bool IS_SIMULATION;
 
 namespace {
-const double FRAME_PERIOD = 1.0 / Param::Vision::FRAME_RATE;
+    const double FRAME_PERIOD = 1.0 / Param::Vision::FRAME_RATE;
 
-bool DEBUG_NO_ZERO_VEL = false;
-const double DEC_FACTOR = 2.0;
-const double lowerBoundSpeedLimitRotate = 0;
-const double upperBoundSpeedLimitRotate = 300;
-const double minAngleLimitRotateSpeed = 15.0 / 180.0 * Param::Math::PI;
+    bool DEBUG_NO_ZERO_VEL = false;
+    const double DEC_FACTOR = 2.0;
+    const double lowerBoundSpeedLimitRotate = 0;
+    const double upperBoundSpeedLimitRotate = 300;
+    const double minAngleLimitRotateSpeed = 15.0 / 180.0 * Param::Math::PI;
 
-double OUR_MAX_SPEED = 2000;
-double OUR_MAX_ACC = 2000;
-double OUR_MAX_DEC = 2000;
-bool DISPLAY_ROTATION_LIMIT = true;
-bool DEBUG_TIME = false;
-bool addComp = true;
-int timeDebugColor = COLOR_GREEN;
-int timeItor = 0;
-int isX = 1;
+    double OUR_MAX_SPEED = 2000;
+    double OUR_MAX_ACC = 2000;
+    double OUR_MAX_DEC = 2000;
+    bool DISPLAY_ROTATION_LIMIT = true;
+    bool DEBUG_TIME = false;
+    bool addComp = true;
+    int timeDebugColor = COLOR_GREEN;
+
+    int isX = 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,9 +58,9 @@ void compute_motion_1d(double x0, double v0, double v1,
     char v1debugmsg[100];
     //char xdebugmsg[100];
     bool DEBUG_ENGINE = 0;
+
     sprintf(v0debugmsg, "%f", v0);
     sprintf(v1debugmsg, "%f", v1);
-
     //if (pT == MOVE_X) {
     //    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -400), xdebugmsg, COLOR_YELLOW);
     //}
@@ -185,62 +185,68 @@ void compute_motion_1d(double x0, double v0, double v1,
     }
 
     // 计算时间部分
-    // 需要先后退再加速非零速到点
-    if (fabs(v1) > 1e-8 && v1 * x0 > 0 && mode == ACCURATE) {
-        double time_to_accel = fabs(v1) / a_max;
-        double x_to_accel = (v1 * v1) / (2.0 * a_max);
-        compute_motion_1d(x0 + copysign(x_to_accel, v1), v0, 0, a_max * a_factor, d_max *  a_factor,
-                          v_max, a_factor, vel_factor, traj_accel, traj_time, traj_time_acc, traj_time_dec, traj_time_flat, pT, mode);
-        traj_time += time_to_accel;
-        //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R3").toLatin1(), timeDebugColor);
-        if (DEBUG_ENGINE) {
-            if (pT == MOVE_X) {
-                sprintf(adebugmsg, "%f", traj_accel);
-                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), adebugmsg, COLOR_YELLOW);
-                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), v0debugmsg, COLOR_YELLOW);
-                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), v1debugmsg, COLOR_YELLOW);
-            }
-            if (pT == MOVE_Y) {
-                sprintf(adebugmsg, "%f", traj_accel);
-                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 250), adebugmsg, COLOR_YELLOW);
-                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 300), v0debugmsg, COLOR_YELLOW);
-                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 350), v1debugmsg, COLOR_YELLOW);
-            }
-        }
-        return;
-    }
-    // 从x0运动到零点
-    // 初速和目标点反向 或 初速大于目标速来不及减速到目标速
-    // 全程减速
-    else if (v0 * x0 > 0 || (fabs(v0) > fabs(v1) && decel_dist_to_v1 > fabs(x0))) {
+    //// 需要先后退再加速非零速到点
+    //if (fabs(v1) > 1e-8 && v1 * x0 > 0 && mode == ACCURATE) {
+    //    double time_to_accel = fabs(v1) / a_max;
+    //    double x_to_accel = (v1 * v1) / (2.0 * a_max);
+    //    compute_motion_1d(x0 + copysign(x_to_accel, v1), v0, 0, a_max * a_factor, d_max *  a_factor,
+    //                      v_max, a_factor, vel_factor, traj_accel, traj_time, traj_time_acc, traj_time_dec, traj_time_flat, pT, mode);
+    //    traj_time += time_to_accel;
+    //    //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R3").toLatin1(), timeDebugColor);
+    //    if (DEBUG_ENGINE) {
+    //        if (pT == MOVE_X) {
+    //            sprintf(adebugmsg, "%f", traj_accel);
+    //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), adebugmsg, COLOR_YELLOW);
+    //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), v0debugmsg, COLOR_YELLOW);
+    //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), v1debugmsg, COLOR_YELLOW);
+    //        }
+    //        if (pT == MOVE_Y) {
+    //            sprintf(adebugmsg, "%f", traj_accel);
+    //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 250), adebugmsg, COLOR_YELLOW);
+    //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 300), v0debugmsg, COLOR_YELLOW);
+    //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 350), v1debugmsg, COLOR_YELLOW);
+    //        }
+    //    }
+    //    return;
+    //}
+    //// 从x0运动到零点
+    //// 初速和目标点反向 或 初速大于目标速来不及减速到目标速
+    //// 全程减速
+    //else 
+        // 从x0运动到零点
+        // 初速和目标点反向 或 初速大于目标速来不及减速到目标速
+        // 全程减速
+
+    if (v0 * x0 > 0 || (fabs(v0) > fabs(v1) && decel_dist_to_v1 > fabs(x0))) {
         // 停下后到达的时间 + 停下所用时间
         double time_to_stop = fabs(v0) / (d_max);                                                       // 停下时间
         double x_to_stop = v0 * v0 / (2.0 * d_max);                                                   // 停止时运动距离
         double time_to_accel = fabs(v1) / a_max;
         double x_to_accel = (v1 * v1) / (2.0 * a_max);
 
-        if (fabs(v1) > 1e-8 && mode == ACCURATE) {
-            compute_motion_1d(x0 + copysign(x_to_accel, v1), v0, 0, a_max * a_factor, d_max * a_factor,
-                              v_max, a_factor, vel_factor, traj_accel, traj_time, traj_time_acc, traj_time_dec, traj_time_flat, pT, mode);
-            traj_time += time_to_accel;
-            //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R4").toLatin1(), timeDebugColor);
-            if (DEBUG_ENGINE) {
-                if (pT == MOVE_X) {
-                    sprintf(adebugmsg, "%f", traj_accel);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), adebugmsg, COLOR_YELLOW);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), v0debugmsg, COLOR_YELLOW);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), v1debugmsg, COLOR_YELLOW);
-                }
-                if (pT == MOVE_Y) {
-                    sprintf(adebugmsg, "%f", traj_accel);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 250), adebugmsg, COLOR_YELLOW);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 300), v0debugmsg, COLOR_YELLOW);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 350), v1debugmsg, COLOR_YELLOW);
-                }
-            }
-            return;
-        }
-        else {
+        //if (fabs(v1) > 1e-8 && mode == ACCURATE) {
+        //    compute_motion_1d(x0 + copysign(x_to_accel, v1), v0, 0, a_max * a_factor, d_max * a_factor,
+        //                      v_max, a_factor, vel_factor, traj_accel, traj_time, traj_time_acc, traj_time_dec, traj_time_flat, pT, mode);
+        //    traj_time += time_to_accel;
+        //    //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R4").toLatin1(), timeDebugColor);
+        //    if (DEBUG_ENGINE) {
+        //        if (pT == MOVE_X) {
+        //            sprintf(adebugmsg, "%f", traj_accel);
+        //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), adebugmsg, COLOR_YELLOW);
+        //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), v0debugmsg, COLOR_YELLOW);
+        //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), v1debugmsg, COLOR_YELLOW);
+        //        }
+        //        if (pT == MOVE_Y) {
+        //            sprintf(adebugmsg, "%f", traj_accel);
+        //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 250), adebugmsg, COLOR_YELLOW);
+        //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 300), v0debugmsg, COLOR_YELLOW);
+        //            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 350), v1debugmsg, COLOR_YELLOW);
+        //        }
+        //    }
+        //    return;
+        //}
+        //else {
+        puts("hereeeeeeeeeeeeeee");
             compute_motion_1d(x0 + copysign(x_to_stop, v0), 0, v1, a_max * a_factor, d_max * a_factor,
                               v_max, a_factor, vel_factor, traj_accel, traj_time, traj_time_acc, traj_time_dec, traj_time_flat, pT, mode);    // 递归运算直到跳出这一条件
             traj_time += time_to_stop;                                                                    // 加上路径规划时间
@@ -271,8 +277,9 @@ void compute_motion_1d(double x0, double v0, double v1,
             }
             //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R5").toLatin1(), timeDebugColor);
             return;
-        }
+        //}
     }
+    else puts("NOTTTTTTTT hereeeeeeeeeeeeeee");
 
     if (accel_dist_to_v1 > fabs(x0) && fabs(v0) < fabs(v1)) {
         traj_time_acc = (sqrt(2 * a_max * fabs(x0) + v0 * v0) - fabs(v0)) / a_max;
@@ -358,51 +365,61 @@ void compute_motion_1d(double x0, double v0, double v1,
 void compute_motion_2d(CVector x0, CVector v0, CVector v1,
                        double a_max, double d_max, double v_max,
                        double a_factor, CVector &traj_accel, double &time, double &time_acc, double &time_dec, double &time_flat, nonZeroMode mode) {
+   
     double time_x = 0, time_x_acc = 0, time_x_dec = 0, time_x_flat = 0;
     double time_y = 0, time_y_acc = 0, time_y_dec = 0, time_y_flat = 0;
     double rotangle = 0;
     double traj_accel_x = 0;
     double traj_accel_y = 0;
-    if(v0 * x0 > 0) {           //如果发现正在反方向走，则不再零速到点，防止车冲出去
-//        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(1.0, 0.0), QString("Limit v1").toLatin1());
+    /* 此处是正在反向 让其零速到点 */
+    if(v0 * x0 > 0) {
         v1 = CVector(0.0, 0.0);
     }
+    /*
+    else {
+        cout << v0.x() << ' ' << v0.y() << ' ' << x0.x() << ' ' << x0.y() << ' ' << v0 * x0<<endl;
+        puts("error");
+    }
+    */
+
     if (v1.mod() == 0 || mode == FAST) {
         rotangle = x0.dir();
     }
     else {
         rotangle = v1.dir();
     }
+
     x0 = x0.rotate(-rotangle);
+
     v0 = v0.rotate(-rotangle);
     v1 = v1.rotate(-rotangle); //坐标系转换，转换到末速度方向为x轴的坐标系中
 
     double velFactorX = 1.0, velFactorY = 1.0;
     velFactorX = (fabs(v1.x()) > 1e-8 ? 2.8 : 1.0);
     velFactorY = (fabs(v1.y()) > 1e-8 ? 2.8 : 1.0);
-    if(v1.mod() > 0 && mode == FAST) {
+    if (v1.mod() > 0 && mode == FAST) {
         v1.setVector(copysign(v1.mod(), v1.x()), 0);
-//        v_max = v1.mod();
+        //        v_max = v1.mod();
     }
 
-    timeItor = 0;
     isX = 1;
     compute_motion_1d(x0.x(), v0.x(), v1.x(), a_max, d_max, v_max, a_factor, velFactorX,
                       traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
-    timeItor = 0;
+
     isX = -1;
     compute_motion_1d(x0.y(), v0.y(), v1.y(), a_max, d_max, v_max, a_factor, velFactorY,
                       traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_Y, mode);//两轴同样的最大速度、加速度独立考虑求两轴运动时间
-
-    if(v1.mod() > 1e-8 && mode == ACCURATE) {
-        if (time_x - time_y > FRAME_PERIOD) {
-            compute_motion_1d(x0.y(), v0.y(), 0, a_max, d_max, v_max, a_factor, velFactorX,
-                              traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_X, mode);
-        } else if (time_y - time_x > FRAME_PERIOD) {
-            compute_motion_1d(x0.x(), v0.x(), 0, a_max, d_max, v_max, a_factor, velFactorY,
-                              traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
-        }
-    }
+    //cout << traj_accel_y/60 << ' ' << time_y << ' ' << time_y_acc << ' ' << time_y_dec << ' ' << time_y_flat << endl;
+    // 
+    //if(v1.mod() > 1e-8 && mode == ACCURATE) {
+    //    if (time_x - time_y > FRAME_PERIOD) {
+    //        compute_motion_1d(x0.y(), v0.y(), 0, a_max, d_max, v_max, a_factor, velFactorX,
+    //                          traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_X, mode);
+    //    } else if (time_y - time_x > FRAME_PERIOD) {
+    //        compute_motion_1d(x0.x(), v0.x(), 0, a_max, d_max, v_max, a_factor, velFactorY,
+    //                          traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
+    //    }
+    //}
     if(v1.mod() > 0 && DEBUG_NO_ZERO_VEL) {
         //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 0.0), QString("xVel: %1").arg(v0.x()).toLatin1());
         //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 20.0*10), QString("xVelFinal: %1").arg(v0.x() + traj_accel_x * FRAME_PERIOD).toLatin1());
@@ -438,82 +455,86 @@ void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
                        double a_max, double d_max, double v_max,
                        double a_factor, CVector& traj_accel, double& time, double& time_acc, double& time_dec, double& time_flat, 
                        double a_x, double a_y, nonZeroMode mode) {
-    double time_x = 0, time_x_acc = 0, time_x_dec = 0, time_x_flat = 0;
-    double time_y = 0, time_y_acc = 0, time_y_dec = 0, time_y_flat = 0;
-    double rotangle = 0;
-    double traj_accel_x = 0;
-    double traj_accel_y = 0;
-    if (v0 * x0 > 0) {           //如果发现正在反方向走，则不再零速到点，防止车冲出去
-//        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(1.0, 0.0), QString("Limit v1").toLatin1());
-        v1 = CVector(0.0, 0.0);
-    }
-    if (v1.mod() == 0 || mode == FAST) {
-        rotangle = x0.dir();
-    }
-    else {
-        rotangle = v1.dir();
-    }
-    x0 = x0.rotate(-rotangle);
-    v0 = v0.rotate(-rotangle);
-    v1 = v1.rotate(-rotangle); //坐标系转换，转换到末速度方向为x轴的坐标系中
-
-    double velFactorX = 1.0, velFactorY = 1.0;
-    velFactorX = (fabs(v1.x()) > 1e-8 ? 2.8 : 1.0);
-    velFactorY = (fabs(v1.y()) > 1e-8 ? 2.8 : 1.0);
-    if (v1.mod() > 0 && mode == FAST) {
-        v1.setVector(copysign(v1.mod(), v1.x()), 0);
-        //        v_max = v1.mod();
-    }
-
-    timeItor = 0;
-    isX = 1;
-    compute_motion_1d(x0.x(), v0.x(), v1.x(), a_max, d_max, v_max, a_factor, velFactorX,
-        traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
-
-    timeItor = 0;
-    isX = -1;
-    compute_motion_1d(x0.y(), v0.y(), v1.y(), a_max, d_max, v_max, a_factor, velFactorY,
-        traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_Y, mode);//两轴同样的最大速度、加速度独立考虑求两轴运动时间
-
-    if (v1.mod() > 1e-8 && mode == ACCURATE) {
-        if (time_x - time_y > FRAME_PERIOD) {
-            compute_motion_1d(x0.y(), v0.y(), 0, a_max, d_max, v_max, a_factor, velFactorX,
-                traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_X, mode);
-        }
-        else if (time_y - time_x > FRAME_PERIOD) {
-            compute_motion_1d(x0.x(), v0.x(), 0, a_max, d_max, v_max, a_factor, velFactorY,
-                traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
-        }
-    }
-    if (v1.mod() > 0 && DEBUG_NO_ZERO_VEL) {
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 0.0), QString("xVel: %1").arg(v0.x()).toLatin1());
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 20.0*10), QString("xVelFinal: %1").arg(v0.x() + traj_accel_x * FRAME_PERIOD).toLatin1());
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 40.0*10), QString("targetVel:  %1").arg(v1.mod()).toLatin1());
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 60.0*10), QString("yVel: %1").arg(v0.y()).toLatin1());
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 80.0*10), QString("yVelFinal: %1").arg(v0.y() + traj_accel_y * FRAME_PERIOD).toLatin1());
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 100.0*10), QString("v_max: %1").arg(v_max).toLatin1());
-    }
-
-    if (traj_accel.mod())
-        traj_accel = traj_accel.rotate(rotangle);
-    traj_accel = CVector(a_x, a_y);
-
-    if (time_x < 1e-5 || time_x > 50) time_x = 0;
-    if (time_y < 1e-5 || time_y > 50) time_y = 0;
-    if (time_x < time_y) {
-        //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(320*10 , -270*10), QString("this").toLatin1());
-        time = time_y;
-        time_acc = time_y_acc;
-        time_dec = time_y_dec;
-        time_flat = time_y_flat;
-    }
-    else {
-        //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320*10 , -270*10), QString("this").toLatin1());
-        time = time_x;
-        time_acc = time_x_acc;
-        time_dec = time_x_dec;
-        time_flat = time_x_flat;
-    }
+//
+//    double time_x = 0, time_x_acc = 0, time_x_dec = 0, time_x_flat = 0;
+//    double time_y = 0, time_y_acc = 0, time_y_dec = 0, time_y_flat = 0;
+//    double rotangle = 0;
+//    double traj_accel_x = 0;
+//    double traj_accel_y = 0;
+//    if (v0 * x0 > 0) {           //如果发现正在反方向走，则不再零速到点，防止车冲出去
+////        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(1.0, 0.0), QString("Limit v1").toLatin1());
+//        v1 = CVector(0.0, 0.0);
+//    }
+//    if (v1.mod() == 0 || mode == FAST) {
+//        rotangle = x0.dir();
+//    }
+//    else {
+//        rotangle = v1.dir();
+//    }
+//    x0 = x0.rotate(-rotangle);
+//    v0 = v0.rotate(-rotangle);
+//    v1 = v1.rotate(-rotangle); //坐标系转换，转换到末速度方向为x轴的坐标系中
+//
+//    double velFactorX = 1.0, velFactorY = 1.0;
+//    velFactorX = (fabs(v1.x()) > 1e-8 ? 2.8 : 1.0);
+//    velFactorY = (fabs(v1.y()) > 1e-8 ? 2.8 : 1.0);
+//    if (v1.mod() > 0 && mode == FAST) {
+//        v1.setVector(copysign(v1.mod(), v1.x()), 0);
+//        //        v_max = v1.mod();
+//    }
+//
+//
+//    isX = 1;
+//    compute_motion_1d(x0.x(), v0.x(), v1.x(), a_max, d_max, v_max, a_factor, velFactorX,
+//        traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
+//
+//
+//    isX = -1;
+//    compute_motion_1d(x0.y(), v0.y(), v1.y(), a_max, d_max, v_max, a_factor, velFactorY,
+//        traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_Y, mode);//两轴同样的最大速度、加速度独立考虑求两轴运动时间
+//
+//
+//
+//
+//    if (v1.mod() > 1e-8 && mode == ACCURATE) {
+//        if (time_x - time_y > FRAME_PERIOD) {
+//            compute_motion_1d(x0.y(), v0.y(), 0, a_max, d_max, v_max, a_factor, velFactorX,
+//                traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_X, mode);
+//        }
+//        else if (time_y - time_x > FRAME_PERIOD) {
+//            compute_motion_1d(x0.x(), v0.x(), 0, a_max, d_max, v_max, a_factor, velFactorY,
+//                traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
+//        }
+//    }
+//    if (v1.mod() > 0 && DEBUG_NO_ZERO_VEL) {
+//        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 0.0), QString("xVel: %1").arg(v0.x()).toLatin1());
+//        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 20.0*10), QString("xVelFinal: %1").arg(v0.x() + traj_accel_x * FRAME_PERIOD).toLatin1());
+//        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 40.0*10), QString("targetVel:  %1").arg(v1.mod()).toLatin1());
+//        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 60.0*10), QString("yVel: %1").arg(v0.y()).toLatin1());
+//        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 80.0*10), QString("yVelFinal: %1").arg(v0.y() + traj_accel_y * FRAME_PERIOD).toLatin1());
+//        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 100.0*10), QString("v_max: %1").arg(v_max).toLatin1());
+//    }
+//
+//    if (traj_accel.mod())
+//        traj_accel = traj_accel.rotate(rotangle);
+//    traj_accel = CVector(a_x, a_y);
+//
+//    if (time_x < 1e-5 || time_x > 50) time_x = 0;
+//    if (time_y < 1e-5 || time_y > 50) time_y = 0;
+//    if (time_x < time_y) {
+//        //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(320*10 , -270*10), QString("this").toLatin1());
+//        time = time_y;
+//        time_acc = time_y_acc;
+//        time_dec = time_y_dec;
+//        time_flat = time_y_flat;
+//    }
+//    else {
+//        //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320*10 , -270*10), QString("this").toLatin1());
+//        time = time_x;
+//        time_acc = time_x_acc;
+//        time_dec = time_x_dec;
+//        time_flat = time_x_flat;
+//    }
 }
 
 
@@ -575,24 +596,11 @@ void goto_point_omni( const PlayerVisionT& start,
     double max_angle_accel = capability.maxAngularAccel;
     double max_angle_decel = capability.maxAngularDec;
     CVector a;
-    double ang_a, factor_a;
+    double ang_a;
     double time_a, time_a_acc, time_a_dec, time_a_flat, time;
     double time_acc, time_dec, time_flat;
+    
     compute_motion_2d(x, v, target_vel, max_accel, max_decel, max_speed, accel_factor, a, time, time_acc, time_dec, time_flat, mode);
-    factor_a = 1;
-
-    double rotateFactor;
-    double selfSpeed = start.Vel().mod();
-
-    if(upperBoundSpeedLimitRotate == lowerBoundSpeedLimitRotate)
-        cout << "Oh shit!!! Error speed limit params!!! ---CMmotion.cpp" << endl;
-    else if(selfSpeed < lowerBoundSpeedLimitRotate)
-        rotateFactor = 1.0;
-    else if(selfSpeed < upperBoundSpeedLimitRotate)
-        rotateFactor = 1 - (selfSpeed - lowerBoundSpeedLimitRotate) / (upperBoundSpeedLimitRotate - lowerBoundSpeedLimitRotate);
-    else
-        rotateFactor = 0.0;
-
     compute_motion_1d(ang, ang_v, 0.0, max_angle_accel, max_angle_decel, max_angle_speed, angle_accel_factor, 1.0, ang_a, time_a, time_a_acc, time_a_dec, time_a_flat, ROTATE, mode);
 
     if(DISPLAY_ROTATION_LIMIT){
@@ -605,29 +613,33 @@ void goto_point_omni( const PlayerVisionT& start,
     v = v + a * FRAME_PERIOD;
     ang_v += ang_a * FRAME_PERIOD;
 
-    // if (v.mod() > max_speed) {
-    //     v = v * max_speed / v.mod();
-    // }
-    // if (ang_v > max_angle_speed) {
-    //     ang_v = max_angle_speed;
-    // } else if (ang_v < -max_angle_speed) {
-    //     ang_v = -max_angle_speed;
-    // }
 
-    /* added wheel constraint -> v and ang_v*/
-
-    float WHEEL_CENTER_OFFSET = 0.082f; /* ÂÖ×Ó¾à³µÖÐÐÄ¾àÀë(m) */
-    float D_WHEEL_ANGLE_FRONT = 55; /* Ç°ÂÖÓëÖáÏß½Ç¶È(¶È) Ç°ÂÖÂÖ×ÓÖáÏßÓëÐ¡³µÇ°ºóÖáÏß½Ç¶È*/
-    float D_WHEEL_ANGLE_BACK_2013 = 125; /* ºóÂÖÓëÖáÏß½Ç¶È(¶È) */
-    float vx = v.x() / 100;
-    float vy = v.y()  / 100;    //µ¥Î»[m/s]
-    float vz = ang_v * 0.025f * WHEEL_CENTER_OFFSET; //V=2*pi*r/t = w*r µ¥Î»[m/s]
-    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// @fn void goto_point_omni( const PlayerVisionT& start, const PlayerVisionT& final,
+    ///     const PlayerCapabilityT& capability, const double& accel_factor,
+    ///     const double& angle_accel_factor, PlayerVisionT& nextStep)
+    ///
+    /// @brief  added wheel constraint -> v and ang_v
+    ///
+    /// @author ...
+    /// @date   ...
+    ///
+    /// @Debug Tyh
+    ///     将坐标系转化成小车坐标系
+    ///     2023版小车后轮参数修改
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    float WHEEL_CENTER_OFFSET = 0.082f;
+    float D_WHEEL_ANGLE_FRONT = 55;
+    float D_WHEEL_ANGLE_BACK_2013 = 135;
+    CVector localVel = v.rotate(-start.Dir());
+    float vx = localVel.x() / 100;
+    float vy = localVel.y() / 100;
+    float vz = ang_v * 0.025f * WHEEL_CENTER_OFFSET;
     float wheel_angle[4] = { 
-         D_WHEEL_ANGLE_FRONT,     //×óÇ°ÂÖ
-        -D_WHEEL_ANGLE_FRONT,      //ÓÒÇ°ÂÖ
-        -D_WHEEL_ANGLE_BACK_2013,   //ÓÒºóÂÖ
-         D_WHEEL_ANGLE_BACK_2013     //×óºóÂÖÂÖ
+         D_WHEEL_ANGLE_FRONT,
+        -D_WHEEL_ANGLE_FRONT,
+        -D_WHEEL_ANGLE_BACK_2013,
+         D_WHEEL_ANGLE_BACK_2013
     };
 
     float wheel_speed[4] = {0,0,0,0};
@@ -645,7 +657,6 @@ void goto_point_omni( const PlayerVisionT& start,
     
     if (largest_wheel_speed > paramManager->MAX_WHEEL_SPEED)
     {
-        //std::cout << "warning! wheel spinning too fast: " << largest_wheel_speed << std::endl;
         double slow_ratio = paramManager->MAX_WHEEL_SPEED / largest_wheel_speed;
         v = v * slow_ratio;
         ang_v *= slow_ratio;
@@ -694,90 +705,89 @@ void goto_point_omni_test(const PlayerVisionT& start,
     PlayerVisionT& nextStep,
     double a_x, double a_y, double a_r,
     nonZeroMode mode) {
-    CGeoPoint target_pos = final.Pos();
-    CVector x = start.Pos() - target_pos;
-    CVector v = start.Vel();
-    double ang = Utils::Normalize(start.Dir() - final.Dir());
-    double ang_v = start.RotVel();
-    CVector target_vel = final.Vel();
-    double max_accel = capability.maxAccel;
-    double max_decel = capability.maxDec;
-    double max_speed = capability.maxSpeed;
+    //CGeoPoint target_pos = final.Pos();
+    //CVector x = start.Pos() - target_pos;
+    //CVector v = start.Vel();
+    //double ang = Utils::Normalize(start.Dir() - final.Dir());
+    //double ang_v = start.RotVel();
+    //CVector target_vel = final.Vel();
+    //double max_accel = capability.maxAccel;
+    //double max_decel = capability.maxDec;
+    //double max_speed = capability.maxSpeed;
 
-    double max_angle_speed = capability.maxAngularSpeed;
-    double max_angle_accel = capability.maxAngularAccel;
-    double max_angle_decel = capability.maxAngularDec;
-    CVector a;
-    double ang_a, factor_a;
-    double time_a, time_a_acc, time_a_dec, time_a_flat, time;
-    double time_acc, time_dec, time_flat;
-    compute_motion_2d_test(x, v, target_vel, max_accel, max_decel, max_speed, accel_factor, a, time, time_acc, time_dec, time_flat, a_x, a_y, mode);
-    factor_a = 1;
+    //double max_angle_speed = capability.maxAngularSpeed;
+    //double max_angle_accel = capability.maxAngularAccel;
+    //double max_angle_decel = capability.maxAngularDec;
+    //CVector a;
+    //double ang_a;
+    //double time_a, time_a_acc, time_a_dec, time_a_flat, time;
+    //double time_acc, time_dec, time_flat;
+    //compute_motion_2d_test(x, v, target_vel, max_accel, max_decel, max_speed, accel_factor, a, time, time_acc, time_dec, time_flat, a_x, a_y, mode);
 
-    double rotateFactor;
-    double selfSpeed = start.Vel().mod();
+    //double rotateFactor;
+    //double selfSpeed = start.Vel().mod();
 
-    if (upperBoundSpeedLimitRotate == lowerBoundSpeedLimitRotate)
-        cout << "Oh shit!!! Error speed limit params!!! ---CMmotion.cpp" << endl;
-    else if (selfSpeed < lowerBoundSpeedLimitRotate)
-        rotateFactor = 1.0;
-    else if (selfSpeed < upperBoundSpeedLimitRotate)
-        rotateFactor = 1 - (selfSpeed - lowerBoundSpeedLimitRotate) / (upperBoundSpeedLimitRotate - lowerBoundSpeedLimitRotate);
-    else
-        rotateFactor = 0.0;
+    //if (upperBoundSpeedLimitRotate == lowerBoundSpeedLimitRotate)
+    //    cout << "Oh shit!!! Error speed limit params!!! ---CMmotion.cpp" << endl;
+    //else if (selfSpeed < lowerBoundSpeedLimitRotate)
+    //    rotateFactor = 1.0;
+    //else if (selfSpeed < upperBoundSpeedLimitRotate)
+    //    rotateFactor = 1 - (selfSpeed - lowerBoundSpeedLimitRotate) / (upperBoundSpeedLimitRotate - lowerBoundSpeedLimitRotate);
+    //else
+    //    rotateFactor = 0.0;
 
-    compute_motion_1d(ang, ang_v, 0.0, max_angle_accel, max_angle_decel, max_angle_speed, angle_accel_factor, 1.0, ang_a, time_a, time_a_acc, time_a_dec, time_a_flat, ROTATE, mode);
+    //compute_motion_1d(ang, ang_v, 0.0, max_angle_accel, max_angle_decel, max_angle_speed, angle_accel_factor, 1.0, ang_a, time_a, time_a_acc, time_a_dec, time_a_flat, ROTATE, mode);
 
-    if (DISPLAY_ROTATION_LIMIT) {
-        //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-40*10), QString("maxRotateAcc:   %1").arg(max_angle_accel).toLatin1());
-        //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-20*10), QString("maxRotateSpeed: %1").arg(max_angle_speed).toLatin1());
-        //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-60*10), QString("rotateVel:      %1").arg(ang_v).toLatin1());
-        //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-80*10), QString("nextRotateVel:  %1").arg(ang_v + ang_a * FRAME_PERIOD).toLatin1());
-    }
+    //if (DISPLAY_ROTATION_LIMIT) {
+    //    //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-40*10), QString("maxRotateAcc:   %1").arg(max_angle_accel).toLatin1());
+    //    //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-20*10), QString("maxRotateSpeed: %1").arg(max_angle_speed).toLatin1());
+    //    //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-60*10), QString("rotateVel:      %1").arg(ang_v).toLatin1());
+    //    //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-80*10), QString("nextRotateVel:  %1").arg(ang_v + ang_a * FRAME_PERIOD).toLatin1());
+    //}
 
-    v = v + a * FRAME_PERIOD;
-    ang_a = a_r;
-    ang_v += ang_a * FRAME_PERIOD;
+    //v = v + a * FRAME_PERIOD;
+    //ang_a = a_r;
+    //ang_v += ang_a * FRAME_PERIOD;
 
-    if (v.mod() > max_speed) {
-        v = v * max_speed / v.mod();
-    }
-    if (ang_v > max_angle_speed) {
-        ang_v = max_angle_speed;
-    }
-    else if (ang_v < -max_angle_speed) {
-        ang_v = -max_angle_speed;
-    }
-    CGeoPoint next_pos = start.Pos() + Utils::Polar2Vector(v.mod() * FRAME_PERIOD, v.dir());
-    double next_angle = start.Dir() + ang_v * FRAME_PERIOD;
+    //if (v.mod() > max_speed) {
+    //    v = v * max_speed / v.mod();
+    //}
+    //if (ang_v > max_angle_speed) {
+    //    ang_v = max_angle_speed;
+    //}
+    //else if (ang_v < -max_angle_speed) {
+    //    ang_v = -max_angle_speed;
+    //}
+    //CGeoPoint next_pos = start.Pos() + Utils::Polar2Vector(v.mod() * FRAME_PERIOD, v.dir());
+    //double next_angle = start.Dir() + ang_v * FRAME_PERIOD;
 
-    nextStep.SetValid(true);
-    nextStep.SetPos(next_pos);
-    nextStep.SetDir(next_angle);
-    nextStep.SetVel(v);
+    //nextStep.SetValid(true);
+    //nextStep.SetPos(next_pos);
+    //nextStep.SetDir(next_angle);
+    //nextStep.SetVel(v);
 
-    nextStep.SetRotVel(ang_v);
+    //nextStep.SetRotVel(ang_v);
 
-    if (DEBUG_TIME) {
-        CVector acc;
-        compute_motion_2d(x, v, target_vel, OUR_MAX_ACC, OUR_MAX_DEC, OUR_MAX_SPEED, accel_factor, acc, time, time_acc, time_dec, time_flat);
+    //if (DEBUG_TIME) {
+    //    CVector acc;
+    //    compute_motion_2d(x, v, target_vel, OUR_MAX_ACC, OUR_MAX_DEC, OUR_MAX_SPEED, accel_factor, acc, time, time_acc, time_dec, time_flat);
 
-        static double lastTime = time;
-        static double lastTimeAcc = time_acc;
-        static double lastTimeDec = time_dec;
-        static double lastTimeFlat = time_flat;
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-100*10, -400*10), QString("initialVel: %1").arg(start.Vel().mod()).toLatin1(), timeDebugColor);
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100*10, -400*10), QString("finalVel: %1").arg((start.Vel() + a / Param::Vision::FRAME_RATE).mod()).toLatin1(), timeDebugColor);
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 0.0), QString("time: %1").arg((lastTime - time) * 1000.0).toLatin1(), timeDebugColor);
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 20*10), QString("timeAcc: %1").arg(time_acc * 1000.0).toLatin1(), timeDebugColor);
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 40*10), QString("timeDec: %1").arg(time_dec * 1000.0).toLatin1(), timeDebugColor);
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 60*10), QString("timeFlat: %1").arg((lastTimeFlat - time_flat) * 1000.0).toLatin1(), timeDebugColor);
+    //    static double lastTime = time;
+    //    static double lastTimeAcc = time_acc;
+    //    static double lastTimeDec = time_dec;
+    //    static double lastTimeFlat = time_flat;
+    //    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-100*10, -400*10), QString("initialVel: %1").arg(start.Vel().mod()).toLatin1(), timeDebugColor);
+    //    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100*10, -400*10), QString("finalVel: %1").arg((start.Vel() + a / Param::Vision::FRAME_RATE).mod()).toLatin1(), timeDebugColor);
+    //    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 0.0), QString("time: %1").arg((lastTime - time) * 1000.0).toLatin1(), timeDebugColor);
+    //    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 20*10), QString("timeAcc: %1").arg(time_acc * 1000.0).toLatin1(), timeDebugColor);
+    //    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 40*10), QString("timeDec: %1").arg(time_dec * 1000.0).toLatin1(), timeDebugColor);
+    //    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 60*10), QString("timeFlat: %1").arg((lastTimeFlat - time_flat) * 1000.0).toLatin1(), timeDebugColor);
 
-        lastTime = time;
-        lastTimeAcc = time_acc;
-        lastTimeDec = time_dec;
-        lastTimeFlat = time_flat;
-    }
+    //    lastTime = time;
+    //    lastTimeAcc = time_acc;
+    //    lastTimeDec = time_dec;
+    //    lastTimeFlat = time_flat;
+    //}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

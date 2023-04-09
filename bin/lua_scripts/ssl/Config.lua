@@ -9,9 +9,9 @@ gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
 		--return "Test_Circle"
-		return "Test_NormalAttack"
+		return "Test_Run"
 	else
-		return "Test_NormalAttack"
+		return "Test_Run"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
