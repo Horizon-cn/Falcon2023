@@ -36,8 +36,9 @@ DEFINE_ATTRIBUTE(ACanBeLeader);//用于计算定位球时两车开球的真leader
 DEFINE_ATTRIBUTE(ADist2TheirGoal);//return double 到对方球门中心点的距离
 DEFINE_ATTRIBUTE(ADist2OurGoal);//return double 到我方球门中心点的距离
 DEFINE_ATTRIBUTE(ADist2Ball);	//return double	 到球的距离
+DEFINE_ATTRIBUTE(ADist2BallNormalized); //return double 归一化（同一帧所有车最大值为1）的到球的距离
+DEFINE_ATTRIBUTE(ADist2BallProjModified); //return double 归一化（超过80均为1，最小为0.125）的到球速线投影的距离，再根据球速档位修正系数
 DEFINE_ATTRIBUTE(AValid);//return 1 or 0 对方是否存在
-DEFINE_ATTRIBUTE(ABestPlayer);//return 1 or 0 是否是对方BestPlayer
 DEFINE_ATTRIBUTE(AShootRange);//return double 射门角度
 DEFINE_ATTRIBUTE(AShootRangeWithoutMarker);//return double 将我方Marker排除在外时的射门角度
 DEFINE_ATTRIBUTE(AFillingInDist);//return double 补防距离
