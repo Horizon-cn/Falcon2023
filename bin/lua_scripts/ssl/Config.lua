@@ -10,7 +10,7 @@ gTestPlay = function ()
 	if not IS_YELLOW then
 		return "Test_Advance" --"Test_Run"
 	else
-		return "Test_BezierRun" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
