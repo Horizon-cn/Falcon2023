@@ -246,7 +246,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     CGeoPoint middlePoint = finalTargetPos;
 
     // 到达中间点的判据，让整条路径更加连贯
-    double arrivedDist = self.Vel().mod() * 0.7  + 30;
+    double arrivedDist = self.Vel().mod() * 0.2  + 10;
 
     //cout << arrivedDist << ' ' << (lastPoint[vecNumber] - self.Pos()).mod() << endl;
     // 第一种情况：可以直接到目标点
@@ -287,7 +287,8 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
 
     newTask.player.pos = middlePoint;
-    //GDebugEngine::Instance()->gui_debug_x(middlePoint);
+    GDebugEngine::Instance()->gui_debug_x(middlePoint, 1);
+    GDebugEngine::Instance()->gui_debug_x(finalTargetPos, 2);
     // 零速到达中间点，非零速只有在可以直接到时才执行
     //if (middlePoint.dist(task().player.pos) > 1e-8) newTask.player.vel = CVector(0.0, 0.0);
 

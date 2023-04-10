@@ -13,7 +13,7 @@ firstState = "getball",
 		switch = function ()
 			if bufcnt(player.toTargetDist("Receiver")<40 and
 				player.toTargetDist("Goalie")<10, 3, 180) then
-				return "chippass"
+				return "getball"
 			end
 		end,
 		Receiver = task.getBall(),

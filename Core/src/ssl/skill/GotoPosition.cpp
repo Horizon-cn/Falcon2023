@@ -176,8 +176,11 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	nonZeroMode mode = FAST;
 
 	// 进行轨迹生成并记录理想执行时间
-	control.makeCmTrajectory(self, final, capability, mode);					// CMU 非零速到点
+	//control.makeCmTrajectory(self, final, capability, mode);					// CMU 非零速到点
+	static int idx = 0;
 
+	//control.makeCmTrajectoryTest(self, final, capability, mode);
+	control.makeCmTrajectory(self, final, capability, mode);
 	float usedtime = target.dist(self.Pos()) / capability.maxSpeed / 1.414;		// 单位：秒
 	const double time_factor = 1.5;
 	usedtime = expectedCMPathTime(self, final.Pos(), capability.maxAccel, capability.maxSpeed, time_factor);
