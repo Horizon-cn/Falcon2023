@@ -24,6 +24,9 @@ private:
     int fraredOff;
     CGeoPoint dribblePoint;
     CGeoPoint move_point;
+    static int index;
+    static CGeoPoint point[5];
+    bool isSetPoint(const CVisionModule* pVision, const CGeoPoint* point, const CGeoPoint& target);
 
     //help track robot trace
     CGeoPoint lastFrameposition;
