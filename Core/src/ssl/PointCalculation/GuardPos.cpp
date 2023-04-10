@@ -38,41 +38,60 @@ CGuardPos::CGuardPos()
     dangerDist = ParamManager::Instance()->dangerDist;
 }
 
-void CGuardPos::generatePos(int guardNum)
-{
-    // ????????????
-    guardNum = std::min(Param::Field::MAX_PLAYER, std::max(1, guardNum));
+CGeoLineRectangleIntersection CGuardPos::intersecMiddle(int enemyNum) {
     const BallVisionT& Ball = vision->Ball();
-    // ????????
-    int bestenemy = BestPlayer::Instance()->getTheirBestPlayer();
-    CGeoPoint defendTarget = Ball.Valid() ? Ball.Pos() : vision->TheirPlayer(bestenemy).Pos();
+    CGeoPoint defendTarget = Ball.Valid() ? Ball.Pos() : vision->TheirPlayer(enemyNum).Pos();
     if ((defendTarget - GOAL_MIDDLE).dir() > (RIGHTBACK_CRITICAL_POINT - GOAL_MIDDLE).dir()) // ???Target????????????/??????????縺????????????
         defendTarget = RIGHTBACK_CRITICAL_POINT;
     else if ((defendTarget - GOAL_MIDDLE).dir() < (LEFTBACK_CRITICAL_POINT - GOAL_MIDDLE).dir())
         defendTarget = LEFTBACK_CRITICAL_POINT;
     GDebugEngine::Instance()->gui_debug_msg(defendTarget, "target", COLOR_CYAN);
-
     CGeoLine targetToMiddle(defendTarget, GOAL_MIDDLE); // ???????????????
     CGeoLine targetToLeft(defendTarget, GOAL_LEFT);
     CGeoLine targetToRight(defendTarget, GOAL_RIGHT);
-    CGeoLine EnemyDir(defendTarget, vision->TheirPlayer(bestenemy).Dir());
-    double diffAngle = vision->TheirPlayer(bestenemy).Dir() - (GOAL_MIDDLE - defendTarget).dir();
+    CGeoLine EnemyDir(defendTarget, vision->TheirPlayer(enemyNum).Dir());
+    double diffAngle = vision->TheirPlayer(enemyNum).Dir() - (GOAL_MIDDLE - defendTarget).dir();
     // ??????????????????????????????????????????????竹
-    CGeoLineRectangleIntersection intersecMiddle(targetToMiddle, guardMoveRec);
-    if (vision->TheirPlayer(bestenemy).Pos().dist(defendTarget) < 20 && defendTarget.x() < -250 && fabs(diffAngle) < atan(0.5))
-        intersecMiddle = CGeoLineRectangleIntersection(EnemyDir, guardMoveRec);
-    if (intersecMiddle.intersectant()) {
-        // ?抗???
+    CGeoLineRectangleIntersection _intersecMiddle(targetToMiddle, guardMoveRec);
+    if (vision->TheirPlayer(enemyNum).Pos().dist(defendTarget) < 20 && defendTarget.x() < -250 && fabs(diffAngle) < atan(0.5))
+        _intersecMiddle = CGeoLineRectangleIntersection(EnemyDir, guardMoveRec);
+    return _intersecMiddle;
+}
+
+bool defend_break_or_not() {
+    return true;
+}
+
+
+void CGuardPos::generatePos(int guardNum)
+{
+    guardNum = std::min(Param::Field::MAX_PLAYER, std::max(1, guardNum));
+    const BallVisionT& Ball = vision->Ball();
+    int bestenemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
+    int potentialenemy = DefenceInfo::Instance()->getAttackOppNumByPri(1);
+    bool flag_defend_break = defend_break_or_not();
+    if (flag_defend_break) {
+        _intersecMiddle = intersecMiddle(potentialenemy);
+        if (_intersecMiddle.intersectant()) {
+            _backPos[guardNum] = _intersecMiddle.point2().dist(GOAL_MIDDLE) < 1e-8 ? _intersecMiddle.point1() : _intersecMiddle.point2();
+            guardNum = guardNum - 1;
+        }
+        else {
+            std::cout << "GUARDPOS: NO INTERSECTION!!!\n";
+        }
+    }
+    _intersecMiddle = intersecMiddle(bestenemy);
+    if (_intersecMiddle.intersectant()) {
         bool leftValid = true, rightValid = true;
         if (guardNum % 2 == 1) { // ?????????????技?????抗???
-            _backPos[guardNum / 2] = intersecMiddle.point2().dist(GOAL_MIDDLE) < 1e-8 ? intersecMiddle.point1() : intersecMiddle.point2(); // ????我????????????快?????????
+            _backPos[guardNum / 2] = _intersecMiddle.point2().dist(GOAL_MIDDLE) < 1e-8 ? _intersecMiddle.point1() : _intersecMiddle.point2(); // ????我????????????快?????????
             for (int i = 0; i < guardNum / 2; i++) { // ???抗????????????????????????????????
                 leftValid = leftNextPos(_backPos[guardNum / 2 - i], _backPos[guardNum / 2 - i - 1]);
                 rightValid = rightNextPos(_backPos[guardNum / 2 + i], _backPos[guardNum / 2 + i + 1]);
             }
         }
         else { // ???????????????抗???
-            CGeoPoint intersecPos = intersecMiddle.point2().dist(GOAL_MIDDLE) < 1e-8 ? intersecMiddle.point1() : intersecMiddle.point2();
+            CGeoPoint intersecPos = _intersecMiddle.point2().dist(GOAL_MIDDLE) < 1e-8 ? _intersecMiddle.point1() : _intersecMiddle.point2();
             leftValid = leftNextPos(intersecPos, _backPos[guardNum / 2 - 1], MIN_DIST_TO_TEAMMATE / 2);
             rightValid = rightNextPos(intersecPos, _backPos[guardNum / 2], MIN_DIST_TO_TEAMMATE / 2);
             for (int i = 0; i < (guardNum - 2) / 2; i++) {
