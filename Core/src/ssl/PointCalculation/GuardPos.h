@@ -16,9 +16,9 @@ public:
 private:
     void generatePos(int guardNum);
     CGeoLineRectangleIntersection intersecMiddle(int enemyNum);
+    CGeoLineRectangleIntersection intersecMiddleNoBall(int enemyNum);
     bool leftNextPos(CGeoPoint basePos, CGeoPoint& nextPos, double dist=-9999);
     bool rightNextPos(CGeoPoint basePos, CGeoPoint& nextPos, double dist=-9999);
-    bool defend_break_or_not();
     void checkBackPos(int guardNum);
     void adjustBackPos(int guardNum);
     int ready_cnt;

@@ -192,6 +192,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(CheckBackPos, "MultiBack/CheckBackPos", true);
             loadParam(dangerVel, "MultiBack/dangerVel", 15);
             loadParam(dangerDist, "MultiBack/dangerDist", 50);
+            loadParam(defendBreak, "MultiBack/defendBreak", true);
 
             loadParam(BAYESLIST, "CMatchState/BAYESLIST", "BayesParams1");
             loadParam(BAYESPARAM, "CMatchState/BAYESPARAM", "Skuba_Attack");
@@ -340,6 +341,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
         bool CheckBackPos;
         int dangerVel;
         int dangerDist;
+        bool defendBreak;
         // MatchState
         QString BAYESLIST;
         QString BAYESPARAM;
