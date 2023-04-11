@@ -32,7 +32,7 @@ public:
 	void makeCmTrajectory(const PlayerVisionT& start, const PlayerVisionT& final, const PlayerCapabilityT& capability, nonZeroMode mode = FAST);
 
 	/// Test NewMotion From TYH. Date:20230409
-	void makeCmTrajectoryTest(const PlayerVisionT& start, const PlayerVisionT & final, const PlayerCapabilityT& capability, nonZeroMode mode);
+	void makeCmTrajectoryTest(const PlayerVisionT& start, const PlayerVisionT & final, const PlayerCapabilityT& capability, nonZeroMode mode, bool IsGoMiddle);
 
 	/// Get the real-time next step
 	const PlayerVisionT& getNextStep() const { return _nextStep; }

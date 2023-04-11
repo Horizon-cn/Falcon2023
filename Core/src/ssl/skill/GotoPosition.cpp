@@ -128,6 +128,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	const double dist = player2target.mod();
 
 	playerFlag = task().player.flag;
+	const bool IsGoMiddle = task().player.IsGoMiddle; // 现在是否走在中间点
 	const bool isDribble = playerFlag & PlayerStatus::DRIBBLING;
 
 	const bool isBack = (vecNumber == TaskMediator::Instance()->leftBack()) ||
@@ -179,8 +180,8 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	//control.makeCmTrajectory(self, final, capability, mode);					// CMU 非零速到点
 	static int idx = 0;
 
-	//control.makeCmTrajectoryTest(self, final, capability, mode);
-	control.makeCmTrajectory(self, final, capability, mode);
+	control.makeCmTrajectoryTest(self, final, capability, mode, IsGoMiddle);
+	//control.makeCmTrajectory(self, final, capability, mode);
 	float usedtime = target.dist(self.Pos()) / capability.maxSpeed / 1.414;		// 单位：秒
 	const double time_factor = 1.5;
 	usedtime = expectedCMPathTime(self, final.Pos(), capability.maxAccel, capability.maxSpeed, time_factor);

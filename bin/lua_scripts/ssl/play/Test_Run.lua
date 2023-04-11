@@ -12,7 +12,7 @@ local DIR2  = 1.57
 local DIR3  = 1.57
 local DIR4  = 1.57
 
-local distThreshold = 50
+local distThreshold = 10
 local ACC = nil
 
 gPlayTable.CreatePlay{
@@ -20,11 +20,11 @@ gPlayTable.CreatePlay{
 firstState = "run1",
 ["run1"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 150) then
+		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 150, 1000) then
 			return "run2";
 		end
 	end,
-	Goalie = task.goCmuRush(TargetPos2),
+	Goalie = task.goCmuRush(TargetPos2, 1.57),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
@@ -32,11 +32,11 @@ firstState = "run1",
 
 ["run2"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 150) then
+		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 150, 1000) then
 			return "run1";
 		end
 	end,
-	Goalie = task.goCmuRush(TargetPos3),
+	Goalie = task.goCmuRush(TargetPos3, 1.57),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
@@ -44,7 +44,7 @@ firstState = "run1",
 
 ["run3"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 150) then
+		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 150, 180) then
 			return "run1";
 		end
 	end,

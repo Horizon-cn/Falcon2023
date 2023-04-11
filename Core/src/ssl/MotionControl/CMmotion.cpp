@@ -606,7 +606,7 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
 
 void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
     double a_max, double d_max, double v_max,
-    double a_factor, CVector& traj_accel, double& time, double& time_acc, double& time_dec, double& time_flat, nonZeroMode mode) {
+    double a_factor, CVector& traj_accel, double& time, double& time_acc, double& time_dec, double& time_flat, nonZeroMode mode, bool IsGoMiddle) {
 
     double time_x = 0, time_x_acc = 0, time_x_dec = 0, time_x_flat = 0;
     double time_y = 0, time_y_acc = 0, time_y_dec = 0, time_y_flat = 0;
@@ -635,6 +635,14 @@ void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
     }
 
     isX = 1;
+
+    /* Test Function */
+    /*
+    if (IsGoMiddle == 1) {
+        v1.setVector(-copysign(100.0, x0.x()) , 0);
+//        cout << x0.x() << ' ' << v0.x()<<' '<<v1.x() << endl;
+    }
+    */
     compute_motion_1d_test(x0.x(), v0.x(), v1.x(), a_max, d_max, v_max, a_factor, velFactorX,
         traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
 
@@ -826,7 +834,7 @@ void goto_point_omni_test(const PlayerVisionT& start,
     const double& accel_factor,
     const double& angle_accel_factor,
     PlayerVisionT& nextStep,
-    nonZeroMode mode) {
+    nonZeroMode mode, bool IsGoMiddle) {
     CGeoPoint target_pos = final.Pos();
     CVector x = start.Pos() - target_pos;
     CVector v = start.Vel();
@@ -845,7 +853,7 @@ void goto_point_omni_test(const PlayerVisionT& start,
     double time_a, time_a_acc, time_a_dec, time_a_flat, time;
     double time_acc, time_dec, time_flat;
     
-    compute_motion_2d_test(x, v, target_vel, max_accel, max_decel, max_speed, accel_factor, a, time, time_acc, time_dec, time_flat, mode);
+    compute_motion_2d_test(x, v, target_vel, max_accel, max_decel, max_speed, accel_factor, a, time, time_acc, time_dec, time_flat, mode, IsGoMiddle);
     compute_motion_1d_test(ang, ang_v, 0.0, max_angle_accel, max_angle_decel, max_angle_speed, angle_accel_factor, 1.0, ang_a, time_a, time_a_acc, time_a_dec, time_a_flat, ROTATE, mode);
 
     v = v + a * FRAME_PERIOD;

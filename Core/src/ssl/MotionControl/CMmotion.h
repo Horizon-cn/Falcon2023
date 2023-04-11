@@ -30,7 +30,7 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
                        CVector &traj_accel, double &time, double &time_acc, double &time_dec, double &time_flat, nonZeroMode mode = FAST);
 void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
 					   double a_max, double d_max, double v_max, double a_factor,
-					   CVector& traj_accel, double& time, double& time_acc, double& time_dec, double& time_flat, nonZeroMode mode = FAST);
+					   CVector& traj_accel, double& time, double& time_acc, double& time_dec, double& time_flat, nonZeroMode mode = FAST, bool IsGoMiddle = false);
 
 double compute_stop(double v, double max_a);
 void goto_point_omni( const PlayerVisionT& start,
@@ -47,7 +47,7 @@ void goto_point_omni_test(const PlayerVisionT& start,
 	const double& accel_factor,
 	const double& angle_accel_factor,
 	PlayerVisionT& nextStep,
-	nonZeroMode mode = FAST);
+	nonZeroMode mode = FAST, bool IsGoMiddle = false);
 
 double expectedCMPathTime(const PlayerVisionT& start, const CGeoPoint& final, double maxAccel, double maxVelocity, double accel_factor);
 double predictedTime(const PlayerVisionT& start, const CGeoPoint& Target, const CVector& targetVel = CVector(0, 0));

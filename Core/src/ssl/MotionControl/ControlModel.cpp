@@ -41,11 +41,11 @@ void CControlModel::makeCmTrajectory(const PlayerVisionT& start, const PlayerVis
 }
 
 /// Test NewMotion From TYH. Date:20230409
-void CControlModel::makeCmTrajectoryTest(const PlayerVisionT& start, const PlayerVisionT & final, const PlayerCapabilityT& capability, nonZeroMode mode)
+void CControlModel::makeCmTrajectoryTest(const PlayerVisionT& start, const PlayerVisionT & final, const PlayerCapabilityT& capability, nonZeroMode mode, bool IsGoMiddle)
 {
 	_pathList.clear();
 	double accel_factor = 1.5;
 	double angle_accel_factor = 6.5;
 
-	goto_point_omni_test(start, final, capability, accel_factor, angle_accel_factor, _nextStep, mode);
+	goto_point_omni_test(start, final, capability, accel_factor, angle_accel_factor, _nextStep, mode, IsGoMiddle);
 }

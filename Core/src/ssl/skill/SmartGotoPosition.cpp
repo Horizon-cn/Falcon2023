@@ -289,9 +289,10 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     newTask.player.pos = middlePoint;
     GDebugEngine::Instance()->gui_debug_x(middlePoint, 1);
     GDebugEngine::Instance()->gui_debug_x(finalTargetPos, 2);
-    // 零速到达中间点，非零速只有在可以直接到时才执行
-    //if (middlePoint.dist(task().player.pos) > 1e-8) newTask.player.vel = CVector(0.0, 0.0);
-
+    
+    // 非零速到达中间点，零速只有在可以直接到时才执行
+    if (middlePoint.dist(task().player.pos) > 50) newTask.player.IsGoMiddle = true;
+    else newTask.player.IsGoMiddle = false;
 
     // 控制吸球力度
     if (isDribble || (playerFlag & PlayerStatus::DRIBBLING)) DribbleStatus::Instance()->setDribbleCommand(vecNumber, 2);
