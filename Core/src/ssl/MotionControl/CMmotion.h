@@ -29,7 +29,7 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
 					   double a_max, double d_max, double v_max, double a_factor,
                        CVector &traj_accel, double &time, double &time_acc, double &time_dec, double &time_flat, nonZeroMode mode = FAST);
 void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
-					   double a_max, double d_max, double v_max, double a_factor,
+					   double a_max, double d_max, double v_max, double selfDir, double vx_max, double vy_max, double a_factor,
 					   CVector& traj_accel, double& time, double& time_acc, double& time_dec, double& time_flat, nonZeroMode mode = FAST, bool IsGoMiddle = false);
 
 double compute_stop(double v, double max_a);

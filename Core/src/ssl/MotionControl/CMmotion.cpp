@@ -380,7 +380,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     // 这个时间很关键，设得较大则定位精度将大大降低 by qxz
     double period = 1 / 60.0; // 一段很小的时间，处理运动到目标点附近时加速度，稳定到点，防止超调
     if (pT == MOVE_Y) {
-        traj_accel = -copysign(d_max, v0);
+        traj_accel = -copysign(min(d_max, v0/ period), v0);
         return;
     }
     if ((x0 == 0. && v0 == v1) || (!finite(x0) || !finite(v0) || !finite(v1))) {
@@ -605,7 +605,7 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
-    double a_max, double d_max, double v_max,
+    double a_max, double d_max, double v_max, double selfDir, double vx_max, double vy_max,
     double a_factor, CVector& traj_accel, double& time, double& time_acc, double& time_dec, double& time_flat, nonZeroMode mode, bool IsGoMiddle) {
 
     double time_x = 0, time_x_acc = 0, time_x_dec = 0, time_x_flat = 0;
@@ -622,10 +622,13 @@ void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
     else {
         rotangle = v1.dir();
     }
-
+    //CVector vxyLimit = CVector(vx_max, vy_max);
+    //cout << x0.x() << ' ' << x0.y() << ' ' << vx_max << ' ' << vy_max << ' ' << rotangle << endl;;
     x0 = x0.rotate(-rotangle);
     v0 = v0.rotate(-rotangle);
     v1 = v1.rotate(-rotangle); //坐标系转换，转换到末速度方向为x轴的坐标系中
+    //vxyLimit = vxyLimit.rotate(-rotangle);
+    //cout << x0.x() << ' ' << x0.y() << ' ' << vx_max << ' ' << vy_max << ' ' << rotangle << endl;;
 
     double velFactorX = 1.0, velFactorY = 1.0;
     velFactorX = (fabs(v1.x()) > 1e-8 ? 2.8 : 1.0);
@@ -643,9 +646,14 @@ void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
 //        cout << x0.x() << ' ' << v0.x()<<' '<<v1.x() << endl;
     }
     */
-    compute_motion_1d_test(x0.x(), v0.x(), v1.x(), a_max, d_max, v_max, a_factor, velFactorX,
+    
+    double vX_max = min(fabs(vx_max / cos(rotangle - selfDir)), fabs(vy_max / sin(rotangle - selfDir)));
+    //cout << rotangle - selfDir << ' '<< fabs(vx_max / cos(rotangle - selfDir))<<' '<< fabs(vy_max / sin(rotangle - selfDir)) <<' '<<vX_max << endl;
+    //cout << min(v_max, vX_max) << endl;
+    //compute_motion_1d_test(x0.x(), v0.x(), v1.x(), a_max, d_max, min(v_max, vX_max), a_factor, velFactorX,
+    //  traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
+    compute_motion_1d_test(x0.x(), v0.x(), v1.x(), a_max, d_max, min(v_max, vX_max), a_factor, velFactorX,
         traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
-
     isX = -1;
     compute_motion_1d_test(x0.y(), v0.y(), v1.y(), a_max, d_max, v_max, a_factor, velFactorY,
         traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_Y, mode);//两轴同样的最大速度、加速度独立考虑求两轴运动时间
@@ -848,16 +856,21 @@ void goto_point_omni_test(const PlayerVisionT& start,
     double max_angle_speed = capability.maxAngularSpeed;
     double max_angle_accel = capability.maxAngularAccel;
     double max_angle_decel = capability.maxAngularDec;
+
+    double max_speed_X = capability.maxSpeedX;
+    double max_speed_Y = capability.maxSpeedY;
+
     CVector a;
     double ang_a;
     double time_a, time_a_acc, time_a_dec, time_a_flat, time;
     double time_acc, time_dec, time_flat;
     
-    compute_motion_2d_test(x, v, target_vel, max_accel, max_decel, max_speed, accel_factor, a, time, time_acc, time_dec, time_flat, mode, IsGoMiddle);
+    compute_motion_2d_test(x, v, target_vel, max_accel, max_decel, max_speed, start.Dir(), max_speed_X, max_speed_Y, accel_factor, a, time, time_acc, time_dec, time_flat, mode, IsGoMiddle);
     compute_motion_1d_test(ang, ang_v, 0.0, max_angle_accel, max_angle_decel, max_angle_speed, angle_accel_factor, 1.0, ang_a, time_a, time_a_acc, time_a_dec, time_a_flat, ROTATE, mode);
 
     v = v + a * FRAME_PERIOD;
     ang_v += ang_a * FRAME_PERIOD;
+    
     float WHEEL_CENTER_OFFSET = 0.082f;
     float D_WHEEL_ANGLE_FRONT = 55;
     float D_WHEEL_ANGLE_BACK_2013 = 135;
