@@ -89,8 +89,7 @@ namespace {
 
 }
 
-int CBreak::index;
-CGeoPoint CBreak::point[5];
+
 
 CBreak::CBreak() {
 
@@ -112,6 +111,9 @@ CBreak::CBreak() {
     MAX_ROT_SPEED = 2000;
   
     lastFrameposition = CGeoPoint(-9999, -9999);
+    
+    running_index = 0;
+
 
 }
 
@@ -122,6 +124,7 @@ void CBreak::plan(const CVisionModule* pVision) {
         move_point = CGeoPoint(-9999 * 10, -9999 * 10);
         dribblePoint = pVision->OurPlayer(task().executor).Pos();
         isDribble = false;
+        running_index = 0;
 
     }
     string time1 = stamp();
@@ -175,7 +178,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     bool shootGoal = Utils::InTheirPenaltyArea(passTarget, 0);
 
     double power = shootGoal ? 10000 : passpower;
-
+    
     //以下是运行逻辑
 
     bool frared = (RobotSensor::Instance()->IsInfraredOn(vecNumber));// || isVisionHasBall(pVision, task().executor);
@@ -207,16 +210,16 @@ void CBreak::plan(const CVisionModule* pVision) {
         calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     }*/
     CGeoPoint target = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
-    if (isSetPoint(pVision, point, target)) {
+    if (isSetPoint(pVision, point, me.Pos())) {
         move_point = target;
     }
     else if (pVision->Cycle() % 60 == 0) {
         move_point = target;
     }
     
-    index += 1;
-    index %= 5;
-    point[index]= target;
+    running_index += 1;
+    running_index %= 20;
+    point[running_index]= me.Pos();
     for (int i = 0; i < 5; i++) {
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-400, -400+20*i), ("point[" + to_string(i) + "] (" + to_string(point[i].x()) + "," + to_string(point[i].y()) + ")").c_str(), COLOR_YELLOW);
     }
@@ -250,7 +253,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
 
     setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(grabTask));
-
+    cout << "test git";
 
     if (DEBUG) {
         GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000 * 10, finalDir), COLOR_RED);
@@ -495,15 +498,17 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
 
 }
+
 bool CBreak::isSetPoint(const CVisionModule* pVision, const CGeoPoint* point, const CGeoPoint& target) {
     int i = 0;
     double x = 0, y = 0;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < 20; i++) {
         x += point[i].x();
         y += point[i].y();
     }
-    x /= 5.0; y /= 5.0;
-    if (sqrt(pow(x - target.x(), 2) + pow(y - target.y(), 2)) > 5)
+    x /= 20.0; y /= 20.0;
+
+    if (sqrt(pow(x - target.x(), 2) + pow(y - target.y(), 2)) > 10)
         return true;
     else
         return false;
