@@ -118,7 +118,7 @@ void CAdvance::plan(const CVisionModule* pVision)
     /*??痦??*/
 
 	CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
-
+	ShootPoint= GenerateBreakShootPoint(pVision, _executor);
 	for(int i=0;i<9;++i)
 		SupportPoint[i] = GPUBestAlgThread::Instance()->getBestPointFromArea(i);/* Gpu算点 */
 //	NormalPlayUtils::generatePassPoint(ball.Pos(), SupportPoint[0], SupportPoint[1], SupportPoint[2], SupportPoint[3]);
@@ -394,7 +394,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case BREAKSHOOT:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKSHOOT", COLOR_YELLOW);
         KickStatus::Instance()->setBothKick(_executor, 0, 0);
-		ShootPoint = GenerateBreakShootPoint(pVision, _executor);
+		ShootPoint = (pVision->Cycle() % 60 == 0)? GenerateBreakShootPoint(pVision, _executor):ShootPoint;
         if(AdJudgeBreakCanDo(pVision, _executor, ShootPoint)||true)setSubTask(PlayerRole::makeItBreak(_executor, ShootPoint));
         else setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		break;
