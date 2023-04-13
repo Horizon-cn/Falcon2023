@@ -657,6 +657,18 @@ extern "C" int Skill_DribbleTurnKick(lua_State * L)
 	return 0;
 }
 
+extern "C" int Skill_DribbleTurnKickV2(lua_State * L)
+{
+	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
+	double finalDir = LuaModule::Instance()->GetNumberArgument(2, NULL);
+	double precision = LuaModule::Instance()->GetNumberArgument(3, NULL);
+	int mode = LuaModule::Instance()->GetNumberArgument(4, NULL);
+	double power = LuaModule::Instance()->GetNumberArgument(5, NULL);
+	CPlayerTask* pTask = PlayerRole::makeItDribbleTurnKickV2(runner, finalDir, precision, mode, power);
+	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
+	return 0;
+}
+
 extern "C" int Skill_AdvanceBallV1(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
@@ -1297,6 +1309,7 @@ luaDef GUIGlue[] =
 	{"CSetPassDir",			FUNC_SetPassDir},
 	{"CDribbleTurn",        Skill_DribbleTurn},
 	{"CDribbleTurnKick",    Skill_DribbleTurnKick},
+	{"CDribbleTurnKickV2",  Skill_DribbleTurnKickV2},
 	{"CMarkingField",       Skill_MarkingField},
 	{"CGoAndTurnKickV4",	Skill_GoAndTurnKickV4},
 	{"CShootoutGoalie",		Skill_ShootoutGoalie},

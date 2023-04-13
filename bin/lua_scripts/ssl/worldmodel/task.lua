@@ -388,6 +388,36 @@ function dribbleTurnShoot()
 	return {mexe, mpos}
 end
 
+function dribbleTurnShootV2(d,precision,mode,power)
+	local idir,ipre,imode,ipower
+	if d==nil then
+		idir=dir.shoot()
+	else
+		idir=d
+	end
+	if precision==nil then
+		ipre=pre.middle()
+	else
+		ipre=precision
+	end
+	if mode ~= "chip" then
+		imode="kick"
+	else
+		imode="chip"
+	end
+	if power==nil then
+		if imode=="kick" then
+			ipower=kp.full()
+		else
+			ipower=cp.full()
+		end
+	else
+		ipower=power
+	end
+	local mexe, mpos = DribbleTurnKickV2{dir=idir,precision=ipre,mode=imode,power=ipower}
+	return {mexe, mpos}
+end
+
 function receive(p)
 	local idir
 	if type(p) == "string" then

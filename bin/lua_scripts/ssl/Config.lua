@@ -59,6 +59,7 @@ gSkill = {
 	"GoAndTurnKick",
 	"GoAndTurnKickV3",
 	"GoAndTurnKickV4",
+	"DribbleTurnKickV2",
 	--拿球
 	"GetBall",
 	"SlowGetBall",

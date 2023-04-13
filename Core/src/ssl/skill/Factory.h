@@ -36,6 +36,7 @@ public:
 
 	CPlayerTask* DriftKick(const TaskT& task);
 	CPlayerTask* DribbleTurnKick(const TaskT& task);
+	CPlayerTask* DribbleTurnKickV2(const TaskT& task);
 
 	CPlayerTask* JustKick(const TaskT& task);
 
@@ -167,6 +168,7 @@ namespace PlayerRole {
 	CPlayerTask* makeItPenaltyKick2014(const int num, const int flag = 0);
 	CPlayerTask* makeItDribbleTurn(const int num, const double finalDir, const double pre = Param::Math::PI / 90);
 	CPlayerTask* makeItDribbleTurnKick(const int num, const double finalDir, const double turnRotVel, const double kickPower);
+	CPlayerTask* makeItDribbleTurnKickV2(const int num, const double finalDir=0, const double precision=5*Param::Math::PI/180, const int mode=0, const double power=550);
 	CPlayerTask* makeItGoSupport(const int num, const bool leftOrRight);
 }
 
