@@ -186,7 +186,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	/************************************************************************/
 	// 获取轨迹生成模块在全局坐标系中的速度指令
 	CVector globalVel = control.getNextStep().Vel();
-	GDebugEngine::Instance()->gui_debug_msg(self.Pos(), QString::number(globalVel.mod()).toStdString().c_str(), COLOR_BLUE);
+	//GDebugEngine::Instance()->gui_debug_msg(self.Pos(), QString::number(globalVel.mod()).toStdString().c_str(), COLOR_BLUE);
 	// 如果是后卫且距离禁区比较远，需要打开DSS避障，防止刚匹配的后卫发生碰撞
 	// 在禁区边的后卫允许撞车，否则容易被进球!!!
     if ((isBack || isMultiBack) && !Utils::InOurPenaltyArea(vecPos, 40)) {

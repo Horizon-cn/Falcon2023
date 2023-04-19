@@ -892,13 +892,15 @@ namespace PlayerRole {
 		return TaskFactoryV2::Instance()->DribbleTurnKick(playerTask);
 	}
 
-	CPlayerTask* makeItDribbleTurnKickV2(const int num, const double finalDir, const double precision, const int mode, const double power) {
+	CPlayerTask* makeItDribbleTurnKickV2(const int num, const double finalDir, const double precision, const int mode, const double power, const bool isAdvancer, const CGeoPoint Target) {
 		static TaskT playerTask;
 		playerTask.executor = num;
 		playerTask.player.angle = finalDir;
 		playerTask.player.kickprecision = precision;
 		playerTask.player.ischipkick = mode;
 		playerTask.player.kickpower = power;
+		playerTask.player.pos = Target;
+
 		return TaskFactoryV2::Instance()->DribbleTurnKickV2(playerTask);
 	}
 

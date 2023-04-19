@@ -23,7 +23,8 @@ void CDribbleTurnKickV2::plan(const CVisionModule* pVision)
 	double precision = task().player.kickprecision;
 	bool ischipkick = task().player.ischipkick;
 	double power = task().player.kickpower;
-
+	bool isAdvancer = task().player.isAdvancer;
+	const CGeoPoint Target = task().player.pos;
 	const PlayerVisionT& me = pVision->OurPlayer(runner);
 	const BallVisionT& ball = pVision->Ball();
 
@@ -33,13 +34,14 @@ void CDribbleTurnKickV2::plan(const CVisionModule* pVision)
 	{
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 100), "turn");
 		pTask = PlayerRole::makeItSimpleGoto(runner, me.Pos(), finalDir);
-		KickStatus::Instance()->clearAll();
+		//KickStatus::Instance()->clearAll();
 	}
 	else
 	{
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 100), "turn");
 		KickStatus::Instance()->setKick(runner, power);
 		pTask = PlayerRole::makeItJustKick(runner, ischipkick, power);
+		if(isAdvancer) KickStatus::Instance()->setAdvancerPassTo(Target);
 	}
 	setSubTask(pTask);
 	CStatedTask::plan(pVision);
