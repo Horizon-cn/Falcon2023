@@ -264,7 +264,9 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     //cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
 
-    if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 20) {
+    bool dirok = canScore(pVision, vecNumber, 5, me.Dir());
+    //if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 20) {
+    if (canShoot && dirok){
         cout << "shoot!!!" << endl;
         DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
         KickStatus::Instance()->setKick(vecNumber, power);//力度可调
@@ -552,3 +554,20 @@ double CBreak::holdBallDir(const CVisionModule *pVision, int robotNum){
 }
 
 
+bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const double radius, const double dir) {
+    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+
+    bool flag = true;
+    double x1 = me.X(), y1 = me.Y(), theta = dir;
+    for (int i = 0; i < 8; i++) {
+        auto enemy = pVision->TheirPlayer(i);
+        double x = enemy.X(), y = enemy.Y();
+        double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
+        double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
+        if (r < radius || fabs(projection) > Param::Field::GOAL_WIDTH / 2) {
+            flag = false;
+        }
+    }
+    return flag;
+
+}
