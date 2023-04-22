@@ -15,6 +15,7 @@
 #include <BallSpeedModel.h>
 #include "bayes/MatchState.h"
 #include "defence/DefenceInfo.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include "Semaphore.h"
 Semaphore vision_to_decision(0);
 Semaphore vision_to_cuda(0);
@@ -168,6 +169,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	MatchState::Instance()->update();
 
 	DefenceInfo::Instance()->updateDefenceInfo(this);
+	DefenceInfoNew::Instance()->updateDefenceInfoNew(this);
 
 	/////////////////////////////////////////////////////////////////////////////
 	/// @brief Step 5: 更新裁判盒信息 及处理球数据相关的特殊情况
