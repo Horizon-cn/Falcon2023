@@ -392,10 +392,14 @@ void compute_motion_1d_test(double x0, double v0, double v1,
         traj_accel = copysign(a_max, v1);   //期望速度比初速度大，且二者同号，按最大加速度加速
         return;
     }
-    
+    a_max /= a_factor;
+    d_max /= a_factor;
+    // X = 13, Y = 77, ROT = 16
+    /*
     double decFactor = (pT == ROTATE ? 1.0 : DEC_FACTOR);
     a_max /= a_factor;
     d_max /= ((paramManager->D_MAX_FACTOR) * a_factor);
+    */
 
     double accel_time_to_v1 = fabs(v1 - v0) / a_max;                                                  // 最大加速度加速到末速度的时间
     double accel_dist_to_v1 = fabs((v1 + v0) / 2.0) * accel_time_to_v1;                               // 单一加速到末速度时的位移
@@ -405,6 +409,13 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     double PERIOD_MOVE_X = paramManager->PERIOD_MOVE_X;
     double PERIOD_MOVE_Y = paramManager->PERIOD_MOVE_Y;
     double PERIOD_MOVE_ROT = paramManager->PERIOD_MOVE_ROT;
+    if (pT == MOVE_X)
+        period = PERIOD_MOVE_X;
+    else if (pT == MOVE_Y)
+        period = PERIOD_MOVE_Y;
+    else
+        period = PERIOD_MOVE_ROT;
+    /*
     double A_MAX_1 = paramManager->A_MAX_1;
     double V_LIMIT_1 = paramManager->V_LIMIT_1;
     double PERIOD_V_LIMIT_1 = paramManager->PERIOD_V_LIMIT_1;
@@ -415,13 +426,6 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     double PERIOD_V_LIMIT_3 = paramManager->PERIOD_V_LIMIT_3;
     double V_LIMIT_4 = paramManager->V_LIMIT_4;
     double PERIOD_V_LIMIT_4 = paramManager->PERIOD_V_LIMIT_4;
-    if (pT == MOVE_X)
-        period = PERIOD_MOVE_X;
-    else if (pT == MOVE_Y)
-        period = PERIOD_MOVE_Y;
-    else
-        period = PERIOD_MOVE_ROT;
-
     if (a_max > A_MAX_1 && pT != MOVE_Y) {
         if (fabs(v0) > V_LIMIT_1)
             period = PERIOD_V_LIMIT_1;
@@ -434,6 +438,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
         else if (fabs(v0) > V_LIMIT_4)
             period = PERIOD_V_LIMIT_4;
     }
+    */
     double v_max_dist = (v_max * v_max - v0 * v0) / (2 * a_max) + (v_max * v_max - v1 * v1) / (2 * d_max);
     if (v_max_dist > fabs(x0)) {
         double v_m = sqrt((2 * a_max * d_max * fabs(x0) + d_max * v0 * v0 + a_max * v1 * v1) / (a_max + d_max));
@@ -648,10 +653,6 @@ void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
     */
     
     double vX_max = min(fabs(vx_max / cos(rotangle - selfDir)), fabs(vy_max / sin(rotangle - selfDir)));
-    //cout << rotangle - selfDir << ' '<< fabs(vx_max / cos(rotangle - selfDir))<<' '<< fabs(vy_max / sin(rotangle - selfDir)) <<' '<<vX_max << endl;
-    //cout << min(v_max, vX_max) << endl;
-    //compute_motion_1d_test(x0.x(), v0.x(), v1.x(), a_max, d_max, min(v_max, vX_max), a_factor, velFactorX,
-    //  traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
     compute_motion_1d_test(x0.x(), v0.x(), v1.x(), a_max, d_max, min(v_max, vX_max), a_factor, velFactorX,
         traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
     isX = -1;
@@ -864,7 +865,7 @@ void goto_point_omni_test(const PlayerVisionT& start,
     double ang_a;
     double time_a, time_a_acc, time_a_dec, time_a_flat, time;
     double time_acc, time_dec, time_flat;
-    
+
     compute_motion_2d_test(x, v, target_vel, max_accel, max_decel, max_speed, start.Dir(), max_speed_X, max_speed_Y, accel_factor, a, time, time_acc, time_dec, time_flat, mode, IsGoMiddle);
     compute_motion_1d_test(ang, ang_v, 0.0, max_angle_accel, max_angle_decel, max_angle_speed, angle_accel_factor, 1.0, ang_a, time_a, time_a_acc, time_a_dec, time_a_flat, ROTATE, mode);
 
