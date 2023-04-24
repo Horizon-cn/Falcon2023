@@ -108,6 +108,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(SIDEBACK_MARKING_MODE, "Defence/SIDEBACK_MARKING_MODE", 1);
             loadParam(GOALIE_FILL_IN_MODE, "Defence/GOALIE_FILL_IN_MODE", 0);
 
+            loadParam(display_debug_info, "DefenceNew/display_debug_info", 1);
             loadParam(factor_ballChaserTest, "DefenceNew/factor_ballChaserTest", 0);
             loadParam(factor_Dist2BallNormalized, "DefenceNew/factor_Dist2BallNormalized", 0.7);
             loadParam(factor_Dist2BallProjModified, "DefenceNew/factor_Dist2BallProjModified", 0.7);
@@ -265,6 +266,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
         int SIDEBACK_MARKING_MODE;
         int GOALIE_FILL_IN_MODE;
         // DefenceNew
+        bool display_debug_info;
         double factor_ballChaserTest;
         double factor_Dist2BallNormalized;
         double factor_Dist2BallProjModified;

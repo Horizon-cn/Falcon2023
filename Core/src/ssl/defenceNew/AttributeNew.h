@@ -6,6 +6,7 @@
 using namespace std;
 
 //抽象的属性 包含属性评价方法、属性值，属性的名称只能在初始化时指定
+//从原DefenceInfo移植并略微修改，name属性目前没用上，如果后续也没用上可以考虑直接删除
 class CAttributeNew
 {
 public:

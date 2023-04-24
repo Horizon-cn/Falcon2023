@@ -5,11 +5,10 @@
 #include <utility>
 #include "AttributeNew.h"
 
-typedef std::pair<double, CAttributeNew*> TattributePair;
-
 //抽象属性集，加权得到分数，权重自动从参数管理器获取
 class CAttributeSetNew
 {
+	typedef std::pair<double, CAttributeNew*> TattributePair;//权值和对应的属性
 public:
 	CAttributeSetNew() {};
 	~CAttributeSetNew()
@@ -23,7 +22,7 @@ public:
 	double evaluate(const CVisionModule* pVision, int num)
 	{
 		double score = 0;
-		for (auto attributePair : _attributePairList)
+		for (auto& attributePair : _attributePairList)
 		{
 			attributePair.second->evaluate(pVision, num);
 			score += attributePair.first * attributePair.second->getValue();
