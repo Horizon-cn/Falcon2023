@@ -363,11 +363,12 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
     double rotangle = 0;
     double traj_accel_x = 0;
     double traj_accel_y = 0;
+    // std::cout << "v1.mod(): " << v1.mod() << std::endl; // 目前的调用中，测试得到末速度为0
     if(v0 * x0 > 0) {           //如果发现正在反方向走，则不再零速到点，防止车冲出去
 //        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(1.0, 0.0), QString("Limit v1").toLatin1());
-        v1 = CVector(0.0, 0.0);
+        v1 = CVector(0.0, 0.0);  // 设置末速度为0
     }
-    if (v1.mod() == 0 || mode == FAST) {
+    if (v1.mod() == 0 || mode == FAST) {  // 调用时mode=Fast，进这种情况
         rotangle = x0.dir();
     }
     else {
@@ -376,10 +377,11 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
     x0 = x0.rotate(-rotangle);
     v0 = v0.rotate(-rotangle);
     v1 = v1.rotate(-rotangle); //坐标系转换，转换到末速度方向为x轴的坐标系中
+    // 根据实际情况来看，rotangle为x0朝向，上述变换应当是x0为x轴正方向的坐标系中
 
     double velFactorX = 1.0, velFactorY = 1.0;
-    velFactorX = (fabs(v1.x()) > 1e-8 ? 2.8 : 1.0);
-    velFactorY = (fabs(v1.y()) > 1e-8 ? 2.8 : 1.0);
+    velFactorX = (fabs(v1.x()) > 1e-8 ? 2.8 : 1.0); // 1.0
+    velFactorY = (fabs(v1.y()) > 1e-8 ? 2.8 : 1.0); // 1.0
     if(v1.mod() > 0 && mode == FAST) {
         v1.setVector(copysign(v1.mod(), v1.x()), 0);
 //        v_max = v1.mod();
@@ -394,6 +396,7 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
     compute_motion_1d(x0.y(), v0.y(), v1.y(), a_max, d_max, v_max, a_factor, velFactorY,
                       traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_Y, mode);//两轴同样的最大速度、加速度独立考虑求两轴运动时间
 
+    // 这里不会进，mode=FAST
     if(v1.mod() > 1e-8 && mode == ACCURATE) {
         if (time_x - time_y > FRAME_PERIOD) {
             compute_motion_1d(x0.y(), v0.y(), 0, a_max, d_max, v_max, a_factor, velFactorX,
@@ -412,9 +415,12 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
         //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 100.0*10), QString("v_max: %1").arg(v_max).toLatin1());
     }
 
+    // 得到加速度并反变换回全局坐标系
     traj_accel = CVector(traj_accel_x, traj_accel_y);
     if (traj_accel.mod())
         traj_accel = traj_accel.rotate(rotangle);
+    
+    // 赋值时间
     if(time_x < 1e-5 || time_x > 50) time_x = 0;
     if(time_y < 1e-5 || time_y > 50) time_y = 0;
     if(time_x < time_y) {
@@ -557,13 +563,14 @@ double compute_stop(double v, double max_a) {
 void goto_point_omni( const PlayerVisionT& start,
                       const PlayerVisionT& final,
                       const PlayerCapabilityT& capability,
-                      const double& accel_factor,
-                      const double& angle_accel_factor,
+                      const double& accel_factor,  // 初值：1.5
+                      const double& angle_accel_factor,  // 初值4.5
 					  PlayerVisionT& nextStep,
                       nonZeroMode mode) {
     CGeoPoint target_pos = final.Pos();
     CVector x = start.Pos() - target_pos;
     CVector v = start.Vel();
+    //CVector v = last_csy_command; //  
     double ang = Utils::Normalize(start.Dir() - final.Dir());
     double ang_v = start.RotVel();
     CVector target_vel = final.Vel();
@@ -574,7 +581,7 @@ void goto_point_omni( const PlayerVisionT& start,
     double max_angle_speed = capability.maxAngularSpeed;
     double max_angle_accel = capability.maxAngularAccel;
     double max_angle_decel = capability.maxAngularDec;
-    CVector a;
+    CVector a;  // 加速度
     double ang_a, factor_a;
     double time_a, time_a_acc, time_a_dec, time_a_flat, time;
     double time_acc, time_dec, time_flat;
@@ -602,9 +609,14 @@ void goto_point_omni( const PlayerVisionT& start,
         //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-80*10), QString("nextRotateVel:  %1").arg(ang_v + ang_a * FRAME_PERIOD).toLatin1());
     }
     //std::cout << "vel: " << v << std::endl;
-    v = v + a * FRAME_PERIOD;
+    CVector const_a(0, 400);
+    CVector delta_v = a * FRAME_PERIOD * 2;
+    v = v + delta_v;
+    //last_csy_command = v;
+    //std::cout << "start pos: " << start.Pos().x() << " " << start.Pos().y() << "\ttarget pos: " << target_pos.x() << " " << target_pos.y() << std::endl;
+    //std::cout << "start vel : " << start.Vel().x() << " " << start.Vel().y() << "\ta: " << a.x() << " " << a.y() << "\tvel : " << v.x() << " " << v.y() << std::endl;
     //std::cout << "acc: " << a << " " << v << std::endl;
-    ang_v += ang_a * FRAME_PERIOD;
+    ang_v += ang_a * FRAME_PERIOD * 2;
 
     // if (v.mod() > max_speed) {
     //     v = v * max_speed / v.mod();
@@ -620,8 +632,9 @@ void goto_point_omni( const PlayerVisionT& start,
     float WHEEL_CENTER_OFFSET = 0.082f; /* ÂÖ×Ó¾à³µÖÐÐÄ¾àÀë(m) */
     float D_WHEEL_ANGLE_FRONT = 55; /* Ç°ÂÖÓëÖáÏß½Ç¶È(¶È) Ç°ÂÖÂÖ×ÓÖáÏßÓëÐ¡³µÇ°ºóÖáÏß½Ç¶È*/
     float D_WHEEL_ANGLE_BACK_2013 = 125; /* ºóÂÖÓëÖáÏß½Ç¶È(¶È) */
+    CVector v_in_wheel = v.rotate(-start.Dir());
     float vx = v.x() / 100;
-    float vy = v.y()  / 100;    //µ¥Î»[m/s]
+    float vy = v.y() / 100;    //µ¥Î»[m/s]
     float vz = ang_v * 0.025f * WHEEL_CENTER_OFFSET; //V=2*pi*r/t = w*r µ¥Î»[m/s]
     
     float wheel_angle[4] = { 
@@ -631,16 +644,27 @@ void goto_point_omni( const PlayerVisionT& start,
          D_WHEEL_ANGLE_BACK_2013     //×óºóÂÖÂÖ
     };
 
+    float cur_wheel_speed[4] = { 0,0,0,0 };
     float wheel_speed[4] = {0,0,0,0};
+    float vz_max_4[4] = {0,0,0,0};
+    float vz_min_4[4] = {0,0,0,0};
+    float vz_max = paramManager->MAX_WHEEL_SPEED;
+    float vz_min = -paramManager->MAX_WHEEL_SPEED;
+    CVector cur_v = start.Vel();
+    cur_v = cur_v.rotate(-start.Dir());
+    float cur_vx = cur_v.x() / 100;
+    float cur_vy = cur_v.y() / 100;    //µ¥Î»[m/s]
+    float cur_vz = start.RotVel() * 0.025f * WHEEL_CENTER_OFFSET; //V=2*pi*r/t = w*r µ¥Î»[m/s]
     double largest_wheel_speed = 0;
-    for( int i = 0; i < 4; i++ )
-    {
-        double angle = wheel_angle[i] / 180.0f * (float)Param::Math::PI;
-        wheel_speed[i] = fabs((sin(angle) * vx + cos(angle) * vy + vz) * 74037);
 
-        if (wheel_speed[i] > largest_wheel_speed)
+    for (int i = 0; i < 4; i++) { 
+        // 先计算在满足xy移动是vz的范围
+        double angle = wheel_angle[i] / 180.0f * (float)Param::Math::PI;
+        wheel_speed[i] = (sin(angle) * vx + cos(angle) * vy + vz) * 74037;
+        cur_wheel_speed[i] = (sin(angle) * cur_vx + cos(angle) * cur_vy + cur_vz) * 74037;
+        if (fabs(wheel_speed[i]) > largest_wheel_speed)
         {
-            largest_wheel_speed = wheel_speed[i];
+            largest_wheel_speed = fabs(wheel_speed[i]);
         }
     }
     
@@ -651,8 +675,34 @@ void goto_point_omni( const PlayerVisionT& start,
         v = v * slow_ratio;
         ang_v *= slow_ratio;
     }
-    
 
+    for (int i = 0; i < 4; i++) {
+        double angle = wheel_angle[i] / 180.0f * (float)Param::Math::PI;
+        vz_max_4[i] = (cur_wheel_speed[i] + 500) / 74037 - (sin(angle) * cur_vx + cos(angle) * cur_vy);
+        vz_min_4[i] = (cur_wheel_speed[i] - 500) / 74037 - (sin(angle) * cur_vx + cos(angle) * cur_vy);
+    }
+
+    for (int i = 0; i < 4; i++) {
+        if (vz_max_4[i] < vz_max) {
+            vz_max = vz_max_4[i];
+        }
+        if (vz_min_4[i] > vz_min) {
+            vz_min = vz_min_4[i];
+        }
+    }
+    std::cout << "vz_max: " << vz_max << "vz_min: " << vz_min << std::endl;
+    if (vz_min < vz_max) {
+        if (vz < 0) {
+            vz = vz_min;
+        }
+        else {
+            vz = vz_max;
+        }
+        //ang_v = vz / 0.025 / WHEEL_CENTER_OFFSET;
+    }
+    std::cout << "vz: " << vz << std::endl;
+    
+    
     CGeoPoint next_pos = start.Pos() + Utils::Polar2Vector(v.mod() * FRAME_PERIOD, v.dir());
     double next_angle = start.Dir() + ang_v * FRAME_PERIOD;
 

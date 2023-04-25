@@ -107,6 +107,8 @@ private:
     // 更新球运动速度
     void UpdateBallMoving(const CVisionModule* pVision);
     void CheckKickOutBall(const CVisionModule* pVision);
+    void updateBallPossession(const CVisionModule* pVision);
+    void computeBallPossession(const CVisionModule* pVision, bool isOurPlayer, int maxFrame, double distThreshold, double dirThreshold, bool useInfrared);
 
     CVector _ballMovingVel;
 
@@ -119,8 +121,11 @@ private:
 
     ContactChecker _contactChecker;
 
+    int ballPossession[Param::Field::MAX_PLAYER * 2];
+
     // 先将PlayInterface的信息加入BallStatus中
 public:
+    bool getBallPossession(bool isOurPlayer, int id);
     string checkBallState(const CVisionModule* pVision,int meNum=0);
     void clearBallStateCouter();
     void setChipKickState(bool b_set){ _chipkickstate = b_set;}

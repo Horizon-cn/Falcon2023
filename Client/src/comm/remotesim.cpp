@@ -141,6 +141,8 @@ void RemoteSim::readBlueData() {
                 GlobalData::Instance()->robotInformation[PARAM::BLUE][id].wheelSpeed[1] = robotsPacket.robots_status(i).wheel2();
                 GlobalData::Instance()->robotInformation[PARAM::BLUE][id].wheelSpeed[2] = robotsPacket.robots_status(i).wheel3();
                 GlobalData::Instance()->robotInformation[PARAM::BLUE][id].wheelSpeed[3] = robotsPacket.robots_status(i).wheel4();
+                GlobalData::Instance()->robotInformation[PARAM::BLUE][id].wheelSpeedTimestamp = QTime::currentTime();
+                GlobalData::Instance()->robotInformation[PARAM::BLUE][id].wheelSpeedUpdate = true;
                 GlobalData::Instance()->robotInfoMutex.unlock();
                 ZCommunicator::Instance()->sendCommand(PARAM::BLUE, id);
                 //emit receiveRemoteInfo(PARAM::BLUE, id);
@@ -176,7 +178,7 @@ void RemoteSim::readYellowData() {
                 GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].wheelSpeed[2] = robotsPacket.robots_status(i).wheel3();
                 GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].wheelSpeed[3] = robotsPacket.robots_status(i).wheel4();
                 GlobalData::Instance()->robotInfoMutex.unlock();
-                ZCommunicator::Instance()->sendCommand(PARAM::YELLOW, id);
+                //ZCommunicator::Instance()->sendCommand(PARAM::YELLOW, id);
                 //emit receiveRemoteInfo(PARAM::YELLOW, id);
             }
         }

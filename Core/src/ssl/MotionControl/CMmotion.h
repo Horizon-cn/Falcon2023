@@ -5,6 +5,9 @@
 //{
 //	return fabs(num)<9999;
 //}
+
+static CVector last_csy_command(0.0, 0.0);
+
 enum nonZeroMode {
     FAST,
     ACCURATE
