@@ -361,15 +361,15 @@ void CDealRobot::updateVel(int team, Owl::ReceiveVisionMessage& result) {
             float vy = (0.3904 * wheelSpeed[0] - 0.3904 * wheelSpeed[1] - 0.3904 * wheelSpeed[2] + 0.3904 * wheelSpeed[3]) * 1000; // mm/s
             // std::cout << "robot.angle: " << robot.angle << std::endl; // 仿真中角度是准确的
             // 这里可能有问题 from csy，速度测试不正常
-            if (robot.id == 5) {
-                std::cout << "in robot v: " << vx << " " << vy << std::endl;
-            }
+            //if (robot.id == 5) {
+            //    std::cout << "in robot v: " << vx << " " << vy << std::endl;
+            //}
             CVector vxy = CVector(vx, vy).rotate(robot.angle);
-            float vr = (3.3667 * wheelSpeed[0] + 2.7309 * wheelSpeed[1] + 2.7309 * wheelSpeed[2] + 3.3667 * wheelSpeed[3])*40; // rad/s?????可能还有问题
+            float vr = 3.3667 * wheelSpeed[0] + 2.7309 * wheelSpeed[1] + 2.7309 * wheelSpeed[2] + 3.3667 * wheelSpeed[3]; // rad/s?????可能还有问题
             robot.velocity = Owl::RobotSpeed(vxy.x(), vxy.y(), vr);
-            if (robot.id == 5) {
-                std::cout << "in field v: " << vxy.x() << " " << vxy.y() << std::endl;
-            }
+            //if (robot.id == 5) {
+            //    std::cout << "in field v: " << vxy.x() << " " << vxy.y() << std::endl;
+            //}
             //if (team == 0 && robot.id == 0) {
             //    std::cout << "vx: " << vx << "\tvy: " << vy << std::endl;
             //}

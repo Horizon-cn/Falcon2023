@@ -24,6 +24,8 @@ namespace{
     int lastOurBestPlayer=0;
     const int StateMaxNum=5;
     int stateCouter[StateMaxNum]={0,0,0,0,0};
+
+    auto pm = ParamManager::Instance();
 }
 
 CBallStatus::CBallStatus(void)
@@ -50,9 +52,55 @@ void CBallStatus::UpdateBallStatus(const CVisionModule* pVision)
     if (_isKickedOut||_isChipKickOut){
         _ballToucher=_kickerNum;
     }
-
+    updateBallPossession(pVision);
 }
 
+void CBallStatus::updateBallPossession(const CVisionModule* pVision)
+{
+    // OurPlayer
+    computeBallPossession(pVision, true, pm->maxFrame, pm->ourVisionJudgeDist, pm->ourVisionJudgeDir, true);
+    // TheirPlayer
+    computeBallPossession(pVision, false, pm->maxFrame, pm->theirVisionJudgeDist, pm->theirVisionJudgeDir, false);
+}
+
+void CBallStatus::computeBallPossession(const CVisionModule* pVision, bool isOurPlayer, int maxFrame, double distThreshold, double dirThreshold, bool useInfrared)
+{
+    const BallVisionT& ball = pVision->Ball();
+    for (int id = 0; id < Param::Field::MAX_PLAYER; id++) {
+        PlayerVisionT player;
+        if (isOurPlayer)
+            player = pVision->OurPlayer(id);
+        else
+            player = pVision->TheirPlayer(id);
+        //  ”æı≈–∂œ
+        bool distVisionHasBall = CVector(player.Pos() - ball.Pos()).mod() <= distThreshold;
+        bool dirVisionHasBall;
+        double playerDir = player.Dir();
+        double player2Ball = (ball.Pos() - player.Pos()).dir();
+        double playerDir_player2Ball_Diff = fabs(Utils::Normalize((playerDir - player2Ball)));
+        if (playerDir_player2Ball_Diff < dirThreshold * Param::Math::PI / 180.0)
+            dirVisionHasBall = true;
+        else
+            dirVisionHasBall = false;
+        bool isVisionPossession = dirVisionHasBall && distVisionHasBall;
+        // ∫ÏÕ‚≈–∂œ
+        bool isInfraredPossession = false;
+        if (isOurPlayer && useInfrared && RobotSensor::Instance()->IsInfraredOn(id))
+            isInfraredPossession = true;
+        // ◊€∫œ≈–∂œº∞Œ¨≥÷Œ»∂®
+        int num = id + Param::Field::MAX_PLAYER * (1 - (int)isOurPlayer);
+        if (isVisionPossession || isInfraredPossession)
+            ballPossession[num]++;
+        else
+            ballPossession[num]--;
+        ballPossession[num] = max(0, min(maxFrame, ballPossession[num]));
+    }
+}
+
+bool CBallStatus::getBallPossession(bool isOurPlayer, int id) {
+    int num = id + Param::Field::MAX_PLAYER * (1 - (int)isOurPlayer);
+    return (bool)ballPossession[num];
+}
 
 void CBallStatus::UpdateBallMoving(const CVisionModule* pVision)
 {

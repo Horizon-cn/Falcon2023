@@ -41,7 +41,7 @@ firstState = "run1",
 			return "run3";
 		end
 	end,
-	Kicker  = MOVE_TASK(TargetPos2, -DIR, ACC, DSS),
+	Kicker  = MOVE_TASK(TargetPos2, DIR, ACC, DSS),
 	-- Receiver = task.goCmuRush(TargetPos3, DIR, ACC, DSS),
 	-- Goalie = task.goalie(),
 	match = ""
@@ -65,7 +65,7 @@ firstState = "run1",
 			return "run1";
 		end
 	end,
-	Kicker  = MOVE_TASK(TargetPos4, -DIR, ACC, DSS),
+	Kicker  = MOVE_TASK(TargetPos4, DIR, ACC, DSS),
 	-- Receiver = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 	-- Goalie = task.goalie(),
 	match = ""

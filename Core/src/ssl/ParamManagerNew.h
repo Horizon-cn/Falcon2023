@@ -227,6 +227,12 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(TRANSLATION_ROTATE_ACC_LIMIT, Capability + "/TRANSLATION_ROTATE_ACC_LIMIT", 5);
 
             loadParam(PENALTY_FIGHT, "General/PENALTY_FIGHT", 1);
+
+            loadParam(maxFrame, "BallStatus/maxFrame", 10);
+            loadParam(ourVisionJudgeDist, "BallStatus/ourVisionJudgeDist", 11.3);
+            loadParam(ourVisionJudgeDir, "BallStatus/ourVisionJudgeDir", 30);
+            loadParam(theirVisionJudgeDist, "BallStatus/theirVisionJudgeDist", 20);
+            loadParam(theirVisionJudgeDir, "BallStatus/theirVisionJudgeDir", 30);
         }
     public:
         // GotoPosition 中的调试开关
@@ -381,6 +387,12 @@ class CParamManagerSkill : public Falcon::ParamManager {
         int TRANSLATION_ROTATE_ACC_LIMIT;
         // General
         bool PENALTY_FIGHT;
+        // BallStatus
+        int maxFrame;
+        double ourVisionJudgeDist;
+        double ourVisionJudgeDir;
+        double theirVisionJudgeDist;
+        double theirVisionJudgeDir;
 };
 typedef Falcon::NormalSingleton< CParamManagerSkill > ParamManager;
 

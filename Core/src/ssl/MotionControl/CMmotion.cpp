@@ -613,8 +613,8 @@ void goto_point_omni( const PlayerVisionT& start,
     CVector delta_v = a * FRAME_PERIOD * 2;
     v = v + delta_v;
     //last_csy_command = v;
-    std::cout << "start pos: " << start.Pos().x() << " " << start.Pos().y() << "\ttarget pos: " << target_pos.x() << " " << target_pos.y() << std::endl;
-    std::cout << "start vel : " << start.Vel().x() << " " << start.Vel().y() << "\ta: " << a.x() << " " << a.y() << "\tvel : " << v.x() << " " << v.y() << std::endl;
+    //std::cout << "start pos: " << start.Pos().x() << " " << start.Pos().y() << "\ttarget pos: " << target_pos.x() << " " << target_pos.y() << std::endl;
+    //std::cout << "start vel : " << start.Vel().x() << " " << start.Vel().y() << "\ta: " << a.x() << " " << a.y() << "\tvel : " << v.x() << " " << v.y() << std::endl;
     //std::cout << "acc: " << a << " " << v << std::endl;
     ang_v += ang_a * FRAME_PERIOD;
 
