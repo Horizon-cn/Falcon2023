@@ -23,7 +23,7 @@ firstState = "run1",
 
 ["run1"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 50, 1000) then -- and player.toTargetDist("Receiver") < distThreshold then
+		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 100, 1000) then -- and player.toTargetDist("Receiver") < distThreshold then
 			return "run2";
 		end
 	end,
@@ -37,7 +37,7 @@ firstState = "run1",
 
 ["run2"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 50, 1000) then --and player.toTargetDist("Receiver") < distThreshold then
+		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 100, 1000) then --and player.toTargetDist("Receiver") < distThreshold then
 			return "run3";
 		end
 	end,
@@ -49,7 +49,7 @@ firstState = "run1",
 
 ["run3"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 50, 1000)then --and player.toTargetDist("Receiver") < distThreshold then
+		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 100, 1000)then --and player.toTargetDist("Receiver") < distThreshold then
 			return "run4";
 		end
 	end,
@@ -61,7 +61,7 @@ firstState = "run1",
 
 ["run4"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 50, 1000) then --and player.toTargetDist("Receiver") < distThreshold then
+		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 100, 1000) then --and player.toTargetDist("Receiver") < distThreshold then
 			return "run1";
 		end
 	end,
