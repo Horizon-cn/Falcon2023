@@ -22,6 +22,10 @@
 #include <iomanip>
 #include <iostream>
 
+#define OURPLAYER_NUM	8
+#define THEIRPLAYER_NUM 8
+#define BALL_NUM		1
+
 std::string date_time(std::time_t posix)
 {
     char buf[20]; // big enough for 2015-07-08 10:06:51\0
@@ -79,8 +83,8 @@ namespace {
     const double DEBUG_TEXT_HIGH = 23 * 10;
 
     //视主机性能调节
-    const int MOD_NUM = 8;
-    const int ANGEL_MOD = 6;
+    const int MOD_NUM = 15;
+    const int ANGEL_MOD = 20;
 
 
     const int RADIUS = Param::Vehicle::V2::PLAYER_SIZE * 2;
@@ -209,7 +213,11 @@ void CBreak::plan(const CVisionModule* pVision) {
     else {
         calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     }*/
+    clock_t begin, end;
+    begin = clock();
     CGeoPoint target = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
+    end = clock();
+    std::cout << "best break point calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
     if (isSetPoint(pVision, point, me.Pos())) {
         move_point = target;
     }
@@ -375,125 +383,246 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         }
         else
         {
-            //当前点不行，选定若干个角度分别计算得分，取得分最高的点进行移动
-            std::vector<double>point_score_list;
-            std::vector<CGeoPoint>point_list;
+            std::cout << "============break calc with gpu===============" << std::endl;
+            // 使用GPU
+            int _palyer_pos_num = 6;
+            int pos_num = 2 + 1 + 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
+            int pos_size = pos_num * sizeof(float);
+            int target_point_num = 10;
+            int target_size = 2 * target_point_num * sizeof(float);
+            int results_size = 3 * target_point_num * sizeof(float);
 
-            for (int i = -ANGEL_MOD; i < ANGEL_MOD; i++) {
 
-                for (int j = 1; j < MOD_NUM; j++) {
+            float* pos_info = (float*)malloc(pos_size); // 用于存储计算后的结果
+            float* target_info = (float*)malloc(target_size);
+            float* results = (float*)malloc(results_size);
+            float* vis_points = (float*)malloc(3 * (ANGEL_MOD * 2 - 1) * (MOD_NUM - 1) * sizeof(float));
 
-                //生成test_point
+            if (pos_info == nullptr || target_info == nullptr || results == nullptr) {
+                std::cout << "break malloc fail" << std::endl;
+                return test_point;
+            }
 
-                CVector vec = Utils::Polar2Vector(double(DRIBBLE_DIST) * 2 / j,
-                    Utils::Normalize(me2target.dir() + i * Param::Math::PI / ANGEL_MOD));
-
-                CGeoPoint test_point = me.Pos() + vec;
-
-                if ((test_point - dribblePoint).mod() > DRIBBLE_DIST) {
-                    test_point = makeInCircle(test_point, dribblePoint, DRIBBLE_DIST);
+            pos_info[0] = dribblePoint.x();
+            pos_info[1] = dribblePoint.y();
+            pos_info[2] = DRIBBLE_DIST;
+            pos_info[3] = me.Pos().x();
+            pos_info[4] = me.Pos().y();
+            pos_info[5] = me.Dir();
+            pos_info[6] = pVision->Ball().Pos().x();
+            pos_info[7] = pVision->Ball().Pos().y();
+            pos_info[8] = pVision->Ball().VelX();
+            pos_info[9] = pVision->Ball().VelY();
+            // 己方机器人信息
+            int our_start_idx = 10;    // 在数组中开始存储的位置
+            float* our_player_info = pos_info + our_start_idx;
+            for (int i = 0; i < OURPLAYER_NUM; i++) {
+                if (pVision->OurPlayer(i).Valid()) {
+                    const PlayerVisionT& ourPlayer = pVision->OurPlayer(i);
+                    our_player_info[_palyer_pos_num * i] = 1.0;
+                    our_player_info[_palyer_pos_num * i + 1] = ourPlayer.X();
+                    our_player_info[_palyer_pos_num * i + 2] = ourPlayer.Y();
+                    our_player_info[_palyer_pos_num * i + 3] = ourPlayer.Dir();
+                    our_player_info[_palyer_pos_num * i + 4] = ourPlayer.VelX();
+                    our_player_info[_palyer_pos_num * i + 5] = ourPlayer.VelY();
                 }
-                if (DEBUG) GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_YELLOW);
-
-                if (!Utils::IsInField(test_point, 0))
-                {
-                    test_point = Utils::MakeInField(test_point, 0);
-                    if (DEBUG) GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_BLUE);
-                }
-
-                if (Utils::InTheirPenaltyArea(test_point, 0))
-                {
-                    test_point = Utils::MakeOutOfTheirPenaltyArea(test_point, 0);
-
-                }
-                bool tempflag = false;
-                auto run_seg = CGeoSegment(test_point, me.Pos());
-
-                for (auto test_enemy : enemy_points) {
-
-
-
-
-                    auto projection = run_seg.projection(test_enemy);
-                    if (run_seg.IsPointOnLineOnSegment(projection)) {
-                        double projection_dist = (projection - test_enemy).mod();
-                        double to_projection_dist = (projection - test_point).mod();
-                        double straight_dist = (test_enemy - test_point).mod();
-                        if (projection_dist < 40)
-                        {
-                            tempflag = true;
-                            if (DEBUG) GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_PURPLE);
-                            break;
-                        }
-                    }
-
-
-                }
-                if (tempflag)continue;
-
-
-
-
-                auto test_seg = CGeoSegment(test_point, target);
-
-                //测试点与目标点的距离
-
-                //该指标与敌方车没有关系，越小越好
-                double dist_score = (test_point - target).mod();
-
-                //计算测试点处敌方车辆阻挡球路情况得分,越小越好
-                double block_score = 0;
-                //记录离测试点最近的敌方车辆距离得分，越小越好
-                double near_score = 9999;
-                for (auto test_enemy : enemy_points) {
-
-
-
-                    auto projection = test_seg.projection(test_enemy);
-                    double projection_dist = (projection - test_enemy).mod();
-                    double to_projection_dist = (projection - test_point).mod();
-                    double straight_dist = (test_enemy - test_point).mod();
-
-                    near_score = (straight_dist < near_score) ? (straight_dist) : near_score;
-                    if (test_seg.IsPointOnLineOnSegment(projection)) {//不在连线上的车不考虑
-
-                        block_score += projection_dist;
-
-
+                else {
+                    for (int j = 0; j < _palyer_pos_num; j++) {
+                        our_player_info[_palyer_pos_num * i + j] = 0.0;
                     }
                 }
+            }
+            // 敌方机器人信息
+            int their_start_idx = 10 + _palyer_pos_num * OURPLAYER_NUM; // 在数组中开始存储的位置
+            float* their_player_info = pos_info + their_start_idx;
+            for (int i = 0; i < THEIRPLAYER_NUM; i++) {
+                if (pVision->TheirPlayer(i).Valid()) {
+                    const PlayerVisionT& theirPlayer = pVision->TheirPlayer(i);
+                    their_player_info[_palyer_pos_num * i] = 1.0;
+                    their_player_info[_palyer_pos_num * i + 1] = theirPlayer.X();
+                    their_player_info[_palyer_pos_num * i + 2] = theirPlayer.Y();
+                    their_player_info[_palyer_pos_num * i + 3] = theirPlayer.Dir();
+                    their_player_info[_palyer_pos_num * i + 4] = theirPlayer.VelX();
+                    their_player_info[_palyer_pos_num * i + 5] = theirPlayer.VelY();
+                }
+                else {
+                    for (int j = 0; j < _palyer_pos_num; j++) {
+                        their_player_info[_palyer_pos_num * i + j] = 0.0;
+                    }
+                }
+            }
 
-                near_score = 1/(near_score);
-                /*cout<<"dist_score"<<dist_score;
-                cout<<"  block_score"<<block_score;
-                cout<<"  near_score"<<near_score<<endl;*/
-                double overall_score = COEF_BLOCKSCORE * block_score + COEF_DISTSCORE * dist_score + COEF_NEARSCORE * near_score;
-                point_score_list.push_back(overall_score);
-                point_list.push_back(test_point);
-                GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_YELLOW);
+            // 生成目标点信息：
+            float target_step = Param::Field::GOAL_WIDTH / (target_point_num - 1);
+            for (int i = 0; i < target_point_num; i++) {
+                target_info[2 * i] = Param::Field::PITCH_LENGTH / 2;
+                target_info[2 * i + 1] = -Param::Field::GOAL_WIDTH / 2 + i * target_step;
+            }
 
+            std::cout << "break start calc with gpu" << std::endl;
+            // 这里会返回值，如果是0则可能GPU计算出现问题，建议切换为CPU去计算
+            break_calc_with_gpu(target_info, target_point_num, pos_info, pos_num, ANGEL_MOD, MOD_NUM, results, vis_points);
 
-
-
-
-
-
+            std::cout << "break start find best point" << std::endl;
+            float best_score = 10000;
+            float best_idx = -1;
+            CGeoPoint best_point(-100, -100);
+            for (int i = 0; i < target_point_num; i++) {
+                CGeoPoint target_point(target_info[2 * i], target_info[2 * i + 1]);
+                float current_score = results[3 * i];
+                CGeoPoint move_point(results[3 * i + 1], results[3 * i + 2]);
+                //std::cout << "i: " << i << " | current score: " << current_score << " | move_point: " << move_point << std::endl;
+                if (best_score > current_score) {
+                    best_score = current_score;
+                    best_point = move_point;
+                    best_idx = i;
+                }
+            }
+            std::cout << "best point: " << best_point << " | best idx: " << best_idx << " | best score: " << best_score << std::endl;
+            if (DEBUG) {
+                for (int i = 0; i < target_point_num; i++) {
+                    CGeoPoint target_point(target_info[2 * i], target_info[2 * i + 1]);
+                    float current_score = results[3 * i];
+                    CGeoPoint move_point(results[3 * i + 1], results[3 * i + 2]);
+                    int color = COLOR_YELLOW;
+                    if (i == best_idx) {
+                        color = COLOR_GREEN;
+                    }
+                    GDebugEngine::Instance()->gui_debug_x(target_point, color);
+                    GDebugEngine::Instance()->gui_debug_x(move_point, color);
+                    GDebugEngine::Instance()->gui_debug_line(target_point, move_point, color);
+                }
+                
+            }
+            if (DEBUG) {
+                for (int i = 0; i < (ANGEL_MOD * 2 - 1) * (MOD_NUM - 1); i++) {
+                    //CGeoPoint cur_point(vis_points[3 * i + 1], vis_points[3 * i + 2]);
+                    //std::cout << vis_points[3 * i] << " ";
+                    //GDebugEngine::Instance()->gui_debug_x(cur_point, COLOR_GREEN);
+                }
 
             }
-        }
-            if(point_score_list.empty()||point_list.empty())
-            {
-                //cout<<"error";
-                return me.Pos();
-            }
-            else
-            {
-            int selected_pos = std::min_element(point_score_list.begin(),point_score_list.end())-point_score_list.begin();
+            return best_point;
+            //return me.Pos();
 
-            move_point = point_list[selected_pos];
 
-            return move_point;
-            }
+
+        //    //当前点不行，选定若干个角度分别计算得分，取得分最高的点进行移动
+        //    std::vector<double>point_score_list;
+        //    std::vector<CGeoPoint>point_list;
+
+        //    for (int i = -ANGEL_MOD; i < ANGEL_MOD; i++) {
+
+        //        for (int j = 1; j < MOD_NUM; j++) {
+
+        //        //生成test_point
+
+        //        CVector vec = Utils::Polar2Vector(double(DRIBBLE_DIST) * 2 / j,
+        //            Utils::Normalize(me2target.dir() + i * Param::Math::PI / ANGEL_MOD));
+
+        //        CGeoPoint test_point = me.Pos() + vec;
+
+        //        if ((test_point - dribblePoint).mod() > DRIBBLE_DIST) {  // dribblePoint是中心点还是当前点？？？？
+        //            test_point = makeInCircle(test_point, dribblePoint, DRIBBLE_DIST);
+        //        }
+        //        if (DEBUG) GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_YELLOW);
+
+        //        if (!Utils::IsInField(test_point, 0)) // 将点移动到场地中
+        //        {
+        //            test_point = Utils::MakeInField(test_point, 0);
+        //            if (DEBUG) GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_BLUE);
+        //        }
+
+        //        if (Utils::InTheirPenaltyArea(test_point, 0))
+        //        {
+        //            test_point = Utils::MakeOutOfTheirPenaltyArea(test_point, 0); // 将点移出场地
+
+        //        }
+        //        bool tempflag = false;
+        //        auto run_seg = CGeoSegment(test_point, me.Pos());  // me.pos和期望点的连线
+
+        //        // 排除一些被阻挡的点：距离小于40并且投影在线段上
+        //        for (auto test_enemy : enemy_points) {
+        //            auto projection = run_seg.projection(test_enemy);
+        //            if (run_seg.IsPointOnLineOnSegment(projection)) {
+        //                double projection_dist = (projection - test_enemy).mod();
+        //                double to_projection_dist = (projection - test_point).mod();
+        //                double straight_dist = (test_enemy - test_point).mod();
+        //                if (projection_dist < 40)
+        //                {
+        //                    tempflag = true;
+        //                    if (DEBUG) GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_PURPLE);
+        //                    break;
+        //                }
+        //            }
+
+
+        //        }
+        //        if (tempflag)continue;
+
+
+
+        //        // target：目标射门点
+        //        auto test_seg = CGeoSegment(test_point, target);
+
+        //        //测试点与目标点的距离
+
+        //        //该指标与敌方车没有关系，越小越好
+        //        double dist_score = (test_point - target).mod();
+
+        //        //计算测试点处敌方车辆阻挡球路情况得分,越小越好
+        //        double block_score = 0;
+        //        //记录离测试点最近的敌方车辆距离得分，越小越好
+        //        double near_score = 9999;
+        //        for (auto test_enemy : enemy_points) {
+
+
+
+        //            auto projection = test_seg.projection(test_enemy);
+        //            double projection_dist = (projection - test_enemy).mod();
+        //            double to_projection_dist = (projection - test_point).mod();
+        //            double straight_dist = (test_enemy - test_point).mod();
+
+        //            near_score = (straight_dist < near_score) ? (straight_dist) : near_score;
+        //            if (test_seg.IsPointOnLineOnSegment(projection)) {//不在连线上的车不考虑
+
+        //                block_score += projection_dist;  // 垂线段长度距离和
+
+
+        //            }
+        //        }
+
+        //        near_score = 1/(near_score);
+        //        /*cout<<"dist_score"<<dist_score;
+        //        cout<<"  block_score"<<block_score;
+        //        cout<<"  near_score"<<near_score<<endl;*/
+        //        double overall_score = COEF_BLOCKSCORE * block_score + COEF_DISTSCORE * dist_score + COEF_NEARSCORE * near_score;
+        //        point_score_list.push_back(overall_score);
+        //        point_list.push_back(test_point);
+        //        GDebugEngine::Instance()->gui_debug_x(test_point, COLOR_YELLOW);
+
+
+
+
+
+
+
+
+        //    }
+        //}
+        //    if(point_score_list.empty()||point_list.empty())
+        //    {
+        //        //cout<<"error";
+        //        return me.Pos();
+        //    }
+        //    else
+        //    {
+        //    int selected_pos = std::min_element(point_score_list.begin(),point_score_list.end())-point_score_list.begin();
+
+        //    move_point = point_list[selected_pos];
+
+        //    return move_point;
+        //    }
         }
 
 
