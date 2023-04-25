@@ -54,7 +54,7 @@ void CBallStatus::UpdateBallStatus(const CVisionModule* pVision)
     }
     updateBallPossession(pVision);
 }
-
+// 更新球的所有权，对于
 void CBallStatus::updateBallPossession(const CVisionModule* pVision)
 {
     // OurPlayer
