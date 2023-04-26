@@ -51,7 +51,7 @@
     <message>
         <location filename="src/qml/Widgets/ControlBoard.qml" line="599"/>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="src/qml/Widgets/ControlBoard.qml" line="771"/>
@@ -59,18 +59,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/qml/Widgets/ControlBoard.qml" line="795"/>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="src/qml/Widgets/ControlBoard.qml" line="901"/>
         <source>RecEventLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/qml/Widgets/ControlBoard.qml" line="925"/>
-        <source></source>
         <translation type="unfinished"></translation>
     </message>
     <message>

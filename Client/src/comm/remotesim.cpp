@@ -67,20 +67,20 @@ RemoteSim::RemoteSim(QObject *parent) : QObject(parent)
         grsim_robots_blue[i]->set_spinner(false);
         grsim_robots_blue[i]->set_wheelsspeed(false);
     }
-    for(int i = 0; i < PARAM::TEAMS; i++) {
-        if(connectSim(i)){
-            switch (i) {
-            case 0:
-                blueReceiveThread = new std::thread([=] {readBlueData();});
-                blueReceiveThread->detach();
-                break;
-            case 1:
-                yellowReceiveThread = new std::thread([=] {readYellowData();});
-                yellowReceiveThread->detach();
-                break;
-            }
-        }
-    }
+    // for(int i = 0; i < PARAM::TEAMS; i++) {
+    //     if(connectSim(i)){
+    //         switch (i) {
+    //         case 0:
+    //             blueReceiveThread = new std::thread([=] {readBlueData();});
+    //             blueReceiveThread->detach();
+    //             break;
+    //         case 1:
+    //             yellowReceiveThread = new std::thread([=] {readYellowData();});
+    //             yellowReceiveThread->detach();
+    //             break;
+    //         }
+    //     }
+    // }
 }
 
 bool RemoteSim::disconnectSim(bool color) {
@@ -101,12 +101,20 @@ bool RemoteSim::connectSim(bool color) {
     if(color) {
         if(yellowReceiveSocket.bind(QHostAddress::AnyIPv4, cpm->yellow_status, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)) {
             qDebug() << "Yellow connect successfully!!! --remotesim";
+            if (yellowReceiveThread == nullptr) {
+                yellowReceiveThread = new std::thread([=] {readYellowData(); });
+                yellowReceiveThread->detach();
+            }
             return true;
         }
         return false;
     }
     if(blueReceiveSocket.bind(QHostAddress::AnyIPv4, cpm->blue_status, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)) {
         qDebug() << "Blue connect successfully!!! --remotesim";
+        if (blueReceiveThread == nullptr) {
+            blueReceiveThread = new std::thread([=] {readBlueData(); });
+            blueReceiveThread->detach();
+        }
         return true;
     }
     return false;
@@ -178,7 +186,7 @@ void RemoteSim::readYellowData() {
                 GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].wheelSpeed[2] = robotsPacket.robots_status(i).wheel3();
                 GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].wheelSpeed[3] = robotsPacket.robots_status(i).wheel4();
                 GlobalData::Instance()->robotInfoMutex.unlock();
-                //ZCommunicator::Instance()->sendCommand(PARAM::YELLOW, id);
+                ZCommunicator::Instance()->sendCommand(PARAM::YELLOW, id);
                 //emit receiveRemoteInfo(PARAM::YELLOW, id);
             }
         }

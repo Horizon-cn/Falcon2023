@@ -57,12 +57,12 @@ SimModule::SimModule(QObject *parent) : QObject(parent) {
     //    if(connectSim(i)){
     //        switch (i) {
     //        case PARAM::BLUE:
-                blueReceiveThread = new std::thread([=] {readBlueData();});
-                blueReceiveThread->detach();
+    //            blueReceiveThread = new std::thread([=] {readBlueData();});
+    //            blueReceiveThread->detach();
     //            break;
     //        case PARAM::YELLOW:
-                yellowReceiveThread = new std::thread([=] {readYellowData();});
-                yellowReceiveThread->detach();
+    //            yellowReceiveThread = new std::thread([=] {readYellowData();});
+    //            yellowReceiveThread->detach();
     //            break;
     //        }
     //    }
@@ -82,12 +82,20 @@ bool SimModule::connectSim(bool color) {
     if(color) {
         if(yellowReceiveSocket.bind(QHostAddress::AnyIPv4, cpm->yellow_status, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)) {
             qDebug() << "Yellow connect successfully!!! --simmodule";
+            if (yellowReceiveThread == nullptr) {
+                yellowReceiveThread = new std::thread([=] {readYellowData(); });
+                yellowReceiveThread->detach();
+            }
             return true;
         }
         return false;
     }
     if(blueReceiveSocket.bind(QHostAddress::AnyIPv4, cpm->blue_status, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)) {
         qDebug() << "Blue connect successfully!!! --simmodule";
+        if (blueReceiveThread == nullptr) {
+            blueReceiveThread = new std::thread([=] {readBlueData(); });
+            blueReceiveThread->detach();
+        }
         return true;
     }
     return false;
