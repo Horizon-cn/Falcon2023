@@ -4,6 +4,7 @@
 #include "Vision/VisionModule.h"
 #include "WorldModel/DribbleStatus.h"
 #include "WorldModel/KickStatus.h"
+#include "BallStatus.h"
 #include "GDebugEngine.h"
 #include "WorldModel/WorldModel.h"
 #include "singleton.h"
@@ -21,6 +22,8 @@
 #include "ParamManagerNew.h"
 #include "PointCalculation/SupportPos2022.h"
 #include "RobotSensor.h"
+
+#define has_GPU false
 
 extern CParamManagerSkill* paramManager;
 extern ParamManagerOwl* oParamManager;

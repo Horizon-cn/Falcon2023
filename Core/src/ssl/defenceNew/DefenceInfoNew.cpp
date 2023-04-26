@@ -44,7 +44,7 @@ void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 		_potientialList.push_back(ballChaserAttributeSet::Instance()->evaluate(pVision, num));
 	//持球者直接覆盖计算结果为最优
 	//todo 等待BallStatus移植
-	{
+	/*{
 		double OurLooseBallCtrlDist = Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 3.5;
 		double OurLooseBallCtrlAngle = Param::Math::PI * 15 / 180;
 		double OurStrictBallCtrlDist = Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 1.5;
@@ -68,7 +68,10 @@ void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 			if (ballStrictCtrl)
 				_potientialList[i] = 0;
 		}
-	}
+	}*/
+	for(int i=0;i<Param::Field::MAX_PLAYER;i++)
+		if(BallStatus::Instance()->getBallPossession(false,i))
+			_potientialList[i] = 0;
 	//门将不应太容易成为最优
 	_potientialList[pVision->TheirGoalie()] *= 1.5;
 	_potientialList[pVision->TheirGoalie()] += 0.2;

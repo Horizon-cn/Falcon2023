@@ -147,7 +147,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 
 	//【#TODO】更新双方当前在场上的球员数量，我方排除门将，对方全部
 	CheckBothSidePlayerNum();
-	
+
     /////////////////////////////////////////////////////////////////////////////
 	/// @brief Step 3: 更新双向通讯的数据，仅针对实物模式
     /////////////////////////////////////////////////////////////////////////////
@@ -160,13 +160,13 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	/////////////////////////////////////////////////////////////////////////////
 	// 【#TODO】 球状态模块更新状态, 这部分到时仍需要再细致调试下
 	BallStatus::Instance()->UpdateBallStatus(this);
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), BallStatus::Instance()->checkBallState(this, 0).c_str());
+	//qDebug() << BallStatus::Instance()->getBallPossession(false, 0);
 
 	// 【#TODO】 更新敌我双方对于球的势能，越小越有利于拿球，贝叶斯滤波中有使用
 	BestPlayer::Instance()->update(this); 
 	
 	// 【#TODO】 更新贝叶斯滤波器，评估目前比赛攻防形式
-	MatchState::Instance()->update();
+	// MatchState::Instance()->update();
 
 	DefenceInfo::Instance()->updateDefenceInfo(this);
 	DefenceInfoNew::Instance()->updateDefenceInfoNew(this);
@@ -317,8 +317,8 @@ void CVisionModule::CheckBothSidePlayerNum()
 	// 统计我方实际在场上的小车个数
 	_validNum = 0;
 	int tempGoalieNum = TaskMediator::Instance()->goalie();
-	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {		
-		if (OurPlayer(i).Valid() && i != tempGoalieNum) {	
+	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+		if (OurPlayer(i).Valid() && i != tempGoalieNum) {
 			_validNum++;
 		}
 	}
@@ -327,7 +327,7 @@ void CVisionModule::CheckBothSidePlayerNum()
 	// 统计对方实际在场上的小车个数
 	_TheirValidNum = 0;
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
-		if (TheirPlayer(i).Valid())	{
+		if (TheirPlayer(i).Valid()) {
 			_TheirValidNum ++;
 		}
 	}
@@ -335,8 +335,8 @@ void CVisionModule::CheckBothSidePlayerNum()
 
 //    if (_theirGoalie >=0 && _theirGoalie < Param::Field::MAX_PLAYER) return;
 //    if (_theirGoalie >=0 && _theirGoalie < Param::Field::MAX_PLAYER && !Utils::InTheirPenaltyArea(TheirPlayer(_theirGoalie).Pos(),0))
-//        return;
-    int dist = 1000;
+//        return;	
+	int dist = 1000;
     int tempTheirGoalie=_theirGoalie;
     for(int i=0;i<Param::Field::MAX_PLAYER;i++)
     {

@@ -29,6 +29,7 @@ ZSS::Protocol::Debug_Msgs guiDebugMsgs;
 //extern CEvent *visionEvent;
 QMutex* _best_visiondata_copy_mutex = 0;
 QMutex* _value_getter_mutex = 0;
+QMutex* _ball_pos_prediction_mutex = 0;
 QMutex* _debug_mutex = 0;
 bool IS_SIMULATION = false;
 bool VERBOSE_MODE = false;
@@ -52,6 +53,7 @@ void run(){
 
     _best_visiondata_copy_mutex = new QMutex;
     _value_getter_mutex = new QMutex;
+    _ball_pos_prediction_mutex = new QMutex;
     _debug_mutex = new QMutex;
 	GPUBestAlgThread::Instance()->initialize(VISION_MODULE);
 	GameInfoT gameInfo;
