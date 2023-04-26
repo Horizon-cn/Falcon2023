@@ -70,7 +70,7 @@ public:
     void UpdateBallStatus(const CVisionModule* pVision);
 
     // 获取球运动速度
-    CVector ballMovingVel(void) { return _ballMovingVel; }
+    // CVector ballMovingVel(void) { return _ballMovingVel; }
 
     // 球被踢出,便返回true(可能是挑射,也可能是平射)
     const bool IsBallKickedOut(void) const { return _isKickedOut; }
@@ -79,24 +79,24 @@ public:
     const bool IsBallKickedOut(int num) const { return _isKickedOut && num == _kickerNum;};
 
     const bool IsBallKickedOutNew(const CVisionModule* pVision, int num) {
-        UpdateBallStatus(pVision);
-        return IsBallKickedOut(num);
+         UpdateBallStatus(pVision);
+         return IsBallKickedOut(num);
     }
 
     // 球踢出,且是挑球指令踢出,才返回true
-    const bool IsChipKickedOut(void) const { return _isChipKickOut && _isKickedOut; }
+    // const bool IsChipKickedOut(void) const { return _isChipKickOut && _isKickedOut; }
 
     // 球被某个角色踢出,且是挑球指令踢出,才返回true;
-    const bool IsChipKickedOut(int num) const { return IsChipKickedOut() && num == _kickerNum; }
+    // const bool IsChipKickedOut(int num) const { return IsChipKickedOut() && num == _kickerNum; }
     // 得到踢球队员的号码
-    int getKickerNum() { return _kickerNum; }
+    // int getKickerNum() { return _kickerNum; }
 
     int getBallToucher(){
-        return _ballToucher;
+         return _ballToucher;
     }
 
     bool ballToucherChanged(){
-        return _ballToucher!=_lastBallToucher;
+         return _ballToucher!=_lastBallToucher;
     }
 
 
@@ -125,15 +125,15 @@ private:
 
     // 先将PlayInterface的信息加入BallStatus中
 public:
-    bool getBallPossession(bool isOurPlayer, int id);
+    double getBallPossession(bool isOurPlayer, int id);
     string checkBallState(const CVisionModule* pVision,int meNum=0);
     void clearBallStateCouter();
-    void setChipKickState(bool b_set){ _chipkickstate = b_set;}
-    bool getChipKickState()const { return _chipkickstate; }
-    void setCommand(CSendCmd kickCmd, int cycle);
+    //void setChipKickState(bool b_set){ _chipkickstate = b_set;}
+    //bool getChipKickState()const { return _chipkickstate; }
+    //void setCommand(CSendCmd kickCmd, int cycle);
     void setCommand(int num, int normalKick, int chipKick, unsigned char dribble, int cycle);
     CSendCmd getKickCommand(int num, int cycle) { return _kickCmd[num][cycle % MAX_CMD_STORED]; }
-    void clearKickCmd(int num, int cycle){ _kickCmd[num][cycle % MAX_CMD_STORED].clear(); }
+    //void clearKickCmd(int num, int cycle){ _kickCmd[num][cycle % MAX_CMD_STORED].clear(); }
     void clearKickCmd(); // 清除所有车指令
     void initializeCmdStored();
 private:

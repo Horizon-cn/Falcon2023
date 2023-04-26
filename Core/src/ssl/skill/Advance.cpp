@@ -123,7 +123,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		SupportPoint[i] = GPUBestAlgThread::Instance()->getBestPointFromArea(i);/* Gpu算点 */
 	// 可视化球的预测位置
 	for (int i = 0; i < 6; i++) {
-		GDebugEngine::Instance()->gui_debug_x(GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), i), COLOR_BLUE);
+		GDebugEngine::Instance()->gui_debug_msg(GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), i), QString::number(i).toStdString().c_str(),COLOR_BLUE);
 	}
 	
 
@@ -162,7 +162,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case GET:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
         if (NowIsShoot == 1) { _state = KICK; break; }
-		if (meHasBall>3) {
+		//if (meHasBall>3) {
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 			KickStatus::Instance()->resetAdvancerPassTo();
             /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
             if (NowIsShoot == 2) { _state = BREAKSHOOT; break; }

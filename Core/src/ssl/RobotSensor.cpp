@@ -74,7 +74,12 @@ void CRobotSensor::receiveRobotStatus()
             robot_status_mutex.lock();
             rawDataBuffer[id].bInfraredInfo = robot_status.infrared();
             rawDataBuffer[id].nRobotNum = id;
-            rawDataBuffer[id].nKickInfo = robot_status.chip_kick() || robot_status.flat_kick();
+            if (robot_status.chip_kick())
+                rawDataBuffer[id].nKickInfo = 2;
+            else if (robot_status.flat_kick())
+                rawDataBuffer[id].nKickInfo = 1;
+            else
+                rawDataBuffer[id].nKickInfo = 0;
             //qDebug()<<"receive"<<rawDataBuffer[id].nRobotNum<<"infrared"<<rawDataBuffer[id].bInfraredInfo<<"kick"<<rawDataBuffer[id].nKickInfo;
             robot_status_mutex.unlock();
         }
