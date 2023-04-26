@@ -24,13 +24,13 @@
 #include <thread>
 #include "Semaphore.h"
 #include <sstream>
+#include "Global.h"
 extern Semaphore vision_to_cuda;
 
 #if has_GPU
 extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float* pitch_info);
 extern "C" void ball_model_calc_with_gpu(float* vel_data_cpu, float* predict_results, float* a_1_matrix_cpu, float* bias_1_matrix_cpu, float* a_2_matrix_cpu, float* bias_2_matrix_cpu);
 #else
-bool has_GPU = false;
 void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float* pitch_info) {};
 void ball_model_calc_with_gpu(float* vel_data_cpu, float* predict_results, float* a_1_matrix_cpu, float* bias_1_matrix_cpu, float* a_2_matrix_cpu, float* bias_2_matrix_cpu) {};
 #endif // 
