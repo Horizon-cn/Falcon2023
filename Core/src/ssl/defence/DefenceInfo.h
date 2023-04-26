@@ -1,5 +1,5 @@
-#ifndef __DEFNCE_INFO_H__
-#define __DEFNCE_INFO_H__
+#ifndef __DEFENCE_INFO_H__
+#define __DEFENCE_INFO_H__
 
 #include "singleton.h"
 #include <vector>
