@@ -9,9 +9,9 @@ gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
 		--return "Test_Circle"
-		return "Test_Run"
+		return "Test_GetBall"
 	else
-		return "Test_Run"
+		return "Test_GetBall"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -22,7 +22,7 @@ gSwitchNum = {
 }
 
 gRoleFixNum = {
-	["Kicker"]   = {4},
+	["Kicker"]   = {2},
 	["Goalie"]   = {5},
 	["Tier"]	 = {3},
 	["Receiver"] = {1}

@@ -374,7 +374,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     char v1debugmsg[100];
     char periodmsg[100];
     //char xdebugmsg[100];
-    bool DEBUG_ENGINE = false;
+    bool DEBUG_ENGINE = 1;
     sprintf(v0debugmsg, "%f", v0);
     sprintf(v1debugmsg, "%f", v1);
     // 这个时间很关键，设得较大则定位精度将大大降低 by qxz

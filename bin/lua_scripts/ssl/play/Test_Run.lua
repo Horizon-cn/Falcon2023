@@ -3,8 +3,8 @@ local ALL_NOT_AVOID = flag.not_avoid_their_vehicle + flag.not_avoid_our_vehicle 
 local FLAG = ALL_NOT_AVOID --+ flag.dribbling
 
 local TargetPos1  = CGeoPoint:new_local(280,200)
-local TargetPos2  = CGeoPoint:new_local(280,-200)
-local TargetPos3  = CGeoPoint:new_local(-280,200)
+local TargetPos2  = CGeoPoint:new_local(220,170)
+local TargetPos3  = CGeoPoint:new_local(220,-170)
 local TargetPos4  = CGeoPoint:new_local(-280,-200)
 
 local DIR1  = 1.57
@@ -20,11 +20,11 @@ gPlayTable.CreatePlay{
 firstState = "run1",
 ["run1"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 150, 1000) then
+		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 150, 1000) then
 			return "run2";
 		end
 	end,
-	Goalie = task.goCmuRush(TargetPos2, 0),
+	Kicker = task.goCmuRush(TargetPos2, 1.57),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
@@ -32,11 +32,11 @@ firstState = "run1",
 
 ["run2"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 150, 1000) then
-			return "run3";
+		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 150, 1000) then
+			return "run1";
 		end
 	end,
-	Goalie = task.goCmuRush(TargetPos3, 0),
+	Kicker = task.goCmuRush(TargetPos3, 1.57),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
