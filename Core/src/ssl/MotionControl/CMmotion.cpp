@@ -374,7 +374,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     char v1debugmsg[100];
     char periodmsg[100];
     //char xdebugmsg[100];
-    bool DEBUG_ENGINE = 1;
+    bool DEBUG_ENGINE = false;
     sprintf(v0debugmsg, "%f", v0);
     sprintf(v1debugmsg, "%f", v1);
     // 这个时间很关键，设得较大则定位精度将大大降低 by qxz
@@ -465,10 +465,12 @@ void compute_motion_1d_test(double x0, double v0, double v1,
         else if (traj_time_acc < vel_factor * period && traj_time_flat < period && traj_time_dec > 0.0) {                                         // 加速接近结束且需减速
             traj_time += traj_time_acc + traj_time_flat + traj_time_dec;
             traj_accel = copysign(d_max * a_factor, -v0);
+            //traj_accel = copysign(d_max , -v0);
         }
         else {
             traj_time += traj_time_acc + traj_time_flat + traj_time_dec;
             traj_accel = copysign(a_max * a_factor, -x0);
+            //traj_accel = copysign(a_max , -x0);
         }
     }
     if (DEBUG_ENGINE) {
