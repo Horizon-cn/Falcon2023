@@ -191,6 +191,7 @@ public:
 	void startComm();
 	void setPointValue();
 	void sendPointValue();
+	void sendFieldRectangle();
 
 	/**
 	@brief	开启线程所用的函数*/

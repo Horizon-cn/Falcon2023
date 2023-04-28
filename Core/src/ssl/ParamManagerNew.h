@@ -11,7 +11,7 @@
 //};
 class ParamManagerOwl : public Falcon::ParamManager {
 public:
-    ParamManagerOwl() : ParamManager("../data/owl2.ini") {}
+    ParamManagerOwl() : ParamManager("../data/owl2.ini") { setFileName("./"); update(); }
     ~ParamManagerOwl() {}
     void update()
     {
@@ -34,7 +34,7 @@ public:
 typedef Falcon::MeyersSingleton<ParamManagerOwl> OParamManager;
 class ParamManagerCfg : public Falcon::ParamManager {
 public:
-    ParamManagerCfg() : ParamManager("../data/cfg.ini") {}
+    ParamManagerCfg() : ParamManager("../data/cfg.ini") { setFileName("./"); update(); }
     ~ParamManagerCfg() {}
     void update() {
         //IP address
@@ -63,19 +63,19 @@ public:
 typedef Falcon::MeyersSingleton<ParamManagerCfg> CParamManager;
 class ParamManagerVision : public Falcon::ParamManager {
 public:
-    ParamManagerVision() : ParamManager("../data/vision.ini") {}
+    ParamManagerVision() : ParamManager("../data/vision.ini") { setFileName("./"); }
     ~ParamManagerVision() {}
 };
 typedef Falcon::MeyersSingleton<ParamManagerVision> VParamManager;
 class ParamManagerSimulator : public Falcon::ParamManager {
 public:
-    ParamManagerSimulator() : ParamManager("../data/simulator.ini") {}
+    ParamManagerSimulator() : ParamManager("../data/simulator.ini") { setFileName("./"); }
     ~ParamManagerSimulator() {}
 };
 typedef Falcon::MeyersSingleton<ParamManagerSimulator> SParamManager;
 class CParamManagerSkill : public Falcon::ParamManager {
     public:
-        CParamManagerSkill() : ParamManager("../data/skill.ini") {}
+        CParamManagerSkill() : ParamManager("../data/skill.ini") { setFileName("./"); update(); }
         ~CParamManagerSkill() {}
         void update()
         {

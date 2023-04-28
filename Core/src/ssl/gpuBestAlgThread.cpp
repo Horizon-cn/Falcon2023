@@ -51,7 +51,7 @@ namespace gpuCalcArea {
 	const double middleBackBorderX = -Param::Field::PITCH_LENGTH / 6;
 	const double centerLeftBorderY = -Param::Field::PENALTY_AREA_WIDTH / 2;
 	const double centerRightBorderY = Param::Field::PENALTY_AREA_WIDTH / 2;
-
+	// big bug!!!
 	const double sideLineLeftBorderY = -ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
     //-450
     const double sideLineRightBorderY = ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
@@ -74,7 +74,7 @@ namespace gpuCalcArea {
 	// 目前这个区域已经更新
 
 	FieldRectangle fieldRectangleArray[AREANUM] = {
-		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX, sideLineLeftBorderY)),
         FieldRectangle(CGeoPoint(middleFrontBorderX + 150.0,centerRightBorderY),CGeoPoint(goalLineFrontBorderX - 50,centerLeftBorderY)),
         //FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
         FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
@@ -96,7 +96,6 @@ extern QMutex* _ball_pos_prediction_mutex;
 CGPUBestAlgThread::CGPUBestAlgThread() {
 	sendPoint = CGeoPoint(0, 0);
 	_pVision = NULL;
-
 	for (int i = 0; i < AREANUM; i++) {
 		_lastCycle[i] = 0;
 		_bestPoint[i] = CGeoPoint(0, 0);
@@ -483,6 +482,7 @@ void CGPUBestAlgThread::doBestCalculation() {
 		vision_to_cuda.Wait();
 		GPUBestAlgThread::Instance()->generatePointValue();
 		GPUBestAlgThread::Instance()->predictBallPos();
+		GPUBestAlgThread::Instance()->sendFieldRectangle();
 		GPUBestAlgThread::Instance()->setPointValue();
         GPUBestAlgThread::Instance()->sendPointValue();
 	}
@@ -567,3 +567,18 @@ int CGPUBestAlgThread::getMatrix(const string file_name, int max_row_num, int ma
 	}
 	return 1;
 }// END OF getInputData
+
+void CGPUBestAlgThread::sendFieldRectangle() {
+	for (int i = 0; i < AREANUM; i++) {
+		CGeoPoint leftUpPos = gpuCalcArea::fieldRectangleArray[i]._leftUpPos;
+		CGeoPoint rightUpPos = gpuCalcArea::fieldRectangleArray[i]._rightUpPos;
+		CGeoPoint leftDownPos = gpuCalcArea::fieldRectangleArray[i]._leftDownPos;
+		CGeoPoint rightDownPos = gpuCalcArea::fieldRectangleArray[i]._rightDownPos;
+		CGeoPoint centerPos = gpuCalcArea::fieldRectangleArray[i].getCenter();
+		GDebugEngine::Instance()->gui_debug_line(leftUpPos, rightUpPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_line(rightUpPos, rightDownPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_line(rightDownPos, leftDownPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_line(leftDownPos, leftUpPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(i).toStdString().c_str(), COLOR_BLACK);
+	}
+}

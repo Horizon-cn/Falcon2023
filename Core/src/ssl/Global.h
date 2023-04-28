@@ -23,7 +23,7 @@
 #include "PointCalculation/SupportPos2022.h"
 #include "RobotSensor.h"
 
-#define has_GPU false
+#define has_GPU true
 
 extern CParamManagerSkill* paramManager;
 extern ParamManagerOwl* oParamManager;
