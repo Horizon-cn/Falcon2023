@@ -24,13 +24,15 @@ namespace{
     int lastOurBestPlayer=0;
     const int StateMaxNum=5;
     int stateCouter[StateMaxNum]={0,0,0,0,0};
+
+    auto pm = ParamManager::Instance();
 }
 
 CBallStatus::CBallStatus(void)
 {
     _ballMovingVel = CVector(0,0);
     _isKickedOut = false;
-    _ballToucher=0;
+    _ballToucher = -1;
     _ballState= None;
     _ballStateCouter=0;
 
@@ -42,17 +44,91 @@ CBallStatus::CBallStatus(void)
 
 void CBallStatus::UpdateBallStatus(const CVisionModule* pVision)
 {
-    UpdateBallMoving(pVision);
+    // UpdateBallMoving(pVision);
     CheckKickOutBall(pVision);
-    _contactChecker.refereeJudge(pVision);
-    _lastBallToucher=_ballToucher;
-    _ballToucher=_contactChecker.getContactNum();
-    if (_isKickedOut||_isChipKickOut){
-        _ballToucher=_kickerNum;
+    // _contactChecker.refereeJudge(pVision);
+    _lastBallToucher = _ballToucher;
+    // _ballToucher = _contactChecker.getContactNum();
+    // if (_isKickedOut || _isChipKickOut){
+    //     _ballToucher = _kickerNum;
+    // }
+    updateBallPossession(pVision);
+}
+// 更新球的所有权
+void CBallStatus::updateBallPossession(const CVisionModule* pVision)
+{
+    // 判断我们的球员，使用视觉和红外，进入可吸球范围内
+    computeBallPossession(pVision, true, pm->maxFrame, pm->ourVisionJudgeDist, pm->ourVisionJudgeDir, true);
+    // 判断对方球员，只用视觉，表示离球较近
+    computeBallPossession(pVision, false, pm->maxFrame, pm->theirVisionJudgeDist, pm->theirVisionJudgeDir, false);
+    // 踢球后重置
+    if (_isKickedOut || _isChipKickOut) {
+        ballPossession[_kickerNum] = 0;
+        _ballToucher = _kickerNum;
     }
-
+    else {
+        int maxBallPossession = 0;
+        // 如果我们有球员已经拿到了球，不管对方，就是我们的球
+        for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+            if (ballPossession[i] > maxBallPossession) {
+                maxBallPossession = ballPossession[i];
+                _ballToucher = i;
+            }
+        }
+        // 我们没有拿到球，看对方是否进入拿球的范围内
+        if (maxBallPossession == 0) {
+            for (int i = Param::Field::MAX_PLAYER; i < Param::Field::MAX_PLAYER * 2; i++) {
+                if (ballPossession[i] > maxBallPossession) {
+                    maxBallPossession = ballPossession[i];
+                    _ballToucher = i;
+                }
+            }
+        }
+        // 大家都没有球
+        if (maxBallPossession == 0) {
+            _ballToucher = -1;
+        }
+    }
 }
 
+void CBallStatus::computeBallPossession(const CVisionModule* pVision, bool isOurPlayer, int maxFrame, double distThreshold, double dirThreshold, bool useInfrared)
+{
+    const BallVisionT& ball = pVision->Ball();
+    for (int id = 0; id < Param::Field::MAX_PLAYER; id++) {
+        PlayerVisionT player;
+        if (isOurPlayer)
+            player = pVision->OurPlayer(id);
+        else
+            player = pVision->TheirPlayer(id);
+        // 视觉判断
+        bool distVisionHasBall = CVector(player.Pos() - ball.Pos()).mod() <= distThreshold;
+        bool dirVisionHasBall;
+        double playerDir = player.Dir();
+        double player2Ball = (ball.Pos() - player.Pos()).dir();
+        double playerDir_player2Ball_Diff = fabs(Utils::Normalize((playerDir - player2Ball)));
+        if (playerDir_player2Ball_Diff < dirThreshold * Param::Math::PI / 180.0)
+            dirVisionHasBall = true;
+        else
+            dirVisionHasBall = false;
+        bool isVisionPossession = dirVisionHasBall && distVisionHasBall;
+        // 红外判断
+        bool isInfraredPossession = false;
+        if (isOurPlayer && useInfrared && RobotSensor::Instance()->IsInfraredOn(id))
+            isInfraredPossession = true;
+        // 综合判断及维持稳定
+        int num = id + Param::Field::MAX_PLAYER * (1 - (int)isOurPlayer);
+        if (isVisionPossession || isInfraredPossession)
+            ballPossession[num]++;
+        else
+            ballPossession[num]--;
+        ballPossession[num] = max(0, min(maxFrame, ballPossession[num]));
+    }
+}
+// 返回值的意义类似一个可信度
+double CBallStatus::getBallPossession(bool isOurPlayer, int id) {
+    int num = id + Param::Field::MAX_PLAYER * (1 - (int)isOurPlayer);
+    return (ballPossession[num] * 1.0 / pm->maxFrame);
+}
 
 void CBallStatus::UpdateBallMoving(const CVisionModule* pVision)
 {
@@ -86,10 +162,10 @@ void CBallStatus::initializeCmdStored()
     }
 }
 
-void CBallStatus::setCommand(CSendCmd kickCmd, int cycle)
-{
-    _kickCmd[kickCmd.num()][cycle % MAX_CMD_STORED] = kickCmd;
-}
+// void CBallStatus::setCommand(CSendCmd kickCmd, int cycle)
+// {
+//     _kickCmd[kickCmd.num()][cycle % MAX_CMD_STORED] = kickCmd;
+// }
 void CBallStatus::setCommand(int num, int normalKick, int chipKick, unsigned char dribble, int cycle)
 {
     _kickCmd[num][cycle % MAX_CMD_STORED].setKickCmd(num, normalKick, chipKick, dribble);
@@ -109,63 +185,103 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
     _isKickedOut = false;
     _isChipKickOut = false;
     //std::cout << "This is Checkout.\n";
-    for (int num=0; num < Param::Field::MAX_PLAYER; num++){
-
-        /************************************************************************/
-        /*  优先利用双向通讯信息 [6/16/2011 cliffyin]		                    */
-        /************************************************************************/
-        // 实物: 优先检测上传信息
-        // 实车通信不稳定，也使用仿真方法进行判断
-        if (! IS_SIMULATION && false) {
-            bool sensorValid = RobotSensor::Instance()->IsInfoValid(num);
-            bool isBallInFoot = RobotSensor::Instance()->IsInfraredOn(num);
-            int isKickDeviceOn = RobotSensor::Instance()->IsKickerOn(num);
-            // std::cout << "sensorValid: " << sensorValid << ", isBallInFoot: " << isBallInFoot << ", isKickDeviceOn: " << isKickDeviceOn << ".\n";
-            // 用于双向通迅出现问题时，且此时红外正常
-            if (sensorValid && isKickDeviceOn > 0) {
-                _kickerNum = num;
-                _isKickedOut = true;
-                if (isKickDeviceOn == IS_CHIP_KICK_ON) {
-                    _isChipKickOut = true;
-                }
-                break;
+    for (int num = 0; num < Param::Field::MAX_PLAYER; num++){
+        // 仿真中也接入了红外和其他反馈，统一用视觉和反馈判断 -- 2023.4.25 yjz
+        // 查阅历史指令，考虑下发指令有延时
+        bool isKickCmdSent, isChipCmdSent = false;
+        for (int i = 0; i < MAX_CMD_STORED; i++){
+            CSendCmd kickCmd = getKickCommand( num, (pVision->Cycle() + MAX_CMD_STORED - i) % MAX_CMD_STORED );
+            if (kickCmd.normalKick()>0){
+                isKickCmdSent = true;
+            }
+            else if (kickCmd.chipKick()>0){
+                isChipCmdSent = true;
             }
         }
-        // 仿真: 完全按照图像进行判断
-        else{
-            bool isKickCmdSent = false;
-            for (int i=0; i < MAX_CMD_STORED; i++){
-                CSendCmd kickCmd = getKickCommand( num, (pVision->Cycle()+MAX_CMD_STORED-i) % MAX_CMD_STORED );
-                if (kickCmd.normalKick()>0){
-                    isKickCmdSent = true;
-                }
-                else if (kickCmd.chipKick()>0){
-                    isKickCmdSent = true;
-                    _isChipKickOut = true; // 记录挑球标签
-                }
-            }
-            //std::cout << "isKickCmdSent: " << isKickCmdSent << std::endl;
-            if (false == isKickCmdSent){
-                _isKickedOut = false;
-                continue;
-            }
-
+        // 考虑机器人的反馈，丢包和延时比较明显，挑球只能靠这个判断，平射优先考虑视觉
+        bool sensorValid = RobotSensor::Instance()->IsInfoValid(num);
+        int isKickDeviceOn = RobotSensor::Instance()->IsKickerOn(num);
+        // 之前应该发过踢球指令，否则不可能踢出
+        if (isKickCmdSent) {
             const BallVisionT& ball = pVision->Ball();
             const PlayerVisionT& player = pVision->OurPlayer(num);
             CVector player2ball = ball.Pos() - player.Pos();
             double ballSpeedDir = ball.Vel().dir();
             double ballLeavingAngle = fabs(Utils::Normalize(ballSpeedDir - player2ball.dir()));
             double ballFleeingRelDir = fabs(Utils::Normalize(ballSpeedDir - player.Dir()));
-
             // 球离去的方向与车球朝向应该小于一定角度
-            //std::cout << "isKick:" << (ballLeavingAngle < Param::Math::PI / 3) << " " << (ball.Vel().mod() > 100) << " " << (ballFleeingRelDir < Param::Math::PI / 12) << "\n";
-            if (ballLeavingAngle < Param::Math::PI / 3 && ball.Vel().mod() > 100
-                &&  ballFleeingRelDir < Param::Math::PI/12){
+            if (ballLeavingAngle < Param::Math::PI / 3 && ball.Vel().mod() > 100 && ballFleeingRelDir < Param::Math::PI / 12) {
+                _isKickedOut = true;
+                _kickerNum = num;
+                break;
+            }
+            if (sensorValid && isKickDeviceOn == 1) {
                 _isKickedOut = true;
                 _kickerNum = num;
                 break;
             }
         }
+        if (isChipCmdSent && sensorValid && isKickDeviceOn == 2) {
+            _kickerNum = num;
+            _isChipKickOut = true;
+            break;
+        }
+
+        /************************************************************************/
+        /*  优先利用双向通讯信息 [6/16/2011 cliffyin]		                    */
+        /************************************************************************/
+        // 实物: 优先检测上传信息
+        // 实车通信不稳定，也使用仿真方法进行判断
+        // if (! IS_SIMULATION && false) {
+        //    bool sensorValid = RobotSensor::Instance()->IsInfoValid(num);
+        //    bool isBallInFoot = RobotSensor::Instance()->IsInfraredOn(num);
+        //    int isKickDeviceOn = RobotSensor::Instance()->IsKickerOn(num);
+            // std::cout << "sensorValid: " << sensorValid << ", isBallInFoot: " << isBallInFoot << ", isKickDeviceOn: " << isKickDeviceOn << ".\n";
+            // 用于双向通迅出现问题时，且此时红外正常
+        //    if (sensorValid && isKickDeviceOn > 0) {
+        //        _kickerNum = num;
+        //        _isKickedOut = true;
+        //        if (isKickDeviceOn == IS_CHIP_KICK_ON) {
+        //            _isChipKickOut = true;
+        //        }
+        //        break;
+        //    }
+        // }
+        // 仿真: 完全按照图像进行判断
+        // else{
+        //    bool isKickCmdSent = false;
+        //    for (int i=0; i < MAX_CMD_STORED; i++){
+        //        CSendCmd kickCmd = getKickCommand( num, (pVision->Cycle()+MAX_CMD_STORED-i) % MAX_CMD_STORED );
+        //        if (kickCmd.normalKick()>0){
+        //            isKickCmdSent = true;
+        //        }
+        //        else if (kickCmd.chipKick()>0){
+        //            isKickCmdSent = true;
+        //            _isChipKickOut = true; // 记录挑球标签
+        //        }
+        //    }
+            //std::cout << "isKickCmdSent: " << isKickCmdSent << std::endl;
+        //    if (false == isKickCmdSent){
+        //        _isKickedOut = false;
+        //        continue;
+        //    }
+
+        //    const BallVisionT& ball = pVision->Ball();
+        //    const PlayerVisionT& player = pVision->OurPlayer(num);
+        //    CVector player2ball = ball.Pos() - player.Pos();
+        //    double ballSpeedDir = ball.Vel().dir();
+        //    double ballLeavingAngle = fabs(Utils::Normalize(ballSpeedDir - player2ball.dir()));
+        //    double ballFleeingRelDir = fabs(Utils::Normalize(ballSpeedDir - player.Dir()));
+
+            // 球离去的方向与车球朝向应该小于一定角度
+            //std::cout << "isKick:" << (ballLeavingAngle < Param::Math::PI / 3) << " " << (ball.Vel().mod() > 100) << " " << (ballFleeingRelDir < Param::Math::PI / 12) << "\n";
+        //    if (ballLeavingAngle < Param::Math::PI / 3 && ball.Vel().mod() > 100
+        //        &&  ballFleeingRelDir < Param::Math::PI/12){
+        //        _isKickedOut = true;
+        //        _kickerNum = num;
+        //        break;
+        //    }
+        // }
 
 
         ///************************************************************************/

@@ -65,7 +65,7 @@ const Matrix2d& KalmanFilter::update(double px, double py) {
         init(px, py, 0, 0);
     }
     z = Matrix2d(2, 1, { px, py });
-    x_ = A * x;
+    x_ = A * x;   // 因为update一直跟着predict，所以不用考虑输入 ？？？？
     P_ = A * P * A.transpose() + Q;
     K  = P_ * H.transpose() * ((H * P_ * H.transpose() + R).inverse());
     x  = x_ + K * (z - H * x_);
@@ -137,6 +137,9 @@ PosFilter::PosFilter(double _initCov, double _measErr, double _modelErr) : Kalma
     setCovarianceMat(_initCov);
     setMeasErrorMat(_measErr);
     modelErr = _modelErr;
+    R2 = Matrix2d::createIdentity(4);
+    R2(0, 0) = 10;
+    R2(1, 1) = 10;
 }
 
 void PosFilter::initState(double px, double py, double vx, double vy) {
@@ -168,6 +171,18 @@ void PosFilter::predict2(double ux, double uy){
 void PosFilter::update2(double zx, double zy){
     z = Matrix2d(ctrlNum, 1, { zx, zy });
     _update2(z);
+}
+
+void PosFilter::update4(double zx, double zy, double zvx, double zvy) {
+    z = Matrix2d(4, 1, { zx, zy, zvx, zvy });
+    _update4(z);
+}
+
+void PosFilter::_update4(Matrix2d measMat){
+    Matrix2d observationMat = Matrix2d::createIdentity(4);
+    K2 = P_ * observationMat.transpose() * ((observationMat * P_ * observationMat.transpose() + R2).inverse());
+    x = x_ + K2 * (measMat - observationMat * x_);
+    P = P_ - K2 * observationMat * P_;
 }
 
 /**CGeoPoint PosFilter::predictedPos(double t) const{

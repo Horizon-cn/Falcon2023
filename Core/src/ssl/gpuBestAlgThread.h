@@ -157,8 +157,19 @@ public:
 	CGeoPoint getBestPointFromArea(int area_idx);
 
 	/**
+	@brief	球速预测模块的对外接口
+	@param	ball_pos 当前球的位置
+	@param	ball_dir 当前球的运动方向
+	@param	传入frame，返回frame帧时球的预测位置*/
+	CGeoPoint getBallPosFromFrame(CGeoPoint ball_pos, CVector ball_vel, int frame);
+
+	/**
 	@brief 全场所有点的势能值的生成*/
 	void generatePointValue();
+
+	/**
+	@brief 预测球的位置*/
+	void CGPUBestAlgThread::predictBallPos();
 
 	/**
 	@brief	判断某一区域前一帧的最佳跑位点是否仍有效*/
@@ -209,8 +220,12 @@ private:
 	@brief 判断两个点是否距离较近，目前是判断是否在一个矩阵内
 	用于避免区域生成的点过近*/
 	bool isClose(const CGeoPoint pos1, const CGeoPoint pos2, float x_distance, float y_distance);
-
+	 
+	/**
+	@brief 读取矩阵*/
+	int getMatrix(const string file_name, int max_row_num, int max_col_num, float* matrix);
 private:
+
 	float* _PointPotentialOrigin, * _PointPotential, * _start_pos_cpu;	     ///GPU势能值数组、处理后的GPU势能值数组、场地上机器人及球的信息数组
 	// 注意：_start_pos_cpu中存储了小车、球的信息，并会被复制到GPU中，如果修改了其中信息的传递规则，请仔细阅读赋值部分代码与GPU部分解析代码
 	//
@@ -231,6 +246,12 @@ private:
     float _pitch_info[4] = { static_cast<float>(Param::Field::PITCH_LENGTH), static_cast<float>(Param::Field::PITCH_WIDTH), static_cast<float>(Param::Field::PENALTY_AREA_DEPTH), static_cast<float>(Param::Field::PENALTY_AREA_WIDTH) }; // 场地信息，依次为场地长、宽、禁区深度、宽
 
 	PointValueList pointValueList;
+
+	// 球速预测部分
+	bool matrix_ok = false;
+	int input_dim, output_dim, hidden_layer_dim;
+	float* a_1_matrix_cpu, * bias_1_matrix_cpu, * a_2_matrix_cpu, * bias_2_matrix_cpu;
+	float* _history_ball_vel,* _ball_pos_prediction_results;
 };
 
 typedef Falcon::NormalSingleton<CGPUBestAlgThread> GPUBestAlgThread;

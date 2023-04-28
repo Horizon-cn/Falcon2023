@@ -1,6 +1,7 @@
 #ifndef _BREAK_H_
 #define _BREAK_H_
 #include <skill/PlayerTask.h>
+#include "Global.h"
 
 /**********************************************************/
 /* Skill: ???????¨°
@@ -25,6 +26,12 @@ private:
     CGeoPoint dribblePoint;
     CGeoPoint move_point;
 
+    CGeoPoint point[20];
+    int running_index;
+
+
+    bool isSetPoint(const CVisionModule* pVision, const CGeoPoint* point, const CGeoPoint& target);
+
     //help track robot trace
     CGeoPoint lastFrameposition;
     double dribbleDist = 0;
@@ -32,6 +39,7 @@ private:
     CGeoPoint makeInCircle(const CGeoPoint& point, const CGeoPoint& center, double radius);
     CGeoPoint calc_point(const CVisionModule* pVision, const int vecNumber, const CGeoPoint& target, const CGeoPoint& dribblePoint, const bool isChip, bool& canShoot, bool& needBreakThrough);
     double holdBallDir(const CVisionModule *pVision, int robotNum);
+    bool canScore(const CVisionModule* pVision, const int vecNumber, const double radius, const double dir);
 };
 
 #endif

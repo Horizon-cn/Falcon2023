@@ -25,15 +25,16 @@ DEFINE_CLASS_EX_CPP(ATest2);//for test
 DEFINE_CLASS_EX_CPP(ACanBeLeader);
 DEFINE_CLASS_EX_CPP(ADist2TheirGoal);//return double 到对方球门中心点的距离
 DEFINE_CLASS_EX_CPP(ADist2OurGoal);//return double 到我方球门中心点的距离
-DEFINE_CLASS_EX_CPP(ADist2Ball);	//return double	 到球的距离
+DEFINE_CLASS_EX_CPP(ADist2Ball);//return double	 到球的距离
+DEFINE_CLASS_EX_CPP(ADist2BallNormalized);//return double 归一化（同一帧所有车最大值为1）的到球的距离
+DEFINE_CLASS_EX_CPP(ADist2BallProjModified);//return double 归一化（超过80均为1，最小为0.125）的到球速线投影的距离，再根据球速档位修正系数
 DEFINE_CLASS_EX_CPP(AValid);//return 1 or 0 对方是否存在
-DEFINE_CLASS_EX_CPP(ABestPlayer);//return 1 or 0 是否是对方BestPlayer
 DEFINE_CLASS_EX_CPP(AShootRange);//return double 射门角度
 DEFINE_CLASS_EX_CPP(AShootRangeWithoutMarker);//return double 将我方Marker排除在外时的射门角度
 DEFINE_CLASS_EX_CPP(AFillingInDist);//return double 补防距离
 DEFINE_CLASS_EX_CPP(AKeeperDirFactor);//return double 对方BestPlayer朝向线与对方BestPlayer和对方连线朝向之差
 DEFINE_CLASS_EX_CPP(AMarkerDistFactor);//return double 和我方Marker的距离，无人盯防时该值返回500（暂定）
-DEFINE_CLASS_EX_CPP(AMarkerDirFactor);	//retrun double 对方到门朝向和到我方Marker的朝向之差,无人盯防时该值返回PI（暂定）
+DEFINE_CLASS_EX_CPP(AMarkerDirFactor);//retrun double 对方到门朝向和到我方Marker的朝向之差,无人盯防时该值返回PI（暂定）
 DEFINE_CLASS_EX_CPP(AShootReflectAngle);//return double 对方射门折射角
 DEFINE_CLASS_EX_CPP(AReceiveReflectAngle);//return double or PI传球过程中接球的receiver的折射角
 DEFINE_CLASS_EX_CPP(AImmortalFactor);//return double 球到我门中心向量，与球到该队员向量的夹角,静态意义
@@ -73,8 +74,9 @@ void CAttributeFactory::configuration()
 	_attrSet->add(new ADist2TheirGoal());
 	_attrSet->add(new ADist2OurGoal());
 	_attrSet->add(new ADist2Ball());
+	_attrSet->add(new ADist2BallNormalized());
+	_attrSet->add(new ADist2BallProjModified());
 	_attrSet->add(new AValid());
-	_attrSet->add(new ABestPlayer());
 	_attrSet->add(new AShootRange());
 	_attrSet->add(new AShootRangeWithoutMarker());
 	_attrSet->add(new AFillingInDist());
@@ -178,6 +180,76 @@ EVALUATE_ATTRIBUTE(ADist2Ball)
 	double tempValue = pVision->TheirPlayer(num).Pos().dist(pVision->Ball().Pos());
 	setValue(tempValue);
 }
+//return double 归一化（同一帧所有车最大值为1）的到球的距离
+EVALUATE_ATTRIBUTE(ADist2BallNormalized)
+{
+	vector<double> Dist2BallList;
+	for (int theirNum = 0; theirNum < Param::Field::MAX_PLAYER; ++theirNum)
+	{
+		const PlayerVisionT enemy = pVision->TheirPlayer(theirNum);
+		if (enemy.Valid())
+			Dist2BallList.push_back((enemy.Pos() - pVision->Ball().Pos()).mod());
+		else
+			Dist2BallList.push_back(0);
+	}
+	if (Dist2BallList.empty())
+		setValue(1);
+	else
+		setValue(Dist2BallList[num] / (*max(Dist2BallList.begin(), Dist2BallList.end())+1));
+}
+//return double 归一化（超过80均为1，最小为0.125）的到球速线投影的距离，再根据球速档位修正系数
+EVALUATE_ATTRIBUTE(ADist2BallProjModified)
+{
+	const BallVisionT& ball = pVision->Ball();
+	const PlayerVisionT& player = pVision->TheirPlayer(num);
+
+	double limited_ball_speed = 800;
+	if (!ball.Valid()) {
+		limited_ball_speed = 50;
+	}
+	CVector applicable_ball_vel = ball.Vel();
+	if (ball.Vel().mod() > limited_ball_speed) {
+		applicable_ball_vel = Utils::Polar2Vector(limited_ball_speed, ball.Vel().dir());
+	}
+
+	double maxProjDist = 80;
+	CGeoLine ballVelLine = CGeoLine(ball.Pos(), ball.Pos() + applicable_ball_vel);
+	CGeoPoint proj = ballVelLine.projection(player.Pos());
+	double dist = player.Pos().dist(proj);
+	if (ball.Vel().mod() < 30 || !ball.Valid()) {
+		dist = player.Pos().dist(ball.Pos());
+	}
+	dist = min(dist, maxProjDist);
+	dist = max(dist, 10.0);
+
+	double yDistFactor = 0;
+	if (ball.Vel().mod() > 600) {
+		yDistFactor = 1.3;
+	}
+	else if (ball.Vel().mod() > 400) {
+		yDistFactor = 1.1;
+	}
+	else if (ball.Vel().mod() > 350) {
+		yDistFactor = 1;
+	}
+	else if (ball.Vel().mod() > 280) {
+		yDistFactor = 0.8;
+	}
+	else if (ball.Vel().mod() > 220) {
+		yDistFactor = 0.65;
+	}
+	else if (ball.Vel().mod() > 160) {
+		yDistFactor = 0.45;
+	}
+	else if (ball.Vel().mod() > 100) {
+		yDistFactor = 0.3;
+	}
+	else if (ball.Vel().mod() > 70){
+		yDistFactor = 0.1;
+	}
+
+	setValue(yDistFactor * dist / maxProjDist);
+}
 //return 1 or 0		对方是否存在
 EVALUATE_ATTRIBUTE(AValid)
 {
@@ -185,14 +257,6 @@ EVALUATE_ATTRIBUTE(AValid)
 	{
 		setValue(1.00);
 	} else setValue(0.00);
-}
-//return 1 or 0		是否是对方BestPlayer
-EVALUATE_ATTRIBUTE(ABestPlayer)
-{
-	if (num == BestPlayer::Instance()->getTheirBestPlayer())
-	{
-		setValue(1.00);
-	}else setValue(0.00);
 }
 //return double		射门角度
 EVALUATE_ATTRIBUTE(AShootRange)

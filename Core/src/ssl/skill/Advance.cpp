@@ -118,9 +118,15 @@ void CAdvance::plan(const CVisionModule* pVision)
     /*??痦??*/
 
 	CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
-
+	ShootPoint= GenerateBreakShootPoint(pVision, _executor);
 	for(int i=0;i<9;++i)
 		SupportPoint[i] = GPUBestAlgThread::Instance()->getBestPointFromArea(i);/* Gpu算点 */
+	// 可视化球的预测位置
+	for (int i = 0; i < 6; i++) {
+		GDebugEngine::Instance()->gui_debug_msg(GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), i), QString::number(i).toStdString().c_str(),COLOR_BLUE);
+	}
+	
+
 //	NormalPlayUtils::generatePassPoint(ball.Pos(), SupportPoint[0], SupportPoint[1], SupportPoint[2], SupportPoint[3]);
 	NumberOfSupport = 6;/*暂时只考虑对面半场六个*/
 	IsMeSupport = JudgeIsMeSupport(pVision, _executor);/*判断我是不是support 用于传中*/
@@ -156,7 +162,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case GET:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
         if (NowIsShoot == 1) { _state = KICK; break; }
-		if (meHasBall>3) {
+		//if (meHasBall>3) {
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 			KickStatus::Instance()->resetAdvancerPassTo();
             /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
             if (NowIsShoot == 2) { _state = BREAKSHOOT; break; }
@@ -325,7 +332,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case BREAKSHOOT:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKSHOOT", COLOR_YELLOW);
         KickStatus::Instance()->setBothKick(_executor, 0, 0);
-		ShootPoint = GenerateBreakShootPoint(pVision, _executor);
+		ShootPoint = (pVision->Cycle() % 60 == 0)? GenerateBreakShootPoint(pVision, _executor):ShootPoint;
         if(AdJudgeBreakCanDo(pVision, _executor, ShootPoint)||true)setSubTask(PlayerRole::makeItBreak(_executor, ShootPoint));
         else setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, generateGetballDir(pVision, _executor), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		break;
