@@ -175,6 +175,7 @@ public:
   DEF_VALUE(double,Double,BallLinearDamp)
   DEF_VALUE(double,Double,BallAngularDamp)
 
+  DEF_VALUE(bool, Bool, wheelSpeedCallBack);
   DEF_VALUE(bool,Bool,SyncWithGL)
   DEF_VALUE(int,Intz,NumOfCam)
   DEF_VALUE(double,Double,DesiredFPS)

@@ -12,6 +12,7 @@
 #include <qdebug.h>
 #include "test.h"
 #include "staticparams.h"
+#include "communicator.h"
 namespace Owl {
 namespace {
 bool trans_dribble(double dribble) {
@@ -125,7 +126,8 @@ void SimModule::readBlueData() {
                 GlobalData::Instance()->robotInformation[PARAM::BLUE][id].chip = isChipKick;
                 GlobalData::Instance()->robotInfoMutex.unlock();
                 qDebug() << "Blue id: " << id << "  infrared: " << infrared << "  flat: " << isFlatKick << "  chip: " << isChipKick;
-                emit receiveSimInfo(PARAM::BLUE, id);
+                ZCommunicator::Instance()->sendCommand(PARAM::BLUE, id);
+                //emit receiveSimInfo(PARAM::BLUE, id);
             }
         }
     }
@@ -155,7 +157,8 @@ void SimModule::readYellowData() {
                 GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].chip = isChipKick;
                 GlobalData::Instance()->robotInfoMutex.unlock();
     //            qDebug() << "Yellow id: " << id << "  infrared: " << infrared << "  flat: " << isFlatKick << "  chip: " << isChipKick;
-                emit receiveSimInfo(PARAM::YELLOW, id);
+                ZCommunicator::Instance()->sendCommand(PARAM::YELLOW, id);
+                //emit receiveSimInfo(PARAM::YELLOW, id);
             }           
         }
     }

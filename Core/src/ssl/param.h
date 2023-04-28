@@ -74,6 +74,7 @@ namespace Param{
 			const double DRIBBLE_ANGLE = ::Param::Math::PI * 17 / 180; // 可以带球的最大相对身体角度
 			//const double HEAD_ANGLE = 57*Param::Math::PI / 180; // 前面的开口角度
 			const double TOUCH_SHIFT_DIST = ParamManager::Instance()->value("TOUCHKICK/TOUCH_SHIFT_DIST", 9.96).toDouble(); //9.96; //做Touch时后退的距离
+			const bool WHEEL_SPEED_CALLBACK = SParamManager::Instance()->value("Communication", "wheelSpeedCallBack", false).toBool(); // 机器人是否实时反馈轮速
 		}
 	}
 	namespace AvoidDist{

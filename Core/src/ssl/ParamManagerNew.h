@@ -89,6 +89,12 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(DRAW_BALLPLACE_AREA, "Debug/DRAW_BALLPLACE_AREA", 0);
             loadParam(DRAW_PENALTY_DEBUG_MSG, "Debug/DRAW_PENALTY_DEBUG_MSG", 1);
 
+            loadParam(BUFFER, "GotoPositionNew/BUFFER", 10);
+            loadParam(INFLAT_RATIO, "GotoPositionNew/INFLAT_RATIO", 1.0);
+            loadParam(LOWER_BND_UDOT, "GotoPositionNew/LOWER_BND_UDOT", 2.0);
+            loadParam(MAX_SEARCH_ITERATION, "GotoPositionNew/MAX_SEARCH_ITERATION", 2);
+            loadParam(COUNTPLAN_THRESHOLD, "GotoPositionNew/COUNTPLAN_THRESHOLD", 90);
+
             loadParam(TOUCH_SHIFT_DIST, "TOUCHKICK/TOUCH_SHIFT_DIST", 9.96);
             loadParam(TOUCH_Debug, "TOUCHKICK/TOUCH_Debug", 0);
 
@@ -234,6 +240,12 @@ class CParamManagerSkill : public Falcon::ParamManager {
         int DRAW_OBS;
         int DRAW_BALLPLACE_AREA;
         int DRAW_PENALTY_DEBUG_MSG;
+        // GotoPositionNew 中的调试变量
+        double BUFFER;
+        double INFLAT_RATIO;
+        double LOWER_BND_UDOT;
+        int MAX_SEARCH_ITERATION;
+        int COUNTPLAN_THRESHOLD;
         // TouchKick 中的调试开关
         int TOUCH_SHIFT_DIST;
         int TOUCH_Debug;

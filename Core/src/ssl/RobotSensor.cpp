@@ -92,8 +92,15 @@ void CRobotSensor::Update(int cycle)
     robot_status_mutex.lock();
     for (int i = 0; i < Param::Field::MAX_PLAYER; i ++) {
         robotInfoBuffer[i] = rawDataBuffer[i];
-        if (robotInfoBuffer[i].nRobotNum == i)
+        if (robotInfoBuffer[i].nRobotNum == i) {
             _isValid[i] = true;
+            if (robotInfoBuffer[i].bInfraredInfo) {
+                auto player = VisionModule::Instance()->OurPlayer(i);
+                auto pos = player.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE/2, player.Dir());
+                GDebugEngine::Instance()->gui_debug_arc(pos, 6 * Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
+                GDebugEngine::Instance()->gui_debug_arc(pos, 3 * Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
+            }
+        }
         else
             _isValid[i] = false;
     }

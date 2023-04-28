@@ -8,10 +8,9 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		--return "Test_Circle"
-		return "Test_GetBall"
+		return "Test_Advance" --"Test_Run"
 	else
-		return "Test_GetBall"
+		return "Test_Advance" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -22,8 +21,8 @@ gSwitchNum = {
 }
 
 gRoleFixNum = {
-	["Kicker"]   = {2},
-	["Goalie"]   = {5},
+	["Kicker"]   = {5},
+	["Goalie"]   = {4},
 	["Tier"]	 = {3},
 	["Receiver"] = {1}
 }
@@ -45,12 +44,14 @@ gSkill = {
 	"SmartGoto",
 	"GoCmuRush",
 	"SimpleGoto",
+	"BezierRush",
 	"GotoMatchPos",
 	"RunMultiPos",
 	"RunMultiPosV2",
 	"RunMultiPosVel",
 	"GoTechChalPos",
 	--踢球
+	"JustKick",
 	"WaitKick",
 	"TouchKick",
 	"ShootBall",
@@ -58,6 +59,7 @@ gSkill = {
 	"GoAndTurnKick",
 	"GoAndTurnKickV3",
 	"GoAndTurnKickV4",
+	"DribbleTurnKickV2",
 	--拿球
 	"GetBall",
 	"SlowGetBall",
@@ -179,10 +181,12 @@ gBayesPlayTable = {
 gTestPlayTable = {
 
 	"Test_Run",
+	"Test_BezierRun",
 	"Test_GetBall",
 	"Test_ChaseKick",
 	"Test_PassNormal",
 	"Test_ReceivePass",
+	"Test_PassEachOther",
 	
 	"Test_Advance",
 	"Test_GoSupport",

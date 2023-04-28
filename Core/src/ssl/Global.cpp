@@ -22,6 +22,7 @@ ParamManagerOwl* oParamManager;
 ParamManagerCfg* cParamManager;
 ParamManagerVision* vParamManager;
 ParamManagerSimulator* sParamManager;
+CRobotSensor* robotSensor;
 
 void initializeSingleton()
 {
@@ -47,4 +48,5 @@ void initializeSingleton()
 	tandemPos		= TandemPos::Instance();
 	chipBallJudge	= ChipBallJudge::Instance();
 	indirectDefender= IndirectDefender::Instance();
+	robotSensor		= RobotSensor::Instance();
 }

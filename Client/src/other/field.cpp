@@ -41,13 +41,14 @@ const static QColor DEBUG_COLOR[10] = {
     Qt::black
 };
 const static QColor DEBUG_BRUSH_COLOR = QColor(255, 255, 255, 20);
-const static QColor COLOR_ORANGE(255, 0, 255);
+const static QColor COLOR_VIOLET(255, 0, 255);
 const static QColor COLOR_ORANGE_SHADOW(255, 0, 255, 60);
 const static QColor COLOR_TRANSORANGE(255, 170, 85, 100);
 const static QColor COLOR_DARKGREEN(48, 48, 48);
 const static QColor COLOR_RED(220, 53, 47);
 const static QColor COLOR_LIGHTWHITE(255, 255, 255, 20);
 const static qreal zoomStep = 0.05;
+const static qreal zoomMax = 2;
 const static qreal zoomMin = 0.35; //0.1;
 const int ballRatio = 3;
 
@@ -575,8 +576,8 @@ void Field::middleNoModifierPressEvent(QMouseEvent *e) {
 }
 void Field::middleNoModifierMoveEvent(QMouseEvent *e) {
     auto t = MiddleEvent::zoomStart + zoomRatio * (MiddleEvent::start - QPoint(e->x(), e->y()));
-    zoomStart.setX(limitRange(t.x(), 0, int(area.width() * (1 - zoomRatio))));
-    zoomStart.setY(limitRange(t.y(), 0, int(area.height() * (1 - zoomRatio))));
+    zoomStart.setX(limitRange(t.x(), 0, int(area.width() * (zoomMax - zoomRatio))));
+    zoomStart.setY(limitRange(t.y(), 0, int(area.height() * (zoomMax - zoomRatio))));
     triggerDraw();
 }
 void Field::middleNoModifierReleaseEvent(QMouseEvent *e) {}
@@ -613,11 +614,11 @@ void Field::middleCtrlModifierReleaseEvent(QMouseEvent *e) {
 void Field::wheelEvent (QWheelEvent *e) {
     qreal oldRatio = zoomRatio;
     zoomRatio += (e->delta() < 0 ? zoomStep : -zoomStep);
-    zoomRatio = limitRange(zoomRatio, zoomMin, 1.0);
+    zoomRatio = limitRange(zoomRatio, zoomMin, zoomMax); //1.0
     qDebug()<<"zoomRatio"<<zoomRatio;
     zoomStart -= e->pos() * (zoomRatio - oldRatio);
-    zoomStart.setX(limitRange(zoomStart.x(), 0, int(area.width() * (1 - zoomRatio))));
-    zoomStart.setY(limitRange(zoomStart.y(), 0, int(area.height() * (1 - zoomRatio))));
+    zoomStart.setX(limitRange(zoomStart.x(), 0, int(area.width() * (zoomMax - zoomRatio))));
+    zoomStart.setY(limitRange(zoomStart.y(), 0, int(area.height() * (zoomMax - zoomRatio))));
     pixmapPainter.setRenderHint(QPainter::Antialiasing, zoomRatio>0.5);
     triggerDraw();
 }
@@ -654,7 +655,7 @@ void Field::repaint() {//change here!!!!!!! 每帧视觉都更新
         paintInit(); // 绘制场地线
         drawMaintainVision(0);
         drawDebugMessages(PARAM::BLUE); //BLUE
-        reportStatus();
+        //reportStatus();
         paintOffCar();
         break;
     case 3:
@@ -664,7 +665,7 @@ void Field::repaint() {//change here!!!!!!! 每帧视觉都更新
         paintInit(); // 绘制场地线
         drawMaintainVision(0);
         drawDebugMessages(PARAM::YELLOW); //YELLOW
-        reportStatus();
+        //reportStatus();
         paintOffCar();
         break;
     default:
@@ -823,17 +824,22 @@ void Field::drawMaintainVision(int index) {
 
     for(int i = -99; i < 0; i ++) {
 //        drawVision(GlobalData::Instance()->maintain[index + i],true);
+        auto& robot = GlobalData::Instance()->maintain[index + i].robot[PARAM::BLUE][0];
+        paintShadow(COLOR_LIGHTWHITE, robot.pos.x(), robot.pos.y());
         auto& ball = GlobalData::Instance()->maintain[index + i].ball[0];
         paintShadow(COLOR_TRANSORANGE, ball.pos.x(), ball.pos.y());
     }
     for(int j = 0; j < maintain.ballSize; j++) {
         auto& ball = maintain.ball[j];
         QColor ballColor;
-        if (ball.valid == 2) ballColor = Qt::blue;
-        else if(ball.valid) ballColor = COLOR_ORANGE;
-        else ballColor = COLOR_ORANGE_SHADOW;
+        if (ball.valid == 1)
+            ballColor = COLOR_RED;
+        else if (ball.valid == 2)
+            ballColor = COLOR_VIOLET;
+        else
+            ballColor = COLOR_ORANGE_SHADOW;
         paintBall(ballColor, ball.pos.x(), ball.pos.y());
-        paintFocus(COLOR_RED, ball.pos.x(), ball.pos.y(), 500, ballFocusCount++);
+        paintFocus(ballColor, ball.pos.x(), ball.pos.y(), 500, ballFocusCount++);
     }
 }
 void Field::paintCar(const QColor& color, quint8 num, qreal x, qreal y, qreal radian, bool ifDrawNum, const QColor& textColor, bool needCircle) {
@@ -917,7 +923,7 @@ void Field::drawVision(const Owl::OriginMessage &vision, bool shadow) {
     for(int j = 0; j < vision.ballSize; j++) {
         auto& ball = vision.ball[j];
         if(!shadow) {
-            paintBall(COLOR_ORANGE, ball.pos.x(), ball.pos.y());
+            paintBall(COLOR_RED, ball.pos.x(), ball.pos.y());
         } else {
             paintShadow(COLOR_TRANSORANGE, ball.pos.x(), ball.pos.y());
         }

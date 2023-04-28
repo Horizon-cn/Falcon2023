@@ -1,0 +1,39 @@
+$#include "game_state.h"
+
+class GameState {
+    GameState();
+    void init(int _color);
+    int get() const;
+    void set(int _state);
+    void transition(char ref_command, bool ball_kicked);
+    bool gameOn() const;
+    bool gameOff() const;
+    bool gameOver() const;
+    bool restart() const;
+    bool ourRestart() const;
+    bool theirRestart() const;
+    bool kickoff() const;
+    bool ourKickoff() const;
+    bool theirKickoff() const;
+    bool penaltyKick() const;
+    bool ourPenaltyKick() const;
+    bool theirPenaltyKick() const;
+    bool directKick() const;
+    bool ourDirectKick() const;
+    bool theirDirectKick() const;
+    bool indirectKick() const;
+    bool ourIndirectKick() const;
+    bool theirIndirectKick() const;
+    bool freeKick() const;
+    bool ourFreeKick() const;
+    bool theirFreeKick() const;
+    bool ballPlacement() const;
+    bool ourBallPlacement() const;
+    bool theirBallPlacement() const;
+    bool canMove() const;
+    bool allowedNearBall() const;
+    bool canKickBall() const;
+    bool canEitherKickBall() const;
+    bool isOurTimeout()const;
+    bool isTheirTimeout()const;
+};

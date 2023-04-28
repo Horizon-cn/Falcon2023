@@ -33,9 +33,9 @@ void Communicator::setGrsimInterfaceIndex(const int index) {
 }
 
 Communicator::Communicator(QObject *parent) : QObject(parent) {
-    QObject::connect(Owl::ZSimModule::Instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)));
-    QObject::connect(ZSS::ZRemoteSimModule::Instance(), SIGNAL(receiveRemoteInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
-    QObject::connect(Owl::ActionModule::Instance(), SIGNAL(receiveRobotInfo(int, int)), this, SLOT(sendCommand(int, int)));
+    //QObject::connect(Owl::ZSimModule::Instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)));
+    //QObject::connect(ZSS::ZRemoteSimModule::Instance(), SIGNAL(receiveRemoteInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
+    //QObject::connect(Owl::ActionModule::Instance(), SIGNAL(receiveRobotInfo(int, int)), this, SLOT(sendCommand(int, int)));
     for(int i = 0; i < PARAM::TEAMS; i++) {
         /** connect(&receiveSocket[i], &QUdpSocket::readyRead, [ = ]() {
             receiveCommand(i);

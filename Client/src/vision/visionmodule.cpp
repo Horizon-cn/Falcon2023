@@ -274,7 +274,7 @@ void  CVisionModule::udpSend() {
         CVector TransferVel(result.ball[0].velocity.x(), result.ball[0].velocity.y());
         detectionBall->set_vel_x(TransferVel.x());
         detectionBall->set_vel_y(TransferVel.y());
-        detectionBall->set_valid(DealBall::Instance()->getValid());
+        detectionBall->set_valid(true); //DealBall::Instance()->getValid()
         detectionBall->set_last_touch(GlobalData::Instance()->lastTouch);
         detectionBall->set_ball_state(result.ball[0].ball_state_machine.ballState);
         detectionBall->set_raw_x(GlobalData::Instance()->processBall[0].ball[0].pos.x());

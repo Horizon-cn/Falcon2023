@@ -16,6 +16,7 @@ public:
     //ÅÜÎ»µÄSkill. by HXY
     CPlayerTask* GotoPosition(const TaskT& task);
     CPlayerTask* SmartGotoPosition(const TaskT& task);
+	CPlayerTask* GotoPositionNew(const TaskT& task);
 
 	CPlayerTask* GoAroundRobot(const TaskT& task);
     CPlayerTask* GoTechChalPos(const TaskT& task);
@@ -36,6 +37,9 @@ public:
 
 	CPlayerTask* DriftKick(const TaskT& task);
 	CPlayerTask* DribbleTurnKick(const TaskT& task);
+	CPlayerTask* DribbleTurnKickV2(const TaskT& task);
+
+	CPlayerTask* JustKick(const TaskT& task);
 
 	CPlayerTask* WaitTouch(const TaskT& task);
 	CPlayerTask* TouchKick(const TaskT& task);
@@ -159,11 +163,13 @@ namespace PlayerRole {
 	CPlayerTask* makeItShootoutGoalie(const int num, const int flag = 0);
 	CPlayerTask* makeItShootoutGoalieV2(const int num, const int flag = 0);
 	CPlayerTask* makeItInterceptBall(const int num, const double add_angle);
+	CPlayerTask* makeItJustKick(const int num, const int mode=0, const double power=550, const int flag=0);
 	CPlayerTask* makeItWaitTouch(const int num, const CGeoPoint& target, const double dir, const double angle, const int flag = 0);
 	CPlayerTask* makeItPenaltyKick2013(const int num, const int flag = 0);
 	CPlayerTask* makeItPenaltyKick2014(const int num, const int flag = 0);
 	CPlayerTask* makeItDribbleTurn(const int num, const double finalDir, const double pre = Param::Math::PI / 90);
 	CPlayerTask* makeItDribbleTurnKick(const int num, const double finalDir, const double turnRotVel, const double kickPower);
+	CPlayerTask* makeItDribbleTurnKickV2(const int num, const double finalDir=0, const double precision=5*Param::Math::PI/180, const int mode=0, const double power=550, const bool isAdvancer = false, const CGeoPoint Target = CGeoPoint(0, 0));
 	CPlayerTask* makeItGoSupport(const int num, const bool leftOrRight);
 	CPlayerTask* makeItGoPIDCircle(const int runner, const CGeoPoint pos, const double r, const bool opt);
 }

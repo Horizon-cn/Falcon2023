@@ -11,6 +11,7 @@
 namespace {
 auto opm = Owl::OParamManager::Instance();
 auto vpm = Owl::VParamManager::Instance();
+auto sipm = Owl::SIParamManager::Instance();
 int DIFF_VECHILE_MAX_DIFF = 600;//1000
 float MAX_SPEED[PARAM::ROBOTMAXID] = {6000,6000,6000,6000,6000,6000};
 float MAX_ROTATION_SPEED[PARAM::ROBOTMAXID] = {15,5,5,5,5,5};
@@ -348,5 +349,20 @@ void CDealRobot::updateVel(int team, Owl::ReceiveVisionMessage& result) {
         }
         else lastRobot[team][robot.id] = robot;
         //lastRobot[team][robot.id].accelerate = (GlobalData::Instance()->robotCommand[team][0].robotSpeed[robot.id].vxy - lastRobot[team][robot.id].velocity.vxy) / lastValid[team][robot.id];
+                
+        if (sipm->wheelSpeedCallBack && ((team == opm->isYellow && !opm->isSimulation) || opm->isSimulation)) {
+            GlobalData::Instance()->robotInfoMutex.lock();
+            auto robotWheelSpeed = GlobalData::Instance()->robotInformation[team][robot.id].wheelSpeed;
+            double wheelSpeed[4] = { 0, 0, 0, 0 };
+            int round_num = opm->isSimulation ? 1000.0 / sipm->WheelRadius : 74037;
+            for (int i = 0; i < 4; i++)
+                wheelSpeed[i] = robotWheelSpeed[i] * 1000.0 / round_num; // mm/s
+            float vx = 0.3498 * wheelSpeed[0] - 0.3498 * wheelSpeed[1] - 0.3019 * wheelSpeed[2] + 0.3019 * wheelSpeed[3];
+            float vy = 0.3904 * wheelSpeed[0] + 0.3904 * wheelSpeed[1] - 0.3904 * wheelSpeed[2] - 0.3904 * wheelSpeed[3];
+            CVector vxy = CVector(vx, vy).rotate(robot.angle);
+            float vr = 0.337 * wheelSpeed[0] + 0.337 * wheelSpeed[1] + 0.273 * wheelSpeed[2] + 0.273 * wheelSpeed[3];
+            robot.velocity = Owl::RobotSpeed(vxy.x(), vxy.y(), vr);
+            GlobalData::Instance()->robotInfoMutex.unlock();
+        }
     }
 }

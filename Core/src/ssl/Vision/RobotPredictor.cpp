@@ -41,8 +41,10 @@ void CRobotPredictor::updateVision(int cycle, const VehicleInfoT& player, const 
 	predictedVision.SetAcc(CVector(acc_x, acc_y));
 	predictedVision.SetVel(CVector(vel_x, vel_y));
 	predictedVision.SetRotVel(dirVel);
+	//if (player.isYellow && player.ID == 5)
+	//	std::cout << "realVel: " << CVector(vel_x, vel_y) << std::endl;
 
-	if (_isHasRotation) {//our robot
+	if (_isHasRotation && !Param::Vehicle::V2::WHEEL_SPEED_CALLBACK) {//our robot
 		if (_commandLogger.commandValid(cycle - 1)) {
 			cmd = _commandLogger.getCommand(cycle - 1);
 		}

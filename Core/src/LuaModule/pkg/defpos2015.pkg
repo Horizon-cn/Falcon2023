@@ -1,0 +1,42 @@
+$#include "DefPos2015.h"
+
+struct Defend2015 {
+    CGeoPoint leftD;
+    CGeoPoint rightD;
+    CGeoPoint leftFrontD;
+  	CGeoPoint rightFrontD;
+	  CGeoPoint leftBackD;
+	  CGeoPoint rightBackD;
+  	CGeoPoint leftCenD;
+  	CGeoPoint rightCenD;
+    CGeoPoint middleD;
+    CGeoPoint singleD;
+    CGeoPoint goalieD;
+    CGeoPoint sideD;
+    CGeoPoint getSidePos();
+    CGeoPoint getLeftPos();
+    CGeoPoint getRightPos();
+  	CGeoPoint getLeftCenPos();
+  	CGeoPoint getRightCenPos();
+    CGeoPoint getMiddlePos();
+    CGeoPoint getSinglePos();
+    CGeoPoint getGoaliePos();
+};
+
+class CVisionModule;
+
+class CDefPos2015 {
+    CDefPos2015();
+    ~CDefPos2015();
+    void generatePos(const CVisionModule* pVision);
+    Defend2015 getDefPos2015(const CVisionModule* pVision);
+    double checkCollision(int myself, CGeoPoint targetPoint, const CVisionModule* pVision);
+		const CGeoPoint& getSidePos();
+		const CGeoPoint& getLeftPos();
+		const CGeoPoint& getRightPos();
+		const CGeoPoint& getLeftCenPos();
+		const CGeoPoint& getRightCenPos();
+		const CGeoPoint& getMiddlePos();
+		const CGeoPoint& getSinglePos();
+		const CGeoPoint& getGoaliePos();
+};
