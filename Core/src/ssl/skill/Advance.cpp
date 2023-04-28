@@ -290,6 +290,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 		else {
 			/*正常KICK阶段  需要区分是否方向已经转向成功  此处尚未完备可能存在BUG*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Kick", COLOR_ORANGE);
+			
+			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, GetFPassPower(me.Pos(), PassPos), 0, PassPos));
+			/*
 			if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick isDirOK", COLOR_ORANGE);
 				KickStatus::Instance()->setKick(_executor, KICKPOWER);
@@ -300,6 +303,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 				setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, generateGetballDir(pVision, _executor), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick is NOT DirOK ", COLOR_ORANGE);
 			}
+			*/
 		}
 		break;
 	case PASS:
