@@ -310,7 +310,7 @@ void CGPUBestAlgThread::predictBallPos() {
 		memcpy(_ball_pos_prediction_results, results, output_dim * sizeof(float));
 		free(results);
 		for (int i = 0; i < 3; i++) {
-			std::cout << _ball_pos_prediction_results[i] << " ";
+			std::cout << _ball_pos_prediction_results[i*10] << " ";
 		}
 		std::cout << std::endl;
 		_ball_pos_prediction_mutex->unlock();
