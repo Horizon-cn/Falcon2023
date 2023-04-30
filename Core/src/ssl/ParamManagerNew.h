@@ -113,6 +113,11 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(factor_Dist2BallNormalized, "DefenceNew/factor_Dist2BallNormalized", 0.7);
             loadParam(factor_Dist2BallProjModified, "DefenceNew/factor_Dist2BallProjModified", 0.7);
             loadParam(factor_BallMovingCost, "DefenceNew/factor_BallMovingCost", 0.35);
+            loadParam(factor_TooFar4Pass, "DefenceNew/factor_TooFar4Pass", 0.01);
+            loadParam(factor_TooClose4Pass, "DefenceNew/factor_TooClose4Pass", 1);
+            loadParam(factor_EasyBlock, "DefenceNew/factor_EasyBlock", 100);
+            loadParam(factor_NearSideLine, "DefenceNew/factor_NearSideLine", 1);
+            loadParam(factor_EasyShoot, "DefenceNew/EasyShoot", 50);
 
             loadParam(PERIOD_MOVE_X, "Motion/PERIOD_MOVE_X", 0.07692);
             loadParam(PERIOD_MOVE_Y, "Motion/PERIOD_MOVE_Y", 0.013);
@@ -277,6 +282,11 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double factor_Dist2BallNormalized;
         double factor_Dist2BallProjModified;
         double factor_BallMovingCost;
+        double factor_TooFar4Pass;
+        double factor_TooClose4Pass;
+        double factor_EasyBlock;
+        double factor_NearSideLine;
+        double factor_EasyShoot;
         // 电机参数
         double PERIOD_MOVE_X;
         double PERIOD_MOVE_Y;
