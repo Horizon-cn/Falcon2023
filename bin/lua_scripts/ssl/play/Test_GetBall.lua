@@ -16,7 +16,7 @@ firstState = "getball",
 			end
 		end,
 		--Receiver = task.getBall(),
-		Kicker = task.getBall(),
+		Kicker = task.getBall(0),
 		match    = ""
 },
 

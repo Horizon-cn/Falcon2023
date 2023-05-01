@@ -155,7 +155,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	}
 	double arrivedDist = self.Vel().mod() * 0.12 + 0.1;
 	// 记录当前的规划执行目标点
-	DRAW_TARGET = 1;
+	DRAW_TARGET = 0;
 	if (DRAW_TARGET) {
 		GDebugEngine::Instance()->gui_debug_x(target, TASK_TARGET_COLOR);
 		GDebugEngine::Instance()->gui_debug_line(self.Pos(), target, TASK_TARGET_COLOR);

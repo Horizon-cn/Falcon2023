@@ -485,7 +485,7 @@ void CGetBallV3::plan(const CVisionModule* pVision)
             }
             getball_task.player.pos = ballPosWithVel + Utils::Polar2Vector(getBallDist, reverse_finalDir); //该距离要小于directGetBallDist
             // 吸球
-            getball_task.player.needdribble = IS_DRIBBLE;
+            getball_task.player.needdribble = !IS_DRIBBLE;
         }
         else if (LARGEANGLE == gb_state)
         {

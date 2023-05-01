@@ -227,7 +227,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
         break;
 	}
-	
+	_state = GET;
 	/**********************************************************
 	* Description: ×´Ì¬Ö´ÐÐ
 	* Author: Ì·Óîºê
