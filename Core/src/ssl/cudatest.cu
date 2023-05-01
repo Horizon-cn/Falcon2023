@@ -609,24 +609,27 @@ extern "C" int break_calc_with_gpu(float* target_point_cpu, int target_point_num
 
 // mat_c = mat_a * mat_b
 //优化：利用cublas中cublasSgemm加速矩阵运算
+// mat_a:M*N, mat_b:N*K, mat_c:M*K
 //__global__ void matrix_multi(float* mat_a, float* mat_b, float* mat_c, int M, int N, int K) {
 void matrix_multi(float* mat_a, float* mat_b, float* mat_c, int M, int N, int K) {
 
+    cublasHandle_t handle;
     // initialize CUBLAS context
-    stat = cublasCreate(&handle);
+    cublasStatus_t stat = cublasCreate(&handle);
 
     float al = 1.0f;
     float bet = 0.0f;
     
     //当前认定原矩阵存储方式为行优先
-    stat = cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_T, M, N, K, 
-        &al, mat_a, K, mat_b, N, 
+    stat = cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_T, M, K, N, 
+        &al, mat_a, N, mat_b, K, 
         &bet, mat_c, M);
+    
     //如为列优先可启用下列代码
     //stat = cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K,
     //    &al, mat_a, M, mat_b, K,
     //    &bet, mat_c, M);
-
+    cublasDestroy(handle);
     //int row_idx = blockIdx.x;
     //int col_idx = threadIdx.x;
     //int idx = blockDim.x * blockIdx.x + threadIdx.x;
@@ -750,7 +753,7 @@ extern "C" void ball_model_calc_with_gpu(float* vel_data_cpu, float *predict_res
     //dim3 dimGrid3(1);
     //dim3 dimBlock3(OUTPUT_DIM);
     //matrix_multi << <dimGrid3, dimBlock3 >> > (hidden_layer_data_gpu, a_2_matrix_gpu, results_gpu, 1, HIDDEN_LAYER_DIM, OUTPUT_DIM);
-    matrix_multi(vel_data_gpu, a_1_matrix_gpu, hidden_layer_data_gpu, 1, INPUT_DIM, HIDDEN_LAYER_DIM);
+    matrix_multi(hidden_layer_data_gpu, a_2_matrix_gpu, results_gpu, 1, HIDDEN_LAYER_DIM, OUTPUT_DIM);
 
     // y+=b，加法可以使用同一片地址，但是乘法不行
     dim3 dimGrid4(1);
@@ -764,7 +767,10 @@ extern "C" void ball_model_calc_with_gpu(float* vel_data_cpu, float *predict_res
     cudaFree(results_gpu);
     cudaFree(vel_data_gpu);
     cudaFree(hidden_layer_data_gpu);
-
+    cudaFree(a_1_matrix_gpu);
+    cudaFree(bias_1_matrix_gpu);
+    cudaFree(a_2_matrix_gpu);
+    cudaFree(bias_2_matrix_gpu);
     //end = clock();
     //std::cout << "best break point calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
 }
