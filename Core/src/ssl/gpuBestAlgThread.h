@@ -212,6 +212,10 @@ private:
 	void getBestPoint(const CGeoPoint leftUp, const CGeoPoint rightDown, CGeoPoint& bestPoint, float& minValue);
 
 	/**
+	@brief	动态模糊边界*/
+	void obscureBoundary();
+
+	/**
 	@brief 处理全场势能点，并搜索前六个区域中的最优点
 	目前处理的目的为：避免区域生成的点过近*/
 	void processPointValue();
