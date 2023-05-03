@@ -145,6 +145,8 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	}
 	GDebugEngine::Instance()->gui_debug_line(Ball().Pos() , Ball().Pos() + Ball().Vel());
 
+	vision_to_cuda.Signal();
+
 	//【#TODO】更新双方当前在场上的球员数量，我方排除门将，对方全部
 	CheckBothSidePlayerNum();
 
@@ -275,7 +277,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	// 	 GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 3*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
 	// }
 	vision_to_decision.Signal();
-	vision_to_cuda.Signal();
+	// vision_to_cuda.Signal();
 	return ;
 }
 

@@ -121,6 +121,8 @@ struct FieldRectangle {
 	//	}
 	//}
 	FieldRectangle centerArea() {
+		_rangeX = (_rightDownPos.x() - _leftUpPos.x()) * 0.45;
+		_rangeY = (_rightDownPos.y() - _leftUpPos.y()) * 0.45;
 		return FieldRectangle(CGeoPoint(_centerPos.x() - _rangeX, _centerPos.y() + _rangeY), CGeoPoint(_centerPos.x() + _rangeX, _centerPos.y() - _rangeY));
 	}
 	CGeoPoint getCenter() {

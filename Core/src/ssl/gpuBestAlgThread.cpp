@@ -229,7 +229,7 @@ void CGPUBestAlgThread::generatePointValue() {
 		/* 数据算法数据传入：车球位置信息                                       */
 		/************************************************************************/
 		// 上锁
-		_best_visiondata_copy_mutex->lock();
+		// _best_visiondata_copy_mutex->lock();
 		// 拷贝
 		_start_pos_cpu[0] = _start_pos_x;
 		_start_pos_cpu[1] = _start_pos_y;
@@ -277,7 +277,7 @@ void CGPUBestAlgThread::generatePointValue() {
 			}
 		}
 		// 解锁
-		_best_visiondata_copy_mutex->unlock();
+		// _best_visiondata_copy_mutex->unlock();
 		int pos_num = 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
 
 		_value_getter_mutex->lock();
@@ -297,7 +297,7 @@ void CGPUBestAlgThread::predictBallPos() {
 	//clock_t begin, end;
 	//begin = clock();
 	
-	_best_visiondata_copy_mutex->lock();
+	// _best_visiondata_copy_mutex->lock();
 	// 拷贝
 	
 	for (int i = 0; i < input_dim - 1; i++) {
@@ -310,7 +310,7 @@ void CGPUBestAlgThread::predictBallPos() {
 	//}
 	//std::cout << std::endl;
 	// 解锁
-	_best_visiondata_copy_mutex->unlock();
+	// _best_visiondata_copy_mutex->unlock();
 
 	if (matrix_ok) {
 		// set模型的参数
@@ -333,12 +333,18 @@ void CGPUBestAlgThread::predictBallPos() {
 }
 
 CGeoPoint CGPUBestAlgThread::getBestPointFromArea(int area_idx) {
+	CGeoPoint temp_bestPoint;
+	_value_getter_mutex->lock();
 	if (area_idx > AREANUM) { // 处理越界情况，但是后三个点的位置并没有生成
-		return _bestPoint[0];
+		temp_bestPoint = _bestPoint[0];
 	}
 	else {
-		return _bestPoint[area_idx];
+		if (area_idx == 0)
+			sendFieldRectangle();
+		temp_bestPoint =  _bestPoint[area_idx];
 	}
+	_value_getter_mutex->unlock();
+	return temp_bestPoint;
 }
 
 CGeoPoint CGPUBestAlgThread::getBallPosFromFrame(CGeoPoint ball_pos, CVector ball_vel, int frame) {
@@ -435,44 +441,44 @@ void CGPUBestAlgThread::obscureBoundary() {
 	for (int area_idx = 0; area_idx < 9; area_idx++) {
 		mov_X[area_idx] = obsRate * (gpuCalcArea::fieldRectangleArray[area_idx]._centerPos.x() - ball_X);
 		mov_Y[area_idx] = obsRate * (gpuCalcArea::fieldRectangleArray[area_idx]._centerPos.y() - ball_Y);
+		// qDebug() << area_idx << mov_X[area_idx] << mov_Y[area_idx];
 	}
 	//0134
-	gpuCalcArea::processed_fieldRectangleArray[0].centerArea()._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[0].centerArea()._rightDownPos.x() + mov_X[0]);
-	gpuCalcArea::processed_fieldRectangleArray[0].centerArea()._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[0].centerArea()._rightDownPos.y() + mov_Y[0]);
-	gpuCalcArea::processed_fieldRectangleArray[1].centerArea()._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[1].centerArea()._leftUpPos.y() + mov_Y[1]);
-	gpuCalcArea::processed_fieldRectangleArray[1].centerArea()._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[1].centerArea()._rightDownPos.x() + mov_X[1]);
-	gpuCalcArea::processed_fieldRectangleArray[3].centerArea()._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[3].centerArea()._leftUpPos.x() + mov_X[3]);
-	gpuCalcArea::processed_fieldRectangleArray[3].centerArea()._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[3].centerArea()._rightDownPos.y() + mov_Y[3]);
-	gpuCalcArea::processed_fieldRectangleArray[4].centerArea()._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[4].centerArea()._leftUpPos.x() + mov_X[4]);
-	gpuCalcArea::processed_fieldRectangleArray[4].centerArea()._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[4].centerArea()._leftUpPos.y() + mov_Y[4]);
+	gpuCalcArea::processed_fieldRectangleArray[0]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[0]._rightDownPos.x() + mov_X[0]);
+	gpuCalcArea::processed_fieldRectangleArray[0]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[0]._rightDownPos.y() + mov_Y[0]);
+	gpuCalcArea::processed_fieldRectangleArray[1]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[1]._leftUpPos.y() + mov_Y[1]);
+	gpuCalcArea::processed_fieldRectangleArray[1]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[1]._rightDownPos.x() + mov_X[1]);
+	gpuCalcArea::processed_fieldRectangleArray[3]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[3]._leftUpPos.x() + mov_X[3]);
+	gpuCalcArea::processed_fieldRectangleArray[3]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[3]._rightDownPos.y() + mov_Y[3]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[4]._leftUpPos.x() + mov_X[4]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[4]._leftUpPos.y() + mov_Y[4]);
 	//1245
-	gpuCalcArea::processed_fieldRectangleArray[1].centerArea()._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[1].centerArea()._rightDownPos.x() + mov_X[1]);
-	gpuCalcArea::processed_fieldRectangleArray[1].centerArea()._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[1].centerArea()._rightDownPos.y() + mov_Y[1]);
-	gpuCalcArea::processed_fieldRectangleArray[2].centerArea()._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[2].centerArea()._leftUpPos.y() + mov_Y[2]);
-	gpuCalcArea::processed_fieldRectangleArray[2].centerArea()._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[2].centerArea()._rightDownPos.x() + mov_X[2]);
-	gpuCalcArea::processed_fieldRectangleArray[4].centerArea()._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[4].centerArea()._leftUpPos.x() + mov_X[4]);
-	gpuCalcArea::processed_fieldRectangleArray[4].centerArea()._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[4].centerArea()._rightDownPos.y() + mov_Y[4]);
-	gpuCalcArea::processed_fieldRectangleArray[5].centerArea()._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[5].centerArea()._leftUpPos.x() + mov_X[5]);
-	gpuCalcArea::processed_fieldRectangleArray[5].centerArea()._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[5].centerArea()._leftUpPos.y() + mov_Y[5]);
+	gpuCalcArea::processed_fieldRectangleArray[1]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[1]._rightDownPos.x() + mov_X[1]);
+	gpuCalcArea::processed_fieldRectangleArray[1]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[1]._rightDownPos.y() + mov_Y[1]);
+	gpuCalcArea::processed_fieldRectangleArray[2]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[2]._leftUpPos.y() + mov_Y[2]);
+	gpuCalcArea::processed_fieldRectangleArray[2]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[2]._rightDownPos.x() + mov_X[2]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[4]._leftUpPos.x() + mov_X[4]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[4]._rightDownPos.y() + mov_Y[4]);
+	gpuCalcArea::processed_fieldRectangleArray[5]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[5]._leftUpPos.x() + mov_X[5]);
+	gpuCalcArea::processed_fieldRectangleArray[5]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[5]._leftUpPos.y() + mov_Y[5]);
 	//3467
-	gpuCalcArea::processed_fieldRectangleArray[3].centerArea()._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[3].centerArea()._rightDownPos.x() + mov_X[3]);
-	gpuCalcArea::processed_fieldRectangleArray[3].centerArea()._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[3].centerArea()._rightDownPos.y() + mov_Y[3]);
-	gpuCalcArea::processed_fieldRectangleArray[4].centerArea()._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[4].centerArea()._leftUpPos.y() + mov_Y[4]);
-	gpuCalcArea::processed_fieldRectangleArray[4].centerArea()._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[4].centerArea()._rightDownPos.x() + mov_X[4]);
-	gpuCalcArea::processed_fieldRectangleArray[6].centerArea()._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[6].centerArea()._leftUpPos.x() + mov_X[6]);
-	gpuCalcArea::processed_fieldRectangleArray[6].centerArea()._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[6].centerArea()._rightDownPos.y() + mov_Y[6]);
-	gpuCalcArea::processed_fieldRectangleArray[7].centerArea()._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[7].centerArea()._leftUpPos.x() + mov_X[7]);
-	gpuCalcArea::processed_fieldRectangleArray[7].centerArea()._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[7].centerArea()._leftUpPos.y() + mov_Y[7]);
+	gpuCalcArea::processed_fieldRectangleArray[3]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[3]._rightDownPos.x() + mov_X[3]);
+	gpuCalcArea::processed_fieldRectangleArray[3]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[3]._rightDownPos.y() + mov_Y[3]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[4]._leftUpPos.y() + mov_Y[4]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[4]._rightDownPos.x() + mov_X[4]);
+	gpuCalcArea::processed_fieldRectangleArray[6]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[6]._leftUpPos.x() + mov_X[6]);
+	gpuCalcArea::processed_fieldRectangleArray[6]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[6]._rightDownPos.y() + mov_Y[6]);
+	gpuCalcArea::processed_fieldRectangleArray[7]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[7]._leftUpPos.x() + mov_X[7]);
+	gpuCalcArea::processed_fieldRectangleArray[7]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[7]._leftUpPos.y() + mov_Y[7]);
 	//4578
-	gpuCalcArea::processed_fieldRectangleArray[4].centerArea()._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[4].centerArea()._rightDownPos.x() + mov_X[4]);
-	gpuCalcArea::processed_fieldRectangleArray[4].centerArea()._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[4].centerArea()._rightDownPos.y() + mov_Y[4]);
-	gpuCalcArea::processed_fieldRectangleArray[5].centerArea()._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[5].centerArea()._leftUpPos.y() + mov_Y[5]);
-	gpuCalcArea::processed_fieldRectangleArray[5].centerArea()._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[5].centerArea()._rightDownPos.x() + mov_X[5]);
-	gpuCalcArea::processed_fieldRectangleArray[7].centerArea()._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[7].centerArea()._leftUpPos.x() + mov_X[7]);
-	gpuCalcArea::processed_fieldRectangleArray[7].centerArea()._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[7].centerArea()._rightDownPos.y() + mov_Y[7]);
-	gpuCalcArea::processed_fieldRectangleArray[8].centerArea()._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[8].centerArea()._leftUpPos.x() + mov_X[8]);
-	gpuCalcArea::processed_fieldRectangleArray[8].centerArea()._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[8].centerArea()._leftUpPos.y() + mov_Y[8]);
-
+	gpuCalcArea::processed_fieldRectangleArray[4]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[4]._rightDownPos.x() + mov_X[4]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[4]._rightDownPos.y() + mov_Y[4]);
+	gpuCalcArea::processed_fieldRectangleArray[5]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[5]._leftUpPos.y() + mov_Y[5]);
+	gpuCalcArea::processed_fieldRectangleArray[5]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[5]._rightDownPos.x() + mov_X[5]);
+	gpuCalcArea::processed_fieldRectangleArray[7]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[7]._leftUpPos.x() + mov_X[7]);
+	gpuCalcArea::processed_fieldRectangleArray[7]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[7]._rightDownPos.y() + mov_Y[7]);
+	gpuCalcArea::processed_fieldRectangleArray[8]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[8]._leftUpPos.x() + mov_X[8]);
+	gpuCalcArea::processed_fieldRectangleArray[8]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[8]._leftUpPos.y() + mov_Y[8]);
 
 	return;
 }
@@ -549,7 +555,7 @@ void CGPUBestAlgThread::doBestCalculation() {
 		vision_to_cuda.Wait();
 		GPUBestAlgThread::Instance()->generatePointValue();
 		GPUBestAlgThread::Instance()->predictBallPos();
-		GPUBestAlgThread::Instance()->sendFieldRectangle();
+		// GPUBestAlgThread::Instance()->sendFieldRectangle();
 		GPUBestAlgThread::Instance()->setPointValue();
         GPUBestAlgThread::Instance()->sendPointValue();
 	}
@@ -560,7 +566,7 @@ double CGPUBestAlgThread::getPosPotential(const CGeoPoint p) {
 }
 
 void CGPUBestAlgThread::setPointValue() {
-	_value_getter_mutex->lock();
+	// _value_getter_mutex->lock();
 	pointValueList.clear();
 	int size = _h * _w;
 	for (int i = 0; i < size; i++) {
@@ -570,7 +576,7 @@ void CGPUBestAlgThread::setPointValue() {
 		p.value = _PointPotentialOrigin[i];
 		pointValueList.push_back(p);
 	}
-	_value_getter_mutex->unlock();
+	// _value_getter_mutex->unlock();
 }
 
 void CGPUBestAlgThread::sendPointValue() {
@@ -637,11 +643,11 @@ int CGPUBestAlgThread::getMatrix(const string file_name, int max_row_num, int ma
 
 void CGPUBestAlgThread::sendFieldRectangle() {
 	for (int i = 0; i < AREANUM; i++) {
-		CGeoPoint leftUpPos = gpuCalcArea::fieldRectangleArray[i]._leftUpPos;
-		CGeoPoint rightUpPos = gpuCalcArea::fieldRectangleArray[i]._rightUpPos;
-		CGeoPoint leftDownPos = gpuCalcArea::fieldRectangleArray[i]._leftDownPos;
-		CGeoPoint rightDownPos = gpuCalcArea::fieldRectangleArray[i]._rightDownPos;
-		CGeoPoint centerPos = gpuCalcArea::fieldRectangleArray[i].getCenter();
+		CGeoPoint leftUpPos = gpuCalcArea::processed_fieldRectangleArray[i].centerArea()._leftUpPos;
+		CGeoPoint rightUpPos = gpuCalcArea::processed_fieldRectangleArray[i].centerArea()._rightUpPos;
+		CGeoPoint leftDownPos = gpuCalcArea::processed_fieldRectangleArray[i].centerArea()._leftDownPos;
+		CGeoPoint rightDownPos = gpuCalcArea::processed_fieldRectangleArray[i].centerArea()._rightDownPos;
+		CGeoPoint centerPos = gpuCalcArea::processed_fieldRectangleArray[i].centerArea().getCenter();
 		GDebugEngine::Instance()->gui_debug_line(leftUpPos, rightUpPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(rightUpPos, rightDownPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(rightDownPos, leftDownPos, COLOR_BLACK);
