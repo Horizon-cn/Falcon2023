@@ -1,13 +1,12 @@
 #ifndef _BREAK_H_
 #define _BREAK_H_
 #include <skill/PlayerTask.h>
+#include "Global.h"
 
 /**********************************************************/
 /* Skill: ???????¨°
 /* by pjt:
 /**********************************************************/
-
-extern "C" int break_calc_with_gpu(float* target_point_cpu, int target_point_num, float* pos_info_cpu, int pos_info_num, int angle_mod, int dist_mod, float* results, float* vis_points);
 
 class CBreak :public CStatedTask {
 public:

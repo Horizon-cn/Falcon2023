@@ -100,8 +100,6 @@ CALC_ROLE(RLeader)
 {
 	double t = 0;
 	t = attrSet->getValue("ACanBeLeader");
-	//
-	//t=attrSet->getValue("ABestPlayer");
 	setSubValue(t);//0.9...
 }
 

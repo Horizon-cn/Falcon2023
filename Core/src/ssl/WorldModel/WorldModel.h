@@ -63,9 +63,6 @@ private:
 	// 默认对方小车号
 	const static int enemyDefaultNum;
 
-	CEnemySituation enemySuation;
-
-
 public:
 	// 自己到球的矢量
 	const CVector	self2ball					(int current_cycle, int myNum = myDefaultNum, int enemyNum = enemyDefaultNum);

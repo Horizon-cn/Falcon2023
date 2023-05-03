@@ -85,6 +85,7 @@ file (GLOB SSL_BAYES_HEADERS "./src/ssl/bayes/*.h" "./src/ssl/bayes/*.hpp")
 file (GLOB SSL_CMU_HEADERS "./src/ssl/cmu/*.h" "./src/ssl/cmu/*.hpp")
 file (GLOB SSL_CORNELL_HEADERS "./src/ssl/cornell/*.h" "./src/ssl/cornell/*.hpp")
 file (GLOB SSL_DEFENCE_HEADERS "./src/ssl/defence/*.h" "./src/ssl/defence/*.hpp")
+file (GLOB SSL_DEFENCE_NEW_HEADERS "./src/ssl/defenceNew/*.h" "./src/ssl/defenceNew/*.hpp")
 file (GLOB SSL_ROLEMATCH_HEADERS "./src/ssl/rolematch/*.h" "./src/ssl/rolematch/*.hpp")
 file (GLOB SSL_SKILL_HEADERS "./src/ssl/skill/*.h" "./src/ssl/skill/*.hpp")
 file (GLOB SSL_PATHPLAN_HEADERS "./src/ssl/PathPlan/*.h" "./src/ssl/PathPlan/*.hpp")
@@ -100,6 +101,7 @@ aux_source_directory(./src/ssl/bayes DIR_SSL_BAYES_SRCS)
 aux_source_directory(./src/ssl/cmu DIR_SSL_CMU_SRCS)
 aux_source_directory(./src/ssl/cornell DIR_SSL_CORNELL_SRCS)
 aux_source_directory(./src/ssl/defence DIR_SSL_DEFENCE_SRCS)
+aux_source_directory(./src/ssl/defenceNew DIR_SSL_DEFENCE_NEW_SRCS)
 aux_source_directory(./src/ssl/rolematch DIR_SSL_ROLEMATCH_SRCS)
 aux_source_directory(./src/ssl/skill DIR_SSL_SKILL_SRCS)
 aux_source_directory(./src/ssl/PathPlan DIR_SSL_PATHPLAN_SRCS)
@@ -126,6 +128,8 @@ source_group("include\\ssl\\cornell" FILES ${SSL_CORNELL_HEADERS})
 source_group("src\\ssl\\cornell" FILES ${DIR_SSL_CORNELL_SRCS})
 source_group("include\\ssl\\defence" FILES ${SSL_DEFENCE_HEADERS})
 source_group("src\\ssl\\defence" FILES ${DIR_SSL_DEFENCE_SRCS})
+source_group("include\\ssl\\defenceNew" FILES ${SSL_DEFENCE_NEW_HEADERS})
+source_group("src\\ssl\\defenceNew" FILES ${DIR_SSL_DEFENCE_NEW_SRCS})
 source_group("include\\ssl\\rolematch" FILES ${SSL_ROLEMATCH_HEADERS})
 source_group("src\\ssl\\rolematch" FILES ${DIR_SSL_ROLEMATCH_SRCS})
 source_group("include\\ssl\\skill" FILES ${SSL_SKILL_HEADERS})
@@ -154,6 +158,7 @@ add_executable(${TARGET_NAME}
 		${DIR_SSL_CMU_SRCS}
 		${DIR_SSL_CORNELL_SRCS}
 		${DIR_SSL_DEFENCE_SRCS}
+		${DIR_SSL_DEFENCE_NEW_SRCS}
 		${DIR_SSL_ROLEMATCH_SRCS}
 		${DIR_SSL_SKILL_SRCS}
 		${DIR_SSL_PATHPLAN_SRCS}
@@ -169,6 +174,7 @@ add_executable(${TARGET_NAME}
 		${SSL_CMU_HEADERS}
 		${SSL_CORNELL_HEADERS}
 		${SSL_DEFENCE_HEADERS}
+		${SSL_DEFENCE_NEW_HEADERS}
 		${SSL_ROLEMATCH_HEADERS}
 		${SSL_SKILL_HEADERS}
 		${SSL_PATHPLAN_HEADERS}
