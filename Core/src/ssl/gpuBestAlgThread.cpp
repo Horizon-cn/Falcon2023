@@ -24,10 +24,9 @@
 #include <thread>
 #include "Semaphore.h"
 #include <sstream>
-#include "Global.h"
 extern Semaphore vision_to_cuda;
 
-#if has_GPU
+#ifdef ENABLE_CUDA
 extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float* pitch_info);
 extern "C" void ball_model_calc_with_gpu(float* vel_data_cpu, float* predict_results, float* a_1_matrix_cpu, float* bias_1_matrix_cpu, float* a_2_matrix_cpu, float* bias_2_matrix_cpu);
 #else
@@ -130,7 +129,7 @@ CGPUBestAlgThread::CGPUBestAlgThread() {
 		_ball_pos_prediction_results[i] = 0.0f;
 	}
 
-	if (has_GPU) {
+#ifdef ENABLE_CUDA
 		// 需要查找的区域
 		_start_pos_x = -(int)(Param::Field::PITCH_LENGTH / 2);
 		_start_pos_y = -(int)(Param::Field::PITCH_WIDTH / 2);
@@ -174,7 +173,7 @@ CGPUBestAlgThread::CGPUBestAlgThread() {
 		if (status1 && status2 && status3 && status4) {
 			matrix_ok = true;
 		}
-	}
+#endif
 }
 
 CGPUBestAlgThread::~CGPUBestAlgThread() {
@@ -196,10 +195,10 @@ CGPUBestAlgThread::~CGPUBestAlgThread() {
 void CGPUBestAlgThread::initialize(CVisionModule* pVision) {
 	_pVision = pVision;
 	// 开启 GPU 计算的线程
-	if (has_GPU) {
+#ifdef ENABLE_CUDA
         gpuCalcArea::_best_calculation_thread = new std::thread([=] {doBestCalculation();});
         gpuCalcArea::_best_calculation_thread->detach();
-	}
+#endif
 }
 
 void CGPUBestAlgThread::startComm() {
@@ -386,7 +385,7 @@ void CGPUBestAlgThread::erasePointPotentialValue(const CGeoPoint centerPoint, fl
 // 计算每个区域的最优点和最优值，在generatePointValue中已经加了进程锁，所以这里没有加，所以这个函数不准在外面调用
 void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rightDown, CGeoPoint& bestPoint, float& minValue) {
 	// 存下九个区域的最优点以供调用，并且需要记录每个点在当前cycle是否已经更新
-	if (has_GPU) {
+#ifdef ENABLE_CUDA
 		// 初始化参数
 		minValue = 255;
 		// 场地参数
@@ -425,11 +424,10 @@ void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rig
 				}
 			}
 		}
-	}
-	else {
+#else
 		minValue = 255;
 		bestPoint = leftUp.midPoint(rightDown);
-	}
+#endif
 }
 
 void CGPUBestAlgThread::obscureBoundary() {

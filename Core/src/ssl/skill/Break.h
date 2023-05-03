@@ -1,7 +1,6 @@
 #ifndef _BREAK_H_
 #define _BREAK_H_
 #include <skill/PlayerTask.h>
-#include "Global.h"
 
 /**********************************************************/
 /* Skill: ???????¨°
