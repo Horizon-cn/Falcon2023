@@ -115,9 +115,10 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(factor_BallMovingCost, "DefenceNew/factor_BallMovingCost", 0.35);
             loadParam(factor_TooFar4Pass, "DefenceNew/factor_TooFar4Pass", 0.01);
             loadParam(factor_TooClose4Pass, "DefenceNew/factor_TooClose4Pass", 1);
+            loadParam(factor_TooFar4Shoot, "DefenceNew/factor_TooFar4Shoot", 0.1);
             loadParam(factor_EasyBlock, "DefenceNew/factor_EasyBlock", 100);
             loadParam(factor_NearSideLine, "DefenceNew/factor_NearSideLine", 1);
-            loadParam(factor_EasyShoot, "DefenceNew/EasyShoot", 50);
+            loadParam(factor_EasyShoot, "DefenceNew/factor_EasyShoot", 50);
 
             loadParam(PERIOD_MOVE_X, "Motion/PERIOD_MOVE_X", 0.07692);
             loadParam(PERIOD_MOVE_Y, "Motion/PERIOD_MOVE_Y", 0.013);
@@ -284,6 +285,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double factor_BallMovingCost;
         double factor_TooFar4Pass;
         double factor_TooClose4Pass;
+        double factor_TooFar4Shoot;
         double factor_EasyBlock;
         double factor_NearSideLine;
         double factor_EasyShoot;

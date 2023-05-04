@@ -98,7 +98,7 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 		_ballReceiverList.push_back(i);
 	_ballReceiverList.erase(remove_if(_ballReceiverList.begin(), _ballReceiverList.end(),
-		[&](int num) {return (!pVision->TheirPlayer(num).Valid()) || _receiverPotientialList[num] >= 100; }),
+		[&](int num) {return (!pVision->TheirPlayer(num).Valid()) || _receiverPotientialList[num] >= 1000; }),
 		_ballReceiverList.end());
 	sort(_ballReceiverList.begin(), _ballReceiverList.end(),
 		[&](int num1, int num2) {return _receiverPotientialList[num1] < _receiverPotientialList[num2]; });

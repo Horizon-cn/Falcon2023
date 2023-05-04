@@ -8,6 +8,7 @@ namespace {
 //算法基本移植于GPU支援算点
 DEFINE_ATTRIBUTE_NEW(TooFar4Pass);//太远传球比较难
 DEFINE_ATTRIBUTE_NEW(TooClose4Pass);//太近传球没意义
+DEFINE_ATTRIBUTE_NEW(TooFar4Shoot);//太远射门比较难
 DEFINE_ATTRIBUTE_NEW(EasyBlock);//只考虑投影，我方是否有球员能够断球
 //DEFINE_ATTRIBUTE_NEW(AffectShoot);//前场影响原本的射门，感觉不适用于防守体系
 DEFINE_ATTRIBUTE_NEW(NearSideLine);//靠近边线，接球困难，容易出界
@@ -29,6 +30,12 @@ EVALUATE_ATTRIBUTE_NEW(TooClose4Pass)
 		setValue(300 - dist);
 	else
 		setValue(0);
+}
+
+EVALUATE_ATTRIBUTE_NEW(TooFar4Shoot)
+{
+	double dist = vision->TheirPlayer(num).Pos().dist(goalCentre);
+	setValue(max(0.0, dist - 200.0));
 }
 
 EVALUATE_ATTRIBUTE_NEW(EasyBlock)
@@ -91,6 +98,7 @@ void CballReceiverAttributeSet::setAttributes()
 {
 	ADD_ATTRIBUTE_NEW(TooFar4Pass);
 	ADD_ATTRIBUTE_NEW(TooClose4Pass);
+	ADD_ATTRIBUTE_NEW(TooFar4Shoot);
 	ADD_ATTRIBUTE_NEW(EasyBlock);
 	ADD_ATTRIBUTE_NEW(NearSideLine);
 	ADD_ATTRIBUTE_NEW(EasyShoot);
