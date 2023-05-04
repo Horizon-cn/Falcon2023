@@ -111,6 +111,20 @@ struct FieldRectangle {
 		_rangeX = (ru.x() - ld.x()) * 0.45;
 		_rangeY = (ld.y() - ru.y()) * 0.45;
 	}
+
+	void processField(CGeoPoint lu, CGeoPoint rd) {
+		_leftUpPos = lu;
+		_rightDownPos = rd;
+
+		_leftDownPos = CGeoPoint(lu.x(), rd.y());
+		_rightUpPos = CGeoPoint(rd.x(), lu.y());
+
+		double tempX = (lu.x() + rd.x()) / 2, tempY = (lu.y() + rd.y()) / 2;
+		_centerPos = CGeoPoint(tempX, tempY);
+		_rangeX = (rd.x() - lu.x()) * 0.45;
+		_rangeY = (rd.y() - lu.y()) * 0.45;
+	}
+
 	// 区域相加功能重构后还未实现，此部分代码需要结合x轴向右，y轴向上的的坐标系理解 from siyuan chen
 	//FieldRectangle operator +(FieldRectangle& param){
 	//	if (param._leftDownPos.x()<this->_leftDownPos.x()
