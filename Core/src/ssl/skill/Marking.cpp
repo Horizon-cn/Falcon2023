@@ -323,8 +323,8 @@ void CMarking::plan(const CVisionModule* pVision)
 		DefenceInfo::Instance()->setMarkMode(vecNumber,enemyNum,false);
 		setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(MarkingTask));
 	}
-	if (MarkingTask.player.flag & PlayerStatus::ALLOW_DSS)
-		;
+    // if (MarkingTask.player.flag & PlayerStatus::ALLOW_DSS)
+        // cout << "This is DSS!" << endl;
 	GDebugEngine::Instance()->gui_debug_msg(MarkingTask.player.pos,"M",COLOR_WHITE);
 	//cout<<enemyNum<<": "<<pVision->TheirPlayer(enemyNum).Vel().mod()<<" "<<vecNumber<<endl;
 	_lastCycle = pVision->Cycle();

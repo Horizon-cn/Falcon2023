@@ -84,12 +84,12 @@ public:
     }
 
     // 球踢出,且是挑球指令踢出,才返回true
-    // const bool IsChipKickedOut(void) const { return _isChipKickOut && _isKickedOut; }
+    const bool IsChipKickedOut(void) const { return _isChipKickOut && _isKickedOut; }
 
     // 球被某个角色踢出,且是挑球指令踢出,才返回true;
     // const bool IsChipKickedOut(int num) const { return IsChipKickedOut() && num == _kickerNum; }
-    // 得到踢球队员的号码
-    // int getKickerNum() { return _kickerNum; }
+    // 得到踢球队员的号码，0~15为我方球员，16~31为对方球员，模16得真实号码
+    int getKickerNum() { return _kickerNum; }
 
     int getBallToucher(){
          return _ballToucher;
@@ -107,6 +107,7 @@ private:
     // 更新球运动速度
     void UpdateBallMoving(const CVisionModule* pVision);
     void CheckKickOutBall(const CVisionModule* pVision);
+    void detectKickOutOnVision(const CVisionModule* pVision, int playerID);
     void updateBallPossession(const CVisionModule* pVision);
     void computeBallPossession(const CVisionModule* pVision, bool isOurPlayer, int maxFrame, double distThreshold, double dirThreshold, bool useInfrared);
 

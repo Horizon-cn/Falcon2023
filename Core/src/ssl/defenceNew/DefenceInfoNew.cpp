@@ -96,8 +96,8 @@ void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 		_ballChaserList.size() != _ballChaserSteadyList.size())
 		_ballChaserSteadyList = _ballChaserList;
 	//debugÊä³ö
-	debug_arr(_ballChaserList, CGeoPoint(100, -350));
-	debug_arr(_ballChaserSteadyList, CGeoPoint(-400, -350));
+	//debug_arr(_ballChaserList, CGeoPoint(100, -350));
+	//debug_arr(_ballChaserSteadyList, CGeoPoint(-400, -350));
 }
 
 void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)

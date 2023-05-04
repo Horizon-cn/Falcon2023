@@ -88,9 +88,9 @@ $ sudo make install
     if(N GREATER_EQUAL 4)
     	set(N 4)
     endif()
-  ```
-	- 如果需要使用 GPU，按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置，[cuda 12.0下载](https://jbox.sjtu.edu.cn/l/I1f4um)
-	
+    ```
+	- 如果需要使用 GPU，将 cmake 中的 ENABLE_CUDA 置为 ON，~~按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置~~，[cuda 12.0下载](https://jbox.sjtu.edu.cn/l/I1f4um)
+	![ENABLE_CUDA](wiki/ENABLE_CUDA.png)
 
 ## 使用方法
 
