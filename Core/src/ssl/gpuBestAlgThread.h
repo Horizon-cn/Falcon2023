@@ -101,7 +101,7 @@ typedef std::deque<AreaStruct> AreaStructList;
 // 构造时传入左下点与右上点
 // centerArea返回一个中心点不变，长宽变为0.9倍的区域
 struct FieldRectangle {
-	FieldRectangle(CGeoPoint ld, CGeoPoint ru) {
+	FieldRectangle(CGeoPoint ld, CGeoPoint ru) { 
 		_leftDownPos = ld;
 		_rightUpPos = ru;
 		_leftUpPos = CGeoPoint(ld.x(), ru.y());
@@ -231,6 +231,9 @@ private:
 	/**
 	@brief	动态模糊边界*/
 	void obscureBoundary();
+	void obscureBoundaryV2();
+	double limitPosX(double);
+	double limitPosY(double);
 
 	/**
 	@brief 处理全场势能点，并搜索前六个区域中的最优点
