@@ -25,7 +25,7 @@
 #include "NormalPlayUtils.h"
 #include "param.h"
 
-#define AREANUM 9 // 区域数目
+#define AREANUM 6 // 区域数目
 
 struct PointValueStruct {
 	float pos_x;
@@ -234,6 +234,7 @@ private:
 	/**
 	@brief	按照重要性排序调整bestpoint顺序*/
 	void supportSort();
+	void supportSortV2();
 
 	/**
 	@brief	获取球所在区域index*/
@@ -275,6 +276,7 @@ private:
 	CVisionModule* _pVision;			             ///<图像指针
 	int _lastGPUCycle;					 ///上一帧GPU帧号
 	int _lastCycle[AREANUM] = { 0 };           ///  上一帧9个区域的CPU帧号
+	float _pointPotential[AREANUM];        /// 9个区域最优点的分值  
 	CGeoPoint _bestPoint[AREANUM];         /// 当前帧9个区域的最优点
 	CGeoPoint _bestSupport[AREANUM];         /// 按照支撑点重要性进行排序后的最优点
 

@@ -210,27 +210,25 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(BAYESLIST, "CMatchState/BAYESLIST", "BayesParams1");
             loadParam(BAYESPARAM, "CMatchState/BAYESPARAM", "Skuba_Attack");
             
-            QString mode = OParamManager::Instance()->isSimulation ? "Sim" : "Real";
-            QString Capability = "Capability_" + mode;
-            loadParam(SLOW_FACTOR, Capability + "/SLOW_FACTOR", 0.65);
-            loadParam(MAX_TRANSLATION_SPEED_GOALIE, Capability + "/MAX_TRANSLATION_SPEED_GOALIE", 300);
-            loadParam(MAX_TRANSLATION_ACC_GOALIE, Capability + "/MAX_TRANSLATION_ACC_GOALIE", 300);
-            loadParam(MAX_TRANSLATION_DEC_GOALIE, Capability + "/MAX_TRANSLATION_DEC_GOALIE", 300);
-            loadParam(MAX_ROTATION_ACC_GOALIE, Capability + "/MAX_ROTATION_ACC_GOALIE", 5);
-            loadParam(MAX_ROTATION_SPEED_GOALIE, Capability + "/MAX_ROTATION_SPEED_GOALIE", 10);
-            loadParam(MAX_TRANSLATION_SPEED_BACK, Capability + "/MAX_TRANSLATION_SPEED_BACK", 300);
-            loadParam(MAX_TRANSLATION_ACC_BACK, Capability + "/MAX_TRANSLATION_ACC_BACK", 300);
-            loadParam(MAX_TRANSLATION_DEC_BACK, Capability + "/MAX_TRANSLATION_DEC_BACK", 300);
-            loadParam(MAX_ROTATION_ACC_BACK, Capability + "/MAX_ROTATION_ACC_BACK", 5);
-            loadParam(MAX_ROTATION_SPEED_BACK, Capability + "/MAX_ROTATION_SPEED_BACK", 10);
-            loadParam(MAX_TRANSLATION_SPEED, Capability + "/MAX_TRANSLATION_SPEED", 300);
-            loadParam(MAX_TRANSLATION_ACC, Capability + "/MAX_TRANSLATION_ACC", 100);
-            loadParam(MAX_TRANSLATION_DEC, Capability + "/MAX_TRANSLATION_DEC", 300);
-            loadParam(MAX_ROTATION_ACC, Capability + "/MAX_ROTATION_ACC", 5);
-            loadParam(MAX_ROTATION_SPEED, Capability + "/MAX_ROTATION_SPEED", 10);
-            loadParam(TRANSLATION_ACC_LIMIT, Capability + "/TRANSLATION_ACC_LIMIT", 500);
-            loadParam(TRANSLATION_SPEED_LIMIT, Capability + "/TRANSLATION_SPEED_LIMIT", 300);
-            loadParam(TRANSLATION_ROTATE_ACC_LIMIT, Capability + "/TRANSLATION_ROTATE_ACC_LIMIT", 5);
+            loadParam(SLOW_FACTOR, "Capability/SLOW_FACTOR", 0.65);
+            loadParam(MAX_TRANSLATION_SPEED_GOALIE, "Capability/MAX_TRANSLATION_SPEED_GOALIE", 300);
+            loadParam(MAX_TRANSLATION_ACC_GOALIE, "Capability/MAX_TRANSLATION_ACC_GOALIE", 300);
+            loadParam(MAX_TRANSLATION_DEC_GOALIE, "Capability/MAX_TRANSLATION_DEC_GOALIE", 300);
+            loadParam(MAX_ROTATION_ACC_GOALIE, "Capability/MAX_ROTATION_ACC_GOALIE", 5);
+            loadParam(MAX_ROTATION_SPEED_GOALIE, "Capability/MAX_ROTATION_SPEED_GOALIE", 10);
+            loadParam(MAX_TRANSLATION_SPEED_BACK, "Capability/MAX_TRANSLATION_SPEED_BACK", 300);
+            loadParam(MAX_TRANSLATION_ACC_BACK, "Capability/MAX_TRANSLATION_ACC_BACK", 300);
+            loadParam(MAX_TRANSLATION_DEC_BACK, "Capability/MAX_TRANSLATION_DEC_BACK", 300);
+            loadParam(MAX_ROTATION_ACC_BACK, "Capability/MAX_ROTATION_ACC_BACK", 5);
+            loadParam(MAX_ROTATION_SPEED_BACK, "Capability/MAX_ROTATION_SPEED_BACK", 10);
+            loadParam(MAX_TRANSLATION_SPEED, "Capability/MAX_TRANSLATION_SPEED", 300);
+            loadParam(MAX_TRANSLATION_ACC, "Capability/MAX_TRANSLATION_ACC", 100);
+            loadParam(MAX_TRANSLATION_DEC, "Capability/MAX_TRANSLATION_DEC", 300);
+            loadParam(MAX_ROTATION_ACC, "Capability/MAX_ROTATION_ACC", 5);
+            loadParam(MAX_ROTATION_SPEED, "Capability/MAX_ROTATION_SPEED", 10);
+            loadParam(TRANSLATION_ACC_LIMIT, "Capability/TRANSLATION_ACC_LIMIT", 500);
+            loadParam(TRANSLATION_SPEED_LIMIT, "Capability/TRANSLATION_SPEED_LIMIT", 300);
+            loadParam(TRANSLATION_ROTATE_ACC_LIMIT, "Capability/TRANSLATION_ROTATE_ACC_LIMIT", 5);
 
             loadParam(PENALTY_FIGHT, "General/PENALTY_FIGHT", 1);
 
