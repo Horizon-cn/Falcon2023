@@ -297,10 +297,13 @@ void CDealBall::checkInfrared(Owl::Ball& ball) {/**
                 }
                 else {				// 球看不到，根据红外信号纠正球的位置
                     double guessDist = sipm->CenterFromKicker + sipm->BallRadius; //sipm->RobotRadius + sipm->BallRadius;
-                    ball.pos = robot.pos + CVector(guessDist * cos(robot.angle), guessDist * sin(robot.angle));
-                    ball.velocity = robot.velocity.vxy;
-                    validBall = 2;
-                    break;
+                    CGeoPoint infraredBallPos = robot.pos + CVector(guessDist * cos(robot.angle), guessDist * sin(robot.angle));
+                    if (infraredBallPos.dist(ball.pos) <= 150) {
+                        ball.pos = infraredBallPos;
+                        ball.velocity = robot.velocity.vxy;
+                        validBall = 2;
+                        break;
+                    }
                 }
             }
         }

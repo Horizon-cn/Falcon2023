@@ -121,6 +121,8 @@ struct FieldRectangle {
 	//	}
 	//}
 	FieldRectangle centerArea() {
+		_rangeX = (_rightDownPos.x() - _leftUpPos.x()) * 0.45;
+		_rangeY = (_rightDownPos.y() - _leftUpPos.y()) * 0.45;
 		return FieldRectangle(CGeoPoint(_centerPos.x() - _rangeX, _centerPos.y() + _rangeY), CGeoPoint(_centerPos.x() + _rangeX, _centerPos.y() - _rangeY));
 	}
 	CGeoPoint getCenter() {
@@ -191,6 +193,7 @@ public:
 	void startComm();
 	void setPointValue();
 	void sendPointValue();
+	void sendFieldRectangle();
 
 	/**
 	@brief	开启线程所用的函数*/
@@ -210,6 +213,10 @@ private:
 	@param	rightDown 取点区域的右下点(x轴向正右方向的直角坐标系中)
 	原来支持选择区域形状以及去掉保持系统控制参数的传入，目前暂未实现，先实现基础功能，后续有需要可以加入*/
 	void getBestPoint(const CGeoPoint leftUp, const CGeoPoint rightDown, CGeoPoint& bestPoint, float& minValue);
+
+	/**
+	@brief	动态模糊边界*/
+	void obscureBoundary();
 
 	/**
 	@brief 处理全场势能点，并搜索前六个区域中的最优点

@@ -123,7 +123,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 		SupportPoint[i] = GPUBestAlgThread::Instance()->getBestPointFromArea(i);/* Gpu算点 */
 	// 可视化球的预测位置
 	for (int i = 0; i < 6; i++) {
-		GDebugEngine::Instance()->gui_debug_msg(GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), i), QString::number(i).toStdString().c_str(),COLOR_BLUE);
+		CGeoPoint ball_predict_pos = GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), i * 8);
+		GDebugEngine::Instance()->gui_debug_msg(ball_predict_pos, (to_string(i * 8)).c_str(), COLOR_YELLOW);
+		GDebugEngine::Instance()->gui_debug_x(ball_predict_pos, COLOR_BLUE);
 	}
 	
 
@@ -227,7 +229,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
         break;
 	}
-	
+	//_state = GET;
 	/**********************************************************
 	* Description: 状态执行
 	* Author: 谭宇宏

@@ -152,12 +152,19 @@ function toPointDir(p, role)
 			return function ( role1 )
 				return (p() - player.pos(role1)):dir()
 			end
-		else
+		elseif p == nil then
+			return function ( role1 )
+				return (ball.pos() - player.pos(role1)):dir()
+			end
+		elseif type(p) ~= "CGeoPoint" then
+			return function ( role1 )
+				return p
+			end
+		else 
 			return function ( role1 )
 				return (p - player.pos(role1)):dir()
 			end
 		end
-
 	else
 		return (p - player.pos(role)):dir()
 	end

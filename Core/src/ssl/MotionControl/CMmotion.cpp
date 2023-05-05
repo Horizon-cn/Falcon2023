@@ -374,7 +374,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     char v1debugmsg[100];
     char periodmsg[100];
     //char xdebugmsg[100];
-    bool DEBUG_ENGINE = 1;
+    bool DEBUG_ENGINE = 0;
     sprintf(v0debugmsg, "%f", v0);
     sprintf(v1debugmsg, "%f", v1);
     // 这个时间很关键，设得较大则定位精度将大大降低 by qxz
@@ -840,7 +840,7 @@ void goto_point_omni( const PlayerVisionT& start,
             vz_min = vz_min_4[i];
         }
     }
-    std::cout << "vz_max: " << vz_max << "vz_min: " << vz_min << std::endl;
+    // std::cout << "vz_max: " << vz_max << "vz_min: " << vz_min << std::endl;
     if (vz_min < vz_max) {
         if (vz < 0) {
             vz = vz_min;
@@ -850,7 +850,7 @@ void goto_point_omni( const PlayerVisionT& start,
         }
         //ang_v = vz / 0.025 / WHEEL_CENTER_OFFSET;
     }
-    std::cout << "vz: " << vz << std::endl;
+    // std::cout << "vz: " << vz << std::endl;
     
     
     CGeoPoint next_pos = start.Pos() + Utils::Polar2Vector(v.mod() * FRAME_PERIOD, v.dir());
