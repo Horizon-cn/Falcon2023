@@ -125,6 +125,16 @@ struct FieldRectangle {
 		_rangeY = (rd.y() - lu.y()) * 0.45;
 	}
 
+	bool check4inclusion(CGeoPoint point) {
+		if ( ((point.x() >= _leftUpPos.x() && point.x() <= _rightUpPos.x())  ||
+			  (point.x() <= _leftUpPos.x() && point.x() >= _rightUpPos.x())) &&
+			 ((point.y() >= _leftUpPos.y() && point.y() <= _leftDownPos.y()) ||
+			  (point.y() <= _leftUpPos.y() && point.y() >= _leftDownPos.y()))  )
+			return true;
+		else
+			return false;
+	}
+
 	// 区域相加功能重构后还未实现，此部分代码需要结合x轴向右，y轴向上的的坐标系理解 from siyuan chen
 	//FieldRectangle operator +(FieldRectangle& param){
 	//	if (param._leftDownPos.x()<this->_leftDownPos.x()
@@ -222,6 +232,14 @@ private:
 	void erasePointPotentialValue(const CGeoPoint centerPoint, float length, float width);
 
 	/**
+	@brief	按照重要性排序调整bestpoint顺序*/
+	void supportSort();
+
+	/**
+	@brief	获取球所在区域index*/
+	int getBallArea();
+
+	/**
 	@brief	寻找一定区域里的最优点
 	@param	leftUp 取点区域的左上点(x轴向正右方向的直角坐标系中)
 	@param	rightDown 取点区域的右下点(x轴向正右方向的直角坐标系中)
@@ -258,6 +276,8 @@ private:
 	int _lastGPUCycle;					 ///上一帧GPU帧号
 	int _lastCycle[AREANUM] = { 0 };           ///  上一帧9个区域的CPU帧号
 	CGeoPoint _bestPoint[AREANUM];         /// 当前帧9个区域的最优点
+	CGeoPoint _bestSupport[AREANUM];         /// 按照支撑点重要性进行排序后的最优点
+
 
 	int _start_pos_x, _start_pos_y, _width, _height, _step;     ///搜索区域参数，分别为左上角坐标、区域长与宽、搜索步长
 	int _w, _h;                                       /// 申请空间参数  

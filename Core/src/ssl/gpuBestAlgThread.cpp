@@ -335,19 +335,121 @@ void CGPUBestAlgThread::predictBallPos() {
 	//std::cout << "ball pos predict calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
 }
 
-CGeoPoint CGPUBestAlgThread::getBestPointFromArea(int area_idx) {
-	CGeoPoint temp_bestPoint;
+int CGPUBestAlgThread::getBallArea() {
+	CGeoPoint ballPos = _pVision->Ball().Pos();
+	int areaNum;
+	for (areaNum = 0; areaNum < 6; areaNum++){
+		if (gpuCalcArea::processed_fieldRectangleArray[areaNum].check4inclusion(ballPos))
+			break;
+	}
+	if (areaNum != 6)
+		return areaNum;
+	else
+		return 1;//防止越界，返回对方禁区所在区域
+}
+
+void CGPUBestAlgThread::supportSort() {
+	int ball_area = getBallArea();
+	//           3 0  
+	//  己方球门 4 1  敌方球门
+	//           5 2
+	switch (ball_area)
+	{ // 以下注释均为当前重要性排序，球所在区域均为最低优先级
+	case 0:
+		//           3 球  
+		//  己方球门 2 0  敌方球门
+		//           4 1
+		_bestSupport[0] = _bestPoint[1];
+		_bestSupport[1] = _bestPoint[2];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[3];
+		_bestSupport[4] = _bestPoint[5];
+		_bestSupport[5] = _bestPoint[0];
+		break;
+	case 1:
+		//           3 0
+		//  己方球门 2 球  敌方球门
+		//           4 1
+		_bestSupport[0] = _bestPoint[0];
+		_bestSupport[1] = _bestPoint[2];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[3];
+		_bestSupport[4] = _bestPoint[5];
+		_bestSupport[5] = _bestPoint[1];
+		break;
+	case 2:
+		//           4 1
+		//  己方球门 2 0 敌方球门
+		//           3 球
+		_bestSupport[0] = _bestPoint[1];
+		_bestSupport[1] = _bestPoint[0];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[5];
+		_bestSupport[4] = _bestPoint[3];
+		_bestSupport[5] = _bestPoint[2];
+		break;
+	case 3:
+		//           球1
+		//  己方球门 2 0 敌方球门
+		//           4 3
+		_bestSupport[0] = _bestPoint[1];
+		_bestSupport[1] = _bestPoint[0];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[2];
+		_bestSupport[4] = _bestPoint[5];
+		_bestSupport[5] = _bestPoint[3];
+		break;
+	case 4:
+		//           3 1
+		//  己方球门 球0 敌方球门
+		//           4 2
+		_bestSupport[0] = _bestPoint[1];
+		_bestSupport[1] = _bestPoint[0];
+		_bestSupport[2] = _bestPoint[2];
+		_bestSupport[3] = _bestPoint[3];
+		_bestSupport[4] = _bestPoint[5];
+		_bestSupport[5] = _bestPoint[4];
+		break;
+	case 5:
+		//           4 3
+		//  己方球门 2 0敌方球门
+		//           球1
+		_bestSupport[0] = _bestPoint[1];
+		_bestSupport[1] = _bestPoint[2];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[0];
+		_bestSupport[4] = _bestPoint[3];
+		_bestSupport[5] = _bestPoint[5];
+		break;
+	default://假设球在禁区内
+		//           3 0
+		//  己方球门 2 球  敌方球门
+		//           4 1
+		_bestSupport[0] = _bestPoint[0];
+		_bestSupport[1] = _bestPoint[2];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[3];
+		_bestSupport[4] = _bestPoint[5];
+		_bestSupport[5] = _bestPoint[1];
+		break;
+	}
+}
+
+
+CGeoPoint CGPUBestAlgThread::getBestPointFromArea(int support_idx) {
+	supportSort(); // 按照重要性对支撑点进行排序
+	CGeoPoint temp_bestSupport;
 	_value_getter_mutex->lock();
-	if (area_idx > AREANUM) { // 处理越界情况，但是后三个点的位置并没有生成
-		temp_bestPoint = _bestPoint[0];
+	if (support_idx > AREANUM) { // 处理越界情况，但是后三个点的位置并没有生成
+		temp_bestSupport = _bestSupport[0];
 	}
 	else {
-		if (area_idx == 0)
+		if (support_idx == 0)
 			sendFieldRectangle();
-		temp_bestPoint =  _bestPoint[area_idx];
+		temp_bestSupport =  _bestSupport[support_idx];
 	}
 	_value_getter_mutex->unlock();
-	return temp_bestPoint;
+	return temp_bestSupport;
 }
 
 CGeoPoint CGPUBestAlgThread::getBallPosFromFrame(CGeoPoint ball_pos, CVector ball_vel, int frame) {
