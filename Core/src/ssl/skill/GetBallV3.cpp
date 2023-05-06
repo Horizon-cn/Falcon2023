@@ -9,6 +9,7 @@
 #include <WorldModel/KickStatus.h>
 #include <WorldModel.h>
 #include <TaskMediator.h>
+#include "MotionControl/CMmotion.h"
 
 
 namespace {
@@ -616,8 +617,12 @@ CPlayerCommand* CGetBallV3::execute(const CVisionModule* pVision)
 CGeoPoint CGetBallV3::PredictForBall(int frame, const CVisionModule* pVision) //用GPUBestAlgThread获得球的位置
 {
     CGeoPoint Point;
-    const BallVisionT& ball = pVision->Ball();
+   /*
+   const BallVisionT& ball = pVision->Ball();
     Point = GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), frame);
+   */ 
+
+    Point = BallSpeedModel::Instance()->posForTime(frame, pVision);
     return Point;
 }
 
@@ -687,39 +692,33 @@ int CGetBallV3::PredictForRobot(CGeoPoint point, const CVisionModule* pVision)//
     {
         capability.maxSpeed *= SLOW_FACTOR;
     }
-    int frame = point.dist(Robot.Pos()) / capability.maxSpeed;
-    //cout << capability.maxSpeed << endl;
+    const double time_factor = 1.5;
+    double usedtime = expectedCMPathTime(Robot, point, 300, capability.maxSpeed, time_factor);
+    int frame = usedtime * 60;
+    //double frame = point.dist(Robot.Pos()) / capability.maxSpeed ;
     return frame;
 }
 
 CGeoPoint CGetBallV3::Ball_Predict_Pos(const CVisionModule* pVision)//返回最佳的点
 {
     CGeoPoint point;
-    int FrameMin = 1, FrameMax = 100, FramePerfect;
+    int FrameMin = 1, FrameMax = 200, FramePerfect = 200;
     while (FrameMin <= FrameMax)
     {
         int mid = (FrameMin + FrameMax) / 2;
         int TmpTime = PredictForRobot(PredictForBall(mid, pVision), pVision);
 
-        if (TmpTime < mid)
+        if (TmpTime <= mid)
         {
             FrameMax = mid - 1;
+            FramePerfect = mid;
         }
-        else if (TmpTime > mid)
+        else
         {
             FrameMin = mid + 1;
         }
-        else if (TmpTime == mid)
-        {
-            //cout << FrameMin << ' ' << FrameMax << ' ' << TmpTime << endl;
-            if (TmpTime <= mid) {
-                FramePerfect = mid;
-                FrameMax = mid - 1;
-            }
-            else FrameMin = mid + 1;
-        }
     }
-    point = PredictForBall(FramePerfect, pVision);
+    point = PredictForBall(FramePerfect + 8, pVision);
     return point;
 }
 

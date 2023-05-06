@@ -15,7 +15,7 @@ firstState = "chase",
 		end
 	end,
     
-	Kicker = task.slowGetBall(),
+	Kicker = task.GetBall(),
     match = ""
 },
 ["break"] = {
