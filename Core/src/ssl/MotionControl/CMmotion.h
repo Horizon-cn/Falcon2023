@@ -25,13 +25,15 @@ float motion_time_1d(float dx,float vel0,float vel1,
 void compute_motion_1d(double x0, double v0, double v1,
                        double a_max, double d_max, double v_max, double a_factor, double vel_factor,
                        double &traj_accel, double &traj_time, double &traj_time_acc, double &traj_time_dec, double &traj_time_flat, planType pT, nonZeroMode mode = FAST);
+void compute_motion_1d_test(double x0, double v0, double v1,
+	double a_max, double d_max, double v_max, double a_factor, double vel_factor,
+	double& traj_accel, double& traj_time, double& traj_time_acc, double& traj_time_dec, double& traj_time_flat, planType pT, nonZeroMode mode = FAST);
 void compute_motion_2d(CVector x0, CVector v0, CVector v1,
 					   double a_max, double d_max, double v_max, double a_factor,
                        CVector &traj_accel, double &time, double &time_acc, double &time_dec, double &time_flat, nonZeroMode mode = FAST);
 void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
-					   double a_max, double d_max, double v_max, double a_factor,
-					   CVector& traj_accel, double& time, double& time_acc, double& time_dec, double& time_flat, double a_x, double a_y,
-					   nonZeroMode mode = FAST);
+					   double a_max, double d_max, double v_max, double selfDir, double vx_max, double vy_max, double a_factor,
+					   CVector& traj_accel, double& time, double& time_acc, double& time_dec, double& time_flat, nonZeroMode mode = FAST, bool IsGoMiddle = false);
 
 double compute_stop(double v, double max_a);
 void goto_point_omni( const PlayerVisionT& start,
@@ -48,8 +50,7 @@ void goto_point_omni_test(const PlayerVisionT& start,
 	const double& accel_factor,
 	const double& angle_accel_factor,
 	PlayerVisionT& nextStep,
-	double a_x, double a_y, double a_r,
-	nonZeroMode mode = FAST);
+	nonZeroMode mode = FAST, bool IsGoMiddle = false);
 
 double expectedCMPathTime(const PlayerVisionT& start, const CGeoPoint& final, double maxAccel, double maxVelocity, double accel_factor);
 double predictedTime(const PlayerVisionT& start, const CGeoPoint& Target, const CVector& targetVel = CVector(0, 0));

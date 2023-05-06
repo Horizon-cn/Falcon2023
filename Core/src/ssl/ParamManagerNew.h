@@ -209,7 +209,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
 
             loadParam(BAYESLIST, "CMatchState/BAYESLIST", "BayesParams1");
             loadParam(BAYESPARAM, "CMatchState/BAYESPARAM", "Skuba_Attack");
-            
+
             loadParam(SLOW_FACTOR, "Capability/SLOW_FACTOR", 0.65);
             loadParam(MAX_TRANSLATION_SPEED_GOALIE, "Capability/MAX_TRANSLATION_SPEED_GOALIE", 300);
             loadParam(MAX_TRANSLATION_ACC_GOALIE, "Capability/MAX_TRANSLATION_ACC_GOALIE", 300);
@@ -229,6 +229,8 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(TRANSLATION_ACC_LIMIT, "Capability/TRANSLATION_ACC_LIMIT", 500);
             loadParam(TRANSLATION_SPEED_LIMIT, "Capability/TRANSLATION_SPEED_LIMIT", 300);
             loadParam(TRANSLATION_ROTATE_ACC_LIMIT, "Capability/TRANSLATION_ROTATE_ACC_LIMIT", 5);
+            loadParam(MAX_TRANSLATION_SPEED_X, "Capability/MAX_TRANSLATION_SPEED_X", 500);
+            loadParam(MAX_TRANSLATION_SPEED_Y, "Capability/MAX_TRANSLATION_SPEED_Y", 500);
 
             loadParam(PENALTY_FIGHT, "General/PENALTY_FIGHT", 1);
 
@@ -397,6 +399,9 @@ class CParamManagerSkill : public Falcon::ParamManager {
         int TRANSLATION_ACC_LIMIT;
         int TRANSLATION_SPEED_LIMIT;
         int TRANSLATION_ROTATE_ACC_LIMIT;
+        int MAX_TRANSLATION_SPEED_X;
+        int MAX_TRANSLATION_SPEED_Y;
+
         // General
         bool PENALTY_FIGHT;
         // BallStatus

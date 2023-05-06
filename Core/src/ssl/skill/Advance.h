@@ -145,6 +145,8 @@ private:
     double GetCPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint);
 
     double generateNormalPushDir(const CVisionModule* pVision, const int vecNumber);
+    double generateGetballDir(const CVisionModule* pVision, const int vecNumber);
+
 protected:
 
     CPlayerCommand* _directCommand;
