@@ -174,7 +174,7 @@ void CAdvance::plan(const CVisionModule* pVision)
                     NowIsShoot = 1;
 					_state = KICK; break;
 				}
-				else if(Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor)) {
+				else if(Me2OppTooclose(pVision, _executor) && isInBreakArea(pVision, _executor)) {
 
                     NowIsShoot = 2;
 					_state = BREAKSHOOT; break;
@@ -206,27 +206,33 @@ void CAdvance::plan(const CVisionModule* pVision)
 		else { _state = GET; break; }
 	case KICK:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push KICK", COLOR_YELLOW);
-		if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
 	case PASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push PASS", COLOR_YELLOW);
-		if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
 	case JUSTCHIPPASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHIP", COLOR_YELLOW);
-		if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
 	case BREAKSHOOT:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push BREAK", COLOR_YELLOW);
-		if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
     case PUSHOUT:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push OUT", COLOR_YELLOW);
-        if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
     case BREAKPASS:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push OUT", COLOR_YELLOW);
-        if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
         break;
 	}
 	//_state = GET;

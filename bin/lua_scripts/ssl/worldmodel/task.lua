@@ -759,6 +759,11 @@ function goSecondPassPos(role)
 	return {mexe, mpos}
 end
 
+function support(role, num)
+	local mexe, mpos = GoCmuRush{ pos = ball.supportPassPos(num), dir = player.toShootOrRobot(role),sender=role,flag=bit:_or(flag.allow_dss, flag.avoid_stop_ball_circle)}
+	return {mexe, mpos}
+end
+	
 function goLWPassPos(role)
 	local mexe, mpos = GoCmuRush{ pos = ball.LWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
