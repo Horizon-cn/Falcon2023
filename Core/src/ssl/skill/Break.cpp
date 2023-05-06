@@ -228,7 +228,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     if (isSetPoint(pVision, point, me.Pos())) {
         move_point = target;
     }
-    else if (pVision->Cycle() % 60 == 0) {
+    else if (pVision->Cycle() % 5 == 0) {
         move_point = target;
     }
     

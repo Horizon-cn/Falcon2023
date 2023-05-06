@@ -138,13 +138,15 @@ class BallVisionT : public TranslationT, public ChipPosT {
 /*                        机器人能力数据结构                               */
 /************************************************************************/
 struct PlayerCapabilityT {
-	PlayerCapabilityT() : maxAccel(0), maxSpeed(0), maxAngularAccel(0), maxAngularSpeed(0), maxDec(0), maxAngularDec(0) {}
+	PlayerCapabilityT() : maxAccel(0), maxSpeed(0), maxAngularAccel(0), maxAngularSpeed(0), maxDec(0), maxAngularDec(0), maxSpeedX(0), maxSpeedY(0){}
 	double maxAccel; // 最大加速度
 	double maxSpeed; // 最大速度
 	double maxAngularAccel; // 最大角加速度
 	double maxAngularSpeed; // 最大角速度
 	double maxDec;          // 最大减速度
 	double maxAngularDec;   // 最大角减速度
+	double maxSpeedX; // 最大纵向速度 by Tyh
+	double maxSpeedY; // 最大横向速度 by Tyh
 };
 
 struct ROBOTINFO

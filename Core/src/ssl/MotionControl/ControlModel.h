@@ -31,8 +31,8 @@ public:
 	/// Trapezoidal control from CMU : none-zero final velocity trajectory
 	void makeCmTrajectory(const PlayerVisionT& start, const PlayerVisionT& final, const PlayerCapabilityT& capability, nonZeroMode mode = FAST);
 
-	/// Test Capability From HXY. Date:20210610
-	void makeCmTrajectoryTest(const PlayerVisionT& start, const PlayerVisionT & final, const PlayerCapabilityT& capability, nonZeroMode mode, double x, double y, double rotate);
+	/// Test NewMotion From TYH. Date:20230409
+	void makeCmTrajectoryTest(const PlayerVisionT& start, const PlayerVisionT & final, const PlayerCapabilityT& capability, nonZeroMode mode, bool IsGoMiddle);
 
 	/// Get the real-time next step
 	const PlayerVisionT& getNextStep() const { return _nextStep; }
