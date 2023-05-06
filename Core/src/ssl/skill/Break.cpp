@@ -77,12 +77,13 @@ namespace {
     double MAX_ACC;
     double MAX_VEL;
     double MAX_ROT_ACC;
-    double MAX_ROT_SPEED;
+    double MAX_ROT_VEL;
     double CHECK_OBSTCLE_DIST;
     double DRIBBLE_DIST;
     double COEF_NEARSCORE;
     double COEF_BLOCKSCORE;
     double COEF_DISTSCORE;
+    double OBSTACLE_RADIUS;
     bool safeMode;
     int maxFrared;
 
@@ -108,17 +109,16 @@ CBreak::CBreak() {
     COEF_BLOCKSCORE = paramManager->COEF_BLOCKSCORE;
     COEF_DISTSCORE = paramManager->COEF_DISTSCORE;
     COEF_NEARSCORE = paramManager->COEF_NEARSCORE;
+    OBSTACLE_RADIUS = paramManager->BREAK_OBSTACLE_RADIUS;
+    MAX_ACC = paramManager->BREAK_ACC;
+    MAX_VEL = paramManager->BREAK_VEL;
+    MAX_ROT_ACC = paramManager->BREAK_ROT_ACC;
+    MAX_ROT_VEL = paramManager->BREAK_ROT_VEL;
 
     CHECK_OBSTCLE_DIST = 1000;
     DRIBBLE_DIST = 80;
     safeMode = false;
 
-
-
-    MAX_ACC = 100;
-    MAX_VEL = 100;
-    MAX_ROT_ACC = 20;
-    MAX_ROT_SPEED = 2000;
   
     lastFrameposition = CGeoPoint(-9999, -9999);
     
@@ -239,8 +239,12 @@ void CBreak::plan(const CVisionModule* pVision) {
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-400, -400+20*i), ("point[" + to_string(i) + "] (" + to_string(point[i].x()) + "," + to_string(point[i].y()) + ")").c_str(), COLOR_YELLOW);
     }
     if (DEBUG) GDebugEngine::Instance()->gui_debug_line(dribblePoint, move_point, COLOR_PURPLE);
-    grabTask.player.max_acceleration=120;
-    grabTask.player.max_deceleration=120;
+    
+    grabTask.player.max_acceleration=MAX_ACC;
+    grabTask.player.max_deceleration= MAX_ACC;
+    grabTask.player.max_rot_acceleration = MAX_ROT_ACC;
+    grabTask.player.max_rot_speed = MAX_ROT_VEL;
+
 
 
     if (isPenalty)
@@ -249,8 +253,8 @@ void CBreak::plan(const CVisionModule* pVision) {
         penaltyX=me.Pos().x()+10.0;
         penaltyY=move_point.y()/*>0?-DRIBBLE_DIST:DRIBBLE_DIST*/;
         grabTask.player.pos=CGeoPoint(penaltyX,penaltyY);
-        grabTask.player.max_acceleration=100;
-        grabTask.player.max_deceleration=100;
+        grabTask.player.max_acceleration= MAX_ACC;
+        grabTask.player.max_deceleration= MAX_ACC;
         GDebugEngine::Instance()->gui_debug_x(CGeoPoint(penaltyX,penaltyY),COLOR_BLACK);
     }
 
@@ -279,7 +283,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     //cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
 
-    bool dirok = canScore(pVision, vecNumber, 5, me.Dir());
+    bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
     //if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 20) {
     if (canShoot && dirok){
         cout << "shoot!!!" << endl;
@@ -652,42 +656,7 @@ bool CBreak::isSetPoint(const CVisionModule* pVision, const CGeoPoint* point, co
         return false;
 
 }
-double CBreak::holdBallDir(const CVisionModule *pVision, int robotNum){
-    static const int DIS_THRESHOLD = 800;
 
-    // 计算多人包夹时的角度
-    double finalAngle = 0;
-    double coeff = 0;
-    const PlayerVisionT& me = pVision->OurPlayer(robotNum);
-    for(int i=0; i<Param::Field::MAX_PLAYER; i++){
-        if(!pVision->TheirPlayer(i).Valid()) continue;
-        if(pVision->TheirPlayer(i).Pos().dist(me.Pos()) > DIS_THRESHOLD) continue;
-        const PlayerVisionT& enemy = pVision->TheirPlayer(i);
-        CVector enemy2me = me.Pos() - enemy.Pos();
-        double targetAngle = enemy2me.dir()/* > 0 ? 2*Param::Math::PI - enemy2me.dir() : -1*enemy2me.dir()*/;
-        finalAngle += targetAngle/enemy2me.mod();
-        coeff += 1/enemy2me.mod();
-    }
-    if(std::fabs(finalAngle) < 1e-4) return 1e8;
-
-    finalAngle /= coeff;
-    // 计算最佳距离
-    double anotherAngle = finalAngle < Param::Math::PI ? finalAngle + Param::Math::PI : finalAngle - Param::Math::PI;
-    double diff1 = 0, diff2 = 0;
-    for(int i=0; i<Param::Field::MAX_PLAYER; i++){
-        if(!pVision->TheirPlayer(i).Valid()) continue;
-        if(pVision->TheirPlayer(i).Pos().dist(me.Pos()) > DIS_THRESHOLD) continue;
-        const PlayerVisionT& enemy = pVision->TheirPlayer(i);
-        CVector enemy2me = me.Pos() - enemy.Pos();
-        double targetAngle = enemy2me.dir()/* > 0 ? 2*Param::Math::PI - enemy2me.dir() : -1*enemy2me.dir()*/;
-        double d_angle1 = fabs(targetAngle-finalAngle) < Param::Math::PI ? fabs(targetAngle-finalAngle) : 2*Param::Math::PI - fabs(targetAngle-finalAngle);
-        diff1 += d_angle1/enemy2me.mod();
-        double d_angle2 = abs(targetAngle-anotherAngle) < Param::Math::PI ? fabs(targetAngle-anotherAngle) : 2*Param::Math::PI - fabs(targetAngle-anotherAngle);
-        diff2 += d_angle2/enemy2me.mod();
-    }
-    if(diff1 > diff2)finalAngle = anotherAngle;         
-    return finalAngle;
-}
 
 
 bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const double radius, const double dir) {
@@ -701,6 +670,7 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         double x = enemy.X(), y = enemy.Y();
         double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
+        
         if (r < radius || fabs(projection) > Param::Field::GOAL_WIDTH / 2) {
             flag = false;
         }

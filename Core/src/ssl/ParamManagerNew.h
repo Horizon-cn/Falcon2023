@@ -145,12 +145,20 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(CHALLENGE_BALL_DIST, "Goalie/CHALLENGE_BALL_DIST", 60);
             loadParam(BLOCK_DIST, "Goalie/BLOCK_DIST", 60);
 
-            loadParam(BREAK_BACK_DRIBBLE_SPEED, "BREAK/BACK_DRIBBLE_SPEED", 10);
+           
             loadParam(BREAK_SHOOT_ACCURACY, "BREAK/SHOOT_ACCURACY", 10);
             loadParam(BREAK_DEBUG, "BREAK/DEBUG", 1);
             loadParam(COEF_BLOCKSCORE, "BREAK/COEF_BLOCKSCORE", 10);
             loadParam(COEF_NEARSCORE, "BREAK/COEF_NEARSCORE", 1);
             loadParam(COEF_DISTSCORE, "BREAK/COEF_DISTSCORE", 0.5);
+            loadParam(BREAK_ACC, "BREAK/ACC", 200);
+            loadParam(BREAK_VEL, "BREAK/VEL", 500);
+            loadParam(BREAK_ROT_ACC, "BREAK/ROT_ACC", 50);
+            loadParam(BREAK_ROT_VEL, "BREAK/ROT_VEL", 100);
+            loadParam(BREAK_OBSTACLE_RADIUS, "BREAK/OBSTACLE_RADIUS", 7);
+
+
+
 
             loadParam(KICK_DIST, "Advance/KICK_DIST", 400);
             loadParam(WantToLessShoot, "Advance/WantToLessShoot", 3);
@@ -311,12 +319,17 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double CHALLENGE_BALL_DIST;
         double BLOCK_DIST;
         //break 参数
-        double BREAK_BACK_DRIBBLE_SPEED;
         double BREAK_SHOOT_ACCURACY;
         bool BREAK_DEBUG;
         double COEF_NEARSCORE;
         double COEF_BLOCKSCORE;
         double COEF_DISTSCORE;
+        double BREAK_ACC;
+        double BREAK_VEL;
+        double BREAK_ROT_VEL;
+        double BREAK_ROT_ACC;
+        double BREAK_OBSTACLE_RADIUS;
+
         //advance参数 byTYH  2022.10
         double KICK_DIST;  /*射门允许范围 越高越容易射门*/
         int WantToLessShoot ; /*射门倾向，越低越容易射门 最低为0 最高为5*/
