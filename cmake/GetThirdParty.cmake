@@ -39,3 +39,13 @@ find_package(OpenGL REQUIRED)
 
 ## Eigen
 include(${CMAKE_SOURCE_DIR}/cmake/GetEigen.cmake)
+
+## CUDA
+# define
+option(ENABLE_CUDA OFF)
+message("ENABLE_CUDA : ${ENABLE_CUDA}")
+IF(ENABLE_CUDA)
+    add_definitions(-DENABLE_CUDA)
+    enable_language(CUDA)
+    find_package(CUDA)
+ENDIF()

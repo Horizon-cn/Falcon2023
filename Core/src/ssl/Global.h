@@ -4,6 +4,7 @@
 #include "Vision/VisionModule.h"
 #include "WorldModel/DribbleStatus.h"
 #include "WorldModel/KickStatus.h"
+#include "BallStatus.h"
 #include "GDebugEngine.h"
 #include "WorldModel/WorldModel.h"
 #include "singleton.h"

@@ -4,6 +4,7 @@
 #include "time.h"
 #include "param.h"
 #include <ctime>
+#include "cublas_v2.h"
 
 //namespace {
 //    const float PI = 3.1415926;
@@ -605,18 +606,39 @@ extern "C" int break_calc_with_gpu(float* target_point_cpu, int target_point_num
     //std::cout << "best break point calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
 }
 
-// 注意：！！！！！！！！！！！！！！！！ 这些矩阵运算没有经过优化，也没有一般性，期待后续改进
-// 矩阵乘法，无优化，期待后续优化
+
 // mat_c = mat_a * mat_b
-__global__ void matrix_multi(float* mat_a, float* mat_b, float* mat_c, int M, int N, int K) {
-    int row_idx = blockIdx.x;
-    int col_idx = threadIdx.x;
-    int idx = blockDim.x * blockIdx.x + threadIdx.x;
-    float c = 0;
-    for (int i = 0; i < N; i++) {
-        c += mat_a[row_idx * N + i] * mat_b[col_idx * N + i];
-    }
-    mat_c[idx] = c;
+//优化：利用cublas中cublasSgemm加速矩阵运算
+// mat_a:M*N, mat_b:N*K, mat_c:M*K
+//__global__ void matrix_multi(float* mat_a, float* mat_b, float* mat_c, int M, int N, int K) {
+void matrix_multi(float* mat_a, float* mat_b, float* mat_c, int M, int N, int K) {
+
+    cublasHandle_t handle;
+    // initialize CUBLAS context
+    cublasStatus_t stat = cublasCreate(&handle);
+
+    float al = 1.0f;
+    float bet = 0.0f;
+    
+    //当前认定原矩阵存储方式为行优先
+    stat = cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_T, M, K, N, 
+        &al, mat_a, N, mat_b, K, 
+        &bet, mat_c, M);
+    
+    //如为列优先可启用下列代码
+    //stat = cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K,
+    //    &al, mat_a, M, mat_b, K,
+    //    &bet, mat_c, M);
+    cublasDestroy(handle);
+    //int row_idx = blockIdx.x;
+    //int col_idx = threadIdx.x;
+    //int idx = blockDim.x * blockIdx.x + threadIdx.x;
+    //float c = 0;
+    //for (int i = 0; i < N; i++) {
+    //    c += mat_a[row_idx * N + i] * mat_b[col_idx * N + i];
+    //}
+    //mat_c[idx] = c;
+
 }
 
 __global__ void matrix_add(float* MatA, float* MatB, float* MatC, int nx, int ny)
@@ -717,9 +739,10 @@ extern "C" void ball_model_calc_with_gpu(float* vel_data_cpu, float *predict_res
     }
 
     // y=xA
-    dim3 dimGrid1(1);
-    dim3 dimBlock1(HIDDEN_LAYER_DIM);
-    matrix_multi << <dimGrid1, dimBlock1 >> > (vel_data_gpu, a_1_matrix_gpu, hidden_layer_data_gpu, 1, INPUT_DIM, HIDDEN_LAYER_DIM);
+    //dim3 dimGrid1(1);
+    //dim3 dimBlock1(HIDDEN_LAYER_DIM);
+    //matrix_multi << <dimGrid1, dimBlock1 >> > (vel_data_gpu, a_1_matrix_gpu, hidden_layer_data_gpu, 1, INPUT_DIM, HIDDEN_LAYER_DIM);
+    matrix_multi(vel_data_gpu, a_1_matrix_gpu, hidden_layer_data_gpu, 1, INPUT_DIM, HIDDEN_LAYER_DIM);
 
     // relu(y+=b)，加法可以使用同一片地址，但是乘法不行
     dim3 dimGrid2(1);
@@ -727,9 +750,10 @@ extern "C" void ball_model_calc_with_gpu(float* vel_data_cpu, float *predict_res
     matrix_add_with_relu << <dimGrid2, dimBlock2 >> > (hidden_layer_data_gpu, bias_1_matrix_gpu, hidden_layer_data_gpu, 1, HIDDEN_LAYER_DIM);
 
     // y=xA
-    dim3 dimGrid3(1);
-    dim3 dimBlock3(OUTPUT_DIM);
-    matrix_multi << <dimGrid3, dimBlock3 >> > (hidden_layer_data_gpu, a_2_matrix_gpu, results_gpu, 1, HIDDEN_LAYER_DIM, OUTPUT_DIM);
+    //dim3 dimGrid3(1);
+    //dim3 dimBlock3(OUTPUT_DIM);
+    //matrix_multi << <dimGrid3, dimBlock3 >> > (hidden_layer_data_gpu, a_2_matrix_gpu, results_gpu, 1, HIDDEN_LAYER_DIM, OUTPUT_DIM);
+    matrix_multi(hidden_layer_data_gpu, a_2_matrix_gpu, results_gpu, 1, HIDDEN_LAYER_DIM, OUTPUT_DIM);
 
     // y+=b，加法可以使用同一片地址，但是乘法不行
     dim3 dimGrid4(1);
@@ -743,7 +767,10 @@ extern "C" void ball_model_calc_with_gpu(float* vel_data_cpu, float *predict_res
     cudaFree(results_gpu);
     cudaFree(vel_data_gpu);
     cudaFree(hidden_layer_data_gpu);
-
+    cudaFree(a_1_matrix_gpu);
+    cudaFree(bias_1_matrix_gpu);
+    cudaFree(a_2_matrix_gpu);
+    cudaFree(bias_2_matrix_gpu);
     //end = clock();
     //std::cout << "best break point calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
 }

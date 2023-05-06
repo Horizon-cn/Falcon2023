@@ -11,13 +11,12 @@ firstState = "getball",
 
 ["getball"] = {
 		switch = function ()
-			if bufcnt(player.toTargetDist("Receiver")<40 and
-				player.toTargetDist("Goalie")<10, 3, 180) then
-				return "chippass"
+			if bufcnt(true) then
+				return "getball"
 			end
 		end,
-		Receiver = task.getBall(),
-		Goalie = task.goCmuRush(READY_POS),
+		--Receiver = task.getBall(),
+		Kicker = task.getBall(0),
 		match    = ""
 },
 

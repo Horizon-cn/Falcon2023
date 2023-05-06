@@ -5,6 +5,16 @@
 	- [未走完的路](./TODO.md)
 	- [前人的肩膀](./Document.md)
 
+## Attention！motion参数注意
+
+![Motion](./wiki/Motion.png)
+
+**仿真**下PERIOD-MOVE-X设为0.01到0.05效果较好
+
+**实车**下PERIOD-MOVE-X设为0.1到0.3效果较好
+
+
+
 ## 框架组成
 
 - `3rdParty` -- 编译所用第三方库
@@ -79,8 +89,8 @@ $ sudo make install
     	set(N 4)
     endif()
     ```
-	- 如果需要使用 GPU，按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置，[cuda 12.0下载](https://jbox.sjtu.edu.cn/l/I1f4um)
-	
+	- 如果需要使用 GPU，将 cmake 中的 ENABLE_CUDA 置为 ON，~~按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置~~，[cuda 12.0下载](https://jbox.sjtu.edu.cn/l/I1f4um)
+	![ENABLE_CUDA](wiki/ENABLE_CUDA.png)
 
 ## 使用方法
 

@@ -135,87 +135,87 @@
 <context>
     <name>Display</name>
     <message>
-        <location filename="src/other/display.cpp" line="301"/>
+        <location filename="src/other/display.cpp" line="309"/>
         <source>Set robot:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="302"/>
+        <location filename="src/other/display.cpp" line="310"/>
         <source>team: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="304"/>
+        <location filename="src/other/display.cpp" line="312"/>
         <source>Blue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="305"/>
+        <location filename="src/other/display.cpp" line="313"/>
         <source>Yellow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="308"/>
+        <location filename="src/other/display.cpp" line="316"/>
         <source>robotID: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="313"/>
+        <location filename="src/other/display.cpp" line="321"/>
         <source>Set Display Mode:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="315"/>
+        <location filename="src/other/display.cpp" line="323"/>
         <source>Vxy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="316"/>
+        <location filename="src/other/display.cpp" line="324"/>
         <source>Vx</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="317"/>
+        <location filename="src/other/display.cpp" line="325"/>
         <source>Vy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="318"/>
+        <location filename="src/other/display.cpp" line="326"/>
         <source>Vr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="319"/>
+        <location filename="src/other/display.cpp" line="327"/>
         <source>Angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="320"/>
+        <location filename="src/other/display.cpp" line="328"/>
         <source>BallSpeed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="323"/>
+        <location filename="src/other/display.cpp" line="331"/>
         <source>Set Feature:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="324"/>
+        <location filename="src/other/display.cpp" line="332"/>
         <source>height: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="329"/>
+        <location filename="src/other/display.cpp" line="337"/>
         <source>horizontLines: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="334"/>
+        <location filename="src/other/display.cpp" line="342"/>
         <source>maximum: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/display.cpp" line="339"/>
+        <location filename="src/other/display.cpp" line="347"/>
         <source>limitation: </source>
         <translation type="unfinished"></translation>
     </message>

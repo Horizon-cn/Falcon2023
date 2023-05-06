@@ -67,11 +67,13 @@
 #include "MarkingTouch.h"
 #include "MarkingFront.h"
 #include "DribbleTurnKick.h"
+#include "DribbleTurnKickV2.h"
 #include "InterceptBallV4.h"
 #include "InterceptBallV2.h"
 #include "GoSupport.h"
 #include "GoTechChalPos.h"
 #include "GotoPositionNew.h"
+#include "GoPIDCircle.h"
 
 /************************************************************************/
 /*                      TaskFactoryV2                                    */
@@ -89,151 +91,154 @@
 template < class CTaskType >
 CPlayerTask* CTaskFactoryV2::MakeTask(const TaskT& task)
 {
-    static CTaskType taskPool[Param::Field::MAX_PLAYER];
-    taskPool[task.executor].reset(task);
-    return &taskPool[task.executor];
+	static CTaskType taskPool[Param::Field::MAX_PLAYER];
+	taskPool[task.executor].reset(task);
+	return &taskPool[task.executor];
 }
 
 //working
 //
 CPlayerTask* CTaskFactoryV2::Break(const TaskT& task)
 {
-    return MakeTask<CBreak>(task);
+	return MakeTask<CBreak>(task);
 }
 
 
 
 //////////////////////////////////////////////////////////////////////////
 // current now debugged skill for game
+CPlayerTask* CTaskFactoryV2::GoPIDCircle(const TaskT& task) {
+    return MakeTask< CGoPIDCircle >(task);
+}
 CPlayerTask* CTaskFactoryV2::GotoPosition(const TaskT& task) {
-    return MakeTask< CGotoPosition >(task);
+	return MakeTask< CGotoPosition >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::SmartGotoPosition(const TaskT& task) {
-    return MakeTask< CSmartGotoPosition >(task);
+	return MakeTask< CSmartGotoPosition >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::GotoPositionNew(const TaskT& task) {
-    return MakeTask< CGotoPositionNew >(task);
+	return MakeTask< CGotoPositionNew >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::StopRobot(const TaskT& task) {
-    return MakeTask< CStopRobotV2 >(task);
+	return MakeTask< CStopRobotV2 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::Speed(const TaskT& task) {
-    return MakeTask< CSpeed >(task);
+	return MakeTask< CSpeed >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::OpenSpeed(const TaskT& task) {
-    return MakeTask< COpenSpeed >(task);
+	return MakeTask< COpenSpeed >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::NoneTrajGetBall(const TaskT& task) {
-    return MakeTask< CGetBallV3 >(task);
+	return MakeTask< CGetBallV3 >(task);
 }
 CPlayerTask* CTaskFactoryV2::ForceStartRush(const TaskT& task) {
-    return MakeTask< CForceStartRush >(task);
+	return MakeTask< CForceStartRush >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::ChaseKickV1(const TaskT& task) {
-    return MakeTask< CChaseKickV1 >(task);
+	return MakeTask< CChaseKickV1 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::ChaseKickV2(const TaskT& task) {
-    return MakeTask< CChaseKickV2>(task);
+	return MakeTask< CChaseKickV2>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::ProtectBall(const TaskT& task) {
-    return MakeTask< CProtectBall>(task);
+	return MakeTask< CProtectBall>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::TouchKick(const TaskT& task) {
-    return MakeTask< CTouchKick >(task);
+	return MakeTask< CTouchKick >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::InterceptBallV2(const TaskT& task) {
-    return MakeTask< CInterceptBallV2>(task);
+	return MakeTask< CInterceptBallV2>(task);
 }
 CPlayerTask* CTaskFactoryV2::InterceptBallV3(const TaskT& task) {
-    return MakeTask< CInterceptBallV3>(task);
+	return MakeTask< CInterceptBallV3>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::MarkingTouch(const TaskT& task) {
-    return MakeTask< CMarkingTouch >(task);
+	return MakeTask< CMarkingTouch >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::MarkingFront(const TaskT& task) {
-    return MakeTask< CMarkingFront >(task);
+	return MakeTask< CMarkingFront >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::GoSupport(const TaskT& task) {
-    return MakeTask< CGoSupport >(task);
+	return MakeTask< CGoSupport >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::ShootBall(const TaskT& task) {
-    return MakeTask< CShootBall >(task);
+	return MakeTask< CShootBall >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::ShootBallV2(const TaskT& task) {
-    return MakeTask< CShootBallV2 >(task);
+	return MakeTask< CShootBallV2 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::DriftKick(const TaskT& task) {
-    return MakeTask< CDriftKick >(task);
+	return MakeTask< CDriftKick >(task);
 }
 
 
 CPlayerTask* CTaskFactoryV2::CarzyPush(const TaskT& task) {
-    return MakeTask<CCrazyPush>(task);
+	return MakeTask<CCrazyPush>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::GoAroundRobot(const TaskT& task) {
-    return MakeTask< CGoAroundRobot >(task);
+	return MakeTask< CGoAroundRobot >(task);
 }
 CPlayerTask* CTaskFactoryV2::GoTechChalPos(const TaskT& task) {
-    return MakeTask< CGoTechChalPos >(task);
+	return MakeTask< CGoTechChalPos >(task);
 }
 CPlayerTask* CTaskFactoryV2::PenaltyDefV1(const TaskT& task) {
-    return MakeTask< CPenaltyDefV1 >(task);
+	return MakeTask< CPenaltyDefV1 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::PenaltyDefV2(const TaskT& task) {
-    return MakeTask< CPenaltyDefV2 >(task);
+	return MakeTask< CPenaltyDefV2 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::AdvanceBallV1(const TaskT& task) {
-    return MakeTask< CAdvanceBallV1 >(task);
+	return MakeTask< CAdvanceBallV1 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::AdvanceBallV2(const TaskT& task) {
-    return MakeTask< CAdvanceBallV2 >(task);
+	return MakeTask< CAdvanceBallV2 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::AdvanceBallV3(const TaskT& task) {
-    return MakeTask< CAdvanceBallV3 >(task);
+	return MakeTask< CAdvanceBallV3 >(task);
 }
 CPlayerTask* CTaskFactoryV2::AdvanceBallV4(const TaskT& task) {
-    return MakeTask< CAdvanceBallV4 >(task);
+	return MakeTask< CAdvanceBallV4 >(task);
 }
 CPlayerTask* CTaskFactoryV2::Advance(const TaskT& task) {
-    return MakeTask< CAdvance >(task);
+	return MakeTask< CAdvance >(task);
 }
 CPlayerTask* CTaskFactoryV2::PenaltyKickV2(const TaskT& task) {
-    return MakeTask< CPenaltyKickV2 >(task);
+	return MakeTask< CPenaltyKickV2 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::Tandem(const TaskT& task)
 {
-    return MakeTask< CTandem >(task);
+	return MakeTask< CTandem >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::GoAndTurnKick(const TaskT& task) {
-    return MakeTask< CGoAndTurnKick >(task);
+	return MakeTask< CGoAndTurnKick >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::CircleAndPass(const TaskT& task) {
-    return MakeTask< CCircleAndPass >(task);
+	return MakeTask< CCircleAndPass >(task);
 }
 
 
@@ -241,399 +246,403 @@ CPlayerTask* CTaskFactoryV2::CircleAndPass(const TaskT& task) {
 //    return MakeTask< CGoAndTurnKickV2 >(task);
 //}
 CPlayerTask* CTaskFactoryV2::GoAndTurnKickV3(const TaskT& task) {
-    return MakeTask< CGoAndTurnKickV3 >(task);
+	return MakeTask< CGoAndTurnKickV3 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::GoAndTurnKickV4(const TaskT& task) {
-    return MakeTask< CGoAndTurnKickV4 >(task);
+	return MakeTask< CGoAndTurnKickV4 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::GoAndTurn(const TaskT& task) {
-    return MakeTask< CGoAndTurn >(task);
+	return MakeTask< CGoAndTurn >(task);
 }
 CPlayerTask* CTaskFactoryV2::SlowGetBall(const TaskT& task) {
-    return MakeTask< CSlowGetBall >(task);
+	return MakeTask< CSlowGetBall >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::timeDelayTest(const TaskT& task) {
-    return MakeTask< CTimeDelayTest >(task);
+	return MakeTask< CTimeDelayTest >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::Marking(const TaskT& task) {
-    return MakeTask< CMarking >(task);
+	return MakeTask< CMarking >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::TestCircleBall(const TaskT& task) {
-    return MakeTask<CTestCircleBall>(task);
+	return MakeTask<CTestCircleBall>(task);
 }
 
 
 CPlayerTask* CTaskFactoryV2::PassBall(const TaskT& task) {
-    return MakeTask< CPassBall >(task);
+	return MakeTask< CPassBall >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::ReceivePass(const TaskT& task) {
-    return MakeTask< CReceivePass >(task);
+	return MakeTask< CReceivePass >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::FetchBall(const TaskT& task) {
-    return MakeTask< CFetchBall >(task);
+	return MakeTask< CFetchBall >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::PenaltyGoalie(const TaskT& task) {
-    return MakeTask< CPenaltyGoalie2012 >(task);
+	return MakeTask< CPenaltyGoalie2012 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::Goalie2013(const TaskT& task) {
-    return MakeTask< CGoalie2013 >(task);
+	return MakeTask< CGoalie2013 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::Goalie2022(const TaskT& task) {
-    return MakeTask< CGoalie2022 >(task);
+	return MakeTask< CGoalie2022 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::ShootoutGoalie(const TaskT& task) {
-    return MakeTask< CShootoutGoalie >(task);
+	return MakeTask< CShootoutGoalie >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::ShootoutGoalieV2(const TaskT& task) {
-    return MakeTask< CShootoutGoalieV2 >(task);
+	return MakeTask< CShootoutGoalieV2 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::InterceptBall(const TaskT& task)
 {
-    return MakeTask< CInterceptBall >(task);
+	return MakeTask< CInterceptBall >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::InterceptBallV4(const TaskT& task)
 {
-    return MakeTask< CInterceptBallV4 >(task);
+	return MakeTask< CInterceptBallV4 >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::JustKick(const TaskT& task) {
-    return MakeTask<CJustKick>(task);
+	return MakeTask<CJustKick>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::WaitTouch(const TaskT& task) {
-    return MakeTask<CWaitTouch>(task);
+	return MakeTask<CWaitTouch>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::PenaltyKick2013(const TaskT& task) {
-    return MakeTask<CPenaltyKick2013>(task);
+	return MakeTask<CPenaltyKick2013>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::PenaltyKick2014(const TaskT& task) {
-    return MakeTask<CPenaltyKick2014>(task);
+	return MakeTask<CPenaltyKick2014>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::DribbleTurn(const TaskT& task) {
-    
-    return MakeTask<CDribbleTurn>(task);
+
+	return MakeTask<CDribbleTurn>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::DribbleTurnKick(const TaskT& task) {
-    return MakeTask<CDribbleTurnKick>(task);
+	return MakeTask<CDribbleTurnKick>(task);
+}
+
+CPlayerTask* CTaskFactoryV2::DribbleTurnKickV2(const TaskT& task) {
+	return MakeTask<CDribbleTurnKickV2>(task);
 }
 
 //////////////////////////////////////////////////////////////////////////
 // define the namespace used to provide interface for task calling
 namespace PlayerRole {
-    CPlayerTask* makeItBreak(const int num, const CGeoPoint& target, bool isPenalty,double shootaccuracy,bool isSpin)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.pos = target;
-        playerTask.player.kickprecision = shootaccuracy;
-        if(isPenalty)playerTask.player.flag = playerTask.player.flag|PlayerStatus::PENALTY_KICK;
-        if(isSpin)playerTask.player.flag = playerTask.player.flag|PlayerStatus::SPIN;
+	CPlayerTask* makeItBreak(const int num, const CGeoPoint& target, bool isPenalty, double shootaccuracy, bool isSpin)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.pos = target;
+		playerTask.player.kickprecision = shootaccuracy;
+		if (isPenalty)playerTask.player.flag = playerTask.player.flag | PlayerStatus::PENALTY_KICK;
+		if (isSpin)playerTask.player.flag = playerTask.player.flag | PlayerStatus::SPIN;
 
-        return TaskFactoryV2::Instance()->Break(playerTask);
-    }
-
-
-    CPlayerTask* makeItStop(const int num, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->StopRobot(playerTask);
-    }
-    CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const int flags, const int sender)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.pos = target;
-        playerTask.player.vel = CVector(0.0, 0.0);
-        playerTask.player.rotvel = 0;
-        playerTask.player.angle = dir;
-        playerTask.player.flag = flags;
-        playerTask.ball.Sender = sender;
-        return TaskFactoryV2::Instance()->SmartGotoPosition(playerTask);
-    }
-    CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotvel, const int flags, const int sender)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.pos = target;
-        playerTask.player.angle = dir;
-        playerTask.player.vel = vel;
-        playerTask.player.rotvel = rotvel;
-        playerTask.player.flag = flags;
-        playerTask.ball.Sender = sender;
-        return TaskFactoryV2::Instance()->SmartGotoPosition(playerTask);
-    }
-
-    CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotVel, const double maxAcc, const double maxRotAcc, const double maxSpeed, const double maxRotSpeed, const int flags) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.pos = target;
-        playerTask.player.angle = dir;
-        playerTask.player.vel = vel;
-        playerTask.player.rotvel = rotVel;
-        playerTask.player.max_acceleration = maxAcc;
-        playerTask.player.max_rot_acceleration = maxRotAcc;
-        playerTask.player.max_speed = maxSpeed;
-        playerTask.player.max_rot_speed = maxRotSpeed;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->SmartGotoPosition(playerTask);
-    }
-
-    CPlayerTask* makeItSimpleGoto(const int num, const CGeoPoint& target, const double dir, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.pos = target;
-        playerTask.player.vel = CVector(0.0, 0.0);
-        playerTask.player.rotvel = 0;
-        playerTask.player.angle = dir;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->GotoPosition(playerTask);
-    }
-
-    CPlayerTask* makeItSimpleGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotvel, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.pos = target;
-        playerTask.player.angle = dir;
-        playerTask.player.vel = vel;
-        playerTask.player.rotvel = rotvel;
-        playerTask.player.flag = flags;
-        if (vision->GetCurrentRefereeMsg() == "ourBallPlacement" && (playerTask.player.pos - vision->OurPlayer(playerTask.executor).Pos()).mod() < paramManager->PlACEBALL_CLOSE_DISTANCE) {
-            playerTask.player.max_speed = paramManager->PlACEBALL_SPEED;
-            playerTask.player.max_rot_speed = paramManager->PlACEBALL_ROT_SPEED;
-            playerTask.player.max_acceleration = paramManager->PlACEBALL_ACCELERATION;
-            playerTask.player.max_deceleration = paramManager->PlACEBALL_DECELERATION;
-            playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
-        }
-        return TaskFactoryV2::Instance()->GotoPosition(playerTask);
-    }
+		return TaskFactoryV2::Instance()->Break(playerTask);
+	}
 
 
-    CPlayerTask* makeItCrazyPush(const int num, double faceDir)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = faceDir;
-        return TaskFactoryV2::Instance()->CarzyPush(playerTask);
-    }
-    CPlayerTask* makeItRun(const int num, const double speedX, const double speedY, const double rotSpeed, int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.speed_x = speedX;
-        playerTask.player.speed_y = speedY;
-        playerTask.player.rotate_speed = rotSpeed;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->Speed(playerTask);
-    }
+	CPlayerTask* makeItStop(const int num, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->StopRobot(playerTask);
+	}
+	CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const int flags, const int sender)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.pos = target;
+		playerTask.player.vel = CVector(0.0, 0.0);
+		playerTask.player.rotvel = 0;
+		playerTask.player.angle = dir;
+		playerTask.player.flag = flags;
+		playerTask.ball.Sender = sender;
+		return TaskFactoryV2::Instance()->SmartGotoPosition(playerTask);
+	}
+	CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotvel, const int flags, const int sender)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.pos = target;
+		playerTask.player.angle = dir;
+		playerTask.player.vel = vel;
+		playerTask.player.rotvel = rotvel;
+		playerTask.player.flag = flags;
+		playerTask.ball.Sender = sender;
+		return TaskFactoryV2::Instance()->SmartGotoPosition(playerTask);
+	}
 
-    CPlayerTask* makeItRunLocalVersion(const int num, const double speedX, const double speedY, const double rotSpeed)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.speed_x = speedX;
-        playerTask.player.speed_y = speedY;
-        playerTask.player.rotate_speed = rotSpeed;
-        return TaskFactoryV2::Instance()->OpenSpeed(playerTask);
-    }
+	CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotVel, const double maxAcc, const double maxRotAcc, const double maxSpeed, const double maxRotSpeed, const int flags) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.pos = target;
+		playerTask.player.angle = dir;
+		playerTask.player.vel = vel;
+		playerTask.player.rotvel = rotVel;
+		playerTask.player.max_acceleration = maxAcc;
+		playerTask.player.max_rot_acceleration = maxRotAcc;
+		playerTask.player.max_speed = maxSpeed;
+		playerTask.player.max_rot_speed = maxRotSpeed;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->SmartGotoPosition(playerTask);
+	}
 
-    CPlayerTask* makeItNoneTrajGetBall(const int num, const double dir, CVector finalVel, int flags, double StopDist, CTRL_METHOD mode)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = dir;
-        playerTask.player.vel = finalVel;
-        playerTask.player.flag = flags;
-        playerTask.player.rotvel = StopDist;
-        playerTask.player.specified_ctrl_method = mode;
-        return TaskFactoryV2::Instance()->NoneTrajGetBall(playerTask);
-    }
-    CPlayerTask* makeItGoAndTurnKickV4(const int num, const double dir, CVector finalVel, int flags, double StopDist, CTRL_METHOD mode)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = dir;
-        playerTask.player.vel = finalVel;
-        playerTask.player.flag = flags;
-        playerTask.player.rotvel = StopDist;
-        playerTask.player.specified_ctrl_method = mode;
-        return TaskFactoryV2::Instance()->GoAndTurnKickV4(playerTask);
-    }
-    CPlayerTask* makeItForceStartRush(const int num, double faceDir, int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = faceDir;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->ForceStartRush(playerTask);
-    }
-    CPlayerTask* makeItChaseKickV1(const int num, double faceDir, int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = faceDir;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->ChaseKickV1(playerTask);
-    }
+	CPlayerTask* makeItSimpleGoto(const int num, const CGeoPoint& target, const double dir, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.pos = target;
+		playerTask.player.vel = CVector(0.0, 0.0);
+		playerTask.player.rotvel = 0;
+		playerTask.player.angle = dir;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->GotoPosition(playerTask);
+	}
 
-    CPlayerTask* makeItChaseKickV2(const int num, double faceDir, int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = faceDir;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->ChaseKickV2(playerTask);
-    }
-
-    CPlayerTask* makeItProtectBall(const int num, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->ProtectBall(playerTask);
-    }
-
-    CPlayerTask* makeItTouchKick(const int num, double kickDir, bool isPass, int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = kickDir;
-        playerTask.player.ispass = isPass;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->TouchKick(playerTask);
-    }
-
-    CPlayerTask* makeItInterKickV2(const int num, const double dir, const int flags, const bool kickway)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = dir;
-        playerTask.player.flag = flags;
-        playerTask.player.ischipkick = kickway;
+	CPlayerTask* makeItSimpleGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotvel, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.pos = target;
+		playerTask.player.angle = dir;
+		playerTask.player.vel = vel;
+		playerTask.player.rotvel = rotvel;
+		playerTask.player.flag = flags;
+		if (vision->GetCurrentRefereeMsg() == "ourBallPlacement" && (playerTask.player.pos - vision->OurPlayer(playerTask.executor).Pos()).mod() < paramManager->PlACEBALL_CLOSE_DISTANCE) {
+			playerTask.player.max_speed = paramManager->PlACEBALL_SPEED;
+			playerTask.player.max_rot_speed = paramManager->PlACEBALL_ROT_SPEED;
+			playerTask.player.max_acceleration = paramManager->PlACEBALL_ACCELERATION;
+			playerTask.player.max_deceleration = paramManager->PlACEBALL_DECELERATION;
+			playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
+		}
+		return TaskFactoryV2::Instance()->GotoPosition(playerTask);
+	}
 
 
-        //        playerTask.player.pos = target;
-        return TaskFactoryV2::Instance()->InterceptBallV2(playerTask);
-    }
+	CPlayerTask* makeItCrazyPush(const int num, double faceDir)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = faceDir;
+		return TaskFactoryV2::Instance()->CarzyPush(playerTask);
+	}
+	CPlayerTask* makeItRun(const int num, const double speedX, const double speedY, const double rotSpeed, int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.speed_x = speedX;
+		playerTask.player.speed_y = speedY;
+		playerTask.player.rotate_speed = rotSpeed;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->Speed(playerTask);
+	}
+
+	CPlayerTask* makeItRunLocalVersion(const int num, const double speedX, const double speedY, const double rotSpeed)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.speed_x = speedX;
+		playerTask.player.speed_y = speedY;
+		playerTask.player.rotate_speed = rotSpeed;
+		return TaskFactoryV2::Instance()->OpenSpeed(playerTask);
+	}
+
+	CPlayerTask* makeItNoneTrajGetBall(const int num, const double dir, CVector finalVel, int flags, double StopDist, CTRL_METHOD mode)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		playerTask.player.vel = finalVel;
+		playerTask.player.flag = flags;
+		playerTask.player.rotvel = StopDist;
+		playerTask.player.specified_ctrl_method = mode;
+		return TaskFactoryV2::Instance()->NoneTrajGetBall(playerTask);
+	}
+	CPlayerTask* makeItGoAndTurnKickV4(const int num, const double dir, CVector finalVel, int flags, double StopDist, CTRL_METHOD mode)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		playerTask.player.vel = finalVel;
+		playerTask.player.flag = flags;
+		playerTask.player.rotvel = StopDist;
+		playerTask.player.specified_ctrl_method = mode;
+		return TaskFactoryV2::Instance()->GoAndTurnKickV4(playerTask);
+	}
+	CPlayerTask* makeItForceStartRush(const int num, double faceDir, int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = faceDir;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->ForceStartRush(playerTask);
+	}
+	CPlayerTask* makeItChaseKickV1(const int num, double faceDir, int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = faceDir;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->ChaseKickV1(playerTask);
+	}
+
+	CPlayerTask* makeItChaseKickV2(const int num, double faceDir, int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = faceDir;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->ChaseKickV2(playerTask);
+	}
+
+	CPlayerTask* makeItProtectBall(const int num, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->ProtectBall(playerTask);
+	}
+
+	CPlayerTask* makeItTouchKick(const int num, double kickDir, bool isPass, int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = kickDir;
+		playerTask.player.ispass = isPass;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->TouchKick(playerTask);
+	}
+
+	CPlayerTask* makeItInterKickV2(const int num, const double dir, const int flags, const bool kickway)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		playerTask.player.flag = flags;
+		playerTask.player.ischipkick = kickway;
 
 
-    CPlayerTask* makeItInterKickV3(const int num, const double dir, const int flags, const bool kickway)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = dir;
-        playerTask.player.flag = flags;
-        playerTask.player.ischipkick = kickway;
-
-        //        playerTask.player.pos = target;
-        return TaskFactoryV2::Instance()->InterceptBallV3(playerTask);
-    }
-
-    CPlayerTask* makeItInterKickV4(const int num, const double dir, const bool kickway, const double ipower, const int flags)        //??C++???D?????InterceptBall
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = dir;
-        playerTask.player.flag = flags;
-        playerTask.player.ischipkick = kickway;
-        playerTask.player.kickpower = ipower;
-        playerTask.player.chipkickpower = ipower;
-        //        playerTask.player.pos = target;
-        return TaskFactoryV2::Instance()->InterceptBallV4(playerTask);
-    }
+		//        playerTask.player.pos = target;
+		return TaskFactoryV2::Instance()->InterceptBallV2(playerTask);
+	}
 
 
-    CPlayerTask* makeItMarkingTouch(const int num, const double kickDir, const CGeoPoint leftUpPos, const CGeoPoint rightDownPos, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = kickDir;
-        playerTask.player.flag = flags;
-        playerTask.ball.pos = leftUpPos;
-        playerTask.player.pos = rightDownPos;
-        return TaskFactoryV2::Instance()->MarkingTouch(playerTask);
-    }
+	CPlayerTask* makeItInterKickV3(const int num, const double dir, const int flags, const bool kickway)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		playerTask.player.flag = flags;
+		playerTask.player.ischipkick = kickway;
 
-    CPlayerTask* makeItMarkingFront(const int num, const int markNum, const double kickDir, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.ball.Sender = markNum;
-        playerTask.player.angle = kickDir;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->MarkingFront(playerTask);
-    }
+		//        playerTask.player.pos = target;
+		return TaskFactoryV2::Instance()->InterceptBallV3(playerTask);
+	}
 
-    CPlayerTask* makeItDriftKick(const int num, double faceDir, int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = faceDir;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->DriftKick(playerTask);
-    }
+	CPlayerTask* makeItInterKickV4(const int num, const double dir, const bool kickway, const double ipower, const int flags)        //??C++???D?????InterceptBall
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		playerTask.player.flag = flags;
+		playerTask.player.ischipkick = kickway;
+		playerTask.player.kickpower = ipower;
+		playerTask.player.chipkickpower = ipower;
+		//        playerTask.player.pos = target;
+		return TaskFactoryV2::Instance()->InterceptBallV4(playerTask);
+	}
 
-    CPlayerTask* makeItAdvanceBallV1(const int num, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->AdvanceBallV1(playerTask);
-    }
-    CPlayerTask* makeItAdvanceBallV2(const int num, const int flags, const int tendemNum)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        playerTask.ball.receiver = tendemNum;
-        return TaskFactoryV2::Instance()->AdvanceBallV2(playerTask);
-    }
-    CPlayerTask* makeItAdvanceBallV3(const int num, const int flags, const int tendemNum)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        playerTask.ball.receiver = tendemNum;
-        return TaskFactoryV2::Instance()->AdvanceBallV3(playerTask);
 
-    }
-    CPlayerTask* makeItAdvanceBallV4(const int num, const int flags, const int tendemNum)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        playerTask.ball.receiver = tendemNum;
-        return TaskFactoryV2::Instance()->AdvanceBallV4(playerTask);
+	CPlayerTask* makeItMarkingTouch(const int num, const double kickDir, const CGeoPoint leftUpPos, const CGeoPoint rightDownPos, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = kickDir;
+		playerTask.player.flag = flags;
+		playerTask.ball.pos = leftUpPos;
+		playerTask.player.pos = rightDownPos;
+		return TaskFactoryV2::Instance()->MarkingTouch(playerTask);
+	}
 
-    }
-    CPlayerTask* makeItAdvance(const int num, const int flags, const int tendemNum)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        playerTask.ball.receiver = tendemNum;
-        return TaskFactoryV2::Instance()->Advance(playerTask);
+	CPlayerTask* makeItMarkingFront(const int num, const int markNum, const double kickDir, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.ball.Sender = markNum;
+		playerTask.player.angle = kickDir;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->MarkingFront(playerTask);
+	}
+
+	CPlayerTask* makeItDriftKick(const int num, double faceDir, int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = faceDir;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->DriftKick(playerTask);
+	}
+
+	CPlayerTask* makeItAdvanceBallV1(const int num, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->AdvanceBallV1(playerTask);
+	}
+	CPlayerTask* makeItAdvanceBallV2(const int num, const int flags, const int tendemNum)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		playerTask.ball.receiver = tendemNum;
+		return TaskFactoryV2::Instance()->AdvanceBallV2(playerTask);
+	}
+	CPlayerTask* makeItAdvanceBallV3(const int num, const int flags, const int tendemNum)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		playerTask.ball.receiver = tendemNum;
+		return TaskFactoryV2::Instance()->AdvanceBallV3(playerTask);
+
+	}
+	CPlayerTask* makeItAdvanceBallV4(const int num, const int flags, const int tendemNum)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		playerTask.ball.receiver = tendemNum;
+		return TaskFactoryV2::Instance()->AdvanceBallV4(playerTask);
+
+	}
+	CPlayerTask* makeItAdvance(const int num, const int flags, const int tendemNum)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		playerTask.ball.receiver = tendemNum;
+		return TaskFactoryV2::Instance()->Advance(playerTask);
 
     }
     CPlayerTask* makeItPenaltyKickV2(const int num, const int flags, const int tendemNum)
@@ -755,6 +764,15 @@ namespace PlayerRole {
         playerTask.player.left_or_right = leftOrRight;
         return TaskFactoryV2::Instance()->GoSupport(playerTask);
     }
+    CPlayerTask* makeItGoPIDCircle(const int runner, const CGeoPoint pos, const double r, const bool opt)
+    {
+        static TaskT playerTask;
+        playerTask.executor = runner;
+        playerTask.player.left_or_right = opt;
+        playerTask.player.pos = pos;
+        playerTask.player.GoRadius = r;
+        return TaskFactoryV2::Instance()->GoPIDCircle(playerTask);
+    }
     CPlayerTask* makeItShootBall(const int num, const double dir, const bool ischipkick, const double precision, const double kp, const double cp, const int flags)
     {
         static TaskT playerTask;
@@ -801,90 +819,102 @@ namespace PlayerRole {
         //    return TaskFactoryV2::Instance()->PenaltyGoalie(playerTask);
     }
 
-    CPlayerTask* makeItGoalie2013(const int num, const int flags) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->Goalie2013(playerTask);
-    }
+	CPlayerTask* makeItGoalie2013(const int num, const int flags) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->Goalie2013(playerTask);
+	}
 
-    CPlayerTask* makeItGoalie2022(const int num, const int flags) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->Goalie2022(playerTask);
-    }
+	CPlayerTask* makeItGoalie2022(const int num, const int flags) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->Goalie2022(playerTask);
+	}
 
-    CPlayerTask* makeItShootoutGoalie(const int num, const int flags) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->ShootoutGoalie(playerTask);
-    }
+	CPlayerTask* makeItShootoutGoalie(const int num, const int flags) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->ShootoutGoalie(playerTask);
+	}
 
-    CPlayerTask* makeItShootoutGoalieV2(const int num, const int flags) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->ShootoutGoalieV2(playerTask);
-    }
+	CPlayerTask* makeItShootoutGoalieV2(const int num, const int flags) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->ShootoutGoalieV2(playerTask);
+	}
 
-    CPlayerTask* makeItInterceptBall(const int num, const double add_angle)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = add_angle;
-        return TaskFactoryV2::Instance()->InterceptBall(playerTask);
-    }
+	CPlayerTask* makeItInterceptBall(const int num, const double add_angle)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = add_angle;
+		return TaskFactoryV2::Instance()->InterceptBall(playerTask);
+	}
 
-    CPlayerTask* makeItJustKick(const int num, const int mode, const double power, const int flag) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.ischipkick = mode;
-        playerTask.player.kickpower = power;
-        playerTask.player.flag = flag;
-        return TaskFactoryV2::Instance()->JustKick(playerTask);
-    }
+	CPlayerTask* makeItJustKick(const int num, const int mode, const double power, const int flag) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.ischipkick = mode;
+		playerTask.player.kickpower = power;
+		playerTask.player.flag = flag;
+		return TaskFactoryV2::Instance()->JustKick(playerTask);
+	}
 
-    CPlayerTask* makeItWaitTouch(const int num, const CGeoPoint& target, const double dir, const double angle, const int flag /* = 0 */) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.ball.pos = target;
-        playerTask.ball.angle = angle;
-        playerTask.player.angle = dir;
-        playerTask.player.flag = flag;
-        return TaskFactoryV2::Instance()->WaitTouch(playerTask);
-    }
+	CPlayerTask* makeItWaitTouch(const int num, const CGeoPoint& target, const double dir, const double angle, const int flag /* = 0 */) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.ball.pos = target;
+		playerTask.ball.angle = angle;
+		playerTask.player.angle = dir;
+		playerTask.player.flag = flag;
+		return TaskFactoryV2::Instance()->WaitTouch(playerTask);
+	}
 
-    CPlayerTask* makeItPenaltyKick2013(const int num, const int flag /* = 0 */) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flag;
-        return TaskFactoryV2::Instance()->PenaltyKick2013(playerTask);
-    }
+	CPlayerTask* makeItPenaltyKick2013(const int num, const int flag /* = 0 */) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flag;
+		return TaskFactoryV2::Instance()->PenaltyKick2013(playerTask);
+	}
 
-    CPlayerTask* makeItPenaltyKick2014(const int num, const int flag /* = 0 */) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flag;
-        return TaskFactoryV2::Instance()->PenaltyKick2014(playerTask);
-    }
+	CPlayerTask* makeItPenaltyKick2014(const int num, const int flag /* = 0 */) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flag;
+		return TaskFactoryV2::Instance()->PenaltyKick2014(playerTask);
+	}
 
-    CPlayerTask* makeItDribbleTurn(const int num, const double finalDir, const double pre) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = finalDir;
-        playerTask.player.speed_x = pre;
-        return TaskFactoryV2::Instance()->DribbleTurn(playerTask);
-    }
+	CPlayerTask* makeItDribbleTurn(const int num, const double finalDir, const double pre) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = finalDir;
+		playerTask.player.speed_x = pre;
+		return TaskFactoryV2::Instance()->DribbleTurn(playerTask);
+	}
 
-    CPlayerTask* makeItDribbleTurnKick(const int num, const double finalDir, const double turnRotVel, const double kickPower) {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = finalDir;
-        playerTask.player.rotvel = turnRotVel;
-        playerTask.player.kickpower = kickPower;
-        return TaskFactoryV2::Instance()->DribbleTurnKick(playerTask);
-    }
+	CPlayerTask* makeItDribbleTurnKick(const int num, const double finalDir, const double turnRotVel, const double kickPower) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = finalDir;
+		playerTask.player.rotvel = turnRotVel;
+		playerTask.player.kickpower = kickPower;
+		return TaskFactoryV2::Instance()->DribbleTurnKick(playerTask);
+	}
+
+	CPlayerTask* makeItDribbleTurnKickV2(const int num, const double finalDir, const double precision, const int mode, const double power, const bool isAdvancer, const CGeoPoint Target) {
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = finalDir;
+		playerTask.player.kickprecision = precision;
+		playerTask.player.ischipkick = mode;
+		playerTask.player.kickpower = power;
+		playerTask.player.pos = Target;
+
+		return TaskFactoryV2::Instance()->DribbleTurnKickV2(playerTask);
+	}
 
 }

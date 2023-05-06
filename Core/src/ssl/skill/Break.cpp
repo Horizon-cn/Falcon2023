@@ -26,6 +26,12 @@
 #define THEIRPLAYER_NUM 8
 #define BALL_NUM		1
 
+#ifdef ENABLE_CUDA
+extern "C" int break_calc_with_gpu(float* target_point_cpu, int target_point_num, float* pos_info_cpu, int pos_info_num, int angle_mod, int dist_mod, float* results, float* vis_points);
+#else
+int break_calc_with_gpu(float* target_point_cpu, int target_point_num, float* pos_info_cpu, int pos_info_num, int angle_mod, int dist_mod, float* results, float* vis_points) { return 0; }
+#endif
+
 std::string date_time(std::time_t posix)
 {
     char buf[20]; // big enough for 2015-07-08 10:06:51\0
@@ -190,7 +196,8 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("Frared Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
 
-    if (!frared)
+    //if (!frared)
+    if (BallStatus::Instance()->getBallPossession(true, vecNumber) == 0)
     {
         dribblePoint = me.Pos();
 
@@ -688,7 +695,8 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
 
     bool flag = true;
     double x1 = me.X(), y1 = me.Y(), theta = dir;
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+        if (!pVision->TheirPlayer(i).Valid()) continue;
         auto enemy = pVision->TheirPlayer(i);
         double x = enemy.X(), y = enemy.Y();
         double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));

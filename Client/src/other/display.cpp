@@ -177,7 +177,11 @@ void Display::paintData(){
     else if(opm->display_mode=="Vx"){
         for(int i=0;i<Vision::MAINTAIN_STORE_BUFFER;i+=1){
             auto gd = visionRecord[1+i-Vision::MAINTAIN_STORE_BUFFER];
-            auto command = commandRecord[i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vx();
+            auto command_vx = commandRecord[i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vx();
+            auto command_vy = commandRecord[i - Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vy();
+            CVector command_v(command_vx, command_vy);
+            command_v = command_v.rotate(gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].angle);
+            auto command = command_v.x();
             auto raw = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].raw.vel.vx();
             if (gd.robotIndex[opm->display_teamIndex][opm->display_robotID] == -1) maintain = 0;
             else maintain = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].velocity.vx();
@@ -203,7 +207,11 @@ void Display::paintData(){
     else if(opm->display_mode=="Vy"){
         for(int i=0;i<Vision::MAINTAIN_STORE_BUFFER;i+=1){
             auto gd = visionRecord[1+i-Vision::MAINTAIN_STORE_BUFFER];
-            auto command = commandRecord[i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vy();
+            auto command_vx = commandRecord[i - Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vx();
+            auto command_vy = commandRecord[i - Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vy();
+            CVector command_v(command_vx, command_vy);
+            command_v = command_v.rotate(gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].angle);
+            auto command = command_v.y();
             auto raw = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].raw.vel.vy();
             if (gd.robotIndex[opm->display_teamIndex][opm->display_robotID] == -1) maintain = 0;
             else maintain = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].velocity.vy();

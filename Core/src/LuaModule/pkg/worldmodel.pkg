@@ -32,6 +32,7 @@ class CWorldModel{
 	const bool generatePassPoint(CGeoPoint& passOne,CGeoPoint& passTwo, CGeoPoint& passThree, CGeoPoint& passFour);
 	const CGeoPoint getTandemPos(int myNum=0);
 	const double getTandemDir(int myNum=0);
+	const double getBallPossession(bool isOurPlayer, int id);
 	const int getBallToucher();
 	const bool IsOurBallByAutoReferee();
 	void clearBallStateCouter();

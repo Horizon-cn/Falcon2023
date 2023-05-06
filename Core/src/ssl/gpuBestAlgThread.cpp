@@ -26,9 +26,7 @@
 #include <sstream>
 extern Semaphore vision_to_cuda;
 
-#define has_GPU true
-
-#if has_GPU
+#ifdef ENABLE_CUDA
 extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float* pitch_info);
 extern "C" void ball_model_calc_with_gpu(float* vel_data_cpu, float* predict_results, float* a_1_matrix_cpu, float* bias_1_matrix_cpu, float* a_2_matrix_cpu, float* bias_2_matrix_cpu);
 #else
@@ -52,6 +50,10 @@ namespace gpuCalcArea {
 	const double middleBackBorderX = -Param::Field::PITCH_LENGTH / 6;
 	const double centerLeftBorderY = -Param::Field::PENALTY_AREA_WIDTH / 2;
 	const double centerRightBorderY = Param::Field::PENALTY_AREA_WIDTH / 2;
+	
+	const double sideLineFrontBorderX = ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_LENGTH / 2;
+
+	const double sideLineBackBorderX = -ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_LENGTH / 2;
 
 	const double sideLineLeftBorderY = -ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
     //-450
@@ -75,7 +77,7 @@ namespace gpuCalcArea {
 	// 目前这个区域已经更新
 
 	FieldRectangle fieldRectangleArray[AREANUM] = {
-		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX, sideLineLeftBorderY)),
         FieldRectangle(CGeoPoint(middleFrontBorderX + 150.0,centerRightBorderY),CGeoPoint(goalLineFrontBorderX - 50,centerLeftBorderY)),
         //FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
         FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
@@ -84,9 +86,23 @@ namespace gpuCalcArea {
         FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + 150.0,centerLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleBackBorderX,sideLineRightBorderY),CGeoPoint(middleFrontBorderX,centerRightBorderY)),
 
-		FieldRectangle(CGeoPoint(goalLineBackBorderX,centerLeftBorderY),CGeoPoint(middleBackBorderX,sideLineLeftBorderY)),
-		FieldRectangle(CGeoPoint(goalLineBackBorderX,centerRightBorderY),CGeoPoint(middleBackBorderX,centerLeftBorderY)),
-		FieldRectangle(CGeoPoint(goalLineBackBorderX,sideLineRightBorderY),CGeoPoint(middleBackBorderX,centerRightBorderY)),
+		// FieldRectangle(CGeoPoint(goalLineBackBorderX,centerLeftBorderY),CGeoPoint(middleBackBorderX,sideLineLeftBorderY)),
+		// FieldRectangle(CGeoPoint(goalLineBackBorderX,centerRightBorderY),CGeoPoint(middleBackBorderX,centerLeftBorderY)),
+		// FieldRectangle(CGeoPoint(goalLineBackBorderX,sideLineRightBorderY),CGeoPoint(middleBackBorderX,centerRightBorderY)),
+	};
+	FieldRectangle processed_fieldRectangleArray[AREANUM] = {
+	FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
+	FieldRectangle(CGeoPoint(middleFrontBorderX + 150.0,centerRightBorderY),CGeoPoint(goalLineFrontBorderX - 50,centerLeftBorderY)),
+	//FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
+	FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
+
+	FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
+	FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + 150.0,centerLeftBorderY)),
+	FieldRectangle(CGeoPoint(middleBackBorderX,sideLineRightBorderY),CGeoPoint(middleFrontBorderX,centerRightBorderY)),
+
+	// FieldRectangle(CGeoPoint(goalLineBackBorderX,centerLeftBorderY),CGeoPoint(middleBackBorderX,sideLineLeftBorderY)),
+	// FieldRectangle(CGeoPoint(goalLineBackBorderX,centerRightBorderY),CGeoPoint(middleBackBorderX,centerLeftBorderY)),
+	// FieldRectangle(CGeoPoint(goalLineBackBorderX,sideLineRightBorderY),CGeoPoint(middleBackBorderX,centerRightBorderY)),
 	};
 }
 
@@ -97,7 +113,6 @@ extern QMutex* _ball_pos_prediction_mutex;
 CGPUBestAlgThread::CGPUBestAlgThread() {
 	sendPoint = CGeoPoint(0, 0);
 	_pVision = NULL;
-
 	for (int i = 0; i < AREANUM; i++) {
 		_lastCycle[i] = 0;
 		_bestPoint[i] = CGeoPoint(0, 0);
@@ -118,7 +133,7 @@ CGPUBestAlgThread::CGPUBestAlgThread() {
 		_ball_pos_prediction_results[i] = 0.0f;
 	}
 
-	if (has_GPU) {
+#ifdef ENABLE_CUDA
 		// 需要查找的区域
 		_start_pos_x = -(int)(Param::Field::PITCH_LENGTH / 2);
 		_start_pos_y = -(int)(Param::Field::PITCH_WIDTH / 2);
@@ -162,7 +177,7 @@ CGPUBestAlgThread::CGPUBestAlgThread() {
 		if (status1 && status2 && status3 && status4) {
 			matrix_ok = true;
 		}
-	}
+#endif
 }
 
 CGPUBestAlgThread::~CGPUBestAlgThread() {
@@ -184,10 +199,10 @@ CGPUBestAlgThread::~CGPUBestAlgThread() {
 void CGPUBestAlgThread::initialize(CVisionModule* pVision) {
 	_pVision = pVision;
 	// 开启 GPU 计算的线程
-	if (has_GPU) {
+#ifdef ENABLE_CUDA
         gpuCalcArea::_best_calculation_thread = new std::thread([=] {doBestCalculation();});
         gpuCalcArea::_best_calculation_thread->detach();
-	}
+#endif
 }
 
 void CGPUBestAlgThread::startComm() {
@@ -217,7 +232,7 @@ void CGPUBestAlgThread::generatePointValue() {
 		/* 数据算法数据传入：车球位置信息                                       */
 		/************************************************************************/
 		// 上锁
-		_best_visiondata_copy_mutex->lock();
+		// _best_visiondata_copy_mutex->lock();
 		// 拷贝
 		_start_pos_cpu[0] = _start_pos_x;
 		_start_pos_cpu[1] = _start_pos_y;
@@ -265,7 +280,7 @@ void CGPUBestAlgThread::generatePointValue() {
 			}
 		}
 		// 解锁
-		_best_visiondata_copy_mutex->unlock();
+		// _best_visiondata_copy_mutex->unlock();
 		int pos_num = 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
 
 		_value_getter_mutex->lock();
@@ -285,7 +300,7 @@ void CGPUBestAlgThread::predictBallPos() {
 	//clock_t begin, end;
 	//begin = clock();
 	
-	_best_visiondata_copy_mutex->lock();
+	// _best_visiondata_copy_mutex->lock();
 	// 拷贝
 	
 	for (int i = 0; i < input_dim - 1; i++) {
@@ -298,7 +313,7 @@ void CGPUBestAlgThread::predictBallPos() {
 	//}
 	//std::cout << std::endl;
 	// 解锁
-	_best_visiondata_copy_mutex->unlock();
+	// _best_visiondata_copy_mutex->unlock();
 
 	if (matrix_ok) {
 		// set模型的参数
@@ -309,10 +324,10 @@ void CGPUBestAlgThread::predictBallPos() {
 		_ball_pos_prediction_mutex->lock();
 		memcpy(_ball_pos_prediction_results, results, output_dim * sizeof(float));
 		free(results);
-		for (int i = 0; i < 3; i++) {
-			std::cout << _ball_pos_prediction_results[i] << " ";
-		}
-		std::cout << std::endl;
+		// for (int i = 0; i < 3; i++) {
+		// 	std::cout << _ball_pos_prediction_results[i*10] << " ";
+		// }
+		// std::cout << std::endl;
 		_ball_pos_prediction_mutex->unlock();
 	}
 
@@ -320,13 +335,134 @@ void CGPUBestAlgThread::predictBallPos() {
 	//std::cout << "ball pos predict calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
 }
 
-CGeoPoint CGPUBestAlgThread::getBestPointFromArea(int area_idx) {
-	if (area_idx > AREANUM) { // 处理越界情况，但是后三个点的位置并没有生成
-		return _bestPoint[0];
+int CGPUBestAlgThread::getBallArea() {
+	CGeoPoint ballPos = _pVision->Ball().Pos();
+	int areaNum;
+	for (areaNum = 0; areaNum < AREANUM; areaNum++){
+		if (gpuCalcArea::processed_fieldRectangleArray[areaNum].check4inclusion(ballPos))
+			break;
+	}
+	if (areaNum != AREANUM)
+		return areaNum;
+	else
+		return 1;//防止越界，返回对方禁区所在区域
+}
+
+void CGPUBestAlgThread::supportSort() {
+	int ball_area = getBallArea();
+	//           3 0  
+	//  己方球门 4 1  敌方球门
+	//           5 2
+	switch (ball_area)
+	{ // 以下注释均为当前重要性排序，球所在区域均为最低优先级
+	case 0:
+		//           3 球  
+		//  己方球门 2 0  敌方球门
+		//           4 1
+		_bestSupport[0] = _bestPoint[1];
+		_bestSupport[1] = _bestPoint[2];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[3];
+		_bestSupport[4] = _bestPoint[5];
+		_bestSupport[5] = _bestPoint[0];
+		break;
+	case 1:
+		//           3 0
+		//  己方球门 2 球  敌方球门
+		//           4 1
+		_bestSupport[0] = _bestPoint[0];
+		_bestSupport[1] = _bestPoint[2];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[3];
+		_bestSupport[4] = _bestPoint[5];
+		_bestSupport[5] = _bestPoint[1];
+		break;
+	case 2:
+		//           4 1
+		//  己方球门 2 0 敌方球门
+		//           3 球
+		_bestSupport[0] = _bestPoint[1];
+		_bestSupport[1] = _bestPoint[0];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[5];
+		_bestSupport[4] = _bestPoint[3];
+		_bestSupport[5] = _bestPoint[2];
+		break;
+	case 3:
+		//           球1
+		//  己方球门 2 0 敌方球门
+		//           4 3
+		_bestSupport[0] = _bestPoint[1];
+		_bestSupport[1] = _bestPoint[0];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[2];
+		_bestSupport[4] = _bestPoint[5];
+		_bestSupport[5] = _bestPoint[3];
+		break;
+	case 4:
+		//           3 1
+		//  己方球门 球0 敌方球门
+		//           4 2
+		_bestSupport[0] = _bestPoint[1];
+		_bestSupport[1] = _bestPoint[0];
+		_bestSupport[2] = _bestPoint[2];
+		_bestSupport[3] = _bestPoint[3];
+		_bestSupport[4] = _bestPoint[5];
+		_bestSupport[5] = _bestPoint[4];
+		break;
+	case 5:
+		//           4 3
+		//  己方球门 2 0敌方球门
+		//           球1
+		_bestSupport[0] = _bestPoint[1];
+		_bestSupport[1] = _bestPoint[2];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[0];
+		_bestSupport[4] = _bestPoint[3];
+		_bestSupport[5] = _bestPoint[5];
+		break;
+	default://假设球在禁区内
+		//           3 0
+		//  己方球门 2 球  敌方球门
+		//           4 1
+		_bestSupport[0] = _bestPoint[0];
+		_bestSupport[1] = _bestPoint[2];
+		_bestSupport[2] = _bestPoint[4];
+		_bestSupport[3] = _bestPoint[3];
+		_bestSupport[4] = _bestPoint[5];
+		_bestSupport[5] = _bestPoint[1];
+		break;
+	}
+}
+
+void CGPUBestAlgThread::supportSortV2() {
+	std::vector<PointValueStruct> pointValueList;
+	for (int areaNum = 0; areaNum < AREANUM; areaNum++) {
+		PointValueStruct p;
+		p.pos = areaNum;
+		p.value = _pointPotential[areaNum];
+		pointValueList.push_back(p);
+	}
+	sort(pointValueList.begin(), pointValueList.end());
+	for (int areaNum = 0; areaNum < AREANUM; areaNum++) {
+		_bestSupport[areaNum] = _bestPoint[(int)pointValueList.at(areaNum).pos];
+	}
+}
+
+CGeoPoint CGPUBestAlgThread::getBestPointFromArea(int support_idx) {
+	
+	CGeoPoint temp_bestSupport;
+	_value_getter_mutex->lock();
+	if (support_idx > AREANUM) { // 处理越界情况，但是后三个点的位置并没有生成
+		temp_bestSupport = _bestSupport[0];
 	}
 	else {
-		return _bestPoint[area_idx];
+		if (support_idx == 0)
+			sendFieldRectangle();
+		temp_bestSupport =  _bestSupport[support_idx];
 	}
+	_value_getter_mutex->unlock();
+	return temp_bestSupport;
 }
 
 CGeoPoint CGPUBestAlgThread::getBallPosFromFrame(CGeoPoint ball_pos, CVector ball_vel, int frame) {
@@ -368,7 +504,7 @@ void CGPUBestAlgThread::erasePointPotentialValue(const CGeoPoint centerPoint, fl
 // 计算每个区域的最优点和最优值，在generatePointValue中已经加了进程锁，所以这里没有加，所以这个函数不准在外面调用
 void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rightDown, CGeoPoint& bestPoint, float& minValue) {
 	// 存下九个区域的最优点以供调用，并且需要记录每个点在当前cycle是否已经更新
-	if (has_GPU) {
+#ifdef ENABLE_CUDA
 		// 初始化参数
 		minValue = 255;
 		// 场地参数
@@ -407,11 +543,143 @@ void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rig
 				}
 			}
 		}
-	}
-	else {
+#else
 		minValue = 255;
 		bestPoint = leftUp.midPoint(rightDown);
+#endif
+}
+
+double CGPUBestAlgThread::limitPosY(double y) {
+	return std::min(std::max(y, gpuCalcArea::sideLineLeftBorderY), gpuCalcArea::sideLineRightBorderY);
+}
+
+double CGPUBestAlgThread::limitPosX(double x) {
+	return std::min(std::max(x, gpuCalcArea::middleBackBorderX), gpuCalcArea::sideLineFrontBorderX);
+}
+
+void CGPUBestAlgThread::obscureBoundaryV2() {
+	// 移动边界
+	double ball_X = _pVision->Ball().Pos().x();
+	double ball_Y = _pVision->Ball().Pos().y();
+	double avoidBallDist = 100;
+	double up_Y = limitPosY(ball_Y - avoidBallDist), down_Y = limitPosY(ball_Y + avoidBallDist);
+	float left_X = limitPosX(ball_X - avoidBallDist), right_X = limitPosX(ball_X + avoidBallDist);
+	float middle_X = (left_X + right_X) * 0.5;
+	float sideLineFrontBorderX = gpuCalcArea::sideLineFrontBorderX - (gpuCalcArea::goalLineFrontBorderX - right_X);
+	sideLineFrontBorderX = sideLineFrontBorderX > gpuCalcArea::sideLineFrontBorderX ? gpuCalcArea::sideLineFrontBorderX : sideLineFrontBorderX;
+	// 粗分区域
+	gpuCalcArea::processed_fieldRectangleArray[0] = FieldRectangle(CGeoPoint(middle_X, up_Y), CGeoPoint(sideLineFrontBorderX, gpuCalcArea::sideLineLeftBorderY));
+	gpuCalcArea::processed_fieldRectangleArray[1] = FieldRectangle(CGeoPoint(right_X, down_Y), CGeoPoint(sideLineFrontBorderX, up_Y));
+	gpuCalcArea::processed_fieldRectangleArray[2] = FieldRectangle(CGeoPoint(middle_X, gpuCalcArea::sideLineRightBorderY), CGeoPoint(sideLineFrontBorderX, down_Y));
+	gpuCalcArea::processed_fieldRectangleArray[3] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, up_Y), CGeoPoint(middle_X, gpuCalcArea::sideLineLeftBorderY));
+	gpuCalcArea::processed_fieldRectangleArray[4] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, down_Y), CGeoPoint(left_X, up_Y));
+	gpuCalcArea::processed_fieldRectangleArray[5] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, gpuCalcArea::sideLineRightBorderY), CGeoPoint(middle_X, down_Y));
+	// gpuCalcArea::processed_fieldRectangleArray[6] = FieldRectangle(CGeoPoint(gpuCalcArea::goalLineBackBorderX, up_Y), CGeoPoint(gpuCalcArea::middleBackBorderX, gpuCalcArea::sideLineLeftBorderY));
+	// gpuCalcArea::processed_fieldRectangleArray[7] = FieldRectangle(CGeoPoint(gpuCalcArea::goalLineBackBorderX, down_Y), CGeoPoint(gpuCalcArea::middleBackBorderX, up_Y));
+	// gpuCalcArea::processed_fieldRectangleArray[8] = FieldRectangle(CGeoPoint(gpuCalcArea::goalLineBackBorderX, gpuCalcArea::sideLineRightBorderY), CGeoPoint(gpuCalcArea::middleBackBorderX, down_Y));
+	// 矫正区域
+	if (up_Y < gpuCalcArea::sideLineLeftBorderY + Param::Vehicle::V2::PLAYER_SIZE * 7) {
+		double fixed_Y = (down_Y + gpuCalcArea::sideLineRightBorderY) * 0.5;
+		gpuCalcArea::processed_fieldRectangleArray[0] = FieldRectangle(CGeoPoint(middle_X, gpuCalcArea::sideLineRightBorderY), CGeoPoint(sideLineFrontBorderX, fixed_Y));
+		gpuCalcArea::processed_fieldRectangleArray[1] = FieldRectangle(CGeoPoint(right_X, down_Y), CGeoPoint(sideLineFrontBorderX, gpuCalcArea::sideLineLeftBorderY));
+		gpuCalcArea::processed_fieldRectangleArray[2] = FieldRectangle(CGeoPoint(middle_X, fixed_Y), CGeoPoint(sideLineFrontBorderX, down_Y));
+		gpuCalcArea::processed_fieldRectangleArray[3] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, gpuCalcArea::sideLineRightBorderY), CGeoPoint(middle_X, fixed_Y));
+		gpuCalcArea::processed_fieldRectangleArray[4] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, down_Y), CGeoPoint(left_X, gpuCalcArea::sideLineLeftBorderY));
+		gpuCalcArea::processed_fieldRectangleArray[5] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, fixed_Y), CGeoPoint(middle_X, down_Y));
+		// gpuCalcArea::processed_fieldRectangleArray[6] = FieldRectangle(CGeoPoint(gpuCalcArea::goalLineBackBorderX, gpuCalcArea::sideLineRightBorderY), CGeoPoint(gpuCalcArea::middleBackBorderX, fixed_Y));
+		// gpuCalcArea::processed_fieldRectangleArray[7] = FieldRectangle(CGeoPoint(gpuCalcArea::goalLineBackBorderX, down_Y), CGeoPoint(gpuCalcArea::middleBackBorderX, gpuCalcArea::sideLineLeftBorderY));
+		// gpuCalcArea::processed_fieldRectangleArray[8] = FieldRectangle(CGeoPoint(gpuCalcArea::goalLineBackBorderX, fixed_Y), CGeoPoint(gpuCalcArea::middleBackBorderX, down_Y));
 	}
+	else if (down_Y > gpuCalcArea::sideLineRightBorderY - Param::Vehicle::V2::PLAYER_SIZE * 7) {
+		double fixed_Y = (up_Y + gpuCalcArea::sideLineLeftBorderY) * 0.5;
+		gpuCalcArea::processed_fieldRectangleArray[0] = FieldRectangle(CGeoPoint(middle_X, up_Y), CGeoPoint(sideLineFrontBorderX, fixed_Y));
+		gpuCalcArea::processed_fieldRectangleArray[1] = FieldRectangle(CGeoPoint(right_X, gpuCalcArea::sideLineRightBorderY), CGeoPoint(sideLineFrontBorderX, up_Y));
+		gpuCalcArea::processed_fieldRectangleArray[2] = FieldRectangle(CGeoPoint(middle_X, fixed_Y), CGeoPoint(sideLineFrontBorderX, gpuCalcArea::sideLineLeftBorderY));
+		gpuCalcArea::processed_fieldRectangleArray[3] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, up_Y), CGeoPoint(middle_X, fixed_Y));
+		gpuCalcArea::processed_fieldRectangleArray[4] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, gpuCalcArea::sideLineRightBorderY), CGeoPoint(left_X, up_Y));
+		gpuCalcArea::processed_fieldRectangleArray[5] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, fixed_Y), CGeoPoint(middle_X, gpuCalcArea::sideLineLeftBorderY));
+		// gpuCalcArea::processed_fieldRectangleArray[6] = FieldRectangle(CGeoPoint(gpuCalcArea::goalLineBackBorderX, up_Y), CGeoPoint(gpuCalcArea::middleBackBorderX, fixed_Y));
+		// gpuCalcArea::processed_fieldRectangleArray[7] = FieldRectangle(CGeoPoint(gpuCalcArea::goalLineBackBorderX, gpuCalcArea::sideLineRightBorderY), CGeoPoint(gpuCalcArea::middleBackBorderX, up_Y));
+		// gpuCalcArea::processed_fieldRectangleArray[8] = FieldRectangle(CGeoPoint(gpuCalcArea::goalLineBackBorderX, fixed_Y), CGeoPoint(gpuCalcArea::middleBackBorderX, gpuCalcArea::sideLineLeftBorderY));
+	}
+	if (right_X > gpuCalcArea::sideLineFrontBorderX - Param::Vehicle::V2::PLAYER_SIZE * 7) {
+		double fixed_X = (left_X + gpuCalcArea::middleBackBorderX) * 0.5;
+		gpuCalcArea::processed_fieldRectangleArray[1] = FieldRectangle(gpuCalcArea::processed_fieldRectangleArray[4]._leftDownPos, CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[4]._rightUpPos.y()));
+		gpuCalcArea::processed_fieldRectangleArray[4] = FieldRectangle(CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[4]._leftDownPos.y()), gpuCalcArea::processed_fieldRectangleArray[4]._rightUpPos);
+	}
+	else if (left_X < gpuCalcArea::middleBackBorderX + Param::Vehicle::V2::PLAYER_SIZE * 7) {
+		double fixed_X = (right_X + gpuCalcArea::sideLineFrontBorderX) * 0.5;
+		gpuCalcArea::processed_fieldRectangleArray[4] = FieldRectangle(CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[1]._leftDownPos.y()), CGeoPoint(gpuCalcArea::sideLineFrontBorderX, gpuCalcArea::processed_fieldRectangleArray[1]._rightUpPos.y()));
+		gpuCalcArea::processed_fieldRectangleArray[1] = FieldRectangle(gpuCalcArea::processed_fieldRectangleArray[1]._leftDownPos, CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[1]._rightUpPos.y()));
+		gpuCalcArea::processed_fieldRectangleArray[3] = FieldRectangle(CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[0]._leftDownPos.y()), CGeoPoint(gpuCalcArea::sideLineFrontBorderX, gpuCalcArea::processed_fieldRectangleArray[0]._rightUpPos.y()));
+		gpuCalcArea::processed_fieldRectangleArray[0] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, gpuCalcArea::processed_fieldRectangleArray[0]._leftDownPos.y()), CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[0]._rightUpPos.y()));
+		gpuCalcArea::processed_fieldRectangleArray[5] = FieldRectangle(CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[2]._leftDownPos.y()), CGeoPoint(gpuCalcArea::sideLineFrontBorderX, gpuCalcArea::processed_fieldRectangleArray[2]._rightUpPos.y()));
+		gpuCalcArea::processed_fieldRectangleArray[2] = FieldRectangle(CGeoPoint(gpuCalcArea::middleBackBorderX, gpuCalcArea::processed_fieldRectangleArray[2]._leftDownPos.y()), CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[2]._rightUpPos.y()));
+	}
+	if (middle_X > gpuCalcArea::sideLineFrontBorderX - Param::Vehicle::V2::PLAYER_SIZE * 7) {
+		double fixed_X = (middle_X + gpuCalcArea::middleBackBorderX) * 0.5;
+		gpuCalcArea::processed_fieldRectangleArray[0] = FieldRectangle(gpuCalcArea::processed_fieldRectangleArray[3]._leftDownPos, CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[3]._rightUpPos.y()));
+		gpuCalcArea::processed_fieldRectangleArray[3] = FieldRectangle(CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[3]._leftDownPos.y()), CGeoPoint(gpuCalcArea::sideLineFrontBorderX, gpuCalcArea::processed_fieldRectangleArray[3]._rightUpPos.y()));
+		gpuCalcArea::processed_fieldRectangleArray[2] = FieldRectangle(gpuCalcArea::processed_fieldRectangleArray[5]._leftDownPos, CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[5]._rightUpPos.y()));
+		gpuCalcArea::processed_fieldRectangleArray[5] = FieldRectangle(CGeoPoint(fixed_X, gpuCalcArea::processed_fieldRectangleArray[5]._leftDownPos.y()), CGeoPoint(gpuCalcArea::sideLineFrontBorderX, gpuCalcArea::processed_fieldRectangleArray[5]._rightUpPos.y()));
+	}
+}
+
+void CGPUBestAlgThread::obscureBoundary() {
+	float ball_X = _pVision->Ball().Pos().x();
+	float ball_Y = _pVision->Ball().Pos().y();
+	float obsRate = 0.2; // 该函数唯一参数：模糊系数，范围为[0, 1]
+	float mov_X[AREANUM]; float mov_Y[AREANUM];
+
+	for (int area_idx = 0; area_idx < AREANUM; area_idx++) {
+		mov_X[area_idx] = obsRate * (ball_X - gpuCalcArea::fieldRectangleArray[area_idx]._centerPos.x());
+		mov_Y[area_idx] = obsRate * (ball_Y - gpuCalcArea::fieldRectangleArray[area_idx]._centerPos.y());//获取区域中心到球的距离向量
+		// qDebug() << area_idx << mov_X[area_idx] << mov_Y[area_idx];
+	}
+	CGeoPoint temp_leftUp;
+	CGeoPoint temp_rightDown;
+	
+	//按顺序重新生成新边界【012345678】
+	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[0]._leftUpPos.x()    + mov_X[0], gpuCalcArea::fieldRectangleArray[0]._leftUpPos.y());
+	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[0]._rightDownPos.x()           , gpuCalcArea::fieldRectangleArray[0]._rightDownPos.y() + mov_Y[0]);
+	gpuCalcArea::processed_fieldRectangleArray[0].processField(temp_leftUp, temp_rightDown);
+
+	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[1]._leftUpPos.x()    + mov_X[1], gpuCalcArea::fieldRectangleArray[1]._leftUpPos.y()    + mov_Y[1]);
+	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[1]._rightDownPos.x() + mov_X[1], gpuCalcArea::fieldRectangleArray[1]._rightDownPos.y() + mov_Y[1]);
+	gpuCalcArea::processed_fieldRectangleArray[1].processField(temp_leftUp, temp_rightDown);
+
+	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[2]._leftUpPos.x()    + mov_X[2], gpuCalcArea::fieldRectangleArray[2]._leftUpPos.y()    + mov_Y[2]);
+	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[2]._rightDownPos.x()           , gpuCalcArea::fieldRectangleArray[2]._rightDownPos.y());
+	gpuCalcArea::processed_fieldRectangleArray[2].processField(temp_leftUp, temp_rightDown);
+
+	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[3]._leftUpPos.x()    + mov_X[3], gpuCalcArea::fieldRectangleArray[3]._leftUpPos.y());
+	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[3]._rightDownPos.x() + mov_X[3], gpuCalcArea::fieldRectangleArray[3]._rightDownPos.y() + mov_Y[3]);
+	gpuCalcArea::processed_fieldRectangleArray[3].processField(temp_leftUp, temp_rightDown);
+
+	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[4]._leftUpPos.x()    + mov_X[4], gpuCalcArea::fieldRectangleArray[4]._leftUpPos.y()    + mov_Y[4]);
+	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[4]._rightDownPos.x() + mov_X[4], gpuCalcArea::fieldRectangleArray[4]._rightDownPos.y() + mov_Y[4]);
+	gpuCalcArea::processed_fieldRectangleArray[4].processField(temp_leftUp, temp_rightDown);
+
+	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[5]._leftUpPos.x()    + mov_X[5], gpuCalcArea::fieldRectangleArray[5]._leftUpPos.y()    + mov_Y[5]);
+	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[5]._rightDownPos.x() + mov_X[5], gpuCalcArea::fieldRectangleArray[5]._rightDownPos.y());
+	gpuCalcArea::processed_fieldRectangleArray[5].processField(temp_leftUp, temp_rightDown);
+
+	/*
+	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[6]._leftUpPos.x()              , gpuCalcArea::fieldRectangleArray[6]._leftUpPos.y() );
+	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[6]._rightDownPos.x() + mov_X[6], gpuCalcArea::fieldRectangleArray[6]._rightDownPos.y() + mov_Y[6]);
+	gpuCalcArea::processed_fieldRectangleArray[6].processField(temp_leftUp, temp_rightDown);
+
+	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[7]._leftUpPos.x()              , gpuCalcArea::fieldRectangleArray[7]._leftUpPos.y()    + mov_Y[7]);
+	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[7]._rightDownPos.x() + mov_X[7], gpuCalcArea::fieldRectangleArray[7]._rightDownPos.y() + mov_Y[7]);
+	gpuCalcArea::processed_fieldRectangleArray[7].processField(temp_leftUp, temp_rightDown);
+
+	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[8]._leftUpPos.x()              , gpuCalcArea::fieldRectangleArray[8]._leftUpPos.y()    + mov_Y[8]);
+	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[8]._rightDownPos.x() + mov_X[8], gpuCalcArea::fieldRectangleArray[8]._rightDownPos.y());
+	gpuCalcArea::processed_fieldRectangleArray[8].processField(temp_leftUp, temp_rightDown);
+	*/
+
+
+	return;
 }
 
 // 处理每个区域，在generatePointValue中已经加了进程锁，所以这里没有加，所以这个函数不准在外面调用
@@ -422,9 +690,17 @@ void CGPUBestAlgThread::processPointValue() {
 	float minValue;
 	int area_idx;
 
+	if (ParamManager::Instance()->boundaryVersion == 1) {
+		obscureBoundary();//动态模糊边界
+	}
+	else if (ParamManager::Instance()->boundaryVersion == 2) {
+		obscureBoundaryV2();
+	}
+
+
 	// 搜索出所有区域的暂时最优点
-	for (int area_idx = 0; area_idx < 6; area_idx++) {
-		getBestPoint(gpuCalcArea::fieldRectangleArray[area_idx].centerArea()._leftUpPos, gpuCalcArea::fieldRectangleArray[area_idx].centerArea()._rightDownPos, bestPoint, minValue);
+	for (int area_idx = 0; area_idx < AREANUM; area_idx++) {
+		getBestPoint(gpuCalcArea::processed_fieldRectangleArray[area_idx]._leftUpPos, gpuCalcArea::processed_fieldRectangleArray[area_idx]._rightDownPos, bestPoint, minValue);
 		areaStructList.push_back(AreaStruct(bestPoint, minValue, area_idx, false));
 	}
 
@@ -434,7 +710,7 @@ void CGPUBestAlgThread::processPointValue() {
 		// 判断value最小的点是否被已选定点冲突
 		if (areaStructList.at(0)._conflict) { // 如果冲突，重新计算该点，并更新该点信息
 			area_idx = areaStructList.at(0)._area_idx;
-			getBestPoint(gpuCalcArea::fieldRectangleArray[area_idx].centerArea()._leftUpPos, gpuCalcArea::fieldRectangleArray[area_idx].centerArea()._rightDownPos, bestPoint, minValue);
+			getBestPoint(gpuCalcArea::processed_fieldRectangleArray[area_idx]._leftUpPos, gpuCalcArea::processed_fieldRectangleArray[area_idx]._rightDownPos, bestPoint, minValue);
 			areaStructList.at(0)._pos = bestPoint;
 			areaStructList.at(0)._value = minValue;
 			areaStructList.at(0)._conflict = false;
@@ -443,6 +719,7 @@ void CGPUBestAlgThread::processPointValue() {
 			bestPoint = areaStructList.at(0)._pos;
 			area_idx = areaStructList.at(0)._area_idx;
 			areaStructList.pop_front();
+			_pointPotential[area_idx] = minValue;
 			_bestPoint[area_idx] = bestPoint;
 			// 判断是否已经全部移出队列，由于该操作，因此最后一个点并不会earse区域
 			if (areaStructList.empty()) {
@@ -463,7 +740,13 @@ void CGPUBestAlgThread::processPointValue() {
 		}
 	}
 
-
+	if (ParamManager::Instance()->boundaryVersion == 1) {
+		supportSort(); // 按照重要性对支撑点进行排序
+	}
+	else if (ParamManager::Instance()->boundaryVersion == 2) {
+		supportSortV2();
+	}
+	
 }
 
 bool CGPUBestAlgThread::isLastOneValid(const CGeoPoint& p) {
@@ -484,6 +767,7 @@ void CGPUBestAlgThread::doBestCalculation() {
 		vision_to_cuda.Wait();
 		GPUBestAlgThread::Instance()->generatePointValue();
 		GPUBestAlgThread::Instance()->predictBallPos();
+		// GPUBestAlgThread::Instance()->sendFieldRectangle();
 		GPUBestAlgThread::Instance()->setPointValue();
         GPUBestAlgThread::Instance()->sendPointValue();
 	}
@@ -494,7 +778,7 @@ double CGPUBestAlgThread::getPosPotential(const CGeoPoint p) {
 }
 
 void CGPUBestAlgThread::setPointValue() {
-	_value_getter_mutex->lock();
+	// _value_getter_mutex->lock();
 	pointValueList.clear();
 	int size = _h * _w;
 	for (int i = 0; i < size; i++) {
@@ -504,7 +788,7 @@ void CGPUBestAlgThread::setPointValue() {
 		p.value = _PointPotentialOrigin[i];
 		pointValueList.push_back(p);
 	}
-	_value_getter_mutex->unlock();
+	// _value_getter_mutex->unlock();
 }
 
 void CGPUBestAlgThread::sendPointValue() {
@@ -568,3 +852,26 @@ int CGPUBestAlgThread::getMatrix(const string file_name, int max_row_num, int ma
 	}
 	return 1;
 }// END OF getInputData
+
+void CGPUBestAlgThread::sendFieldRectangle() {
+	//区域边界debug信息
+	for (int i = 0; i < AREANUM; i++) {
+		CGeoPoint leftUpPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftUpPos;
+		CGeoPoint rightUpPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightUpPos;
+		CGeoPoint leftDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftDownPos;
+		CGeoPoint rightDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightDownPos;
+		CGeoPoint centerPos = _bestSupport[i]; // gpuCalcArea::processed_fieldRectangleArray[i].getCenter();
+		GDebugEngine::Instance()->gui_debug_line(leftUpPos, rightUpPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_line(rightUpPos, rightDownPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_line(rightDownPos, leftDownPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_line(leftDownPos, leftUpPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(i).toStdString().c_str(), COLOR_BLACK);
+	}
+	//支撑点顺序debug信息
+	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], "000", COLOR_YELLOW);
+	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[1], "111", COLOR_YELLOW);
+	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[2], "222", COLOR_YELLOW);
+	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[3], "333", COLOR_YELLOW);
+	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[4], "444", COLOR_YELLOW);
+	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[5], "555", COLOR_YELLOW);
+}

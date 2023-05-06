@@ -293,13 +293,44 @@ void CDealRobot::updateVel(int team, Owl::ReceiveVisionMessage& result) {
         //playerPosVel.predict2(lastRobot[team][robot.id].accelerate);
         playerPosVel.predict2(robot.accelerate);
         //playerPosVel.predict();
-        playerPosVel.update2(robot.pos);
-        
+
+        if (sipm->wheelSpeedCallBack && ((team == opm->isYellow && !opm->isSimulation) || opm->isSimulation)) {
+            GlobalData::Instance()->robotInfoMutex.lock();
+            auto robotWheelSpeed = GlobalData::Instance()->robotInformation[team][robot.id].wheelSpeed;
+            double wheelSpeed[4] = { 0, 0, 0, 0 };
+            int round_num = opm->isSimulation ? 1000.0 / sipm->WheelRadius : 74037;
+            for (int i = 0; i < 4; i++)
+                wheelSpeed[i] = robotWheelSpeed[i] / round_num;
+            // simulation
+            //float vx = (-0.3498 * wheelSpeed[0] - 0.3019 * wheelSpeed[1] + 0.3019 * wheelSpeed[2] + 0.3498 * wheelSpeed[3]) * 1000; // mm/s
+            //float vy = (0.3904 * wheelSpeed[0] - 0.3904 * wheelSpeed[1] - 0.3904 * wheelSpeed[2] + 0.3904 * wheelSpeed[3]) * 1000; // mm/s
+            // real
+            float vx = (0.3498 * wheelSpeed[0] - 0.3498 * wheelSpeed[1] - 0.3019 * wheelSpeed[2] + 0.3019 * wheelSpeed[3]) * 1000; // mm/s
+            float vy = -(0.3904 * wheelSpeed[0] + 0.3904 * wheelSpeed[1] - 0.3904 * wheelSpeed[2] - 0.3904 * wheelSpeed[3]) * 1000; // mm/s
+            // std::cout << "robot.angle: " << robot.angle << std::endl; // 仿真中角度是准确的
+            float vr = -(3.3667 * wheelSpeed[0] + 2.7309 * wheelSpeed[1] + 2.7309 * wheelSpeed[2] + 3.3667 * wheelSpeed[3]); // rad/s?????可能还有问题
+            //robot.velocity = Owl::RobotSpeed(vxy.x(), vxy.y(), vr);
+            CVector vxy = CVector(vx, vy).rotate(robot.angle);
+            robot.velocity.vxy = vxy;
+            if (GlobalData::Instance()->robotInformation[team][robot.id].wheelSpeedUpdate) { // 有新的轮速指令时
+                playerPosVel.update4(robot.pos, vxy);
+                GlobalData::Instance()->robotInformation[team][robot.id].wheelSpeedUpdate = false;
+            }
+            else { // 没有新的轮速时，只用位置更新
+                playerPosVel.update2(robot.pos);
+            }
+            GlobalData::Instance()->robotInfoMutex.unlock();
+        }
+        else {
+            playerPosVel.update2(robot.pos);
+        }
+        //playerPosVel.update2(robot.pos);
+        // 速度与位置从kalmnfilter中获得
         CGeoPoint filtPoint = playerPosVel.postEstimatedPos();
         CVector PlayVel = playerPosVel.postEstimatedVel();
 
         robot.pos = filtPoint;
-        robot.velocity.vxy = PlayVel;
+        //robot.velocity.vxy = PlayVel;
         if(robot.velocity.vxy.mod() > MAX_SPEED[robot.id]) {
             double sin = robot.velocity.vx() / robot.velocity.vxy.mod(), cos = robot.velocity.vy() / robot.velocity.vxy.mod();
             robot.velocity.vxy = CVector(sin, cos) * MAX_SPEED[robot.id];
@@ -319,7 +350,7 @@ void CDealRobot::updateVel(int team, Owl::ReceiveVisionMessage& result) {
             v_angle[ii] = atan2(vxy.y(), vxy.x());
         }
         sort(v,v+ii,std::greater<double>());
-        robot.velocity.vxy = CVector(v[ii/2]*std::cos(v_angle[0]), v[ii/2]*std::sin(v_angle[0]));
+        //robot.velocity.vxy = CVector(v[ii/2]*std::cos(v_angle[0]), v[ii/2]*std::sin(v_angle[0]));
 
         /**if (fabs(robot.angle) > 10) {
             playerRotVel = DirFilter(initPosCov, posMeasErr, posModelErr);
@@ -349,20 +380,5 @@ void CDealRobot::updateVel(int team, Owl::ReceiveVisionMessage& result) {
         }
         else lastRobot[team][robot.id] = robot;
         //lastRobot[team][robot.id].accelerate = (GlobalData::Instance()->robotCommand[team][0].robotSpeed[robot.id].vxy - lastRobot[team][robot.id].velocity.vxy) / lastValid[team][robot.id];
-                
-        if (sipm->wheelSpeedCallBack && ((team == opm->isYellow && !opm->isSimulation) || opm->isSimulation)) {
-            GlobalData::Instance()->robotInfoMutex.lock();
-            auto robotWheelSpeed = GlobalData::Instance()->robotInformation[team][robot.id].wheelSpeed;
-            double wheelSpeed[4] = { 0, 0, 0, 0 };
-            int round_num = opm->isSimulation ? 1000.0 / sipm->WheelRadius : 74037;
-            for (int i = 0; i < 4; i++)
-                wheelSpeed[i] = robotWheelSpeed[i] * 1000.0 / round_num; // mm/s
-            float vx = 0.3498 * wheelSpeed[0] - 0.3498 * wheelSpeed[1] - 0.3019 * wheelSpeed[2] + 0.3019 * wheelSpeed[3];
-            float vy = 0.3904 * wheelSpeed[0] + 0.3904 * wheelSpeed[1] - 0.3904 * wheelSpeed[2] - 0.3904 * wheelSpeed[3];
-            CVector vxy = CVector(vx, vy).rotate(robot.angle);
-            float vr = 0.337 * wheelSpeed[0] + 0.337 * wheelSpeed[1] + 0.273 * wheelSpeed[2] + 0.273 * wheelSpeed[3];
-            robot.velocity = Owl::RobotSpeed(vxy.x(), vxy.y(), vr);
-            GlobalData::Instance()->robotInfoMutex.unlock();
-        }
     }
 }

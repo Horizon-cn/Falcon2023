@@ -15,11 +15,6 @@
 */		
 
 namespace Param{
-	const auto a = OParamManager::Instance()->setFileName("./");
-	const auto b = VParamManager::Instance()->setFileName("./");
-	const auto c = ParamManager::Instance()->setFileName("./");
-	const auto d = SParamManager::Instance()->setFileName("./");
-	const auto e = CParamManager::Instance()->setFileName("./");
 	//const int CAMERA = 8;
 	//const int BALLNUM = 20;
 	//const int BLUE = 0;
