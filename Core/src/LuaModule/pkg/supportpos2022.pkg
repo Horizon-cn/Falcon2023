@@ -1,0 +1,19 @@
+$#include "SupportPos2022.h"
+
+struct SupportPosStruct2022 {
+    CGeoPoint leftSupportPos;
+    CGeoPoint rightSupportPos;
+    CGeoPoint getLeftSupportPos();
+    CGeoPoint getRightSupportPos();
+};
+
+class CSupportPos2022 {
+    CSupportPos2022();
+    ~CSupportPos2022();
+    virtual void generateSupportPoint(const CVisionModule* pVision);
+    virtual SupportPosStruct2022 getSupportPos(const CVisionModule* pVision);
+    virtual bool isEmpty()const;
+    int getAreaScore(const CVisionModule* pVision, double v_max, double v_min);
+    CGeoPoint generateBestPoint(const CVisionModule* pVision, double v_max, double v_min, double maxDist);
+    double calcMaxDist(const CVisionModule* pVision, double middleDir, CGeoLine angleBisector);
+};

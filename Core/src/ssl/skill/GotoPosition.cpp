@@ -53,6 +53,11 @@ namespace {
 	double MAX_ROTATION_ACC_BACK = 15;
 	double MAX_ROTATION_SPEED_BACK = 15;
 
+	// 限定小车横向纵向运动速度
+
+	double MAX_TRANSLATION_SPEED_X = 500;
+	double MAX_TRANSLATION_SPEED_Y = 500;
+
 	/// 底层控制方法参数
 	int TASK_TARGET_COLOR = COLOR_CYAN;
 	int SAO_ACTION = 0;
@@ -97,6 +102,9 @@ CGotoPosition::CGotoPosition()
         TRANSLATION_ACC_LIMIT = ParamManager::Instance()->TRANSLATION_ACC_LIMIT;
         TRANSLATION_SPEED_LIMIT = ParamManager::Instance()->TRANSLATION_SPEED_LIMIT;
         TRANSLATION_ROTATE_ACC_LIMIT = ParamManager::Instance()->TRANSLATION_ROTATE_ACC_LIMIT;
+
+		MAX_TRANSLATION_SPEED_X = ParamManager::Instance()->MAX_TRANSLATION_SPEED_X;
+		MAX_TRANSLATION_SPEED_Y = ParamManager::Instance()->MAX_TRANSLATION_SPEED_Y;
 	}
 }
 
@@ -128,6 +136,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	const double dist = player2target.mod();
 
 	playerFlag = task().player.flag;
+	const bool IsGoMiddle = task().player.IsGoMiddle; // 现在是否走在中间点
 	const bool isDribble = playerFlag & PlayerStatus::DRIBBLING;
 
 	const bool isBack = (vecNumber == TaskMediator::Instance()->leftBack()) ||
@@ -146,6 +155,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	}
 	double arrivedDist = self.Vel().mod() * 0.12 + 0.1;
 	// 记录当前的规划执行目标点
+	DRAW_TARGET = 0;
 	if (DRAW_TARGET) {
 		GDebugEngine::Instance()->gui_debug_x(target, TASK_TARGET_COLOR);
 		GDebugEngine::Instance()->gui_debug_line(self.Pos(), target, TASK_TARGET_COLOR);
@@ -175,8 +185,11 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	nonZeroMode mode = FAST;
 
 	// 进行轨迹生成并记录理想执行时间
-	control.makeCmTrajectory(self, final, capability, mode);					// CMU 非零速到点
+	//control.makeCmTrajectory(self, final, capability, mode);					// CMU 非零速到点
+	static int idx = 0;
 
+	control.makeCmTrajectoryTest(self, final, capability, mode, IsGoMiddle);
+	//control.makeCmTrajectory(self, final, capability, mode);
 	float usedtime = target.dist(self.Pos()) / capability.maxSpeed / 1.414;		// 单位：秒
 	const double time_factor = 1.5;
 	usedtime = expectedCMPathTime(self, final.Pos(), capability.maxAccel, capability.maxSpeed, time_factor);
@@ -186,7 +199,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	/************************************************************************/
 	// 获取轨迹生成模块在全局坐标系中的速度指令
 	CVector globalVel = control.getNextStep().Vel();
-
+	//cout << "vel:  "<<globalVel.mod() << endl;
 	// 如果是后卫且距离禁区比较远，需要打开DSS避障，防止刚匹配的后卫发生碰撞
 	// 在禁区边的后卫允许撞车，否则容易被进球!!!
     if ((isBack || isMultiBack) && !Utils::InOurPenaltyArea(vecPos, 40)) {
@@ -235,7 +248,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	}
 
 	if (RECORD_COMMAND && vecNumber == paramManager->RECORD_NUM) {
-		velCommandData << vecPos.x() << "  " << vecPos.y() <<"  "<< self.Dir() << "  " << globalVel.x() << " " << globalVel.y()<<"  "<< rotVel << std::endl;
+		//velCommandData << vecPos.x() << "  " << vecPos.y() <<"  "<< self.Dir() << "  " << globalVel.x() << " " << globalVel.y()<<"  "<< rotVel << std::endl;
 	}
 
     if(NOT_MOVE)
@@ -319,5 +332,9 @@ PlayerCapabilityT CGotoPosition::setCapability(const CVisionModule *pVision) {
 	{
 		capability.maxSpeed *= SLOW_FACTOR;
 	}
+
+	capability.maxSpeedX = MAX_TRANSLATION_SPEED_X;
+	capability.maxSpeedY = MAX_TRANSLATION_SPEED_Y;
+
 	return capability;
 }

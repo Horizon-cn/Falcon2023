@@ -1,130 +1,64 @@
-metaadd = {}
-function metaadd.__add(a, b)
-	for _, value in ipairs(b) do
-		table.insert(a, value)
-	end
-	return a
-end
-gPlay = setmetatable({}, metaadd)
-gPlay = gPlay + gRefPlay + gTestPlay
-
-for _, value in ipairs(gPlay) do
-	local filename = LUA_SCRIPTS_PLAY_PATH .. value .. ".lua"
-	dofile(filename)
-end
-
 gPlayTable = {}
-gTimeCounter = 0
-gCurrentState = ""
-gLastState  = ""
-gLastPlay = ""
-gCurrentPlay = ""
-gRealState = ""
+gCurrentState = nil
+gLastState  = nil
+gLastPlay = nil
+gCurrentPlay = nil
+gRealState = nil
 gLastCycle = 0
-gLastRefMsg = ""
-gActiveRole = {}
-gIsOurIndirectKickExit = false
 
-gCurrentBallStatus="None"
-gLastBallStatus=""
-gCurrentFieldArea="BackField"
-gLastFieldArea=""
+--for _, value in pairs(gRefPlay) do
+--	local filename = LUA_SCRIPTS_REFPLAY_PATH .. value .. ".lua"
+--	dofile(filename)
+--end
 
---gCurrentOurBallAction="None"
------add by zhyaic 2014.5.22-----
-gExternStopCycle = 0
-gExternExitCycle = 0
-
-function gPlay.Next()
-	local index = 1
-	return function()
-		index = index + 1
-		return gPlay[index % table.getn(gPlay) + 1]
+for _, value in pairs(gTestPlay) do
+	local filename = LUA_SCRIPTS_TESTPLAY_PATH .. value .. ".lua"
+	local play = dofile(filename)
+	if play ~= nil then
+		gPlayTable[value] = play
 	end
 end
 
 function gPlayTable.CreatePlay(spec)
-	assert(type(spec.name) == "string")
-	assert(spec.applicable ~= nil)
-	assert(spec.attribute ~= nil)
-	assert(type(spec.timeout) == "number")
-	--print("Init Play: "..spec.name)
-
-	for attr, attr_table in pairs(spec) do
-		if type(attr_table) == "table" then
-			if attr_table.match ~= nil then
-				for rolename, task in pairs(attr_table) do
-					if rolename == "match" then
-						-- attr_table.match = DecodeMatchStr(attr_table.match)
-					else
-						--rolename =
+	-- firstState作为脚本入口，不可缺少
+	if spec.firstState ~= nil then
+		-- 暂时不检测脚本内容
+		for attr, attr_table in pairs(spec) do
+			if type(attr_table) == "table" then
+				if attr_table.match ~= nil then
+					local role = {}
+					for rolename, task in pairs(attr_table) do
+						if rolename ~= "match" and rolename ~= "switch" then
+							role.insert(rolename)
+						end
 					end
+					attr_table.match = DecodeMatchStr(attr_table.match, role)
 				end
 			end
 		end
+		return spec
 	end
-
-	gPlayTable[spec.name] = spec
-	return spec
 end
 
-function IsRoleActive(rolename)
-	for _, name in pairs(gActiveRole) do
-		if rolename == name then
-			return true
-		end
+function checkPlayENV()
+	-- 视觉有问题，但跑任何脚本都一样，仅报告
+	if vision:Cycle() - gLastCycle > 6 then
+		debugEngine:gui_debug_msg(CGeoPoint:new_local(-param.pitchLength/2,-param.pitchWidth/2),"Error Vision Cycle",0)
+	end
+end
+
+function NeedExit(name)
+	-- 脚本名不存在，退出
+	if type(name) ~= "string" or gPlayTable[name] == nil then
+		debugEngine:gui_debug_msg(CGeoPoint:new_local(-param.pitchLength/2+100,-param.pitchWidth/2),"Error Play Name: "..name,0)
+		return true
+	end
+	-- 正常状态退出
+	local curPlay = gPlayTable[name]
+	if gCurrentState == "finish" or gCurrentState == "exit" then
+		return true
 	end
 	return false
-end
-
--- 注意，此处只是针对间接和直接定位球的防守
--- 此时，Leader和Goalie不参与第二次防碰撞检测
-function UsePenaltyCleaner(curPlay)
-	for rolename, task in pairs(curPlay[gRealState]) do
-		if(type(task) == "table" and rolename ~= "match" and rolename ~= "Goalie" and rolename ~= "Kicker") then
-			--ERROR here,FIX IT!!!!!!!!!!!!!
-			--print("string.sub(rolename,1,1) =",string.sub(rolename,1,1),"\n")
-			--print("gRoleNum[rolename] =",gRoleNum[rolename],"\n")
-			--print("gRolePos[rolename]:x() =",gRolePos[rolename]:x(),"\n")
-			--print("gRolePos[rolename]:y() =",gRolePos[rolename]:y(),"\n")
-			CAddPenaltyCleaner(string.sub(rolename,1,1), gRoleNum[rolename], gRolePos[rolename]:x(), gRolePos[rolename]:y())
-		end
-	end
-	CCleanPenalty()
-	for rolename, task in pairs(curPlay[gRealState]) do
-		if(type(task) == "table" and rolename ~= "match" and rolename ~= "Goalie" and rolename ~= "Kicker") then
-			local x, y = CGetPenaltyCleaner(string.sub(rolename,1,1))
-			gRolePos[rolename] = CGeoPoint:new_local(x,y)
-		end
-	end
-	-- print(gCurrentState, CGetResetMatchStr())
-	DoRoleMatchReset(CGetResetMatchStr())
-end
-
-function DoRolePosMatch(curPlay, isPlaySwitched, isStateSwitched)
-	if gCurrentState == "exit" or gCurrentState == "finish" then
-		gRealState = gLastState
-	else
-		gRealState = gCurrentState
-	end
-	gActiveRole = {}
-	for rolename, task in pairs(curPlay[gRealState]) do
-		if(type(task) == "function" and rolename ~= "match" and rolename~="switch") then
-			task = task()
-		end	
-		if(type(task) == "table" and rolename ~= "match") then
-			table.insert(gActiveRole, rolename)
-			if task.name == "continue" and gCurrentState ~= "exit" and gCurrentState ~= "finish" then
-				curPlay[gRealState][rolename] = {}
-				for i,v in ipairs(curPlay[gLastState][rolename]) do
-					table.insert(curPlay[gRealState][rolename], v)
-				end
-				curPlay[gRealState][rolename].name = "continue"
-			end
-			gRolePos[rolename] = curPlay[gRealState][rolename][2]()
-		end
-	end
-	UpdateRole(curPlay[gRealState].match, isPlaySwitched, isStateSwitched)
 end
 
 function ResetPlay(name)
@@ -138,129 +72,110 @@ function ResetPlay(name)
 	defenceInfo:resetMarkingInfo()
 	--DefendUtils.clearKickOffDefArea()
 	--------------------------------
-	if curPlay.firstState ~= nil then
-		gCurrentState = curPlay.firstState
-		DoRolePosMatch(curPlay, true, false)
-	else
-		print("Error in ResetPlay!!")
-	end
-	gTimeCounter = 0
-end
-
-function ResetPlayWithLastMatch(name)
-	local curPlay = gPlayTable[name]
-	world:SPlayFSMSwitchClearAll(true)
-	if curPlay.firstState ~= nil then
-		gCurrentState = curPlay.firstState
-	else
-		print("Error in ResetPlay!!")
-	end
-	gTimeCounter = 0
+	gCurrentState = curPlay.firstState
+	DoRolePosMatch(curPlay, true, false)
 end
 
 function RunPlay(name)
-	if(gPlayTable[name] == nil) then
-		print("Error Play Name In RunPlay: "..name)
+	local curPlay = gPlayTable[name]
+	local curState = nil
+	local isStateSwitched = false
+	-- Play里的switch
+	if type(curPlay.switch) == "function" then
+		curState = curPlay:switch()
 	else
-		debugEngine:gui_debug_msg(CGeoPoint:new_local(-50, -param.pitchWidth/2-20),gCurrentPlay)
-		local curPlay = gPlayTable[name]
-		local curState
---		gLastState = gCurrentState
-		local isStateSwitched = false
-		if curPlay.switch ~= nil then
-			curState = curPlay:switch()
-		else
-			if gCurrentState ~= "exit" and gCurrentState ~= "finish" then
-				curState = curPlay[gCurrentState]:switch()
-				-- print("curState"..curState)
-			end
-			--gCurrentState = curPlay[gCurrentState]:switch()
+		-- Play某个状态里的switch
+		if gCurrentState ~= "exit" and gCurrentState ~= "finish" and type(curPlay[gCurrentState].switch) == "function" then
+			curState = curPlay[gCurrentState]:switch()
 		end
+	end
+	-- 完成状态切换
+	if curState ~= nil then
+		gLastState = gCurrentState
+		gCurrentState = curState
+		isStateSwitched = true
+		world:SPlayFSMSwitchClearAll(true)
+	end
 
-		-- if gCurrentState == nil then
-		-- 	gCurrentState = gLastState
-		if curState ~= nil then
-			gLastState = gCurrentState
-			gCurrentState = curState
-			-- print ("		"..gLastState.." ------->>>>>>>>>>>>>>>"..gCurrentState)
-			isStateSwitched = true
-			world:SPlayFSMSwitchClearAll(true)
-		end
-
-		-- debugEngine:gui_debug_msg(vision:OurPlayer(gRoleNum[rolename]):Pos(), rolename)
-
-		DoRolePosMatch(curPlay, false, isStateSwitched)
+	DoRolePosMatch(curPlay, false, isStateSwitched)
 		
---~		Play中任务返回规则
---~		1 ---> task, 2 --> matchpos, 3--->kick, 4 --->dir, 5 --->pre, 6 --->kp, 7--->cp, 8--->flag
-		kickStatus:clearAll()
-		for rolename, task in pairs(curPlay[gRealState]) do
-			if (type(task) == "function" and rolename ~= "match" and (gRoleNum[rolename] ~= nil or type(rolename)=="function")) then
-				task = task(gRoleNum[rolename])
+--~	Play中任务返回规则
+--~	1 ---> task, 2 --> matchpos, 3--->kick, 4 --->dir, 5 --->pre, 6 --->kp, 7--->cp, 8--->flag
+	kickStatus:clearAll()
+	for rolename, task in pairs(curPlay[gRealState]) do
+		if (type(task) == "function" and rolename ~= "match" and (gRoleNum[rolename] ~= nil or type(rolename)=="function")) then
+			task = task(gRoleNum[rolename])
+		end
+
+		if (type(task) == "table" and rolename ~= "match" and (gRoleNum[rolename] ~= nil or type(rolename)=="function")) then
+--~ 		统一进行射门和吸球的管理,并做任务处理
+			if task[1] == nil then
+				task = curPlay[gLastState][rolename]
 			end
 
-			if (type(task) == "table" and rolename ~= "match" and (gRoleNum[rolename] ~= nil or type(rolename)=="function")) then
---~ 			统一进行射门和吸球的管理,并做任务处理
-				if task[1] == nil then
-					task = curPlay[gLastState][rolename]
-				end
+			local roleNum
+			if type(rolename)=="string" then
+				roleNum = gRoleNum[rolename]
+				--print("Here in string : "..roleNum)
+			elseif type(rolename)=="function" then
+				roleNum = rolename()
+				--print("Here in function : "..roleNum)
+			end
 
-				local roleNum
-				if type(rolename)=="string" then
-					roleNum = gRoleNum[rolename]
-					--print("Here in string : "..roleNum)
-				elseif type(rolename)=="function" then
-					roleNum = rolename()
-					--print("Here in function : "..roleNum)
-				end
-
-				if roleNum ~= -1 then
-					if task[3] ~= nil and task[3](roleNum) ~= kick.none() then
-						local mkick = task[3](roleNum)
-						local mdir = task[4](roleNum)
-						local mpre = task[5](roleNum)
-						local mkp  = task[6](roleNum)
-						local mcp  = task[7](roleNum)
-						local mflag = task[8]
-						local isDirOk = world:KickDirArrived(vision:Cycle(), mdir, mpre, roleNum)
-						-- if rolename == "Breaker" then
-						-- 	print(player.dir("Breaker"), mdir, isDirOk, ball.toPlayerDist("Breaker"))
-						-- end
-						if isDirOk or bit:_and(mflag, flag.force_kick) ~= 0 then
-							if mkick == kick.flat() then
-								kickStatus:setKick(roleNum, mkp)
-							elseif mkick == kick.chip() then
-								kickStatus:setChipKick(roleNum, mcp)
-							end
+			if roleNum ~= -1 then
+				if task[3] ~= nil and task[3](roleNum) ~= kick.none() then
+					local mkick = task[3](roleNum)
+					local mdir = task[4](roleNum)
+					local mpre = task[5](roleNum)
+					local mkp  = task[6](roleNum)
+					local mcp  = task[7](roleNum)
+					local mflag = task[8]
+					local isDirOk = world:KickDirArrived(vision:Cycle(), mdir, mpre, roleNum)
+					-- if rolename == "Breaker" then
+					-- 	print(player.dir("Breaker"), mdir, isDirOk, ball.toPlayerDist("Breaker"))
+					-- end
+					if isDirOk or bit:_and(mflag, flag.force_kick) ~= 0 then
+						if mkick == kick.flat() then
+							kickStatus:setKick(roleNum, mkp)
+						elseif mkick == kick.chip() then
+							kickStatus:setChipKick(roleNum, mcp)
 						end
 					end
-					if(type(rolename)=="string") then
-						debugEngine:gui_debug_msg(vision:OurPlayer(roleNum):Pos(), string.sub(rolename, 1, 1))
-					end
-					task[1](roleNum)
 				end
+				if(type(rolename)=="string") then
+					debugEngine:gui_debug_msg(vision:OurPlayer(roleNum):Pos(), string.sub(rolename, 1, 1))
+				end
+				-- 执行skill里的excute()
+				task[1](roleNum)
 			end
 		end
-		gTimeCounter = gTimeCounter + 1
 	end
 	gLastCycle = vision:Cycle()
 end
 
-function NeedExit(name)
-	if name == "" then
-		return false
-	end
-	if(gPlayTable[name] == nil) then
-		print("Error Skill Name In NeedExit: "..name)
+function DoRolePosMatch(curPlay, isPlaySwitched, isStateSwitched)
+	if (gCurrentState == "exit" or gCurrentState == "finish") and gLastState ~= nil then
+		gRealState = gLastState
 	else
-		local curPlay = gPlayTable[name]
-		if gCurrentState == "finish" or
-		    gCurrentState == "exit" or
-		    gTimeCounter > curPlay.timeout or
-			vision:Cycle() - gLastCycle > 6 then
-			gTimeCounter = 0
-			return true
+		gRealState = gCurrentState
+	end
+	for rolename, task in pairs(curPlay[gRealState]) do
+		-- 执行task，得出用于RoleMatch的点位
+		-- 接受两类写法，一般是table，执行matchPos()，function可根据情况返回table
+		if(type(task) == "function" and rolename ~= "match" and rolename~="switch") then
+			task = task()
+		end	
+		if(type(task) == "table" and rolename ~= "match") then
+			-- 特殊skill，保持上一状态的skill
+			if task.name == "continue" and gCurrentState ~= "exit" and gCurrentState ~= "finish" and gLastState ~= nil then
+				curPlay[gRealState][rolename] = {}
+				for i,v in ipairs(curPlay[gLastState][rolename]) do
+					table.insert(curPlay[gRealState][rolename], v)
+				end
+			end
+			-- 执行skill里的matchPos()
+			gRolePos[rolename] = curPlay[gRealState][rolename][2]()
 		end
 	end
-	return false
+	UpdateRole(curPlay[gRealState].match, isPlaySwitched, isStateSwitched)
 end

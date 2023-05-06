@@ -55,6 +55,15 @@ namespace Falcon {
         }
         return true;
     }
+    bool ParamManager::loadParam(std::string& value, const QString& key, QString defaultValue) {
+        value = settings->value(key, defaultValue).toString().toStdString();
+        if (!settings->contains(key)) {
+            settings->setValue(key, defaultValue);
+            settings->sync();
+            return false;
+        }
+        return true;
+    }
     bool ParamManager::loadParam(bool& value, const QString& key, bool defaultValue) {
         value = settings->value(key, defaultValue).toBool();
         if (!settings->contains(key)) {

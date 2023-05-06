@@ -246,8 +246,9 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     CGeoPoint middlePoint = finalTargetPos;
 
     // 到达中间点的判据，让整条路径更加连贯
-    double arrivedDist = self.Vel().mod() * 0.1 + 5;
+    double arrivedDist = self.Vel().mod() * 0.2  + 10;
 
+    //cout << arrivedDist << ' ' << (lastPoint[vecNumber] - self.Pos()).mod() << endl;
     // 第一种情况：可以直接到目标点
     if (obsNew.check(startNew.pos, targetNew.pos) || obsNew.check(self.Pos(), targetNew.pos) ||
         self.Pos().dist(finalTargetPos) < Param::Vehicle::V2::PLAYER_SIZE * 2) {
@@ -266,7 +267,10 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         // 规划成功的情况则给中间点赋值，一般都是有中间点的
         if (viaPoint[vecNumber].size() > 2) middlePoint = viaPoint[vecNumber][1].pos;
     }
-    // GDebugEngine::Instance()->gui_debug_x(middlePoint, 0);
+
+    //GDebugEngine::Instance()->gui_debug_x(middlePoint, 0);
+    //GDebugEngine::Instance()->gui_debug_x(lastPoint[vecNumber], 1);
+
     // 记录中间点，作为下一次规划基础
     lastPoint[vecNumber] = middlePoint;
     bool needRush2Ball = Utils::InTheirPenaltyArea(ballPos, 10) && !Utils::InTheirPenaltyArea(ballPos, 0); // 球在禁区外且很靠近禁区，直接冲击
@@ -280,11 +284,15 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         }
         lastPoint[vecNumber] = middlePoint;
     }
-    newTask.player.pos = middlePoint;
-    //GDebugEngine::Instance()->gui_debug_x(middlePoint);
-    // 零速到达中间点，非零速只有在可以直接到时才执行
-    if (middlePoint.dist(task().player.pos) > 1e-8) newTask.player.vel = CVector(0.0, 0.0);
 
+
+    newTask.player.pos = middlePoint;
+    //GDebugEngine::Instance()->gui_debug_x(middlePoint, 1);
+    //GDebugEngine::Instance()->gui_debug_x(finalTargetPos, 2);
+    
+    // 非零速到达中间点，零速只有在可以直接到时才执行
+    if (middlePoint.dist(task().player.pos) > 50) newTask.player.IsGoMiddle = true;
+    else newTask.player.IsGoMiddle = false;
 
     // 控制吸球力度
     if (isDribble || (playerFlag & PlayerStatus::DRIBBLING)) DribbleStatus::Instance()->setDribbleCommand(vecNumber, 2);

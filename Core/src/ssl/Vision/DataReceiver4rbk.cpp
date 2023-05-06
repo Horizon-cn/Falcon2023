@@ -87,7 +87,7 @@ void CDataReceiver4rbk::receiveVision() {
 }
 
 bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameInfoT& info){
-	/** GameInfo鍖呮嫭瑙嗚淇℃伅鍜岃鍒や俊鎭紝涔嬪悗瑕佸?涓婃柟宸瓑淇℃伅,player鐨勪俊鎭叏閮ㄥ?杞借繘鏉ワ紝鐢ㄤ簬robot predictor **/
+	/** GameInfo包括视觉信息和裁判信息，之后要加上方差等信息,player的信息全部加载进来，用于robot predictor **/
     static int last_cycle = 0;
     static int strategy_cycle = 0;
     bool receive_new_vision = false;
@@ -95,9 +95,11 @@ bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameIn
     receive_vision_mutex.lock();
     vision = rec_vision;
     receive_vision_mutex.unlock();
+    if (vision.has_login_name() && vision.login_name() != OParamManager::Instance()->LoginName) // 串频问题
+        return false;
     info.cycle = ++strategy_cycle;
     info.mode = m_play_mode;
-    info.ball.pos.valid = vision.has_balls();
+    info.ball.pos.valid = vision.has_balls() ? vision.balls().valid() : false;
     if (info.ball.pos.valid) {
         auto& ball = vision.balls();
         info.ball.pos.x = msgX2InfoX(ball.x());
@@ -201,6 +203,8 @@ void CDataReceiver4rbk::receiveRefMsgs() {
             datagram.resize(referee_socket.pendingDatagramSize());
             referee_socket.readDatagram(datagram.data(), datagram.size());
             ssl_referee.ParseFromArray((void*)datagram.data(), datagram.size());
+            if (ssl_referee.has_login_name() && ssl_referee.login_name() != OParamManager::Instance()->LoginName)
+                break;
             PlayMode next_play_mode = PMNone; // avoid next command is none
             if (ssl_referee.has_next_command()) { // check next command first
                 Referee_Command next_command = ssl_referee.next_command();
@@ -214,7 +218,7 @@ void CDataReceiver4rbk::receiveRefMsgs() {
             }
             unsigned long command_counter = ssl_referee.command_counter();
             if (command_counter == former_cmd_index) continue;
-            former_cmd_index = command_counter;	// 锟斤拷锟斤拷锟斤拷一锟斤拷指锟斤拷帽锟街局?
+            former_cmd_index = command_counter;	// 更新上一次指令得标志值
             //update refereemsg
             unsigned long long packet_timestamp = ssl_referee.packet_timestamp();
             Referee_Stage stage = ssl_referee.stage();
@@ -275,7 +279,7 @@ PlayMode CDataReceiver4rbk::translateRefMsgs(Referee_Command command){
     PlayMode play_mode = PMNone;
     for( int pm = PMStop; pm <= PMNone; ++pm ) {
         if( playModePair[pm].ch == cmd ) {
-            // 寻锟斤拷匹锟斤拷锟街革拷锟斤拷锟斤拷锟?
+            // 寻找匹配的指令名字
             play_mode = playModePair[pm].mode;
             break;
         }

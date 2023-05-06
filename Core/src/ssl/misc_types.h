@@ -22,10 +22,10 @@ struct PlayerStatus{
 	PlayerStatus() : flag(0),
 		pos(0.0, 0.0), angle(0.0), vel(0.0, 0.0), rotvel(0.0), a_x(0.0), a_y(0.0), a_r(0.0),
 		max_acceleration(0.0), max_deceleration(0.0), max_rot_acceleration(0.0), max_speed(0.0), max_rot_speed(0.0), rotdir(0),
-		is_specify_ctrl_method(false), specified_ctrl_method(ZERO_FINAL),
+		is_specify_ctrl_method(false), specified_ctrl_method(ZERO_FINAL), GoRadius(0.0),
 		needkick(true), needdribble(false), ispass(false), ischipkick(false), kickprecision(0.0), kickpower(0.0), chipkickpower(0.0),
 		speed_x(0.0), speed_y(0.0), rotate_speed(0.0), path_plan_in_circle(false), path_plan_circle_center(CGeoPoint(1e8, 1e8)), path_plan_circle_radius(1e8),
-		specify_path_plan_area(false) { }
+		specify_path_plan_area(false), IsGoMiddle(false) , isAdvancer(false) { }
 
 	/// 标签
 	int flag;														// 任务标签
@@ -75,6 +75,12 @@ struct PlayerStatus{
 	double a_y;
 	double a_r;
 
+
+	// 是否现在前往中间点 by TYH Date 20230410
+	bool IsGoMiddle;
+	
+	bool isAdvancer;
+
 	/// 标签常量
 	//默认的flag
 	static const int NOTHING						= 0x00000000; // 默认
@@ -116,6 +122,9 @@ struct PlayerStatus{
     // Break的 flags
     static const int PENALTY_KICK                   = 0x04000000; // 大点球状态
     static const int SPIN                           = 0x04100000; // 吸球轉身
+
+	// Gocircle参数 by tyh 23.3.3
+	double GoRadius;
 };
 
 /// 球状态结构

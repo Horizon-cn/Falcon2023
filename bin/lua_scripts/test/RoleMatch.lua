@@ -1,33 +1,8 @@
-gRoleNum = {
-	["Goalie"] = -1,
-	["Kicker"] = -1,
-	["Tier"] = -1,
-	["Receiver"] = -1,
-
-	["Assister"] = -1,
-	["Breaker"] = -1,
-	["Crosser"] = -1,
-	["Defender"] = -1,
-	["Engine"] = -1,
-	["Finisher"] = -1,
-	["Hawk"] = -1,
-	["Leader"] = -1,
-	["Middle"] = -1,
-	["Powerhouse"] = -1,
-	["Special"] = -1
-}
-
-gLastRoleNum = {
-
-}
-
-gRolePos = {
-
-}
-
-gRolePriority = { "Goalie","Kicker","Tier","Receiver"}
+gRoleNum = {}
+gLastRoleNum = {}
+gRoleFixNum = {}
+gRolePos = {}
 gOurExistNum = {}
-
 gRoleLookUpTable = {
 -- 角色分为两类
 -- 第一类为在gRolePriority和gRoleFixNum中进行真实车号配置的
@@ -50,7 +25,7 @@ gRoleLookUpTable = {
 ["S"] = "Special"
 }
 
-function DecodeMatchStr(matchRule) -- 解析match字符串
+function DecodeMatchStr(matchRule, matchRole) -- 解析match字符串
 	local strTable = {}
 	local teamCnt = 1
 	local str
@@ -82,7 +57,13 @@ function DecodeMatchStr(matchRule) -- 解析match字符串
 		local endPos, _ = string.find(str, endChar)
 		local teamTable = {}
 		for subIndex = 2, endPos-1 do -- 插入所有需要匹配的角色
-			table.insert(teamTable, gRoleLookUpTable[string.sub(str, subIndex, subIndex)])
+			local char = string.sub(str, subIndex, subIndex)
+			for _, rolename in matchRole do 
+				if char == string.sub(rolename, 1, 1) then
+					table.insert(teamTable, rolename)
+					break
+				end
+			end
 		end
 		teamTable["mode"] = mode
 		strTable[teamCnt] = teamTable
@@ -93,58 +74,19 @@ function DecodeMatchStr(matchRule) -- 解析match字符串
 	return strTable
 end
 
+function DoFixNumMatch(fixNum)
+	for i = 0, param.maxPlayer - 1 do
+		if gOurExistNum[i] == fixNum then
+			gOurExistNum[i] = -1
+			return i
+		end
+	end
+	return -1
+end
+
 function GetMatchPotential(num, role)
 	local vec = player.pos(num) - gRolePos[role]
     return vec:mod2() / 4.0
-end
-
-function RemoveExistNum(num)
-	gOurExistNum[num] = -1
-end
-
-function DoRoleMatchReset(str)
-	-- 循环获得需要重新匹配的角色
-	while true do
-		local character = string.sub(str, 1, 1)
-		
-		if character ~= '[' then
-			break
-		end
-
-		local endPos, _ = string.find(str, ']')
-		local roleTable = {}
-		local numTable = {}
-		for subIndex = 2, endPos-1 do
-			local roleNameStr = gRoleLookUpTable[string.sub(str, subIndex, subIndex)]
-			table.insert(roleTable, roleNameStr)
-			table.insert(numTable, gRoleNum[roleNameStr])
-		end
-
-		-- 开始对每个分组进行重新的匹配
-		local nrows = table.getn(roleTable)
-		local ncols = table.getn(numTable)
-		local matrix = Matrix_double_:new_local(nrows, ncols)
-		for row = 1, nrows do
-			for col = 1, ncols do
-				matrix:setValue(row-1, col-1, GetMatchPotential(numTable[col], roleTable[row]))
-			end
-		end
-
-		local m = Munkres:new_local()
-		m:solve(matrix)
-
-		for row = 1, nrows do
-			for col = 1, ncols do
-				if matrix:getValue(row-1, col-1) == 0 then
-					gRoleNum[roleTable[row]] = numTable[col]				
-					break
-				end
-			end
-		end
-
-		str = string.sub(str,endPos+1)
-		if str == "" then break end
-	end
 end
 
 function DoMunkresMatch(rolePos)
@@ -184,48 +126,29 @@ function DoMunkresMatch(rolePos)
 	end
 end
 
-
-function DoFixNumMatch(fixNums)
-	for _, fixNum in ipairs(fixNums) do
-		for i = 0, param.maxPlayer - 1 do
-			if gOurExistNum[i] == fixNum then
-				gOurExistNum[i] = -1
-				return i
-			end
-		end
-	end
-	return -1
-end
-
-function SetNoMatchRoleZero()
-	for _, rolename in pairs(gRoleLookUpTable) do
-		if gRoleNum[rolename] == nil then
-			gRoleNum[rolename] = -1
-		end
-	end	
+function RemoveExistNum(num)
+	gOurExistNum[num] = -1
 end
 
 function UpdateRole(matchTactic, isPlaySwitched, isStateSwitched)
-	if isPlaySwitched then
+	--if isPlaySwitched then
 		gRoleNum = {}
-	end
-	-- print("---------------------------------")
+	--end
 
 	-- 为了使车号统一从0开始
 	-- 但这样lua的table接口全都无法使用，所以只能强行trick放弃代码简洁性保证功能
 	for i = 0, param.maxPlayer - 1 do
-		if player.valid(i) then
+		if player.valid(i) then -- todo
 			gOurExistNum[i] = i -- table.insert(ourExistNum, i)
 		else
 			gOurExistNum[i] = -1
 		end
 	end
 
-	for _, rolename in pairs(gRolePriority) do
+	for rolename, roleID in pairs(gRoleFixNum) do
 		for existname, _ in pairs(gRolePos) do
-			if rolename == existname and
-				type(gRoleFixNum[rolename]) == "table" then
-				gRoleNum[rolename] = DoFixNumMatch(gRoleFixNum[rolename])
+			if rolename == existname and type(roleID) == "number" then
+				gRoleNum[rolename] = DoFixNumMatch(roleID)
 				if rolename == "Goalie" then
 					CRegisterRole(gRoleNum[rolename], "goalie")
 				end
@@ -234,7 +157,6 @@ function UpdateRole(matchTactic, isPlaySwitched, isStateSwitched)
 	end
 	
 	local matchList = {}
-	matchTactic = DecodeMatchStr(matchTactic)
 	for tactic, value in pairs(matchTactic) do -- 依次处理match中的括号
 		if value.mode == "RealTime" or isPlaySwitched or
 			(isStateSwitched and value.mode == "Once") then -- 重新匹配
@@ -274,6 +196,5 @@ function UpdateRole(matchTactic, isPlaySwitched, isStateSwitched)
 		DoMunkresMatch(role) -- 匹配
 	end
 	
-	SetNoMatchRoleZero()
 	gLastRoleNum = gRoleNum	
 end

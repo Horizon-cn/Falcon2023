@@ -60,7 +60,7 @@ function canDefenceExit()
 end
 
 function timeRemain()
-	return vision:TimeRemain()
+--	return vision:TimeRemain()
 end
 
 function ourGoal()

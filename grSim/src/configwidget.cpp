@@ -45,7 +45,7 @@ ConfigWidget::ConfigWidget()
   this->setModel(tmodel);
   use_vars = VarListPtr(new VarList("User"));
   world.push_back(use_vars); 
-  ADD_VALUE(use_vars,Double,LoginName,opm->value("Alert", "LoginName", 0).toDouble(),"LoginName")
+  ADD_VALUE(use_vars,String,LoginName,opm->value("Alert", "LoginName", "SRC").toString().toStdString(),"LoginName")
   geo_vars = VarListPtr(new VarList("Geometry"));
   world.push_back(geo_vars);  
   robot_settings = new QSettings;
@@ -136,6 +136,7 @@ ConfigWidget::ConfigWidget()
     ADD_VALUE(comm_vars,Intz,YellowStatusSendPort,cpm->value("Ports/yellow_status", 30012).toInt(),"Yellow Team status send port")
     ADD_VALUE(comm_vars,Intz,sendDelay,spm->value("Communication", "sendDelay", 0).toInt(),"Sending delay (milliseconds)")
     ADD_VALUE(comm_vars,Intz,sendGeometryEvery,spm->value("Communication/sendGeometryEvery", 120).toInt(),"Send geometry every X frames")
+    ADD_VALUE(comm_vars, Bool, wheelSpeedCallBack, spm->value("Communication", "wheelSpeedCallBack", false).toBool(), "Send wheelSpeed every frame")
     VarListPtr gauss_vars(new VarList("Gaussian noise"));
         comm_vars->addChild(gauss_vars);
         ADD_VALUE(gauss_vars,Bool,noise,spm->value("Noise", "noise", false).toBool(),"Noise")

@@ -20,6 +20,7 @@
 #include "rec_eventlabel.h"
 #include "optionobject.h"
 #include "globaldata.h"
+#include "translator.hpp"
 #include "Config.h"
 #include <FrameworkWidgetFactory.h>
 
@@ -37,6 +38,7 @@ void qmlRegister() {
     qmlRegisterType<LogEventLabel>("Owl", 1, 0, "LogEventLabel");
     //qmlRegisterType<optionObject>("Owl", 1, 0, "Option");
     //qmlRegisterType<Test>("Owl", 1, 0, "Test");
+    qmlRegisterType<Translator>("Owl", 1, 0, "Translator");
     qmlRegisterSingletonType<rec_slider>("Owl", 1, 0, "RecSlider", &rec_slider::Instance);
     qmlRegisterSingletonType<RecEventLabel>("Owl", 1, 0, "RecEventLabel", &RecEventLabel::Instance);
 }
@@ -61,7 +63,7 @@ int main(int argc, char *argv[]) {
     app.setFont(QFont("Microsoft YaHei", 9));
     // 创建必要文件夹
     QDir dir = qApp->applicationDirPath();
-    QString folder_name[4] = { "../data","../LOG","../Formations","../Help" };
+    QString folder_name[4] = { "../data","../LOG","../Formations","../Language" }; //"../Help" };
     for (int i = 0; i < 4; i++) {
         if (!dir.exists(folder_name[i])) {
             if (!dir.mkpath(folder_name[i]))

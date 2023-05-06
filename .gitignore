@@ -1,3 +1,4 @@
+.vs/
 *.pdb
 *.user
 # C++ objects and libs
@@ -30,6 +31,8 @@ Client/qrc_*.cpp
 Client/ui_*.h
 Client/Makefile*
 Client/*build*
+Client/*.ts
+Client/*.qm
 
 # Qt unit tests
 Client/target_wrapper.*
@@ -99,7 +102,7 @@ Core/CMakeLists.txt.user*
 # Protobuf
 Core/*.pb.*
 Core/*_pb2.py
-# Core/src/LuaModule/lua_zeus.cpp
+Core/src/LuaModule/lua_zeus.cpp
 Core/share/proto/cpp/
 
 ZBin/*
@@ -297,3 +300,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+/bin/Layout/111.json
+/.gitignore
+/bin/config

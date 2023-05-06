@@ -69,7 +69,7 @@ Page{
                             anchors.horizontalCenter: parent.horizontalCenter;
                             anchors.top: parent.top;
                             anchors.margins: 10;
-                            title :qsTr("Sender Setting");
+                            title :qsTr("Sender Setting")+translator.emptyString;
                             Grid{
                                 height:parent.height;
                                 id : crazyListView;
@@ -82,7 +82,7 @@ Page{
                                 enabled: !crazyConnect.ifConnected;
                                 property int itemWidth : 90;
                                 ZText{
-                                    text: qsTr("Control Mode");
+                                    text: qsTr("Control Mode")+translator.emptyString;
                                 }
                                 Control.Switch {
                                     id : switchControl;
@@ -92,14 +92,14 @@ Page{
                                     }
                                 }
                                 ZText{
-                                    text: qsTr(" ");
+                                    text: " ";
                                 }
                                 ZText{
-                                    text: qsTr(" ");
+                                    text: " ";
                                 }
                                 //端口相关
                                 ZText{
-                                    text: qsTr("Ports");
+                                    text: qsTr("Ports")+translator.emptyString;
                                     width:parent.itemWidth;
                                 }
                                 Control.ComboBox{
@@ -116,11 +116,11 @@ Page{
                                 }
                                 //频率相关
                                 ZText{
-                                    text: qsTr("Frequency");
+                                    text: qsTr("Frequency")+translator.emptyString;
                                     width:parent.itemWidth;
                                 }
                                 Control.ComboBox{
-                                    model: [0,1,2,3,4,5,6,7,8,9];
+                                    model: interaction.getFrequencyList();
                                     onActivated: interaction.changeSerialFrequency(currentIndex);
                                     width:parent.itemWidth;
                                 }
@@ -129,7 +129,7 @@ Page{
                         //连接按钮
                         Control.Button{
                             id : crazyConnect;
-                            text : (ifConnected ? qsTr("Disconnect") : qsTr("Connect"));
+                            text : (ifConnected ? qsTr("Disconnect") : qsTr("Connect"))+translator.emptyString;
                             property bool ifConnected:false;
                             anchors.top: crazyListRectangle.bottom;
                             anchors.right: parent.right;
@@ -151,7 +151,7 @@ Page{
                         }
                         //下面大的Box
                         ZGroupBox{
-                            title : qsTr("Manual Control");
+                            title : qsTr("Manual Control")+translator.emptyString;
                             width:parent.width - 15;
                             anchors.top:crazyConnect.bottom;
                             anchors.horizontalCenter: parent.horizontalCenter;
@@ -197,87 +197,87 @@ Page{
                                 property bool back: false;
                                 property int itemWidth : 99;
 
-                                ZText{ text:qsTr("Robot") }
+                                ZText{ text:qsTr("Robot")+translator.emptyString }
                                 //最多12辆车
                                 ZSpinBox{ minimumValue:0; maximumValue:15; value:parent.robotID; width:parent.itemWidth
                                     onEditingFinished:{parent.robotID = value}}
-                                ZText{ text:"Stop" }
+                                ZText{ text:qsTr("Stop")+translator.emptyString }
                                 //有用吗？
                                 Control.Button{ 
-                                    text:qsTr("[Space]");width:parent.itemWidth 
+                                    text:qsTr("[Space]")+translator.emptyString;width:parent.itemWidth 
                                     onClicked:crazyShow.updateStop();
                                 }
                                 ZText{ text:" " }
                                 ZText{ text:" " }
-                                ZText{ text:qsTr("Vx [W/S]") }
+                                ZText{ text:qsTr("Vx")+translator.emptyString+" [W/S]" }
                                 //Vx:(-m_VELX, m_VELX)
                                 ZSpinBox{ minimumValue:-crazyShow.m_VELX; maximumValue:crazyShow.m_VELX; value:parent.velX;width:parent.itemWidth
                                     onEditingFinished:{parent.velX = value;}}
-                                ZText{ text:qsTr("VxStep") }
+                                ZText{ text:qsTr("VxStep")+translator.emptyString }
                                 //VxStep:(1, m_VELX)
                                 ZSpinBox{ minimumValue:1; maximumValue:crazyShow.m_VELX; value:parent.velXStep;width:parent.itemWidth;
                                     onEditingFinished:{parent.velXStep = value;}}
-                                ZText{ text:qsTr("MaxVelX") }
+                                ZText{ text:qsTr("MaxVelX")+translator.emptyString }
                                 //MaxVelX:(1, velocityMax)
                                 ZSpinBox{ minimumValue:1; maximumValue:crazyShow.velocityMax; value:parent.m_VELX;width:parent.itemWidth
                                     onEditingFinished:{parent.m_VELX = value;}}
-                                ZText{ text:qsTr("Vy [A/D]") }
+                                ZText{ text:qsTr("Vy")+translator.emptyString+" [A/D]" }
                                 //Vy:(-m_VELY, m_VELY)
                                 ZSpinBox{ minimumValue:-crazyShow.m_VELY; maximumValue:crazyShow.m_VELY; value:parent.velY;width:parent.itemWidth
                                     onEditingFinished:{parent.velY = value;}}
-                                ZText{ text:qsTr("VyStep") }
+                                ZText{ text:qsTr("VyStep")+translator.emptyString }
                                 //VyStep:(1, m_VELY)
                                 ZSpinBox{ minimumValue:1; maximumValue:crazyShow.m_VELY; value:parent.velYStep;width:parent.itemWidth
                                     onEditingFinished:{parent.velYStep = value;}}
-                                ZText{ text:qsTr("MaxVelY") }
+                                ZText{ text:qsTr("MaxVelY")+translator.emptyString }
                                 //MaxVelY:(1, velocityMax)
                                 ZSpinBox{ minimumValue:1; maximumValue:crazyShow.velocityMax; value:parent.m_VELY;width:parent.itemWidth
                                     onEditingFinished:{parent.m_VELY = value;}}
-                                ZText{ text:qsTr("Vr [Z/C]") }
+                                ZText{ text:qsTr("Vr")+translator.emptyString+" [Z/C]" }
                                 //Vr:(-m_VELR, m_VELR)
                                 ZSpinBox{ minimumValue:-crazyShow.m_VELR; maximumValue:crazyShow.m_VELR; value:parent.velR;width:parent.itemWidth
                                     onEditingFinished:{parent.velR = value;}}
-                                ZText{ text:qsTr("VrStep") }
+                                ZText{ text:qsTr("VrStep")+translator.emptyString }
                                 //VrStep:(1, m_VELR)
                                 ZSpinBox{ minimumValue:1; maximumValue:crazyShow.m_VELR; value:parent.velRStep;width:parent.itemWidth
                                     onEditingFinished:{parent.velRStep = value;}}
-                                ZText{ text:qsTr("MaxVelR") }
+                                ZText{ text:qsTr("MaxVelR")+translator.emptyString }
                                 //MaxVelR:(1, velocityRMax)
                                 ZSpinBox{ minimumValue:1; maximumValue:crazyShow.velocityRMax; value:parent.m_VELR;width:parent.itemWidth
                                     onEditingFinished:{parent.m_VELR = value;}}
-                                ZText{ text:qsTr("Shoot [E]") }
-                                Control.Button{ text:(parent.shoot? qsTr("true") : qsTr("false"));width:parent.itemWidth
+                                ZText{ text:qsTr("Shoot")+translator.emptyString+" [E]" }
+                                Control.Button{ text:(parent.shoot? qsTr("true") : qsTr("false"))+translator.emptyString;width:parent.itemWidth
                                     onClicked: {
                                         parent.shoot = !parent.shoot;
                                     }
                                 }
-                                ZText{ text:qsTr("KickMode [X]") }
-                                Control.Button{ text:selectMode();width:parent.itemWidth
+                                ZText{ text:qsTr("KickMode")+translator.emptyString+" [X]" }
+                                Control.Button{ text:selectMode()+translator.emptyString;width:parent.itemWidth
                                     onClicked: {
                                         parent.mode = (parent.mode + 1) % parent.modeTypes;
                                     }
                                     function selectMode() {
                                         if (parent.mode == 0) 
-                                            return "convert flat";
+                                            return qsTr("convert flat");
                                         else if (parent.mode == 1)
-                                            return "convert chip";
+                                            return qsTr("convert chip");
                                         else if (parent.mode == 2)
-                                            return "flat";
+                                            return qsTr("flat");
                                         else 
-                                            return "chip";
+                                            return qsTr("chip");
                                     }
                                 }
-                                ZText{ text:qsTr("KickPower") }
+                                ZText{ text:qsTr("KickPower")+translator.emptyString }
                                 //KickPower:(1, kickPowerMax)
                                 ZSpinBox{ minimumValue:0; maximumValue:parent.mode>1? parent.kickPowerMax:parent.convertPowerMax; value:parent.power;width:parent.itemWidth
                                     onEditingFinished:{parent.power = value;}}
-                                ZText{ text:qsTr("Dribble [Q]") }
-                                Control.Button{ text:(parent.dribble ? qsTr("true") : qsTr("false"));width:parent.itemWidth
+                                ZText{ text:qsTr("Dribble")+translator.emptyString+" [Q]" }
+                                Control.Button{ text:(parent.dribble ? qsTr("true") : qsTr("false"))+translator.emptyString;width:parent.itemWidth
                                     onClicked: {
                                         parent.dribble = !parent.dribble;
                                     }
                                 }
-                                ZText{ text:qsTr("DribbleLevel") }
+                                ZText{ text:qsTr("DribbleLevel")+translator.emptyString }
                                 //DribbleLevel:(0, dribbleMaxLevel)
                                 ZSpinBox{ minimumValue:0; maximumValue:crazyShow.dribbleMaxLevel; value:parent.dribbleLevel;width:parent.itemWidth
                                     onEditingFinished:{parent.dribbleLevel = value;}}
@@ -290,35 +290,35 @@ Page{
                                     }
                                 }
                                 ZText{ text:" " }
-                                ZText{ text:qsTr("AutoShoot") }
-                                Control.Button{ text:(parent.autoShoot ? qsTr("true") : qsTr("false"));width:parent.itemWidth
+                                ZText{ text:qsTr("AutoShoot")+translator.emptyString }
+                                Control.Button{ text:(parent.autoShoot ? qsTr("true") : qsTr("false"))+translator.emptyString;width:parent.itemWidth
                                     onClicked: {
                                         parent.autoShoot = !parent.autoShoot;
                                     }
                                 }
-                                ZText{ text:qsTr("AutoDribble") }
-                                Control.Button{ text:(parent.autoDribble ? qsTr("true") : qsTr("false"));width:parent.itemWidth
+                                ZText{ text:qsTr("AutoDribble")+translator.emptyString }
+                                Control.Button{ text:(parent.autoDribble ? qsTr("true") : qsTr("false"))+translator.emptyString;width:parent.itemWidth
                                     onClicked: {
                                         parent.autoDribble = !parent.autoDribble;
                                     }
                                 }
-                                ZText{ text:qsTr("Infrared") }
+                                ZText{ text:qsTr("Infrared")+translator.emptyString }
                                 Rectangle{ width:parent.itemWidth; height:20; color:parent.infrared? "red" : "lightgrey"; }
-                                ZText{ text:qsTr("Rush") }
-                                Control.Button{ text:(parent.rush ? qsTr("true") : qsTr("false"));width:parent.itemWidth;
+                                ZText{ text:qsTr("Rush")+translator.emptyString }
+                                Control.Button{ text:(parent.rush ? qsTr("true") : qsTr("false"))+translator.emptyString;width:parent.itemWidth;
                                     onClicked: {
                                         //parent.rush = !parent.rush;
                                         //crazyShow.updateRush();
                                     }
                                 }
-                                ZText{ text:qsTr("Back") }
-                                Control.Button{ text:(parent.back ? qsTr("true") : qsTr("false"));width:parent.itemWidth;
+                                ZText{ text:qsTr("Back")+translator.emptyString }
+                                Control.Button{ text:(parent.back ? qsTr("true") : qsTr("false"))+translator.emptyString;width:parent.itemWidth;
                                     onClicked: {
                                         //parent.back = !parent.back;
                                         //crazyShow.updateBack();
                                     }
                                 }
-                                ZText{ text:qsTr("RushSpeed") }
+                                ZText{ text:qsTr("RushSpeed")+translator.emptyString }
                                 //RushSpeed:(0, m_VELX)
                                 ZSpinBox{ minimumValue:0; maximumValue:crazyShow.m_VELX; value:parent.rushSpeed;width:parent.itemWidth
                                     onEditingFinished:{parent.rushSpeed = value;}}
@@ -513,7 +513,7 @@ Page{
                         //最下面的Start按钮
                         Control.Button{
                             id:crazyStart;
-                            text:qsTr("Start");
+                            text:qsTr("Start")+translator.emptyString;
                             property bool ifStarted:false;
                             anchors.right:parent.right;
                             anchors.rightMargin: 20;
@@ -530,7 +530,7 @@ Page{
                                     timer.start();
                                 }
                                 ifStarted = !ifStarted;
-                                text = (ifStarted ? qsTr("Stop") : qsTr("Start"));
+                                text = (ifStarted ? qsTr("Stop") : qsTr("Start"))+translator.emptyString;
                             }
                         }
                     }

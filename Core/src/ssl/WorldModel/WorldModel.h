@@ -63,9 +63,6 @@ private:
 	// 默认对方小车号
 	const static int enemyDefaultNum;
 
-	CEnemySituation enemySuation;
-
-
 public:
 	// 自己到球的矢量
 	const CVector	self2ball					(int current_cycle, int myNum = myDefaultNum, int enemyNum = enemyDefaultNum);
@@ -131,7 +128,9 @@ public:
 		return BallStatus::Instance()->getBallToucher();
 	}
 	const bool IsOurBallByAutoReferee(){
-		return BallStatus::Instance()->getBallToucher()<6?false:true;
+		int ballToucher = BallStatus::Instance()->getBallToucher();
+		// -1 是没有人控球，0~15是我方控球，16~31是对方控球
+		return ballToucher >= 0 && ballToucher < Param::Field::MAX_PLAYER ? true : false;
 	}
 	void clearBallStateCouter(){
 		BallStatus::Instance()->clearBallStateCouter();

@@ -25,7 +25,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     void loadParamFromFile() {
       qDebug() << "load" + filename;
       //Global Settings
-      loadParam(LoginName, "Alert/LoginName", 0);
+      loadParam(LoginName, "Alert/LoginName", "SRC");
       loadParam(isSimulation, "Alert/isSimulation", true);
       loadParam(isYellow, "Alert/isYellow", false);
       loadParam(isRight, "Alert/isRight", false);
@@ -101,7 +101,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     }
   public:
     //Global Settings
-    int LoginName;
+    std::string LoginName;
     bool isSimulation, isYellow, isRight;
     QString field;
     bool updateGeometry;
@@ -131,7 +131,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     int penalty_radius, penalty_area_l;
     int field_wall_dist;
     //Team
-    QString blueTeam, yellowTeam;
+    std::string blueTeam, yellowTeam;
     int KeeperID;
     //Camera Settings
     int total_cameras;
@@ -294,13 +294,13 @@ public:
         loadParam(convertPower, "General/convertPower", true);
         for (int i = 0; i < PARAM::ROBOTMAXID; i++) {
             loadParam(flat_a[i], QString("Robot%1/flat_a").arg(i), 0);
-            loadParam(flat_b[i], QString("Robot%1/flat_b").arg(i), 18.14);
-            loadParam(flat_c[i], QString("Robot%1/flat_c").arg(i), 100);
+            loadParam(flat_b[i], QString("Robot%1/flat_b").arg(i), 0.1814);
+            loadParam(flat_c[i], QString("Robot%1/flat_c").arg(i), 0);
             loadParam(chip_a[i], QString("Robot%1/chip_a").arg(i), 0);
-            loadParam(chip_b[i], QString("Robot%1/chip_b").arg(i), 32);
+            loadParam(chip_b[i], QString("Robot%1/chip_b").arg(i), 0.32);
             loadParam(chip_c[i], QString("Robot%1/chip_c").arg(i), 0);
             loadParam(flat_max[i], QString("Robot%1/flat_max").arg(i), 127);
-            loadParam(flat_min[i], QString("Robot%1/flat_min").arg(i), 60);
+            loadParam(flat_min[i], QString("Robot%1/flat_min").arg(i), 0);
             loadParam(chip_max[i], QString("Robot%1/chip_max").arg(i), 127);
             loadParam(chip_min[i], QString("Robot%1/chip_min").arg(i), 30);
         }
@@ -335,19 +335,23 @@ public:
         loadParam(Gravity, "World/Gravity", 9.8);
         BallRadius = value("Ball/BallRadius", 0.0215).toDouble() * 1000;
         loadParam(DesiredFPS, "World/DesiredFPS", 75);
+        loadParam(wheelSpeedCallBack, "Communication/wheelSpeedCallBack", false);
         team = value("Team", "blueTeam", "SRC").toString();
         robot_settings = new QSettings(qApp->applicationDirPath()+ QString("/../data/config/") + QString("%1.ini").arg(team), QSettings::IniFormat);
         CenterFromKicker = robot_settings->value("Geometery/CenterFromKicker", 0.073).toDouble() * 1000;
         RobotRadius = robot_settings->value("Geometery/Radius", 0.09).toDouble() * 1000;
+        WheelRadius = robot_settings->value("Geometery/WheelRadius", 0.0325).toDouble() * 1000;
     }
 public:
     double Gravity;
     double BallRadius;
     double DesiredFPS;
+    bool wheelSpeedCallBack;
     QString team;
     QSettings* robot_settings;
     double CenterFromKicker;
     double RobotRadius;
+    double WheelRadius;
 };
 class ParamManagerSkill : public Falcon::ParamManager {
 public:

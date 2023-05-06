@@ -144,7 +144,7 @@ public:
   RobotSettings yellowSettings;
 
   /*    Geometry/Game Vartypes   */
-  DEF_VALUE(double,Double,LoginName)
+  DEF_VALUE(std::string,String,LoginName)
   DEF_ENUM(std::string, Division)
   DEF_VALUE(int, Intz, Robots_Count)
   DEF_FIELD_VALUE(double,Double,Field_Line_Width)
@@ -175,6 +175,7 @@ public:
   DEF_VALUE(double,Double,BallLinearDamp)
   DEF_VALUE(double,Double,BallAngularDamp)
 
+  DEF_VALUE(bool, Bool, wheelSpeedCallBack);
   DEF_VALUE(bool,Bool,SyncWithGL)
   DEF_VALUE(int,Intz,NumOfCam)
   DEF_VALUE(double,Double,DesiredFPS)

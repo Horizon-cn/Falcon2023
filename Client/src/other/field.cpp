@@ -41,13 +41,14 @@ const static QColor DEBUG_COLOR[10] = {
     Qt::black
 };
 const static QColor DEBUG_BRUSH_COLOR = QColor(255, 255, 255, 20);
-const static QColor COLOR_ORANGE(255, 0, 255);
+const static QColor COLOR_VIOLET(255, 0, 255);
 const static QColor COLOR_ORANGE_SHADOW(255, 0, 255, 60);
 const static QColor COLOR_TRANSORANGE(255, 170, 85, 100);
 const static QColor COLOR_DARKGREEN(48, 48, 48);
 const static QColor COLOR_RED(220, 53, 47);
 const static QColor COLOR_LIGHTWHITE(255, 255, 255, 20);
 const static qreal zoomStep = 0.05;
+const static qreal zoomMax = 2;
 const static qreal zoomMin = 0.35; //0.1;
 const int ballRatio = 3;
 
@@ -338,13 +339,13 @@ void Field::leftDoubleClickEvent(QMouseEvent * e){
     if (pressedBall) {
         QDialog dialog;
         QFormLayout form(&dialog);
-        form.addRow(new QLabel("Set ball pos:"));
-        QString value1 = QString("x: ");
+        form.addRow(new QLabel(tr("Set ball pos:")));
+        QString value1 = QString(tr("x: "));
         QDoubleSpinBox *spinbox1 = new QDoubleSpinBox(&dialog);
         spinbox1->setRange(std::numeric_limits<double>::lowest(), 1000000);
         spinbox1->setValue(GlobalData::Instance()->maintain[0].ball[0].pos.x()*0.1);
         form.addRow(value1, spinbox1);
-        QString value2 = QString("y: ");
+        QString value2 = QString(tr("y: "));
         QDoubleSpinBox *spinbox2 = new QDoubleSpinBox(&dialog);
         spinbox2->setRange(std::numeric_limits<double>::lowest(), 1000000);
         spinbox2->setValue(GlobalData::Instance()->maintain[0].ball[0].pos.y()*0.1);
@@ -470,18 +471,18 @@ void Field::rightDoubleClickEvent(QMouseEvent * e){
     if (pressedRobot) {
         QDialog dialog;
         QFormLayout form(&dialog);
-        form.addRow(new QLabel("Set robot pose:"));
-        QString value1 = QString("x: ");
+        form.addRow(new QLabel(tr("Set robot pose:")));
+        QString value1 = QString(tr("x: "));
         QDoubleSpinBox *spinbox1 = new QDoubleSpinBox(&dialog);
         spinbox1->setRange(std::numeric_limits<double>::lowest(), 1000000);
         spinbox1->setValue(GlobalData::Instance()->maintain[0].robot[robotTeam][robotID].pos.x()*0.1);
         form.addRow(value1, spinbox1);
-        QString value2 = QString("y: ");
+        QString value2 = QString(tr("y: "));
         QDoubleSpinBox *spinbox2 = new QDoubleSpinBox(&dialog);
         spinbox2->setRange(std::numeric_limits<double>::lowest(), 1000000);
         spinbox2->setValue(-GlobalData::Instance()->maintain[0].robot[robotTeam][robotID].pos.y()*0.1);
         form.addRow(value2, spinbox2);
-        QString value3 = QString("dir: ");
+        QString value3 = QString(tr("dir: "));
         QDoubleSpinBox *spinbox3 = new QDoubleSpinBox(&dialog);
         spinbox3->setRange(std::numeric_limits<double>::lowest(), 1000000);
         spinbox3->setValue(GlobalData::Instance()->maintain[0].robot[robotTeam][robotID].angle*180/M_PI);
@@ -575,8 +576,8 @@ void Field::middleNoModifierPressEvent(QMouseEvent *e) {
 }
 void Field::middleNoModifierMoveEvent(QMouseEvent *e) {
     auto t = MiddleEvent::zoomStart + zoomRatio * (MiddleEvent::start - QPoint(e->x(), e->y()));
-    zoomStart.setX(limitRange(t.x(), 0, int(area.width() * (1 - zoomRatio))));
-    zoomStart.setY(limitRange(t.y(), 0, int(area.height() * (1 - zoomRatio))));
+    zoomStart.setX(limitRange(t.x(), 0, int(area.width() * (zoomMax - zoomRatio))));
+    zoomStart.setY(limitRange(t.y(), 0, int(area.height() * (zoomMax - zoomRatio))));
     triggerDraw();
 }
 void Field::middleNoModifierReleaseEvent(QMouseEvent *e) {}
@@ -613,19 +614,23 @@ void Field::middleCtrlModifierReleaseEvent(QMouseEvent *e) {
 void Field::wheelEvent (QWheelEvent *e) {
     qreal oldRatio = zoomRatio;
     zoomRatio += (e->delta() < 0 ? zoomStep : -zoomStep);
-    zoomRatio = limitRange(zoomRatio, zoomMin, 1.0);
+    zoomRatio = limitRange(zoomRatio, zoomMin, zoomMax); //1.0
     qDebug()<<"zoomRatio"<<zoomRatio;
     zoomStart -= e->pos() * (zoomRatio - oldRatio);
-    zoomStart.setX(limitRange(zoomStart.x(), 0, int(area.width() * (1 - zoomRatio))));
-    zoomStart.setY(limitRange(zoomStart.y(), 0, int(area.height() * (1 - zoomRatio))));
+    zoomStart.setX(limitRange(zoomStart.x(), 0, int(area.width() * (zoomMax - zoomRatio))));
+    zoomStart.setY(limitRange(zoomStart.y(), 0, int(area.height() * (zoomMax - zoomRatio))));
     pixmapPainter.setRenderHint(QPainter::Antialiasing, zoomRatio>0.5);
     triggerDraw();
 }
 #endif
 void Field::setSize(int width, int height) {
-    opm->updateParam(opm->canvasHeight, "Canvas/canvasHeight", height, true);
-    opm->updateParam(opm->canvasWidth, "Canvas/canvasWidth", width, true);
-    GlobalSettings::Instance()->needRepaint();
+    if (width > 0 && height > 0) {
+        opm->updateParam(opm->canvasHeight, "Canvas/canvasHeight", height, true);
+        opm->updateParam(opm->canvasWidth, "Canvas/canvasWidth", width, true);
+        // 自动保持场地的正常尺寸
+        opm->updateParam(opm->param_canvasHeight, "Canvas/param_canvasHeight", height * 1.0 / width * opm->param_canvasWidth, true);
+        GlobalSettings::Instance()->needRepaint();
+    }
 }
 void Field::triggerDraw() { //滚轮触发一次更新一次
     initPainterPath();
@@ -650,7 +655,7 @@ void Field::repaint() {//change here!!!!!!! 每帧视觉都更新
         paintInit(); // 绘制场地线
         drawMaintainVision(0);
         drawDebugMessages(PARAM::BLUE); //BLUE
-        reportStatus();
+        //reportStatus();
         paintOffCar();
         break;
     case 3:
@@ -660,7 +665,7 @@ void Field::repaint() {//change here!!!!!!! 每帧视觉都更新
         paintInit(); // 绘制场地线
         drawMaintainVision(0);
         drawDebugMessages(PARAM::YELLOW); //YELLOW
-        reportStatus();
+        //reportStatus();
         paintOffCar();
         break;
     default:
@@ -819,17 +824,22 @@ void Field::drawMaintainVision(int index) {
 
     for(int i = -99; i < 0; i ++) {
 //        drawVision(GlobalData::Instance()->maintain[index + i],true);
+        auto& robot = GlobalData::Instance()->maintain[index + i].robot[PARAM::BLUE][0];
+        paintShadow(COLOR_LIGHTWHITE, robot.pos.x(), robot.pos.y());
         auto& ball = GlobalData::Instance()->maintain[index + i].ball[0];
         paintShadow(COLOR_TRANSORANGE, ball.pos.x(), ball.pos.y());
     }
     for(int j = 0; j < maintain.ballSize; j++) {
         auto& ball = maintain.ball[j];
         QColor ballColor;
-        if (ball.valid == 2) ballColor = Qt::blue;
-        else if(ball.valid) ballColor = COLOR_ORANGE;
-        else ballColor = COLOR_ORANGE_SHADOW;
+        if (ball.valid == 1)
+            ballColor = COLOR_RED;
+        else if (ball.valid == 2)
+            ballColor = COLOR_VIOLET;
+        else
+            ballColor = COLOR_ORANGE_SHADOW;
         paintBall(ballColor, ball.pos.x(), ball.pos.y());
-        paintFocus(COLOR_RED, ball.pos.x(), ball.pos.y(), 500, ballFocusCount++);
+        paintFocus(ballColor, ball.pos.x(), ball.pos.y(), 500, ballFocusCount++);
     }
 }
 void Field::paintCar(const QColor& color, quint8 num, qreal x, qreal y, qreal radian, bool ifDrawNum, const QColor& textColor, bool needCircle) {
@@ -913,7 +923,7 @@ void Field::drawVision(const Owl::OriginMessage &vision, bool shadow) {
     for(int j = 0; j < vision.ballSize; j++) {
         auto& ball = vision.ball[j];
         if(!shadow) {
-            paintBall(COLOR_ORANGE, ball.pos.x(), ball.pos.y());
+            paintBall(COLOR_RED, ball.pos.x(), ball.pos.y());
         } else {
             paintShadow(COLOR_TRANSORANGE, ball.pos.x(), ball.pos.y());
         }
@@ -948,6 +958,8 @@ void Field::drawDebugMessages(int team) {
     }
 //    qDebug() << "FUCK DEBUG MESSAGE SIZE" << msgs.ByteSize();
     GlobalData::Instance()->debugMutex.unlock();
+    if (msgs.has_login_name() && msgs.login_name() != opm->LoginName)
+        return;
 //    qDebug() << "FUCK DEBUG SIZE" << msgs.msgs_size();
     pixmapPainter.setFont(QFont("Helvetica [Cronyx]", ::w(130), QFont::Normal)); //QFont::Bold));
     pixmapPainter.setBrush(QBrush(DEBUG_BRUSH_COLOR));
@@ -1068,6 +1080,8 @@ void Field::receiveBlue(){
             datagram.resize(receiverBlue->pendingDatagramSize());
             receiverBlue->readDatagram(datagram.data(),datagram.size());
             blueHeatMap.ParseFromArray(datagram.data(), datagram.size());
+            if (blueHeatMap.has_login_name() && blueHeatMap.login_name() != opm->LoginName)
+                break;
             auto size = blueHeatMap.points_size();
             for(int i = 0; i < size; i++) {
                 auto heatPoints = blueHeatMap.points(i);
@@ -1111,6 +1125,8 @@ void Field::receiveYellow(){
             datagram.resize(receiverYellow->pendingDatagramSize());
             receiverYellow->readDatagram(datagram.data(),datagram.size());
             yellowHeatMap.ParseFromArray(datagram.data(), datagram.size());
+            if (yellowHeatMap.has_login_name() && yellowHeatMap.login_name() != opm->LoginName)
+                break;
             auto size = yellowHeatMap.points_size();
             for(int i = 0; i < size; i++) {
                 auto heatPoints = yellowHeatMap.points(i);

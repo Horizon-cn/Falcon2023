@@ -60,6 +60,8 @@ void CRobotSensor::receiveRobotStatus()
             datagram.resize(robot_status_socket->pendingDatagramSize());
             robot_status_socket->readDatagram(datagram.data(), datagram.size());
             robot_status.ParseFromArray(datagram, datagram.size());
+            if (robot_status.has_login_name() && robot_status.login_name() != OParamManager::Instance()->LoginName)
+                break;
             if (!robot_status.has_robot_id()) {
                 qDebug()<<"no robot status";
                 continue;
@@ -72,8 +74,13 @@ void CRobotSensor::receiveRobotStatus()
             robot_status_mutex.lock();
             rawDataBuffer[id].bInfraredInfo = robot_status.infrared();
             rawDataBuffer[id].nRobotNum = id;
-            rawDataBuffer[id].nKickInfo = robot_status.chip_kick() || robot_status.flat_kick();
-            qDebug()<<"receive"<<rawDataBuffer[id].nRobotNum<<"infrared"<<rawDataBuffer[id].bInfraredInfo<<"kick"<<rawDataBuffer[id].nKickInfo;
+            if (robot_status.chip_kick())
+                rawDataBuffer[id].nKickInfo = 2;
+            else if (robot_status.flat_kick())
+                rawDataBuffer[id].nKickInfo = 1;
+            else
+                rawDataBuffer[id].nKickInfo = 0;
+            //qDebug()<<"receive"<<rawDataBuffer[id].nRobotNum<<"infrared"<<rawDataBuffer[id].bInfraredInfo<<"kick"<<rawDataBuffer[id].nKickInfo;
             robot_status_mutex.unlock();
         }
     }
@@ -90,8 +97,15 @@ void CRobotSensor::Update(int cycle)
     robot_status_mutex.lock();
     for (int i = 0; i < Param::Field::MAX_PLAYER; i ++) {
         robotInfoBuffer[i] = rawDataBuffer[i];
-        if (robotInfoBuffer[i].nRobotNum == i)
+        if (robotInfoBuffer[i].nRobotNum == i) {
             _isValid[i] = true;
+            if (robotInfoBuffer[i].bInfraredInfo) {
+                auto player = VisionModule::Instance()->OurPlayer(i);
+                auto pos = player.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE/2, player.Dir());
+                GDebugEngine::Instance()->gui_debug_arc(pos, 6 * Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
+                GDebugEngine::Instance()->gui_debug_arc(pos, 3 * Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
+            }
+        }
         else
             _isValid[i] = false;
     }

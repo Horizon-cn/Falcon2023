@@ -10,10 +10,10 @@ ScrollView {
     Timer {
         id:refBoxTimer;
         interval:16;
-        running:false;
+        running:refBoxSwitch.refereeSwitch && refBoxModeSwitch.refereeAutoMode!=2; //false;
         repeat:true;
         onTriggered: {
-            if(refBoxModeSwitch.refereeAutoMode!=2)
+            //if(refBoxModeSwitch.refereeAutoMode!=2)
                 refereeBox.multicastCommand();
         }
     }
@@ -26,6 +26,14 @@ ScrollView {
     ScrollBar.horizontal.interactive: true;
     ScrollBar.vertical.interactive: true;
     property var color : ["#ddd","#79a6ea","#fbeb9c"];
+    function getColor(index) {
+        if (index == 0)
+            return "#ddd";
+        else if (index == 1)
+            return "#79a6ea";
+        else if (index == 2)
+            return "#fbeb9c";
+    }
     property int state : Client.GameState.HALTED;
     property bool haltGame : false;
     property bool stopGame : true;
@@ -60,7 +68,7 @@ ScrollView {
             state = Client.GameState.PREPARE_PENALTY;break;
         case Client.RefBoxCommand.GOAL_YELLOW:
         case Client.RefBoxCommand.GOAL_BLUE:
-            state = Client.GameState.STOPPED;break;
+            state = Client.GameState.HALTED;break;
         default:
             console.log("RefBox Command ERROR!!!!!!");
             return;
@@ -124,7 +132,7 @@ ScrollView {
                     onClicked: changeState();
                     function changeState(){
                         refBoxSwitch.refereeSwitch = !refBoxSwitch.refereeSwitch;
-                        run();
+                        //run();
                     }
                     function run(){
                         if(refBoxSwitch.refereeSwitch){
@@ -133,7 +141,7 @@ ScrollView {
                             refBoxTimer.stop();
                         }
                     }
-                    Component.onCompleted: run();
+                    //Component.onCompleted: run();
                 }
                 Button{
                     id:refBoxModeSwitch;
@@ -227,10 +235,10 @@ ScrollView {
                         ZRefButton{
                             property int index : modelData.cmd_num;
                             text:qsTr(modelData.cmd_str);
-                            highlighted:next_command == index;
+                            //highlighted:next_command == index;
                             onClicked:getButtonsCommand(index);
                             Component.onCompleted: {
-                                color = root.color[modelData.cmd_type];
+                                color = getColor(modelData.cmd_type); //root.color[modelData.cmd_type];
                             }
                         }
                     }
@@ -264,17 +272,16 @@ ScrollView {
                         ZRefButton{
                             property int index : modelData.cmd_num;
                             text:qsTr(modelData.cmd_str);
-                            highlighted:next_command == index;
+                            //highlighted:next_command == index;
                             onClicked:getButtonsCommand(index);
                             Component.onCompleted: {
-                                color = root.color[modelData.cmd_type];
+                                color = getColor(modelData.cmd_type); //root.color[modelData.cmd_type];
                             }
                         }
                     }
                 }
             }
         }
-        /**
         ZGroupBox{
             title:qsTr("Next Command");
             Grid{
@@ -303,12 +310,11 @@ ScrollView {
                             refereeBox.setNextCommand(index);
                         }
                         Component.onCompleted: {
-                            color = root.color[modelData.cmd_type];
+                            color = getColor(modelData.cmd_type); //color = root.color[modelData.cmd_type];
                         }
                     }
                 }
             }
         }
-        **/
     }
 }

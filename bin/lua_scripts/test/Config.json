@@ -1,22 +1,17 @@
 {
-	"gRoleFixNum": {
-		"Goalie": 0,
-		"Kicker": 4,	
-		"Tier": 3,
-		"Receiver": 1
-	},
-	"OPPONENT_NAME": "Avoidfoul",
-	"gReadyPlay": {
-		"blue": "Test_NormalDefend",
-		"yellow": "Test_NormalMiddleDefend"
-	},
-	"gSkill": [
-		
-	],
-	"gRefPlay": [
-		
-	],
-	"gTestPlay": [
-		
-	]
+    "OPPONENT_NAME": "Avoidfoul",
+    "gReadyPlay": "sss",
+    "gRefPlay": [
+    ],
+    "gRoleFixNum": {
+        "Goalie": 0,
+        "Kicker": 4,
+        "Receiver": 1,
+        "Tier": 3
+    },
+    "gSkill": [
+        "GoCmuRush"
+    ],
+    "gTestPlay": [
+    ]
 }

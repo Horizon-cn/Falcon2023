@@ -33,7 +33,7 @@ ScrollView{
         rowSpacing: 0;
         property int itemWidth : width - padding*2;
         ZGroupBox{
-            title: qsTr("Display")
+            title: qsTr("Display")+translator.emptyString;
             Grid{
                 width:parent.width;
                 verticalItemAlignment: Grid.AlignVCenter;
@@ -56,7 +56,7 @@ ScrollView{
                 Grid {
                     property int buttonWidth: parent.itemWidth;
                     ZButton{
-                        text:"SET";
+                        text:qsTr("SET")+translator.emptyString;
                         onClicked: {
                             display.setDisplayMode();
                         }
@@ -65,7 +65,7 @@ ScrollView{
                 Grid {
                     property int buttonWidth: parent.itemWidth;
                     ZButton{
-                        text:viewer.freezeDisplay?"RESUME":"FREEZE";
+                        text:(viewer.freezeDisplay?qsTr("RESUME"):qsTr("FREEZE"))+translator.emptyString;
                         onClicked: {
                             display.ifNeedDisplay(viewer.freezeDisplay);
                             viewer.freezeDisplay = !viewer.freezeDisplay;
@@ -75,7 +75,7 @@ ScrollView{
                 Grid {
                     property int buttonWidth: parent.itemWidth;
                     ZButton{
-                        text:"LOAD";
+                        text:qsTr("LOAD")+translator.emptyString;
                         onClicked: {
                             fdrs.open();
                         }
@@ -83,11 +83,11 @@ ScrollView{
                 }
                 FileDialog {
                     id:fdrs
-                    title: "Please select"
+                    title: qsTr("Please select")+translator.emptyString;
                     selectExisting: true
                     selectFolder: false
                     selectMultiple: false
-                    nameFilters: ["Rec files (*.txt)"]
+                    nameFilters: [qsTr("Data files")+translator.emptyString+" (*.txt)"]
                     onAccepted: {
                         console.log("You chose: " + fdrs.fileUrl);
                     }

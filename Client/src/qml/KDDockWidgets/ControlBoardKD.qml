@@ -84,7 +84,7 @@ Page{
                 rowSpacing: 0;
                 property int itemWidth : width - padding*2;
                 ZGroupBox{
-                    title: qsTr("Vision")
+                    title: qsTr("Vision")+translator.emptyString;
                     Column{
                         id:visionControls;
                         width:parent.width;
@@ -125,8 +125,8 @@ Page{
                             id:simulation;
                             enabled:!visionControls.ifConnected;
                             width:parent.itemWidth;
-                            leftText:qsTr("Simulation");
-                            rightText:qsTr("Real");
+                            leftText:qsTr("Simulation")+translator.emptyString;
+                            rightText:qsTr("Real")+translator.emptyString;
                             checked: false;
                             onCheckedChanged: {
                                 control.isSimulation = !control.isSimulation;
@@ -168,7 +168,7 @@ Page{
                     }
                 }
                 ZGroupBox{
-                    title: qsTr("Simulator")
+                    title: qsTr("Simulator")+translator.emptyString;
                     visible: control.isSimulation;
                     Grid{
                         width:parent.width;
@@ -186,7 +186,7 @@ Page{
                                 icon.source:control.simConnect ? "/resource/stop.png" : "/resource/start.png";
                                 onClicked: {
                                     control.simConnect = !control.simConnect;
-                                    interaction.controlSim(control.simConnect, simModeBtn.text == "Show");
+                                    interaction.controlSim(control.simConnect, simModeBtn.text == qsTr("Show")+translator.emptyString);
                                     interaction.controlProcess(2, control.simConnect);
                                 }
                             }
@@ -196,9 +196,9 @@ Page{
                             ZButton{
                                 id: simModeBtn;
                                 enabled:!control.simConnect;
-                                text: "Hide";
+                                text: qsTr("Hide")+translator.emptyString;
                                 onClicked: {
-                                    simModeBtn.text = simModeBtn.text == "Hide" ? "Show": "Hide";
+                                    simModeBtn.text = qsTr(simModeBtn.text == qsTr("Hide")+translator.emptyString ? "Show": "Hide")+translator.emptyString;
                                 }
                             }
                         }/**
@@ -310,7 +310,7 @@ Page{
                     }
                 }**/
                 ZGroupBox{
-                    title: qsTr("Controller")
+                    title: qsTr("Controller")+translator.emptyString;
                     Grid{
                         width:parent.width;
                         verticalItemAlignment: Grid.AlignVCenter;
@@ -343,7 +343,7 @@ Page{
                                     icon.color: "#2976ca";
                                     onClicked: {
                                         control.blueRBKConnect = !control.blueRBKConnect;
-                                        interaction.changeRBKSettings(false, blueSideBtn.text == "RIGHT"); // false: blue
+                                        interaction.changeRBKSettings(false, blueSideBtn.text == qsTr("RIGHT")+translator.emptyString); // false: blue
                                         if(!simulation.checked){
                                             interaction.connectSim(control.blueRBKConnect,0);
                                         }else{
@@ -364,9 +364,9 @@ Page{
                                 ZButton{
                                     id: blueSideBtn;
                                     enabled:!control.blueRBKConnect;
-                                    text: "LEFT";
+                                    text: qsTr("LEFT")+translator.emptyString;
                                     onClicked: {
-                                        blueSideBtn.text = blueSideBtn.text == "LEFT" ? "RIGHT": "LEFT";
+                                        blueSideBtn.text = qsTr(blueSideBtn.text == qsTr("LEFT")+translator.emptyString ? "RIGHT": "LEFT")+translator.emptyString;
                                     }
                                 }
                             }/**
@@ -395,7 +395,7 @@ Page{
                                     icon.color: "#ebdb7c";
                                     onClicked: {
                                         control.yellowRBKConnect = !control.yellowRBKConnect;
-                                        interaction.changeRBKSettings(true, yellowSideBtn.text == "RIGHT"); // true: yellow
+                                        interaction.changeRBKSettings(true, yellowSideBtn.text == qsTr("RIGHT")+translator.emptyString); // true: yellow
                                         if(!simulation.checked){
                                             interaction.connectSim(control.yellowRBKConnect,1);
                                         }else{
@@ -416,9 +416,9 @@ Page{
                                 ZButton{
                                     id: yellowSideBtn;
                                     enabled:!control.yellowRBKConnect;
-                                    text: "RIGHT";
+                                    text: qsTr("RIGHT")+translator.emptyString;
                                     onClicked: {
-                                        yellowSideBtn.text = yellowSideBtn.text == "LEFT" ? "RIGHT": "LEFT";
+                                        yellowSideBtn.text = qsTr(yellowSideBtn.text == qsTr("LEFT")+translator.emptyString ? "RIGHT": "LEFT")+translator.emptyString;
                                     }
                                 }
                             }/**
@@ -443,7 +443,7 @@ Page{
                     }
                 }
                 ZGroupBox{
-                    title: qsTr("Kill")
+                    title: qsTr("Kill")+translator.emptyString;
                     Grid{
                         width:parent.width;
                         verticalItemAlignment: Grid.AlignVCenter;

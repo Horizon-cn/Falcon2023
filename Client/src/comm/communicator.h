@@ -29,9 +29,9 @@ class Communicator : public QObject {
     void startRecordCommands(bool);
     void recordCommands(ZSS::Protocol::Robots_Command);
     //void recordCommands(rbk::protocol::SRC_Cmd);
+    void sendCommand(int, int);
   private slots:
     void receiveCommand(int);
-    void sendCommand(int, int);
     //void sendEmptyCmd(int);
   private:
     QUdpSocket sendSockets, receiveSocket[PARAM::TEAMS];

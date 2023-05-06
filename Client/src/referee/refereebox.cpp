@@ -51,7 +51,7 @@ void RefereeBox::multicastCommand(){
 
     ssl_referee.set_command_timestamp(0);//todo
     Referee_TeamInfo *yellow = ssl_referee.mutable_yellow();
-    yellow->set_name(opm->blueTeam.toStdString());
+    yellow->set_name(opm->yellowTeam);
     yellow->set_score(0);//todo
     yellow->set_red_cards(0);//todo
     //yellow->set_yellow_card_times(0,0); //todo
@@ -60,7 +60,7 @@ void RefereeBox::multicastCommand(){
     yellow->set_timeout_time(0.0);//todo
     yellow->set_goalkeeper(0); //todo
     Referee_TeamInfo *blue = ssl_referee.mutable_blue();
-    blue->set_name(opm->yellowTeam.toStdString());
+    blue->set_name(opm->blueTeam);
     blue->set_score(0);//todo
     blue->set_red_cards(0);//todo
     //blue->set_yellow_card_times(0,0); //todo
@@ -73,6 +73,8 @@ void RefereeBox::multicastCommand(){
     point->set_y(GlobalSettings::Instance()->ballPlacementY);
     // add test for next_command
     ssl_referee.set_next_command(Referee_Command(nextCommand));
+    if (GlobalData::Instance()->refereeMode == 0)
+        ssl_referee.set_login_name(opm->LoginName);
     int size = ssl_referee.ByteSize();
     QByteArray buffer(size,0);
     ssl_referee.SerializeToArray(buffer.data(), buffer.size());

@@ -33,9 +33,9 @@ void Communicator::setGrsimInterfaceIndex(const int index) {
 }
 
 Communicator::Communicator(QObject *parent) : QObject(parent) {
-    QObject::connect(Owl::ZSimModule::Instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)));
-    QObject::connect(ZSS::ZRemoteSimModule::Instance(), SIGNAL(receiveRemoteInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
-    QObject::connect(Owl::ActionModule::Instance(), SIGNAL(receiveRobotInfo(int, int)), this, SLOT(sendCommand(int, int)));
+    //QObject::connect(Owl::ZSimModule::Instance(), SIGNAL(receiveSimInfo(int, int)), this, SLOT(sendCommand(int, int)));
+    //QObject::connect(ZSS::ZRemoteSimModule::Instance(), SIGNAL(receiveRemoteInfo(int, int)), this, SLOT(sendCommand(int, int)),Qt::DirectConnection);
+    //QObject::connect(Owl::ActionModule::Instance(), SIGNAL(receiveRobotInfo(int, int)), this, SLOT(sendCommand(int, int)));
     for(int i = 0; i < PARAM::TEAMS; i++) {
         /** connect(&receiveSocket[i], &QUdpSocket::readyRead, [ = ]() {
             receiveCommand(i);
@@ -80,6 +80,8 @@ void Communicator::receiveCommand(int t) {
             //rbk::protocol::SRC_Cmd commands;
             ZSS::Protocol::Robots_Command commands;
             commands.ParseFromArray(datagram, datagram.size());
+            if (commands.has_login_name() && commands.login_name() != opm->LoginName)
+                break;
             commandBuffer[t].valid = true;
             for(int i = 0; i < commands.command_size(); i++) {
                 auto& command = commands.command(i);
@@ -116,6 +118,7 @@ void Communicator::sendCommand(int team, int id) {
     GlobalData::Instance()->robotInfoMutex.unlock();
 
     ZSS::Protocol::Robot_Status robot_status;
+    robot_status.set_login_name(opm->LoginName);
     robot_status.set_robot_id(id);
     //rbk::protocol::Robot_Status robot_status;
     //robot_status.set_robot(id);

@@ -148,14 +148,15 @@ void CActionModule::sendToOwl(const rbk::protocol::SRC_Cmd& cmds)
     else if (totalnum <= 0) {
         qDebug()<<"no command!!!";
     }
+	ZSS_CMDS.set_login_name(OParamManager::Instance()->LoginName);
     //qDebug()<<"ready to send!!!";
     for (int i = 0; i < cmds.command_size(); i++) {
         auto zss_cmd = ZSS_CMDS.add_command();
         auto src_cmd = cmds.command(i);
-        zss_cmd->set_robot_id(src_cmd.robot_id());
-        zss_cmd->set_velocity_x(src_cmd.velocity_x()); // m/s
-        zss_cmd->set_velocity_y(src_cmd.velocity_y());
-        zss_cmd->set_velocity_r(src_cmd.velocity_r());
+		zss_cmd->set_robot_id(src_cmd.robot_id());
+		zss_cmd->set_velocity_x(src_cmd.velocity_x()); // m/s
+		zss_cmd->set_velocity_y(src_cmd.velocity_y());
+		zss_cmd->set_velocity_r(src_cmd.velocity_r());
         zss_cmd->set_dribbler_spin(src_cmd.dribbler_spin());
         if (src_cmd.flat_kick() > 0.01) {
             zss_cmd->set_kick(false);

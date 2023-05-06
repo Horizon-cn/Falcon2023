@@ -36,6 +36,7 @@ Item{
             delegate:stringDelegate;
         }
 
+
        style: TreeViewStyle {
             backgroundColor: "#484848";
             alternateBackgroundColor:"#404040";

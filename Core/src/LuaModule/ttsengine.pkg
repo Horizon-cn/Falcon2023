@@ -1,6 +1,0 @@
-$#include "TTSEngine.h"
-
-class CTTSEngine{
-	CTTSEngine();
-	void speak(char*);
-};

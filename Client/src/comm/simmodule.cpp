@@ -12,6 +12,7 @@
 #include <qdebug.h>
 #include "test.h"
 #include "staticparams.h"
+#include "communicator.h"
 namespace Owl {
 namespace {
 bool trans_dribble(double dribble) {
@@ -56,12 +57,12 @@ SimModule::SimModule(QObject *parent) : QObject(parent) {
     //    if(connectSim(i)){
     //        switch (i) {
     //        case PARAM::BLUE:
-                blueReceiveThread = new std::thread([=] {readBlueData();});
-                blueReceiveThread->detach();
+    //            blueReceiveThread = new std::thread([=] {readBlueData();});
+    //            blueReceiveThread->detach();
     //            break;
     //        case PARAM::YELLOW:
-                yellowReceiveThread = new std::thread([=] {readYellowData();});
-                yellowReceiveThread->detach();
+    //            yellowReceiveThread = new std::thread([=] {readYellowData();});
+    //            yellowReceiveThread->detach();
     //            break;
     //        }
     //    }
@@ -81,12 +82,20 @@ bool SimModule::connectSim(bool color) {
     if(color) {
         if(yellowReceiveSocket.bind(QHostAddress::AnyIPv4, cpm->yellow_status, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)) {
             qDebug() << "Yellow connect successfully!!! --simmodule";
+            if (yellowReceiveThread == nullptr) {
+                yellowReceiveThread = new std::thread([=] {readYellowData(); });
+                yellowReceiveThread->detach();
+            }
             return true;
         }
         return false;
     }
     if(blueReceiveSocket.bind(QHostAddress::AnyIPv4, cpm->blue_status, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)) {
         qDebug() << "Blue connect successfully!!! --simmodule";
+        if (blueReceiveThread == nullptr) {
+            blueReceiveThread = new std::thread([=] {readBlueData(); });
+            blueReceiveThread->detach();
+        }
         return true;
     }
     return false;
@@ -112,8 +121,9 @@ void SimModule::readBlueData() {
             datagram.resize(blueReceiveSocket.pendingDatagramSize());
             blueReceiveSocket.readDatagram(datagram.data(), datagram.size());
             robotsPacket.ParseFromArray(datagram, datagram.size());
-
             for (int i = 0; i < robotsPacket.robots_status_size(); ++i) {
+                if (robotsPacket.robots_status(i).has_login_name() && robotsPacket.robots_status(i).login_name() != opm->LoginName)
+                    break;
                 int id = robotsPacket.robots_status(i).robot_id();
                 bool infrared = robotsPacket.robots_status(i).infrared();
                 bool isFlatKick = robotsPacket.robots_status(i).flat_kick();
@@ -124,7 +134,8 @@ void SimModule::readBlueData() {
                 GlobalData::Instance()->robotInformation[PARAM::BLUE][id].chip = isChipKick;
                 GlobalData::Instance()->robotInfoMutex.unlock();
                 qDebug() << "Blue id: " << id << "  infrared: " << infrared << "  flat: " << isFlatKick << "  chip: " << isChipKick;
-                emit receiveSimInfo(PARAM::BLUE, id);
+                ZCommunicator::Instance()->sendCommand(PARAM::BLUE, id);
+                //emit receiveSimInfo(PARAM::BLUE, id);
             }
         }
     }
@@ -142,6 +153,8 @@ void SimModule::readYellowData() {
             yellowReceiveSocket.readDatagram(datagram.data(), datagram.size());
             robotsPacket.ParseFromArray(datagram, datagram.size());
             for (int i = 0; i < robotsPacket.robots_status_size(); ++i) {
+                if (robotsPacket.robots_status(i).has_login_name() && robotsPacket.robots_status(i).login_name() != opm->LoginName)
+                    break;
                 int id = robotsPacket.robots_status(i).robot_id();
                 bool infrared = robotsPacket.robots_status(i).infrared();
                 bool isFlatKick = robotsPacket.robots_status(i).flat_kick();
@@ -152,7 +165,8 @@ void SimModule::readYellowData() {
                 GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].chip = isChipKick;
                 GlobalData::Instance()->robotInfoMutex.unlock();
     //            qDebug() << "Yellow id: " << id << "  infrared: " << infrared << "  flat: " << isFlatKick << "  chip: " << isChipKick;
-                emit receiveSimInfo(PARAM::YELLOW, id);
+                ZCommunicator::Instance()->sendCommand(PARAM::YELLOW, id);
+                //emit receiveSimInfo(PARAM::YELLOW, id);
             }           
         }
     }
@@ -160,6 +174,8 @@ void SimModule::readYellowData() {
 
 void SimModule::sendSim(int t, ZSS::Protocol::Robots_Command& command) {
 //void SimModule::sendSim(int t, rbk::protocol::SRC_Cmd& command) {
+    // 线上赛仿真器如果用grSim，下一行要注掉
+    grsim_packet.set_login_name(opm->LoginName);
     grsim_commands->set_timestamp(0);
     if (t == 0) {
         grsim_commands->set_isteamyellow(false);

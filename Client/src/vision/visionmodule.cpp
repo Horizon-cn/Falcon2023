@@ -63,7 +63,7 @@ void CVisionModule::udpSocketConnect() {
     }
     if (!opm->isSimulation || grsimInterface != 0 || !opm->useSimInside) {
         //qDebug() << "VisionPort : " << vision_port;
-        
+
         udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress);
         //udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address));
         udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address), NetworkInterfaces::Instance()->getFromIndex(_interface));
@@ -171,7 +171,9 @@ void CVisionModule::parseVision() {
 void CVisionModule::parse(void * ptr, int size) {
     static SSL_WrapperPacket packet;
     Owl::ReceiveVisionMessage message;
-    packet.ParseFromArray(ptr, size);  
+    packet.ParseFromArray(ptr, size);
+    if (packet.has_login_name() && opm->LoginName != packet.login_name())
+        return;
     if (packet.has_geometry() && opm->updateGeometry) {
         const SSL_GeometryFieldSize& field = packet.geometry().field();
         
@@ -182,7 +184,6 @@ void CVisionModule::parse(void * ptr, int size) {
     if (packet.has_detection()) {
         //t = QTime::currentTime();
         const SSL_DetectionFrame& detection = packet.detection();
-        if(opm->isSimulation && opm->LoginName != detection.login_name()) return;
         message.camID = detection.camera_id();
         if (message.camID >= opm->total_cameras || message.camID < 0 || !GlobalData::Instance()->cameraControl[message.camID]) {
             qDebug() << "get invalid camera id : " << message.camID;
@@ -263,6 +264,7 @@ void CVisionModule::checkCommand() {
 void  CVisionModule::udpSend() {
     //udp start
     static QUdpSocket udpSendSocket;
+    detectionFrame.set_login_name(opm->LoginName);
     auto detectionBall = detectionFrame.mutable_balls();
     Owl::ReceiveVisionMessage result = GlobalData::Instance()->maintain[0];
     if (result.ballSize > 0) {
@@ -272,7 +274,7 @@ void  CVisionModule::udpSend() {
         CVector TransferVel(result.ball[0].velocity.x(), result.ball[0].velocity.y());
         detectionBall->set_vel_x(TransferVel.x());
         detectionBall->set_vel_y(TransferVel.y());
-        detectionBall->set_valid(DealBall::Instance()->getValid());
+        detectionBall->set_valid(true); //DealBall::Instance()->getValid()
         detectionBall->set_last_touch(GlobalData::Instance()->lastTouch);
         detectionBall->set_ball_state(result.ball[0].ball_state_machine.ballState);
         detectionBall->set_raw_x(GlobalData::Instance()->processBall[0].ball[0].pos.x());

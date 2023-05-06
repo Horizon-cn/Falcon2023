@@ -101,6 +101,7 @@ void CSimulator::send(grSim_Packet* packet){
 
     }
     else {
+        packet->set_login_name(opm->LoginName);
         int size = packet->ByteSize();
         QByteArray buffer(size,0);
         packet->SerializeToArray(buffer.data(), size);

@@ -15,6 +15,7 @@
 #include <BallSpeedModel.h>
 #include "bayes/MatchState.h"
 #include "defence/DefenceInfo.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include "Semaphore.h"
 Semaphore vision_to_decision(0);
 Semaphore vision_to_cuda(0);
@@ -141,12 +142,14 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 		_ourPlayerPredictor[i].updateVision(vInfo.cycle, ourPlayer, thisBall, invert);
 		_theirPlayerPredictor[i].updateVision(vInfo.cycle, theirPlayer, thisBall, invert);
 		//GDebugEngine::Instance()->gui_debug_line(OurPlayer(i).Pos(), OurPlayer(i).Pos() + OurPlayer(i).Vel());
-	} 
+	}
 	GDebugEngine::Instance()->gui_debug_line(Ball().Pos() , Ball().Pos() + Ball().Vel());
+
+	vision_to_cuda.Signal();
 
 	//【#TODO】更新双方当前在场上的球员数量，我方排除门将，对方全部
 	CheckBothSidePlayerNum();
-	
+
     /////////////////////////////////////////////////////////////////////////////
 	/// @brief Step 3: 更新双向通讯的数据，仅针对实物模式
     /////////////////////////////////////////////////////////////////////////////
@@ -164,9 +167,10 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	BestPlayer::Instance()->update(this); 
 	
 	// 【#TODO】 更新贝叶斯滤波器，评估目前比赛攻防形式
-	MatchState::Instance()->update();
+	// MatchState::Instance()->update();
 
 	DefenceInfo::Instance()->updateDefenceInfo(this);
+	DefenceInfoNew::Instance()->updateDefenceInfoNew(this);
 
 	/////////////////////////////////////////////////////////////////////////////
 	/// @brief Step 5: 更新裁判盒信息 及处理球数据相关的特殊情况
@@ -186,7 +190,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	// 特殊情况一
 	// 一些特殊比赛状态下，对于球的特殊处理，与场地的尺寸参数相关
 	// 一般要求球看不到才予以处理
-    //if (!IS_SIMULATION) {
+    /**if (!IS_SIMULATION) {
 		if (_gameState.kickoff()) {				// 开球时
 			if (!Ball().Valid() || Ball().Pos().dist(CGeoPoint(0,0)) > 20) {
 				_ballPredictor.setPos(Cycle(),CGeoPoint(0,0));
@@ -210,7 +214,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 				}
 			}
 		}
-    //}
+    }**/
     /**
 	// 特殊情况二：
 	// 红外有信息，若球没看到，则予以位置修正，球若看到则检查红外信号，用以替换owl2中的处理 zyj
@@ -235,7 +239,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 				}
 			}
 		}
-    }**/
+    }**//**
     double ball_size = 2.15;
 	bool sensorBall = false;
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i ++) {
@@ -252,7 +256,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 
 			break;
 		}
-	}
+	}**/
 	/////////////////////////////////////////////////////////////////////////////
 	/// @brief Step 7: 向调试面板中显示一些必要的信息
 	/////////////////////////////////////////////////////////////////////////////
@@ -267,13 +271,13 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	// 	GDebugEngine::Instance()->gui_debug_robot(OurPlayer(i).Pos(), OurPlayer(i).Dir());
 	// }
 	// 输出我方小车的红外信号
-	if (sensorBall) {
-		//LogInfo("received infrared");
-		GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 6*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
-		GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 3*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
-	}
+	// if (sensorBall) {
+		//qDebug() << "received infrared";
+	// 	 GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 6*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
+	// 	 GDebugEngine::Instance()->gui_debug_arc(Ball().Pos(), 3*Param::Field::BALL_SIZE, 0, 360, COLOR_PURPLE);
+	// }
 	vision_to_decision.Signal();
-	vision_to_cuda.Signal();
+	// vision_to_cuda.Signal();
 	return ;
 }
 
@@ -314,8 +318,8 @@ void CVisionModule::CheckBothSidePlayerNum()
 	// 统计我方实际在场上的小车个数
 	_validNum = 0;
 	int tempGoalieNum = TaskMediator::Instance()->goalie();
-	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {		
-		if (OurPlayer(i).Valid() && i != tempGoalieNum) {	
+	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+		if (OurPlayer(i).Valid() && i != tempGoalieNum) {
 			_validNum++;
 		}
 	}
@@ -324,7 +328,7 @@ void CVisionModule::CheckBothSidePlayerNum()
 	// 统计对方实际在场上的小车个数
 	_TheirValidNum = 0;
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
-		if (TheirPlayer(i).Valid())	{
+		if (TheirPlayer(i).Valid()) {
 			_TheirValidNum ++;
 		}
 	}
@@ -332,8 +336,8 @@ void CVisionModule::CheckBothSidePlayerNum()
 
 //    if (_theirGoalie >=0 && _theirGoalie < Param::Field::MAX_PLAYER) return;
 //    if (_theirGoalie >=0 && _theirGoalie < Param::Field::MAX_PLAYER && !Utils::InTheirPenaltyArea(TheirPlayer(_theirGoalie).Pos(),0))
-//        return;
-    int dist = 1000;
+//        return;	
+	int dist = 1000;
     int tempTheirGoalie=_theirGoalie;
     for(int i=0;i<Param::Field::MAX_PLAYER;i++)
     {

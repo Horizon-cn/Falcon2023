@@ -23,14 +23,15 @@
 #include <time.h>
 #include <thread>
 #include "Semaphore.h"
+#include <sstream>
 extern Semaphore vision_to_cuda;
 
-#define has_GPU false
-
-#if has_GPU
+#ifdef ENABLE_CUDA
 extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float* pitch_info);
+extern "C" void ball_model_calc_with_gpu(float* vel_data_cpu, float* predict_results, float* a_1_matrix_cpu, float* bias_1_matrix_cpu, float* a_2_matrix_cpu, float* bias_2_matrix_cpu);
 #else
 void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float* pitch_info) {};
+void ball_model_calc_with_gpu(float* vel_data_cpu, float* predict_results, float* a_1_matrix_cpu, float* bias_1_matrix_cpu, float* a_2_matrix_cpu, float* bias_2_matrix_cpu) {};
 #endif // 
 
 
@@ -49,7 +50,7 @@ namespace gpuCalcArea {
 	const double middleBackBorderX = -Param::Field::PITCH_LENGTH / 6;
 	const double centerLeftBorderY = -Param::Field::PENALTY_AREA_WIDTH / 2;
 	const double centerRightBorderY = Param::Field::PENALTY_AREA_WIDTH / 2;
-
+	// big bug!!!
 	const double sideLineLeftBorderY = -ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
     //-450
     const double sideLineRightBorderY = ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
@@ -72,7 +73,7 @@ namespace gpuCalcArea {
 	// 目前这个区域已经更新
 
 	FieldRectangle fieldRectangleArray[AREANUM] = {
-		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX, sideLineLeftBorderY)),
         FieldRectangle(CGeoPoint(middleFrontBorderX + 150.0,centerRightBorderY),CGeoPoint(goalLineFrontBorderX - 50,centerLeftBorderY)),
         //FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
         FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
@@ -85,22 +86,50 @@ namespace gpuCalcArea {
 		FieldRectangle(CGeoPoint(goalLineBackBorderX,centerRightBorderY),CGeoPoint(middleBackBorderX,centerLeftBorderY)),
 		FieldRectangle(CGeoPoint(goalLineBackBorderX,sideLineRightBorderY),CGeoPoint(middleBackBorderX,centerRightBorderY)),
 	};
+	FieldRectangle processed_fieldRectangleArray[AREANUM] = {
+	FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
+	FieldRectangle(CGeoPoint(middleFrontBorderX + 150.0,centerRightBorderY),CGeoPoint(goalLineFrontBorderX - 50,centerLeftBorderY)),
+	//FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
+	FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
+
+	FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
+	FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + 150.0,centerLeftBorderY)),
+	FieldRectangle(CGeoPoint(middleBackBorderX,sideLineRightBorderY),CGeoPoint(middleFrontBorderX,centerRightBorderY)),
+
+	FieldRectangle(CGeoPoint(goalLineBackBorderX,centerLeftBorderY),CGeoPoint(middleBackBorderX,sideLineLeftBorderY)),
+	FieldRectangle(CGeoPoint(goalLineBackBorderX,centerRightBorderY),CGeoPoint(middleBackBorderX,centerLeftBorderY)),
+	FieldRectangle(CGeoPoint(goalLineBackBorderX,sideLineRightBorderY),CGeoPoint(middleBackBorderX,centerRightBorderY)),
+	};
 }
 
 extern QMutex* _best_visiondata_copy_mutex;
 extern QMutex* _value_getter_mutex;
+extern QMutex* _ball_pos_prediction_mutex;
 
 CGPUBestAlgThread::CGPUBestAlgThread() {
 	sendPoint = CGeoPoint(0, 0);
 	_pVision = NULL;
-
 	for (int i = 0; i < AREANUM; i++) {
 		_lastCycle[i] = 0;
 		_bestPoint[i] = CGeoPoint(0, 0);
 	}
 	_lastGPUCycle = 0;
 
-	if (has_GPU) {
+	// 球速预测部分
+	input_dim = 10;
+	hidden_layer_dim = 80;
+	output_dim = 50;
+
+	_history_ball_vel = (float*)malloc(input_dim * sizeof(float));
+	for (int i = 0; i < input_dim; i++) {
+		_history_ball_vel[i] = 0.0f;
+	}
+	_ball_pos_prediction_results = (float*)malloc(output_dim * sizeof(float));
+	for (int i = 0; i < output_dim; i++) {
+		_ball_pos_prediction_results[i] = 0.0f;
+	}
+
+#ifdef ENABLE_CUDA
 		// 需要查找的区域
 		_start_pos_x = -(int)(Param::Field::PITCH_LENGTH / 2);
 		_start_pos_y = -(int)(Param::Field::PITCH_WIDTH / 2);
@@ -126,15 +155,37 @@ CGPUBestAlgThread::CGPUBestAlgThread() {
 		_PointPotential = (float*)malloc(map_size);
 		_start_pos_cpu = (float*)malloc(pos_size); // 交给GPU运算的数据
 		for (int i = 0; i < 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num; i++) {
-			_start_pos_cpu[i] = 0;
+			_start_pos_cpu[i] = 0.0f;
 		}
-	}
+
+		// 读取矩阵
+		// 线性层：y=x*A+b  ，这里的A与pytorch param中的矩阵是转置关系
+		a_1_matrix_cpu = (float*)malloc((input_dim * hidden_layer_dim) * sizeof(float));
+		bias_1_matrix_cpu = (float*)malloc(hidden_layer_dim * sizeof(float));
+		a_2_matrix_cpu = (float*)malloc((hidden_layer_dim * output_dim) * sizeof(float));
+		bias_2_matrix_cpu = (float*)malloc(output_dim * sizeof(float));
+		
+		int status1 = getMatrix("../data/BallModel/model_param/a_1.txt", input_dim, hidden_layer_dim, a_1_matrix_cpu);
+		int status2 = getMatrix("../data/BallModel/model_param/b_1.txt", hidden_layer_dim, 1, bias_1_matrix_cpu);
+		int status3 = getMatrix("../data/BallModel/model_param/a_2.txt", hidden_layer_dim, output_dim, a_2_matrix_cpu);
+		int status4 = getMatrix("../data/BallModel/model_param/b_2.txt", output_dim, 1, bias_2_matrix_cpu);
+
+		if (status1 && status2 && status3 && status4) {
+			matrix_ok = true;
+		}
+#endif
 }
 
 CGPUBestAlgThread::~CGPUBestAlgThread() {
 	free(_PointPotentialOrigin);
 	free(_PointPotential);
 	free(_start_pos_cpu);
+	free(_history_ball_vel);
+	free(_ball_pos_prediction_results);
+	free(a_1_matrix_cpu);
+	free(bias_1_matrix_cpu);
+	free(a_2_matrix_cpu);
+	free(bias_2_matrix_cpu);
     delete gpuCalcArea::heatMap_socket;
     gpuCalcArea::heatMap_socket = nullptr;
     delete gpuCalcArea::_best_calculation_thread;
@@ -144,10 +195,10 @@ CGPUBestAlgThread::~CGPUBestAlgThread() {
 void CGPUBestAlgThread::initialize(CVisionModule* pVision) {
 	_pVision = pVision;
 	// 开启 GPU 计算的线程
-	if (has_GPU) {
+#ifdef ENABLE_CUDA
         gpuCalcArea::_best_calculation_thread = new std::thread([=] {doBestCalculation();});
         gpuCalcArea::_best_calculation_thread->detach();
-	}
+#endif
 }
 
 void CGPUBestAlgThread::startComm() {
@@ -177,7 +228,7 @@ void CGPUBestAlgThread::generatePointValue() {
 		/* 数据算法数据传入：车球位置信息                                       */
 		/************************************************************************/
 		// 上锁
-		_best_visiondata_copy_mutex->lock();
+		// _best_visiondata_copy_mutex->lock();
 		// 拷贝
 		_start_pos_cpu[0] = _start_pos_x;
 		_start_pos_cpu[1] = _start_pos_y;
@@ -185,7 +236,7 @@ void CGPUBestAlgThread::generatePointValue() {
 		_start_pos_cpu[3] = _pVision->Ball().Pos().x();
 		_start_pos_cpu[4] = _pVision->Ball().Pos().y();
 		_start_pos_cpu[5] = _pVision->Ball().VelX();
-		_start_pos_cpu[6] = _pVision->Ball().VelX();
+		_start_pos_cpu[6] = _pVision->Ball().VelY();
 		// 己方机器人信息
 		int our_start_idx = 7;    // 在数组中开始存储的位置
 		float* our_player_info = _start_pos_cpu + our_start_idx;
@@ -225,7 +276,7 @@ void CGPUBestAlgThread::generatePointValue() {
 			}
 		}
 		// 解锁
-		_best_visiondata_copy_mutex->unlock();
+		// _best_visiondata_copy_mutex->unlock();
 		int pos_num = 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
 
 		_value_getter_mutex->lock();
@@ -241,13 +292,67 @@ void CGPUBestAlgThread::generatePointValue() {
 	// cout << "genarate time" << ends - start << endl;
 }
 
+void CGPUBestAlgThread::predictBallPos() {
+	//clock_t begin, end;
+	//begin = clock();
+	
+	// _best_visiondata_copy_mutex->lock();
+	// 拷贝
+	
+	for (int i = 0; i < input_dim - 1; i++) {
+		_history_ball_vel[i] = _history_ball_vel[i + 1];
+	}
+	_history_ball_vel[input_dim - 1] = _pVision->Ball().Vel().mod();
+	//std::cout << "ball vel: ";
+	//for (int i = 0; i < 10; i++) {
+	//	std::cout << _history_ball_vel[i] << " ";
+	//}
+	//std::cout << std::endl;
+	// 解锁
+	// _best_visiondata_copy_mutex->unlock();
+
+	if (matrix_ok) {
+		// set模型的参数
+		//int set_status = set_ball_model_param(a_1_matrix_cpu, bias_1_matrix_cpu, a_2_matrix_cpu, bias_2_matrix_cpu);
+		float* results = (float*)malloc(output_dim * sizeof(float));
+		ball_model_calc_with_gpu(_history_ball_vel, results, a_1_matrix_cpu, bias_1_matrix_cpu, a_2_matrix_cpu, bias_2_matrix_cpu);
+
+		_ball_pos_prediction_mutex->lock();
+		memcpy(_ball_pos_prediction_results, results, output_dim * sizeof(float));
+		free(results);
+		for (int i = 0; i < 3; i++) {
+			std::cout << _ball_pos_prediction_results[i*10] << " ";
+		}
+		std::cout << std::endl;
+		_ball_pos_prediction_mutex->unlock();
+	}
+
+	//end = clock();
+	//std::cout << "ball pos predict calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
+}
+
 CGeoPoint CGPUBestAlgThread::getBestPointFromArea(int area_idx) {
+	CGeoPoint temp_bestPoint;
+	_value_getter_mutex->lock();
 	if (area_idx > AREANUM) { // 处理越界情况，但是后三个点的位置并没有生成
-		return _bestPoint[0];
+		temp_bestPoint = _bestPoint[0];
 	}
 	else {
-		return _bestPoint[area_idx];
+		if (area_idx == 0)
+			sendFieldRectangle();
+		temp_bestPoint =  _bestPoint[area_idx];
 	}
+	_value_getter_mutex->unlock();
+	return temp_bestPoint;
+}
+
+CGeoPoint CGPUBestAlgThread::getBallPosFromFrame(CGeoPoint ball_pos, CVector ball_vel, int frame) {
+	frame = max(min(frame, output_dim - 1), 0);
+	float ball_move_dist = 0.0;
+	_ball_pos_prediction_mutex->lock();
+	ball_move_dist = _ball_pos_prediction_results[frame];
+	_ball_pos_prediction_mutex->unlock();
+	return ball_pos + ball_vel / (ball_vel.mod() + 1e-8) * ball_move_dist;
 }
 
 // 将某一区域内的值变为最大值，从而不被考虑
@@ -280,7 +385,7 @@ void CGPUBestAlgThread::erasePointPotentialValue(const CGeoPoint centerPoint, fl
 // 计算每个区域的最优点和最优值，在generatePointValue中已经加了进程锁，所以这里没有加，所以这个函数不准在外面调用
 void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rightDown, CGeoPoint& bestPoint, float& minValue) {
 	// 存下九个区域的最优点以供调用，并且需要记录每个点在当前cycle是否已经更新
-	if (has_GPU) {
+#ifdef ENABLE_CUDA
 		// 初始化参数
 		minValue = 255;
 		// 场地参数
@@ -319,11 +424,61 @@ void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rig
 				}
 			}
 		}
-	}
-	else {
+#else
 		minValue = 255;
 		bestPoint = leftUp.midPoint(rightDown);
+#endif
+}
+
+void CGPUBestAlgThread::obscureBoundary() {
+	float ball_X = _pVision->Ball().Pos().x();
+	float ball_Y = _pVision->Ball().Pos().y();
+	float obsRate = 0.2;
+	float mov_X[9]; float mov_Y[9];
+
+	for (int area_idx = 0; area_idx < 9; area_idx++) {
+		mov_X[area_idx] = obsRate * (gpuCalcArea::fieldRectangleArray[area_idx]._centerPos.x() - ball_X);
+		mov_Y[area_idx] = obsRate * (gpuCalcArea::fieldRectangleArray[area_idx]._centerPos.y() - ball_Y);
+		// qDebug() << area_idx << mov_X[area_idx] << mov_Y[area_idx];
 	}
+	//0134
+	gpuCalcArea::processed_fieldRectangleArray[0]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[0]._rightDownPos.x() + mov_X[0]);
+	gpuCalcArea::processed_fieldRectangleArray[0]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[0]._rightDownPos.y() + mov_Y[0]);
+	gpuCalcArea::processed_fieldRectangleArray[1]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[1]._leftUpPos.y() + mov_Y[1]);
+	gpuCalcArea::processed_fieldRectangleArray[1]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[1]._rightDownPos.x() + mov_X[1]);
+	gpuCalcArea::processed_fieldRectangleArray[3]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[3]._leftUpPos.x() + mov_X[3]);
+	gpuCalcArea::processed_fieldRectangleArray[3]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[3]._rightDownPos.y() + mov_Y[3]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[4]._leftUpPos.x() + mov_X[4]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[4]._leftUpPos.y() + mov_Y[4]);
+	//1245
+	gpuCalcArea::processed_fieldRectangleArray[1]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[1]._rightDownPos.x() + mov_X[1]);
+	gpuCalcArea::processed_fieldRectangleArray[1]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[1]._rightDownPos.y() + mov_Y[1]);
+	gpuCalcArea::processed_fieldRectangleArray[2]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[2]._leftUpPos.y() + mov_Y[2]);
+	gpuCalcArea::processed_fieldRectangleArray[2]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[2]._rightDownPos.x() + mov_X[2]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[4]._leftUpPos.x() + mov_X[4]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[4]._rightDownPos.y() + mov_Y[4]);
+	gpuCalcArea::processed_fieldRectangleArray[5]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[5]._leftUpPos.x() + mov_X[5]);
+	gpuCalcArea::processed_fieldRectangleArray[5]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[5]._leftUpPos.y() + mov_Y[5]);
+	//3467
+	gpuCalcArea::processed_fieldRectangleArray[3]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[3]._rightDownPos.x() + mov_X[3]);
+	gpuCalcArea::processed_fieldRectangleArray[3]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[3]._rightDownPos.y() + mov_Y[3]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[4]._leftUpPos.y() + mov_Y[4]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[4]._rightDownPos.x() + mov_X[4]);
+	gpuCalcArea::processed_fieldRectangleArray[6]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[6]._leftUpPos.x() + mov_X[6]);
+	gpuCalcArea::processed_fieldRectangleArray[6]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[6]._rightDownPos.y() + mov_Y[6]);
+	gpuCalcArea::processed_fieldRectangleArray[7]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[7]._leftUpPos.x() + mov_X[7]);
+	gpuCalcArea::processed_fieldRectangleArray[7]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[7]._leftUpPos.y() + mov_Y[7]);
+	//4578
+	gpuCalcArea::processed_fieldRectangleArray[4]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[4]._rightDownPos.x() + mov_X[4]);
+	gpuCalcArea::processed_fieldRectangleArray[4]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[4]._rightDownPos.y() + mov_Y[4]);
+	gpuCalcArea::processed_fieldRectangleArray[5]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[5]._leftUpPos.y() + mov_Y[5]);
+	gpuCalcArea::processed_fieldRectangleArray[5]._rightDownPos.setX(gpuCalcArea::fieldRectangleArray[5]._rightDownPos.x() + mov_X[5]);
+	gpuCalcArea::processed_fieldRectangleArray[7]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[7]._leftUpPos.x() + mov_X[7]);
+	gpuCalcArea::processed_fieldRectangleArray[7]._rightDownPos.setY(gpuCalcArea::fieldRectangleArray[7]._rightDownPos.y() + mov_Y[7]);
+	gpuCalcArea::processed_fieldRectangleArray[8]._leftUpPos.setX(gpuCalcArea::fieldRectangleArray[8]._leftUpPos.x() + mov_X[8]);
+	gpuCalcArea::processed_fieldRectangleArray[8]._leftUpPos.setY(gpuCalcArea::fieldRectangleArray[8]._leftUpPos.y() + mov_Y[8]);
+
+	return;
 }
 
 // 处理每个区域，在generatePointValue中已经加了进程锁，所以这里没有加，所以这个函数不准在外面调用
@@ -334,9 +489,11 @@ void CGPUBestAlgThread::processPointValue() {
 	float minValue;
 	int area_idx;
 
+	obscureBoundary();//对后者进行动态模糊边界后存储到前者
+
 	// 搜索出所有区域的暂时最优点
 	for (int area_idx = 0; area_idx < 6; area_idx++) {
-		getBestPoint(gpuCalcArea::fieldRectangleArray[area_idx].centerArea()._leftUpPos, gpuCalcArea::fieldRectangleArray[area_idx].centerArea()._rightDownPos, bestPoint, minValue);
+		getBestPoint(gpuCalcArea::processed_fieldRectangleArray[area_idx].centerArea()._leftUpPos, gpuCalcArea::processed_fieldRectangleArray[area_idx].centerArea()._rightDownPos, bestPoint, minValue);
 		areaStructList.push_back(AreaStruct(bestPoint, minValue, area_idx, false));
 	}
 
@@ -346,7 +503,7 @@ void CGPUBestAlgThread::processPointValue() {
 		// 判断value最小的点是否被已选定点冲突
 		if (areaStructList.at(0)._conflict) { // 如果冲突，重新计算该点，并更新该点信息
 			area_idx = areaStructList.at(0)._area_idx;
-			getBestPoint(gpuCalcArea::fieldRectangleArray[area_idx].centerArea()._leftUpPos, gpuCalcArea::fieldRectangleArray[area_idx].centerArea()._rightDownPos, bestPoint, minValue);
+			getBestPoint(gpuCalcArea::processed_fieldRectangleArray[area_idx].centerArea()._leftUpPos, gpuCalcArea::processed_fieldRectangleArray[area_idx].centerArea()._rightDownPos, bestPoint, minValue);
 			areaStructList.at(0)._pos = bestPoint;
 			areaStructList.at(0)._value = minValue;
 			areaStructList.at(0)._conflict = false;
@@ -395,6 +552,8 @@ void CGPUBestAlgThread::doBestCalculation() {
 	while (true) {
 		vision_to_cuda.Wait();
 		GPUBestAlgThread::Instance()->generatePointValue();
+		GPUBestAlgThread::Instance()->predictBallPos();
+		// GPUBestAlgThread::Instance()->sendFieldRectangle();
 		GPUBestAlgThread::Instance()->setPointValue();
         GPUBestAlgThread::Instance()->sendPointValue();
 	}
@@ -405,7 +564,7 @@ double CGPUBestAlgThread::getPosPotential(const CGeoPoint p) {
 }
 
 void CGPUBestAlgThread::setPointValue() {
-	_value_getter_mutex->lock();
+	// _value_getter_mutex->lock();
 	pointValueList.clear();
 	int size = _h * _w;
 	for (int i = 0; i < size; i++) {
@@ -415,7 +574,7 @@ void CGPUBestAlgThread::setPointValue() {
 		p.value = _PointPotentialOrigin[i];
 		pointValueList.push_back(p);
 	}
-	_value_getter_mutex->unlock();
+	// _value_getter_mutex->unlock();
 }
 
 void CGPUBestAlgThread::sendPointValue() {
@@ -425,6 +584,7 @@ void CGPUBestAlgThread::sendPointValue() {
     //Heat_Map msgs;
     OWL::Protocol::Heat_Map_New msgs;
 	for (int m = gpuCalcArea::Color_Size - 1; m >= 0; m--) { //先把重要的点发过去
+		msgs.set_login_name(OParamManager::Instance()->LoginName);
 		auto points = msgs.add_points();
 		for (int n = m * point_size / gpuCalcArea::Color_Size; n < (m + 1) * point_size / gpuCalcArea::Color_Size; n++) {
 			points->add_pos(pointValueList.at(n).pos);
@@ -442,5 +602,54 @@ void CGPUBestAlgThread::sendPointValue() {
 		//删除掉message的部分，回收空间//
 		msgs.Clear();
 		//delete[] msgs;
+	}
+}
+
+int CGPUBestAlgThread::getMatrix(const string file_name, int max_row_num, int max_col_num, float* matrix)
+{
+	ifstream file_stream;
+	string one_line = "";	//输入文件的某一行
+	double tmp = 0;		//当前位置上的数值
+	int row_count = 0;	// 行数计数器
+	int col_count = 0;	// 列数计数器
+	int max_index = max_row_num * (max_col_num - 1) - 1;
+	string line;
+
+	// 打开文件
+	file_stream.open(file_name, ios::in);	//ios::in 表示以只读的方式读取文件
+	if (file_stream.fail()){ //文件打开失败:返回0
+		cout << "matrix: " << file_name << "doesn't exit." << endl;
+		file_stream.close();
+		system("pause");
+		return 0;
+	}
+
+	while (getline(file_stream, line)) // line中不包括每行的换行符
+	{
+		string number;
+		istringstream readstr(line); //string数据流化
+		//将一行数据按'，'分割
+		for (int col = 0; col < max_col_num; col++) { //可根据数据的实际情况取循环获取
+			getline(readstr, number, ' '); //循环读取数据
+			int index = row_count * max_col_num + col;
+			matrix[index] = atof(number.c_str());
+		}
+		row_count++;
+	}
+	return 1;
+}// END OF getInputData
+
+void CGPUBestAlgThread::sendFieldRectangle() {
+	for (int i = 0; i < AREANUM; i++) {
+		CGeoPoint leftUpPos = gpuCalcArea::processed_fieldRectangleArray[i].centerArea()._leftUpPos;
+		CGeoPoint rightUpPos = gpuCalcArea::processed_fieldRectangleArray[i].centerArea()._rightUpPos;
+		CGeoPoint leftDownPos = gpuCalcArea::processed_fieldRectangleArray[i].centerArea()._leftDownPos;
+		CGeoPoint rightDownPos = gpuCalcArea::processed_fieldRectangleArray[i].centerArea()._rightDownPos;
+		CGeoPoint centerPos = gpuCalcArea::processed_fieldRectangleArray[i].centerArea().getCenter();
+		GDebugEngine::Instance()->gui_debug_line(leftUpPos, rightUpPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_line(rightUpPos, rightDownPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_line(rightDownPos, leftDownPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_line(leftDownPos, leftUpPos, COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(i).toStdString().c_str(), COLOR_BLACK);
 	}
 }

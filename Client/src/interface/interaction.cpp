@@ -24,6 +24,7 @@
 #include "game.h"
 #include "shellapi.h"
 #include "remotesim.h"
+#include "scriptsinterfaces.h"
 namespace {
 QProcess *blueRBKProcess = nullptr;
 QProcess *yellowRBKProcess = nullptr;
@@ -127,16 +128,15 @@ void Interaction::chooseCraypath() {
     }
 }**/
 bool Interaction::controlBlueRBK(bool control) {
-    if(control == false) {
-        if (blueRBKProcess != nullptr) {
-            if (blueRBKProcess->isOpen()) {
-                blueRBKProcess->close();
-            }
-            delete blueRBKProcess;
-            blueRBKProcess = nullptr;
-            QTextStream(stdout) << "\n------------------------------------\nexit blue rbk\n------------------------------------\n";
+    if (blueRBKProcess != nullptr) {
+        if (blueRBKProcess->isOpen()) {
+            blueRBKProcess->close();
         }
-    } else {
+        delete blueRBKProcess;
+        blueRBKProcess = nullptr;
+        QTextStream(stdout) << "\n------------------------------------\nexit blue rbk\n------------------------------------\n";
+    }
+    if (control) {
         blueRBKProcess = new QProcess();
         // 告诉要打开的APP他的路径
         blueRBKProcess->setWorkingDirectory(RBKdirectory[PARAM::BLUE]); //"../RBK_RUN_2015/bin");
@@ -153,16 +153,15 @@ bool Interaction::controlBlueRBK(bool control) {
     return true;
 }
 bool Interaction::controlYellowRBK(bool control) {
-    if(control == false) {
-        if (yellowRBKProcess != nullptr) {
-            if (yellowRBKProcess->isOpen()) {
-                yellowRBKProcess->close();
-            }
-            delete yellowRBKProcess;
-            yellowRBKProcess = nullptr;
-            QTextStream(stdout) << "\n------------------------------------\nexit yellow rbk\n------------------------------------\n";
+    if (yellowRBKProcess != nullptr) {
+        if (yellowRBKProcess->isOpen()) {
+            yellowRBKProcess->close();
         }
-    } else {
+        delete yellowRBKProcess;
+        yellowRBKProcess = nullptr;
+        QTextStream(stdout) << "\n------------------------------------\nexit yellow rbk\n------------------------------------\n";
+    }
+    if (control) {
         yellowRBKProcess = new QProcess();
         yellowRBKProcess->setWorkingDirectory(RBKdirectory[PARAM::YELLOW]); //"../RBK_RUN_2015/bin");
         yellowRBKProcess->setCreateProcessArgumentsModifier(
@@ -177,16 +176,15 @@ bool Interaction::controlYellowRBK(bool control) {
     return true;
 }
 bool Interaction::controlSim(bool control, bool show) {
-    if(control == false) {
-        if (simProcess != nullptr) {
-            if (simProcess->isOpen()) {
-                simProcess->close();
-            }
-            delete simProcess;
-            simProcess = nullptr;
-            QTextStream(stdout) << "\n------------------------------------\nexit Sim\n------------------------------------\n";
+    if (simProcess != nullptr) {
+        if (simProcess->isOpen()) {
+            simProcess->close();
         }
-    } else {
+        delete simProcess;
+        simProcess = nullptr;
+        QTextStream(stdout) << "\n------------------------------------\nexit Sim\n------------------------------------\n";
+    }
+    if (control) {
         simProcess = new QProcess();
         QString name =  QString("\"").append(SIMpath).append("\"");
         QStringList args;
@@ -219,16 +217,15 @@ bool Interaction::controlCray(bool control) {
     return true;
 }**/
 bool Interaction::controlMonitor(bool control) {
-    if(control == false) {
-        if (monitorProcess != nullptr) {
-            if (monitorProcess->isOpen()) {
-                monitorProcess->close();
-            }
-            delete monitorProcess;
-            monitorProcess = nullptr;
-            QTextStream(stdout) << "\n------------------------------------\nexit Monitor\n------------------------------------\n";
+    if (monitorProcess != nullptr) {
+        if (monitorProcess->isOpen()) {
+            monitorProcess->close();
         }
-    } else {
+        delete monitorProcess;
+        monitorProcess = nullptr;
+        QTextStream(stdout) << "\n------------------------------------\nexit Monitor\n------------------------------------\n";
+    }
+    if (control) {
         monitorProcess = new QProcess();
         QString name = "sh ProcessAlive.sh"; //"./ProcessAlive.exe";
         monitorProcess->start(name);
@@ -243,6 +240,8 @@ bool Interaction::changeRBKSettings(bool color, bool side) {
 }
 bool Interaction::connectRadio(bool sw, int color, int frq) {
     if(sw) {
+        // 保证实车跑决策算法时用标定后的力度
+        Owl::KParamManager::Instance()->updateParam(Owl::KParamManager::Instance()->convertPower, "General/convertPower", true, true);
         ZCommunicator::Instance()->disconnectMedusa(color);
         ZCommunicator::Instance()->connectMedusa(color);
         Debugger::Instance()->start(color);
@@ -365,12 +364,12 @@ QStringList Interaction::getGrsimInterfaces() {
 void Interaction::getBasicInfo() {
     QDialog dialog;
     QFormLayout form(&dialog);
-    form.addRow(new QLabel("Falcon - AI framework for RoboCup SSL\n\ndeveloped by SRC team since 2023\nsupporting modes of Simulation and Real\nmainly used for controlling and debugging robots\n\ncreated in " + cpm->version));
+    form.addRow(new QLabel(tr("Falcon - AI framework for RoboCup SSL\n\ndeveloped by SRC team since 2023\nsupporting modes of Simulation and Real\nmainly used for controlling and debugging robots\n\ncreated in ") + cpm->version));
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok, Qt::Horizontal, &dialog);
     form.addRow(&buttonBox);
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     if (dialog.exec() == QDialog::Accepted) {}
-}
+}/**
 void Interaction::getMoreInfo() {
     QFileDialog dialog;
     QString Infopath = dialog.getOpenFileName(&dialog, QString::fromLocal8Bit("open"), QApplication::applicationDirPath()+"/../Help", "All files(*.*)");
@@ -388,7 +387,7 @@ void Interaction::getMoreInfo() {
         ShellExecuteA(0,"open",cexe,NULL,NULL,true);
     }
 }
-/**
+**//**
 void Interaction::getSoftwareInfo() {
     QFileDialog dialog;
     Softwarepath = dialog.getOpenFileName(&dialog, QString::fromLocal8Bit("open"), Softwaredirectory, "All files(*.*)");
@@ -483,6 +482,12 @@ int Interaction::getFrequency(){
 int Interaction::getMaxFrequency(){
     return Owl::ActionModule::Instance()->getMaxFrequency();
 }
+QStringList Interaction::getFrequencyList() {
+    QStringList frequencyList;
+    for(int i = 0; i <= Owl::ActionModule::Instance()->getMaxFrequency(); i++)
+       frequencyList.append(QString::number(i));
+    return frequencyList;
+}
 void Interaction::updateCommandParams(int robotID, int velX, int velY, int velR, bool dribble, int dribbleLevel, int mode, bool shoot, int power) {
     static int last_mode = -1;
     if (mode != last_mode) {
@@ -506,4 +511,15 @@ bool Interaction::getInfrared(int robotID) {
 void Interaction::startRecordCommands(bool start){
     ZCommunicator::Instance()->startRecordCommands(start);
 }
-
+void Interaction::updatePlayList() {
+    ScriptsInterfaces::Instance()->updatePlayList();
+}
+QStringList Interaction::getPlayList() {
+    return ScriptsInterfaces::Instance()->getPlayList();
+}
+void Interaction::changeReadyPlay(int currentIndex) {
+    ScriptsInterfaces::Instance()->changeReadyPlay(currentIndex);
+}
+void Interaction::defineScriptsSetting() {
+    ScriptsInterfaces::Instance()->writeJsonFile();
+}

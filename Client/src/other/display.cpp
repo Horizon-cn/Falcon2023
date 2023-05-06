@@ -20,8 +20,8 @@ float MAP_HEIGHT;
 float MAXIMUM;
 qreal zoomRatio = 1;
 const static qreal zoomStep = 0.05;
-const static qreal zoomMax = 20;
-const static qreal zoomMin = 0.1;
+const static qreal zoomMax = 10;
+const static qreal zoomMin = 0.5;
 int pressed = -1;
 QPoint start, end;
 float ax(float a) {return limitRange(a, 0.0f, 1.0f) * MAP_WIDTH;}
@@ -177,7 +177,11 @@ void Display::paintData(){
     else if(opm->display_mode=="Vx"){
         for(int i=0;i<Vision::MAINTAIN_STORE_BUFFER;i+=1){
             auto gd = visionRecord[1+i-Vision::MAINTAIN_STORE_BUFFER];
-            auto command = commandRecord[i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vx();
+            auto command_vx = commandRecord[i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vx();
+            auto command_vy = commandRecord[i - Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vy();
+            CVector command_v(command_vx, command_vy);
+            command_v = command_v.rotate(gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].angle);
+            auto command = command_v.x();
             auto raw = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].raw.vel.vx();
             if (gd.robotIndex[opm->display_teamIndex][opm->display_robotID] == -1) maintain = 0;
             else maintain = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].velocity.vx();
@@ -203,7 +207,11 @@ void Display::paintData(){
     else if(opm->display_mode=="Vy"){
         for(int i=0;i<Vision::MAINTAIN_STORE_BUFFER;i+=1){
             auto gd = visionRecord[1+i-Vision::MAINTAIN_STORE_BUFFER];
-            auto command = commandRecord[i-Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vy();
+            auto command_vx = commandRecord[i - Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vx();
+            auto command_vy = commandRecord[i - Vision::MAINTAIN_STORE_BUFFER].robotSpeed[opm->display_robotID].vy();
+            CVector command_v(command_vx, command_vy);
+            command_v = command_v.rotate(gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].angle);
+            auto command = command_v.y();
             auto raw = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].raw.vel.vy();
             if (gd.robotIndex[opm->display_teamIndex][opm->display_robotID] == -1) maintain = 0;
             else maintain = gd.robot[opm->display_teamIndex][gd.robotIndex[opm->display_teamIndex][opm->display_robotID]].velocity.vy();
@@ -298,45 +306,45 @@ void Display::ifNeedDisplay(bool needDisplay){
 void Display::setDisplayMode() {
     QDialog dialog;
     QFormLayout form(&dialog);
-    form.addRow(new QLabel("Set robot:"));
-    QString value1 = QString("team: ");
+    form.addRow(new QLabel(tr("Set robot:")));
+    QString value1 = QString(tr("team: "));
     QComboBox *comboBox1 = new QComboBox(&dialog);
-    comboBox1->addItem("Blue");
-    comboBox1->addItem("Yellow");
+    comboBox1->addItem(tr("Blue"));
+    comboBox1->addItem(tr("Yellow"));
     comboBox1->setCurrentIndex(opm->display_teamIndex);
     form.addRow(value1, comboBox1);
-    QString value2 = QString("robotID: ");
+    QString value2 = QString(tr("robotID: "));
     QSpinBox *spinbox2 = new QSpinBox(&dialog);
     spinbox2->setRange(0, PARAM::ROBOTMAXID);
     spinbox2->setValue(opm->display_robotID);
     form.addRow(value2, spinbox2);
-    form.addRow(new QLabel("Set Display Mode:"));
+    form.addRow(new QLabel(tr("Set Display Mode:")));
     QComboBox *comboBox3 = new QComboBox(&dialog);
-    comboBox3->addItem("Vxy");
-    comboBox3->addItem("Vx");
-    comboBox3->addItem("Vy");
-    comboBox3->addItem("Vr");
-    comboBox3->addItem("Angle");
-    comboBox3->addItem("BallSpeed");
+    comboBox3->addItem(tr("Vxy"));
+    comboBox3->addItem(tr("Vx"));
+    comboBox3->addItem(tr("Vy"));
+    comboBox3->addItem(tr("Vr"));
+    comboBox3->addItem(tr("Angle"));
+    comboBox3->addItem(tr("BallSpeed"));
     comboBox3->setCurrentIndex(opm->display_modeIndex);
     form.addRow(comboBox3);
-    form.addRow(new QLabel("Set Feature:"));
-    QString value7 = QString("height: ");
+    form.addRow(new QLabel(tr("Set Feature:")));
+    QString value7 = QString(tr("height: "));
     QSpinBox *spinbox7 = new QSpinBox(&dialog);
     spinbox7->setRange(0, 2000);
     spinbox7->setValue(opm->display_height);
     form.addRow(value7, spinbox7);
-    QString value4 = QString("horizontLines: ");
+    QString value4 = QString(tr("horizontLines: "));
     QSpinBox *spinbox4 = new QSpinBox(&dialog);
     spinbox4->setRange(0, 1000);
     spinbox4->setValue(opm->horizontLines);
     form.addRow(value4, spinbox4);
-    QString value5 = QString("maximum: ");
+    QString value5 = QString(tr("maximum: "));
     QDoubleSpinBox *spinbox5 = new QDoubleSpinBox(&dialog);
     spinbox5->setRange(0, 1000);
     spinbox5->setValue(opm->maximum);
     form.addRow(value5, spinbox5);
-    QString value6 = QString("limitation: ");
+    QString value6 = QString(tr("limitation: "));
     QDoubleSpinBox *spinbox6 = new QDoubleSpinBox(&dialog);
     spinbox6->setRange(0, 1000);
     spinbox6->setValue(opm->limitation);
@@ -378,6 +386,8 @@ void Display::wheelEvent(QWheelEvent* e) {
     zoomRatio = limitRange(zoomRatio, zoomMin, zoomMax);
     qDebug() << "zoomRatio" << zoomRatio;
     pixmapPainter.setRenderHint(QPainter::Antialiasing, zoomRatio > 0.5);
+    if (!display)
+        repaint();
 }
 #endif
 

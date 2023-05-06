@@ -29,12 +29,15 @@ Page{
     Timer{
         id:oneSecond;
         interval:800;
-        running:true;
+        running:!visionControls.ifConnected || (!control.isSimulation && !control.radioConnect); //true;
         repeat:true;
         onTriggered: {
-            interaction.updateInterfaces();
-            interfaces4vision.updateModel();
-            radioComboBox.updateModel();
+            if (!visionControls.ifConnected) {
+                interaction.updateInterfaces();
+                interfaces4vision.updateModel();
+            }
+            if (!control.isSimulation && !control.radioConnect)
+                radioComboBox.updateModel();
         }
     }
 

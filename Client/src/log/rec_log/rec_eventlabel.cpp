@@ -42,7 +42,7 @@ void RecEventLabel::loadFile(QString filename) {
         setlogName(filename);
     }
     if (recMsgs.recmsgs_size() <= 0){
-        setlogName("Import Error File");
+        setlogName(tr("Import Error File"));
     }
     else{
         startFrame = camNum = 0;
@@ -53,7 +53,7 @@ bool RecEventLabel::processLabel() {
     prepare();
     processMessage();
     saveLabel();
-    setlogName("Process Done");
+    setlogName(tr("Process Done"));
     return false;
 }
 void RecEventLabel::prepare(){
