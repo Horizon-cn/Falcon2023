@@ -35,8 +35,8 @@ void ball_model_calc_with_gpu(float* vel_data_cpu, float* predict_results, float
 #endif // 
 
 
-#define OURPLAYER_NUM	8
-#define THEIRPLAYER_NUM 8
+#define OURPLAYER_NUM	6
+#define THEIRPLAYER_NUM 6
 #define BALL_NUM		1
 
 namespace gpuCalcArea {
@@ -174,7 +174,13 @@ CGPUBestAlgThread::CGPUBestAlgThread() {
 		int status3 = getMatrix("../data/BallModel/model_param/a_2.txt", hidden_layer_dim, output_dim, a_2_matrix_cpu);
 		int status4 = getMatrix("../data/BallModel/model_param/b_2.txt", output_dim, 1, bias_2_matrix_cpu);
 
+
 		if (status1 && status2 && status3 && status4) {
+			//std::cout << "a1 matrix:";
+			//for (int i = 0; i < 5; i++) {
+			//	std::cout << a_1_matrix_cpu[i] << " ";
+			//}
+			//std::cout << std::endl;
 			matrix_ok = true;
 		}
 #endif
@@ -318,16 +324,20 @@ void CGPUBestAlgThread::predictBallPos() {
 	if (matrix_ok) {
 		// set模型的参数
 		//int set_status = set_ball_model_param(a_1_matrix_cpu, bias_1_matrix_cpu, a_2_matrix_cpu, bias_2_matrix_cpu);
+		//for (int i = 0; i < 5; i++) {
+		//	std::cout << a_1_matrix_cpu[i] << " ";
+		//}
+		//std::cout << std::endl;
 		float* results = (float*)malloc(output_dim * sizeof(float));
 		ball_model_calc_with_gpu(_history_ball_vel, results, a_1_matrix_cpu, bias_1_matrix_cpu, a_2_matrix_cpu, bias_2_matrix_cpu);
 
 		_ball_pos_prediction_mutex->lock();
 		memcpy(_ball_pos_prediction_results, results, output_dim * sizeof(float));
+		//for (int i = 0; i < 3; i++) {
+		//	std::cout << results[i * 10] << " ";
+		//}
+		//std::cout << std::endl;
 		free(results);
-		// for (int i = 0; i < 3; i++) {
-		// 	std::cout << _ball_pos_prediction_results[i*10] << " ";
-		// }
-		// std::cout << std::endl;
 		_ball_pos_prediction_mutex->unlock();
 	}
 
@@ -496,8 +506,11 @@ void CGPUBestAlgThread::erasePointPotentialValue(const CGeoPoint centerPoint, fl
 	int end_pos_x_idx = floor((right_down_pos_x - left_up_pos_x) / _step) + start_pos_x_idx;
 	int end_pos_y_idx = floor((right_down_pos_y - left_up_pos_y) / _step) + start_pos_y_idx;
 
-	for (int i = start_pos_x_idx; i < end_pos_x_idx + 1; i++) {
-		for (int j = start_pos_y_idx; j < end_pos_y_idx + 1; j++) {
+	for (int i = max(start_pos_x_idx, 0); i < min(end_pos_x_idx + 1, _h); i++) {
+		for (int j = max(start_pos_y_idx, 0); j < min(end_pos_y_idx + 1, _w); j++) {
+			if (i * _w + j >= _w * _h) {
+				std::cout << "index error";
+			}
 			_PointPotential[i * _w + j] = 255;
 		}
 	}
