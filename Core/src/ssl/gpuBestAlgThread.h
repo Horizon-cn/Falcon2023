@@ -234,6 +234,11 @@ private:
 	/**
 	@brief	按照重要性排序调整bestpoint顺序*/
 	void supportSort();
+	void supportSortV2();
+
+	double limitPosX(double x);
+	double limitPosY(double y);
+
 
 	/**
 	@brief	获取球所在区域index*/
@@ -249,6 +254,7 @@ private:
 	/**
 	@brief	动态模糊边界*/
 	void obscureBoundary();
+	void obscureBoundaryV2();
 
 	/**
 	@brief 处理全场势能点，并搜索前六个区域中的最优点
@@ -274,6 +280,7 @@ private:
 	int _lastCycle[AREANUM] = { 0 };           ///  上一帧9个区域的CPU帧号
 	CGeoPoint _bestPoint[AREANUM];         /// 当前帧9个区域的最优点
 	CGeoPoint _bestSupport[AREANUM];         /// 按照支撑点重要性进行排序后的最优点
+	float _pointPotential[AREANUM];			///9个区域最优点分值
 
 
 	int _start_pos_x, _start_pos_y, _width, _height, _step;     ///搜索区域参数，分别为左上角坐标、区域长与宽、搜索步长
