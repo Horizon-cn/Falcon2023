@@ -174,7 +174,7 @@ void CAdvance::plan(const CVisionModule* pVision)
                     NowIsShoot = 1;
 					_state = KICK; break;
 				}
-				else if(Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor)) {
+				else if(Me2OppTooclose(pVision, _executor) && isInBreakArea(pVision, _executor)) {
 
                     NowIsShoot = 2;
 					_state = BREAKSHOOT; break;
