@@ -25,7 +25,7 @@
 #include "NormalPlayUtils.h"
 #include "param.h"
 
-#define AREANUM 9 // 区域数目
+#define AREANUM 6 // 区域数目
 
 struct PointValueStruct {
 	float pos_x;
@@ -101,7 +101,7 @@ typedef std::deque<AreaStruct> AreaStructList;
 // 构造时传入左下点与右上点
 // centerArea返回一个中心点不变，长宽变为0.9倍的区域
 struct FieldRectangle {
-	FieldRectangle(CGeoPoint ld, CGeoPoint ru) {
+	FieldRectangle(CGeoPoint ld, CGeoPoint ru) { 
 		_leftDownPos = ld;
 		_rightUpPos = ru;
 		_leftUpPos = CGeoPoint(ld.x(), ru.y());
@@ -236,10 +236,6 @@ private:
 	void supportSort();
 	void supportSortV2();
 
-	double limitPosX(double x);
-	double limitPosY(double y);
-
-
 	/**
 	@brief	获取球所在区域index*/
 	int getBallArea();
@@ -255,6 +251,9 @@ private:
 	@brief	动态模糊边界*/
 	void obscureBoundary();
 	void obscureBoundaryV2();
+
+	double limitPosX(double);
+	double limitPosY(double);
 
 	/**
 	@brief 处理全场势能点，并搜索前六个区域中的最优点
@@ -278,6 +277,7 @@ private:
 	CVisionModule* _pVision;			             ///<图像指针
 	int _lastGPUCycle;					 ///上一帧GPU帧号
 	int _lastCycle[AREANUM] = { 0 };           ///  上一帧9个区域的CPU帧号
+	float _pointPotential[AREANUM];        /// 9个区域最优点的分值  
 	CGeoPoint _bestPoint[AREANUM];         /// 当前帧9个区域的最优点
 	CGeoPoint _bestSupport[AREANUM];         /// 按照支撑点重要性进行排序后的最优点
 	float _pointPotential[AREANUM];			///9个区域最优点分值
