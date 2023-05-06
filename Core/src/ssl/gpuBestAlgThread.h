@@ -280,7 +280,6 @@ private:
 	float _pointPotential[AREANUM];        /// 9个区域最优点的分值  
 	CGeoPoint _bestPoint[AREANUM];         /// 当前帧9个区域的最优点
 	CGeoPoint _bestSupport[AREANUM];         /// 按照支撑点重要性进行排序后的最优点
-	float _pointPotential[AREANUM];			///9个区域最优点分值
 
 
 	int _start_pos_x, _start_pos_y, _width, _height, _step;     ///搜索区域参数，分别为左上角坐标、区域长与宽、搜索步长
