@@ -450,7 +450,7 @@ void CGPUBestAlgThread::supportSortV2() {
 }
 
 CGeoPoint CGPUBestAlgThread::getBestPointFromArea(int support_idx) {
-	// supportSort(); // 按照重要性对支撑点进行排序
+	
 	CGeoPoint temp_bestSupport;
 	_value_getter_mutex->lock();
 	if (support_idx > AREANUM) { // 处理越界情况，但是后三个点的位置并没有生成
@@ -629,9 +629,9 @@ void CGPUBestAlgThread::obscureBoundary() {
 	float ball_X = _pVision->Ball().Pos().x();
 	float ball_Y = _pVision->Ball().Pos().y();
 	float obsRate = 0.2; // 该函数唯一参数：模糊系数，范围为[0, 1]
-	float mov_X[9]; float mov_Y[9];
+	float mov_X[AREANUM]; float mov_Y[AREANUM];
 
-	for (int area_idx = 0; area_idx < 9; area_idx++) {
+	for (int area_idx = 0; area_idx < AREANUM; area_idx++) {
 		mov_X[area_idx] = obsRate * (ball_X - gpuCalcArea::fieldRectangleArray[area_idx]._centerPos.x());
 		mov_Y[area_idx] = obsRate * (ball_Y - gpuCalcArea::fieldRectangleArray[area_idx]._centerPos.y());//获取区域中心到球的距离向量
 		// qDebug() << area_idx << mov_X[area_idx] << mov_Y[area_idx];
@@ -664,7 +664,7 @@ void CGPUBestAlgThread::obscureBoundary() {
 	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[5]._rightDownPos.x() + mov_X[5], gpuCalcArea::fieldRectangleArray[5]._rightDownPos.y());
 	gpuCalcArea::processed_fieldRectangleArray[5].processField(temp_leftUp, temp_rightDown);
 
-
+	/*
 	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[6]._leftUpPos.x()              , gpuCalcArea::fieldRectangleArray[6]._leftUpPos.y() );
 	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[6]._rightDownPos.x() + mov_X[6], gpuCalcArea::fieldRectangleArray[6]._rightDownPos.y() + mov_Y[6]);
 	gpuCalcArea::processed_fieldRectangleArray[6].processField(temp_leftUp, temp_rightDown);
@@ -676,6 +676,7 @@ void CGPUBestAlgThread::obscureBoundary() {
 	temp_leftUp    = CGeoPoint(gpuCalcArea::fieldRectangleArray[8]._leftUpPos.x()              , gpuCalcArea::fieldRectangleArray[8]._leftUpPos.y()    + mov_Y[8]);
 	temp_rightDown = CGeoPoint(gpuCalcArea::fieldRectangleArray[8]._rightDownPos.x() + mov_X[8], gpuCalcArea::fieldRectangleArray[8]._rightDownPos.y());
 	gpuCalcArea::processed_fieldRectangleArray[8].processField(temp_leftUp, temp_rightDown);
+	*/
 
 
 	return;
@@ -735,8 +736,8 @@ void CGPUBestAlgThread::processPointValue() {
 			}
 		}
 	}
-
-	supportSortV2();
+	supportSort(); // 按照重要性对支撑点进行排序
+	//supportSortV2();
 
 }
 
