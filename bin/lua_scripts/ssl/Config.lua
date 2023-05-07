@@ -8,9 +8,9 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_GoSupport" --"Test_ChaseKick" --"Test_Advance" --"Test_Run"
+		return "Test_play6" --"Test_ChaseKick" --"Test_Advance" --"Test_Run"
 	else
-		return "Test_Advance" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "Test_Defence" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -99,6 +99,7 @@ gSkill = {
 gRefPlayTable = {
 	--开球进攻
 	"Ref/KickOff/Ref_KickOffV6",
+	"Ref/KickOff/Ref_KickOffV23",
 
 	--角球进攻
 	"Ref/CornerKick/Ref_CornerKickV1",
@@ -125,6 +126,7 @@ gRefPlayTable = {
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
+	"Ref/KickOffDef/Ref_KickOffDefV23",
 
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDefV5",
@@ -203,5 +205,6 @@ gTestPlayTable = {
 	"Test_NormalDefend",
 	"Test_AvoidFoulDefend",
 	"Test_NormalMiddleDefend",
-	"Test_Circle"
+	"Test_Circle",
+	"Test_play6"
 }
