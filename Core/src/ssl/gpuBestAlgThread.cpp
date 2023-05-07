@@ -136,31 +136,31 @@ CGPUBestAlgThread::CGPUBestAlgThread() {
 	}
 
 #ifdef ENABLE_CUDA
-		// 需要查找的区域
-		_start_pos_x = -(int)(Param::Field::PITCH_LENGTH / 2);
-		_start_pos_y = -(int)(Param::Field::PITCH_WIDTH / 2);
-		// TODO 这里的width和height是和正常看owl2颠倒的，后续再修改一下
-		_height = Param::Field::PITCH_LENGTH;
-		_width = Param::Field::PITCH_WIDTH;
-		_step = 10; // 搜索的步长
-		if (_height % _step != 0 || _width % _step != 0) {
-			cout << "warning warning 场地尺寸不是step的整数倍" << endl;
-		}
-		// 定义需要申请的空间
-		_w = _width / _step;
-		_h = _height / _step;
+	// 需要查找的区域
+	_start_pos_x = -(int)(Param::Field::PITCH_LENGTH / 2);
+	_start_pos_y = -(int)(Param::Field::PITCH_WIDTH / 2);
+	// TODO 这里的width和height是和正常看owl2颠倒的，后续再修改一下
+	_height = Param::Field::PITCH_LENGTH;
+	_width = Param::Field::PITCH_WIDTH;
+	_step = 10; // 搜索的步长
+	if (_height % _step != 0 || _width % _step != 0) {
+		cout << "warning warning 场地尺寸不是step的整数倍" << endl;
+	}
+	// 定义需要申请的空间
+	_w = _width / _step;
+	_h = _height / _step;
 		int map_size = _w * _h * sizeof(float);
-		// (2+1+2+2+OURPLAYER_NUM*_palyer_pos_num+THEIRPLAYER_NUM*_palyer_pos_num) * sizeof(float)
+		// (2+1+2+2+OURPLAYER_NUM*_player_pos_num+THEIRPLAYER_NUM*_player_pos_num) * sizeof(float)
 		// 依次为：搜索区域开始位置、步长step、球的位置、球的速度、我方小车的位置、朝向、速度（首位为是否valid）、敌方小车的位置、朝向、速度（首位为是否valid）
 		// 如果修改这部分代码，请仔细阅读赋值及GPU部分代码并与之进行相应的修改
 		// 需要注意的部分有CPU空间的申请，对其进行赋值，将其拷贝的GPU上时申请的空间、GPU对该列表信息的解析
-		_palyer_pos_num = 6; //一个机器人所需传递的信息数目
-		int pos_size = (2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num) * sizeof(float);
+		_player_pos_num = 6; //一个机器人所需传递的信息数目
+		int pos_size = (2 + 1 + 2 + 2 + OURPLAYER_NUM * _player_pos_num + THEIRPLAYER_NUM * _player_pos_num) * sizeof(float);
 
 		_PointPotentialOrigin = (float*)malloc(map_size); // 用于存储计算后的结果
 		_PointPotential = (float*)malloc(map_size);
 		_start_pos_cpu = (float*)malloc(pos_size); // 交给GPU运算的数据
-		for (int i = 0; i < 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num; i++) {
+		for (int i = 0; i < 2 + 1 + 2 + 2 + OURPLAYER_NUM * _player_pos_num + THEIRPLAYER_NUM * _player_pos_num; i++) {
 			_start_pos_cpu[i] = 0.0f;
 		}
 
@@ -242,8 +242,8 @@ void CGPUBestAlgThread::generatePointValue() {
 		// 上锁
 		// _best_visiondata_copy_mutex->lock();
 		// 拷贝
-		_start_pos_cpu[0] = _start_pos_x;
-		_start_pos_cpu[1] = _start_pos_y;
+	_start_pos_cpu[0] = _start_pos_x;
+	_start_pos_cpu[1] = _start_pos_y;
 		_start_pos_cpu[2] = _step;
 		_start_pos_cpu[3] = _pVision->Ball().Pos().x();
 		_start_pos_cpu[4] = _pVision->Ball().Pos().y();
@@ -255,41 +255,41 @@ void CGPUBestAlgThread::generatePointValue() {
 		for (int i = 0; i < OURPLAYER_NUM; i++) {
 			if (_pVision->OurPlayer(i).Valid()) {
 				const PlayerVisionT& ourPlayer = _pVision->OurPlayer(i);
-				our_player_info[_palyer_pos_num * i] = 1.0;
-				our_player_info[_palyer_pos_num * i + 1] = ourPlayer.X();
-				our_player_info[_palyer_pos_num * i + 2] = ourPlayer.Y();
-				our_player_info[_palyer_pos_num * i + 3] = ourPlayer.Dir();
-				our_player_info[_palyer_pos_num * i + 4] = ourPlayer.VelX();
-				our_player_info[_palyer_pos_num * i + 5] = ourPlayer.VelY();
+				our_player_info[_player_pos_num * i] = 1.0;
+				our_player_info[_player_pos_num * i + 1] = ourPlayer.X();
+				our_player_info[_player_pos_num * i + 2] = ourPlayer.Y();
+				our_player_info[_player_pos_num * i + 3] = ourPlayer.Dir();
+				our_player_info[_player_pos_num * i + 4] = ourPlayer.VelX();
+				our_player_info[_player_pos_num * i + 5] = ourPlayer.VelY();
 			}
 			else {
-				for (int j = 0; j < _palyer_pos_num; j++) {
-					our_player_info[_palyer_pos_num * i + j] = 0.0;
+				for (int j = 0; j < _player_pos_num; j++) {
+					our_player_info[_player_pos_num * i + j] = 0.0;
 				}
 			}
 		}
 		// 敌方机器人信息
-		int their_start_idx = 7 + _palyer_pos_num * OURPLAYER_NUM; // 在数组中开始存储的位置
+		int their_start_idx = 7 + _player_pos_num * OURPLAYER_NUM; // 在数组中开始存储的位置
 		float* their_player_info = _start_pos_cpu + their_start_idx;
 		for (int i = 0; i < THEIRPLAYER_NUM; i++) {
 			if (_pVision->TheirPlayer(i).Valid()) {
 				const PlayerVisionT& theirPlayer = _pVision->TheirPlayer(i);
-				their_player_info[_palyer_pos_num * i] = 1.0;
-				their_player_info[_palyer_pos_num * i + 1] = theirPlayer.X();
-				their_player_info[_palyer_pos_num * i + 2] = theirPlayer.Y();
-				their_player_info[_palyer_pos_num * i + 3] = theirPlayer.Dir();
-				their_player_info[_palyer_pos_num * i + 4] = theirPlayer.VelX();
-				their_player_info[_palyer_pos_num * i + 5] = theirPlayer.VelY();
+				their_player_info[_player_pos_num * i] = 1.0;
+				their_player_info[_player_pos_num * i + 1] = theirPlayer.X();
+				their_player_info[_player_pos_num * i + 2] = theirPlayer.Y();
+				their_player_info[_player_pos_num * i + 3] = theirPlayer.Dir();
+				their_player_info[_player_pos_num * i + 4] = theirPlayer.VelX();
+				their_player_info[_player_pos_num * i + 5] = theirPlayer.VelY();
 			}
 			else {
-				for (int j = 0; j < _palyer_pos_num; j++) {
-					their_player_info[_palyer_pos_num * i + j] = 0.0;
+				for (int j = 0; j < _player_pos_num; j++) {
+					their_player_info[_player_pos_num * i + j] = 0.0;
 				}
 			}
 		}
 		// 解锁
 		// _best_visiondata_copy_mutex->unlock();
-		int pos_num = 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
+		int pos_num = 2 + 1 + 2 + 2 + OURPLAYER_NUM * _player_pos_num + THEIRPLAYER_NUM * _player_pos_num;
 
 		_value_getter_mutex->lock();
 		calc_with_gpu(_PointPotentialOrigin, _start_pos_cpu, _h, _w, pos_num, _pitch_info);
@@ -457,7 +457,7 @@ void CGPUBestAlgThread::supportSortV2() {
 		p.value = _pointPotential[areaNum];
 		pointValueList.push_back(p);
 	}
-	sort(pointValueList.begin(), pointValueList.end());
+	sort(pointValueList.begin(), pointValueList.end()); // 排序，从小到大
 	for (int areaNum = 0; areaNum < AREANUM; areaNum++) {
 		_bestSupport[areaNum] = _bestPoint[(int)pointValueList.at(areaNum).pos];
 	}
@@ -505,8 +505,10 @@ void CGPUBestAlgThread::erasePointPotentialValue(const CGeoPoint centerPoint, fl
 	int start_pos_y_idx = ceil((left_up_pos_y + halfPitchWidth) / _step);
 
 	// 考虑步长的情况下区域结束的位置
-	int end_pos_x_idx = floor((right_down_pos_x - left_up_pos_x) / _step) + start_pos_x_idx;
-	int end_pos_y_idx = floor((right_down_pos_y - left_up_pos_y) / _step) + start_pos_y_idx;
+	int end_pos_x_idx = floor((right_down_pos_x + halfPitchLength) / _step);
+	int end_pos_y_idx = floor((right_down_pos_y + halfPitchWidth) / _step);
+	// int end_pos_x_idx = floor((right_down_pos_x - left_up_pos_x) / _step) + start_pos_x_idx;
+	// int end_pos_y_idx = floor((right_down_pos_y - left_up_pos_y) / _step) + start_pos_y_idx;
 
 	for (int i = max(start_pos_x_idx, 0); i < min(end_pos_x_idx + 1, _h); i++) {
 		for (int j = max(start_pos_y_idx, 0); j < min(end_pos_y_idx + 1, _w); j++) {
@@ -539,8 +541,10 @@ void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rig
 		int start_pos_y_idx = ceil((left_up_pos_y + halfPitchWidth) / _step);
 
 		// 考虑步长的情况下区域结束的位置
-		int end_pos_x_idx = floor((right_down_pos_x - left_up_pos_x) / _step) + start_pos_x_idx;
-		int end_pos_y_idx = floor((right_down_pos_y - left_up_pos_y) / _step) + start_pos_y_idx;
+		int end_pos_x_idx = floor((right_down_pos_x + halfPitchLength) / _step);
+		int end_pos_y_idx = floor((right_down_pos_y + halfPitchWidth) / _step);
+		// int end_pos_x_idx = floor((right_down_pos_x - left_up_pos_x) / _step) + start_pos_x_idx;
+		// int end_pos_y_idx = floor((right_down_pos_y - left_up_pos_y) / _step) + start_pos_y_idx;
 
 		//// 一些点的debug信息
 		//float start_pos_x = start_pos_x_idx * _step - halfPitchLength;
@@ -552,8 +556,8 @@ void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rig
 		//GDebugEngine::Instance()->gui_debug_x(CGeoPoint(start_pos_x_idx * _step - halfPitchLength, end_pos_y_idx * _step - halfPitchWidth), COLOR_BLUE);
 		//GDebugEngine::Instance()->gui_debug_x(CGeoPoint(end_pos_x_idx * _step - halfPitchLength, start_pos_y_idx * _step - halfPitchWidth), COLOR_GREEN);
 
-		for (int i = start_pos_x_idx; i < end_pos_x_idx + 1; i++) {
-			for (int j = start_pos_y_idx; j < end_pos_y_idx + 1; j++) {
+		for (int i = max(start_pos_x_idx, 0); i < min(end_pos_x_idx + 1, _h); i++) {
+		  	for (int j = max(start_pos_y_idx, 0); j < min(end_pos_y_idx + 1, _w); j++) {
 				if (_PointPotential[i * _w + j] < minValue) {
 					minValue = _PointPotential[i * _w + j];
 					bestPoint = CGeoPoint(i * _step - halfPitchLength, j * _step - halfPitchWidth);
@@ -726,8 +730,8 @@ void CGPUBestAlgThread::processPointValue() {
 	}
 
 	while (areaStructList.size()) {
-		// 先排序
-		sort(areaStructList.begin(), areaStructList.end(), greater<AreaStruct>());
+		// 先排序，从小到大
+		sort(areaStructList.begin(), areaStructList.end());
 		// 判断value最小的点是否被已选定点冲突
 		if (areaStructList.at(0)._conflict) { // 如果冲突，重新计算该点，并更新该点信息
 			area_idx = areaStructList.at(0)._area_idx;
@@ -737,6 +741,7 @@ void CGPUBestAlgThread::processPointValue() {
 			areaStructList.at(0)._conflict = false;
 		}
 		else { // 如果不冲突，将该点移出队列存放至规划点数组中，根据该点对场势进行erase并重新判断其余点是否冲突
+			minValue = areaStructList.at(0)._value;
 			bestPoint = areaStructList.at(0)._pos;
 			area_idx = areaStructList.at(0)._area_idx;
 			areaStructList.pop_front();
@@ -747,8 +752,8 @@ void CGPUBestAlgThread::processPointValue() {
 				break;
 			}
 			else {
-				float length = 200;
-				float width = 200;
+				float length = 130; // 200;
+				float width = 130; // 200;
 				erasePointPotentialValue(bestPoint, length, width);
 				for (int i = 0; i < areaStructList.size(); i++) {
 					if (!areaStructList.at(i)._conflict) {  //如果已经冲突则不需要修改
@@ -815,11 +820,12 @@ void CGPUBestAlgThread::setPointValue() {
 
 void CGPUBestAlgThread::sendPointValue() {
 	//将点均分为若干个颜色,现在情况为把所有点按分值大小分配为256部分，每部分对应一个颜色
+	//排序，从大到小
 	sort(pointValueList.begin(), pointValueList.end(), greater<PointValueStruct>());
 	int point_size = pointValueList.size();
     //Heat_Map msgs;
     OWL::Protocol::Heat_Map_New msgs;
-	for (int m = gpuCalcArea::Color_Size - 1; m >= 0; m--) { //先把重要的点发过去
+	for (int m = gpuCalcArea::Color_Size - 1; m >= 0; m--) { //先把重要的点发过去，分值较小的
 		msgs.set_login_name(OParamManager::Instance()->LoginName);
 		auto points = msgs.add_points();
 		for (int n = m * point_size / gpuCalcArea::Color_Size; n < (m + 1) * point_size / gpuCalcArea::Color_Size; n++) {
@@ -882,12 +888,14 @@ void CGPUBestAlgThread::sendFieldRectangle() {
 		CGeoPoint rightUpPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightUpPos;
 		CGeoPoint leftDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftDownPos;
 		CGeoPoint rightDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightDownPos;
-		CGeoPoint centerPos = _bestSupport[i]; // gpuCalcArea::processed_fieldRectangleArray[i].getCenter();
+		CGeoPoint centerPos = gpuCalcArea::processed_fieldRectangleArray[i].getCenter();
 		GDebugEngine::Instance()->gui_debug_line(leftUpPos, rightUpPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(rightUpPos, rightDownPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(rightDownPos, leftDownPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(leftDownPos, leftUpPos, COLOR_BLACK);
-		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(i).toStdString().c_str(), COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_x(_bestSupport[i], COLOR_WHITE);
+		GDebugEngine::Instance()->gui_debug_msg(_bestSupport[i], QString::number(i).toStdString().c_str(), COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(_pointPotential[i]).toStdString().c_str(), COLOR_BLACK);
 	}
 	//支撑点顺序debug信息
 	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], "000", COLOR_YELLOW);
