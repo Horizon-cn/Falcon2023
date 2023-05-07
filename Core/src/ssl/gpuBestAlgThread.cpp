@@ -455,7 +455,7 @@ void CGPUBestAlgThread::supportSortV2() {
 		p.value = _pointPotential[areaNum];
 		pointValueList.push_back(p);
 	}
-	sort(pointValueList.begin(), pointValueList.end());
+	sort(pointValueList.begin(), pointValueList.end()); // 排序，从小到大
 	for (int areaNum = 0; areaNum < AREANUM; areaNum++) {
 		_bestSupport[areaNum] = _bestPoint[(int)pointValueList.at(areaNum).pos];
 	}
@@ -550,8 +550,8 @@ void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rig
 		//GDebugEngine::Instance()->gui_debug_x(CGeoPoint(start_pos_x_idx * _step - halfPitchLength, end_pos_y_idx * _step - halfPitchWidth), COLOR_BLUE);
 		//GDebugEngine::Instance()->gui_debug_x(CGeoPoint(end_pos_x_idx * _step - halfPitchLength, start_pos_y_idx * _step - halfPitchWidth), COLOR_GREEN);
 
-		for (int i = start_pos_x_idx; i < end_pos_x_idx + 1; i++) {
-			for (int j = start_pos_y_idx; j < end_pos_y_idx + 1; j++) {
+		for (int i = max(start_pos_x_idx, 0); i < min(end_pos_x_idx + 1, _h); i++) {
+			for (int j = max(start_pos_y_idx, 0); j < min(end_pos_y_idx + 1, _w); j++) {
 				if (_PointPotential[i * _w + j] < minValue) {
 					minValue = _PointPotential[i * _w + j];
 					bestPoint = CGeoPoint(i * _step - halfPitchLength, j * _step - halfPitchWidth);
@@ -724,8 +724,8 @@ void CGPUBestAlgThread::processPointValue() {
 	}
 
 	while (areaStructList.size()) {
-		// 先排序
-		sort(areaStructList.begin(), areaStructList.end(), greater<AreaStruct>());
+		// 先排序，从小到大
+		sort(areaStructList.begin(), areaStructList.end());
 		// 判断value最小的点是否被已选定点冲突
 		if (areaStructList.at(0)._conflict) { // 如果冲突，重新计算该点，并更新该点信息
 			area_idx = areaStructList.at(0)._area_idx;
@@ -735,6 +735,7 @@ void CGPUBestAlgThread::processPointValue() {
 			areaStructList.at(0)._conflict = false;
 		}
 		else { // 如果不冲突，将该点移出队列存放至规划点数组中，根据该点对场势进行erase并重新判断其余点是否冲突
+			minValue = areaStructList.at(0)._value;
 			bestPoint = areaStructList.at(0)._pos;
 			area_idx = areaStructList.at(0)._area_idx;
 			areaStructList.pop_front();
@@ -745,8 +746,8 @@ void CGPUBestAlgThread::processPointValue() {
 				break;
 			}
 			else {
-				float length = 200;
-				float width = 200;
+				float length = 130; // 200;
+				float width = 130; // 200;
 				erasePointPotentialValue(bestPoint, length, width);
 				for (int i = 0; i < areaStructList.size(); i++) {
 					if (!areaStructList.at(i)._conflict) {  //如果已经冲突则不需要修改
@@ -813,11 +814,12 @@ void CGPUBestAlgThread::setPointValue() {
 
 void CGPUBestAlgThread::sendPointValue() {
 	//将点均分为若干个颜色,现在情况为把所有点按分值大小分配为256部分，每部分对应一个颜色
+	//排序，从大到小
 	sort(pointValueList.begin(), pointValueList.end(), greater<PointValueStruct>());
 	int point_size = pointValueList.size();
     //Heat_Map msgs;
     OWL::Protocol::Heat_Map_New msgs;
-	for (int m = gpuCalcArea::Color_Size - 1; m >= 0; m--) { //先把重要的点发过去
+	for (int m = gpuCalcArea::Color_Size - 1; m >= 0; m--) { //先把重要的点发过去，分值较小的
 		msgs.set_login_name(OParamManager::Instance()->LoginName);
 		auto points = msgs.add_points();
 		for (int n = m * point_size / gpuCalcArea::Color_Size; n < (m + 1) * point_size / gpuCalcArea::Color_Size; n++) {
@@ -880,12 +882,13 @@ void CGPUBestAlgThread::sendFieldRectangle() {
 		CGeoPoint rightUpPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightUpPos;
 		CGeoPoint leftDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftDownPos;
 		CGeoPoint rightDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightDownPos;
-		CGeoPoint centerPos = _bestSupport[i]; // gpuCalcArea::processed_fieldRectangleArray[i].getCenter();
+		CGeoPoint centerPos = gpuCalcArea::processed_fieldRectangleArray[i].getCenter();
 		GDebugEngine::Instance()->gui_debug_line(leftUpPos, rightUpPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(rightUpPos, rightDownPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(rightDownPos, leftDownPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(leftDownPos, leftUpPos, COLOR_BLACK);
-		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(i).toStdString().c_str(), COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_msg(_bestSupport[i], QString::number(i).toStdString().c_str(), COLOR_BLACK);
+		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(_pointPotential[i]).toStdString().c_str(), COLOR_BLACK);
 	}
 	//支撑点顺序debug信息
 	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], "000", COLOR_YELLOW);
