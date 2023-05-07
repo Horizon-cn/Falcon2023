@@ -363,12 +363,12 @@ __global__ void gpu_calc(float startPos[], float map[])
     }
 }
 
-extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float *pitch_info) {
+extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int length, int width, int pos_num, float *pitch_info) {
     //clock_t begin, end;
     //begin = clock();
     float* map_gpu, * start_pos_gpu;
 
-    int map_size = height * width * sizeof(float);
+    int map_size = length * width * sizeof(float);
     int pos_size = pos_num * sizeof(float);
 
     cudaError_t  status1 = cudaMalloc((void**)&map_gpu, map_size); // 用于存储计算后的结果
@@ -398,7 +398,7 @@ extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, 
 
 
     // 定义kernel执行配置，（1024*1024/512）个block，每个block里面有512个线程
-    dim3 dimGrid(height);
+    dim3 dimGrid(length);
     dim3 dimBlock(width);
 
     // 执行kernel

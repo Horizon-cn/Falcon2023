@@ -27,10 +27,10 @@
 extern Semaphore vision_to_cuda;
 
 #ifdef ENABLE_CUDA
-extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float* pitch_info);
+extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int length, int width, int pos_num, float* pitch_info);
 extern "C" void ball_model_calc_with_gpu(float* vel_data_cpu, float* predict_results, float* a_1_matrix_cpu, float* bias_1_matrix_cpu, float* a_2_matrix_cpu, float* bias_2_matrix_cpu);
 #else
-void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int height, int width, int pos_num, float* pitch_info) {};
+void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int length, int width, int pos_num, float* pitch_info) {};
 void ball_model_calc_with_gpu(float* vel_data_cpu, float* predict_results, float* a_1_matrix_cpu, float* bias_1_matrix_cpu, float* a_2_matrix_cpu, float* bias_2_matrix_cpu) {};
 #endif // 
 
@@ -134,20 +134,20 @@ CGPUBestAlgThread::CGPUBestAlgThread() {
 	}
 
 #ifdef ENABLE_CUDA
-	// 需要查找的区域
-	_start_pos_x = -(int)(Param::Field::PITCH_LENGTH / 2);
-	_start_pos_y = -(int)(Param::Field::PITCH_WIDTH / 2);
-	// TODO 这里的width和height是和正常看owl2颠倒的，后续再修改一下
-	_height = Param::Field::PITCH_LENGTH;
-	_width = Param::Field::PITCH_WIDTH;
-	_step = 10; // 搜索的步长
-	if (_height % _step != 0 || _width % _step != 0) {
-		cout << "warning warning 场地尺寸不是step的整数倍" << endl;
-	}
-	// 定义需要申请的空间
-	_w = _width / _step;
-	_h = _height / _step;
-		int map_size = _w * _h * sizeof(float);
+		// 需要查找的区域
+		_length = Param::Field::PITCH_LENGTH;
+		_width = Param::Field::PITCH_WIDTH;
+		_step = ParamManager::Instance()->step; // 搜索的步长
+		// 起始点使得所有点都距离边线有半个步长的距离
+		_start_pos_x = ParamManager::Instance()->startPosX + _step * 0.5;
+		_start_pos_y = ParamManager::Instance()->startPosY + _step * 0.5;
+		if (_length % _step != 0 || _width % _step != 0) {
+			cout << "warning warning 场地尺寸不是step的整数倍" << endl;
+		}
+		// 定义需要申请的空间
+		_w = _width / _step;
+		_l = _length / _step;
+		int map_size = _w * _l * sizeof(float);
 		// (2+1+2+2+OURPLAYER_NUM*_player_pos_num+THEIRPLAYER_NUM*_player_pos_num) * sizeof(float)
 		// 依次为：搜索区域开始位置、步长step、球的位置、球的速度、我方小车的位置、朝向、速度（首位为是否valid）、敌方小车的位置、朝向、速度（首位为是否valid）
 		// 如果修改这部分代码，请仔细阅读赋值及GPU部分代码并与之进行相应的修改
@@ -240,8 +240,8 @@ void CGPUBestAlgThread::generatePointValue() {
 		// 上锁
 		// _best_visiondata_copy_mutex->lock();
 		// 拷贝
-	_start_pos_cpu[0] = _start_pos_x;
-	_start_pos_cpu[1] = _start_pos_y;
+		_start_pos_cpu[0] = _start_pos_x;
+		_start_pos_cpu[1] = _start_pos_y;
 		_start_pos_cpu[2] = _step;
 		_start_pos_cpu[3] = _pVision->Ball().Pos().x();
 		_start_pos_cpu[4] = _pVision->Ball().Pos().y();
@@ -290,7 +290,7 @@ void CGPUBestAlgThread::generatePointValue() {
 		int pos_num = 2 + 1 + 2 + 2 + OURPLAYER_NUM * _player_pos_num + THEIRPLAYER_NUM * _player_pos_num;
 
 		_value_getter_mutex->lock();
-		calc_with_gpu(_PointPotentialOrigin, _start_pos_cpu, _h, _w, pos_num, _pitch_info);
+		calc_with_gpu(_PointPotentialOrigin, _start_pos_cpu, _l, _w, pos_num, _pitch_info);
 		memcpy(_PointPotential, _PointPotentialOrigin, getMapSize());
 		processPointValue();
 		_value_getter_mutex->unlock();
@@ -489,8 +489,8 @@ CGeoPoint CGPUBestAlgThread::getBallPosFromFrame(CGeoPoint ball_pos, CVector bal
 // 将某一区域内的值变为最大值，从而不被考虑
 void CGPUBestAlgThread::erasePointPotentialValue(const CGeoPoint centerPoint, float length, float width) {
 	// 场地参数
-	float halfPitchLength = Param::Field::PITCH_LENGTH / 2;
-	float halfPitchWidth = Param::Field::PITCH_WIDTH / 2;
+	// float halfPitchLength = Param::Field::PITCH_LENGTH / 2;
+	// float halfPitchWidth = Param::Field::PITCH_WIDTH / 2;
 	// 其方法基本与getBestPoint中的相同，只是将搜索变为复制
 	// 在坐标系中
 	float left_up_pos_x = centerPoint.x() - length / 2;
@@ -499,18 +499,22 @@ void CGPUBestAlgThread::erasePointPotentialValue(const CGeoPoint centerPoint, fl
 	float right_down_pos_y = centerPoint.y() + width / 2;
 
 	// 考虑步长的情况下区域开始的位置
-	int start_pos_x_idx = ceil((left_up_pos_x + halfPitchLength) / _step);
-	int start_pos_y_idx = ceil((left_up_pos_y + halfPitchWidth) / _step);
+	int start_pos_x_idx = ceil((left_up_pos_x - _start_pos_x) / _step);
+	int start_pos_y_idx = ceil((left_up_pos_y - _start_pos_y) / _step);
+	// int start_pos_x_idx = ceil((left_up_pos_x + halfPitchLength) / _step);
+	// int start_pos_y_idx = ceil((left_up_pos_y + halfPitchWidth) / _step);
 
 	// 考虑步长的情况下区域结束的位置
-	int end_pos_x_idx = floor((right_down_pos_x + halfPitchLength) / _step);
-	int end_pos_y_idx = floor((right_down_pos_y + halfPitchWidth) / _step);
+	int end_pos_x_idx = floor((right_down_pos_x - _start_pos_x) / _step);
+	int end_pos_y_idx = floor((right_down_pos_y - _start_pos_y) / _step);
+	// int end_pos_x_idx = floor((right_down_pos_x + halfPitchLength) / _step);
+	// int end_pos_y_idx = floor((right_down_pos_y + halfPitchWidth) / _step);
 	// int end_pos_x_idx = floor((right_down_pos_x - left_up_pos_x) / _step) + start_pos_x_idx;
 	// int end_pos_y_idx = floor((right_down_pos_y - left_up_pos_y) / _step) + start_pos_y_idx;
 
-	for (int i = max(start_pos_x_idx, 0); i < min(end_pos_x_idx + 1, _h); i++) {
+	for (int i = max(start_pos_x_idx, 0); i < min(end_pos_x_idx + 1, _l); i++) {
 		for (int j = max(start_pos_y_idx, 0); j < min(end_pos_y_idx + 1, _w); j++) {
-			if (i * _w + j >= _w * _h) {
+			if (i * _w + j >= _w * _l) {
 				std::cout << "index error";
 			}
 			_PointPotential[i * _w + j] = 255;
@@ -525,8 +529,8 @@ void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rig
 		// 初始化参数
 		minValue = 255;
 		// 场地参数
-		float halfPitchLength = Param::Field::PITCH_LENGTH / 2;
-		float halfPitchWidth = Param::Field::PITCH_WIDTH / 2;
+		// float halfPitchLength = Param::Field::PITCH_LENGTH / 2;
+		// float halfPitchWidth = Param::Field::PITCH_WIDTH / 2;
 
 		// 在坐标系中
 		float left_up_pos_x = leftUp.x();
@@ -535,12 +539,16 @@ void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rig
 		float right_down_pos_y = rightDown.y();
 
 		// 考虑步长的情况下区域开始的位置
-		int start_pos_x_idx = ceil((left_up_pos_x + halfPitchLength) / _step);
-		int start_pos_y_idx = ceil((left_up_pos_y + halfPitchWidth) / _step);
+		int start_pos_x_idx = ceil((left_up_pos_x - _start_pos_x) / _step);
+		int start_pos_y_idx = ceil((left_up_pos_y - _start_pos_y) / _step);
+		// int start_pos_x_idx = ceil((left_up_pos_x + halfPitchLength) / _step);
+		// int start_pos_y_idx = ceil((left_up_pos_y + halfPitchWidth) / _step);
 
 		// 考虑步长的情况下区域结束的位置
-		int end_pos_x_idx = floor((right_down_pos_x + halfPitchLength) / _step);
-		int end_pos_y_idx = floor((right_down_pos_y + halfPitchWidth) / _step);
+		int end_pos_x_idx = floor((right_down_pos_x - _start_pos_x) / _step);
+		int end_pos_y_idx = floor((right_down_pos_y - _start_pos_y) / _step);
+		// int end_pos_x_idx = floor((right_down_pos_x + halfPitchLength) / _step);
+		// int end_pos_y_idx = floor((right_down_pos_y + halfPitchWidth) / _step);
 		// int end_pos_x_idx = floor((right_down_pos_x - left_up_pos_x) / _step) + start_pos_x_idx;
 		// int end_pos_y_idx = floor((right_down_pos_y - left_up_pos_y) / _step) + start_pos_y_idx;
 
@@ -554,11 +562,12 @@ void CGPUBestAlgThread::getBestPoint(const CGeoPoint leftUp, const CGeoPoint rig
 		//GDebugEngine::Instance()->gui_debug_x(CGeoPoint(start_pos_x_idx * _step - halfPitchLength, end_pos_y_idx * _step - halfPitchWidth), COLOR_BLUE);
 		//GDebugEngine::Instance()->gui_debug_x(CGeoPoint(end_pos_x_idx * _step - halfPitchLength, start_pos_y_idx * _step - halfPitchWidth), COLOR_GREEN);
 
-		for (int i = max(start_pos_x_idx, 0); i < min(end_pos_x_idx + 1, _h); i++) {
+		for (int i = max(start_pos_x_idx, 0); i < min(end_pos_x_idx + 1, _l); i++) {
 		  	for (int j = max(start_pos_y_idx, 0); j < min(end_pos_y_idx + 1, _w); j++) {
 				if (_PointPotential[i * _w + j] < minValue) {
 					minValue = _PointPotential[i * _w + j];
-					bestPoint = CGeoPoint(i * _step - halfPitchLength, j * _step - halfPitchWidth);
+					bestPoint = CGeoPoint(i * _step + _start_pos_x, j * _step + _start_pos_y);
+					// bestPoint = CGeoPoint(i * _step - halfPitchLength, j * _step - halfPitchWidth);
 				}
 			}
 		}
@@ -805,7 +814,7 @@ double CGPUBestAlgThread::getPosPotential(const CGeoPoint p) {
 void CGPUBestAlgThread::setPointValue() {
 	// _value_getter_mutex->lock();
 	pointValueList.clear();
-	int size = _h * _w;
+	int size = _l * _w;
 	for (int i = 0; i < size; i++) {
 		if (_PointPotentialOrigin[i] < 0) _PointPotentialOrigin[i] = 0;
 		PointValueStruct p;

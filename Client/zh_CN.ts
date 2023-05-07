@@ -223,29 +223,29 @@
 <context>
     <name>Field</name>
     <message>
-        <location filename="src/other/field.cpp" line="342"/>
+        <location filename="src/other/field.cpp" line="343"/>
         <source>Set ball pos:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/field.cpp" line="343"/>
-        <location filename="src/other/field.cpp" line="475"/>
+        <location filename="src/other/field.cpp" line="344"/>
+        <location filename="src/other/field.cpp" line="476"/>
         <source>x: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/field.cpp" line="348"/>
-        <location filename="src/other/field.cpp" line="480"/>
+        <location filename="src/other/field.cpp" line="349"/>
+        <location filename="src/other/field.cpp" line="481"/>
         <source>y: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/field.cpp" line="474"/>
+        <location filename="src/other/field.cpp" line="475"/>
         <source>Set robot pose:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/other/field.cpp" line="485"/>
+        <location filename="src/other/field.cpp" line="486"/>
         <source>dir: </source>
         <translation type="unfinished"></translation>
     </message>

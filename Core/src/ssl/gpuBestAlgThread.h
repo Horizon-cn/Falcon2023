@@ -211,7 +211,7 @@ public:
 	double getPosPotential(const CGeoPoint p);
 
 	// 返回场势图的size
-	int getMapSize() { return _w * _h * sizeof(float); }
+	int getMapSize() { return _w * _l * sizeof(float); }
 
 	// owl2可视化所需函数
 	void startComm();
@@ -282,8 +282,8 @@ private:
 	CGeoPoint _bestSupport[AREANUM];         /// 按照支撑点重要性进行排序后的最优点
 
 
-	int _start_pos_x, _start_pos_y, _width, _height, _step;     ///搜索区域参数，分别为左上角坐标、区域长与宽、搜索步长
-	int _w, _h;                                       /// 申请空间参数  
+	int _start_pos_x, _start_pos_y, _width, _length, _step;     ///搜索区域参数，分别为左上角坐标、区域长与宽、搜索步长
+	int _w, _l;                                       /// 申请空间参数  
 	int _player_pos_num;                              //一个机器人所需传递的信息数目，目前为小车的位置、朝向、速度（首位为是否valid）
 
 	CGeoPoint sendPoint;				///<传球点，一般为球所在的点
