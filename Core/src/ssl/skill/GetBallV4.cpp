@@ -576,7 +576,7 @@ bool CGetBallV4::ROTATECanToDIRECT(const CVisionModule* pVision, const double fi
     const int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
     const CVector self2ball = ball.Pos() - me.Pos();
-    if (fabs(Utils::Normalize(finalDir - me.Dir())) < Param::Math::PI * 4 / 180.0) return 1;
+    if (fabs(Utils::Normalize(finalDir - me.Dir())) < Param::Math::PI * 8 / 180.0) return 1;
     return 0;
 }
 bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir)
