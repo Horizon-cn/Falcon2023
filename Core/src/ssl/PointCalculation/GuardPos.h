@@ -3,6 +3,7 @@
 
 #include "Vision/VisionModule.h"
 #include "singleton.h"
+#include "PointCalculation\MarkingPosV2.h"
 
 class CGuardPos
 {

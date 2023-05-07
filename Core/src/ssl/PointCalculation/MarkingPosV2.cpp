@@ -20,7 +20,7 @@
 
 namespace NameSpaceMarkingPosV2{
 	// const
-	CGeoPoint ourGoal;
+	CGeoPoint _ourGoal;
 	const double REF_AVOID_BALL = Param::Field::FREE_KICK_AVOID_BALL_DIST + Param::Vehicle::V2::PLAYER_SIZE*3.5;
 	const double PUSH_ENEMY_BUFFER = 0;//original : PUSH_ENEMY_BUFFER = 15;
 	const double CHASE_JUDGE_VALUE = 300;//判断chase的属性值阈值
@@ -60,7 +60,7 @@ namespace NameSpaceMarkingPosV2{
 	double RECEIVER_MARK_BUFFER = -3.0;//receiver 盯人距离
 
 	//调试开关
-	bool debug = false;
+	bool _debug = false;
 };
 
 using namespace NameSpaceMarkingPosV2;
@@ -75,7 +75,7 @@ CMarkingPosV2::CMarkingPosV2()
 	oppPriority = 0;
 	oppNum = 0;
 	clearPos();
-	ourGoal = CGeoPoint(-Param::Field::PITCH_LENGTH/2,0);
+	_ourGoal = CGeoPoint(-Param::Field::PITCH_LENGTH/2,0);
 	_logCycle = 0;
 }
 
@@ -119,14 +119,14 @@ CGeoPoint CMarkingPosV2::getMarkingPos(const CVisionModule* pVision, const int p
 
 CGeoPoint CMarkingPosV2::getMarkingPosByAbsolutePri(const CVisionModule* pVision , const int pri)
 {
-	/*oppPriority = pri;
+	oppPriority = pri;
 	oppNum = DefenceInfo::Instance()->getSteadyAttackOppNumByPri(oppPriority);
 	if (pVision->Cycle() > logCycle[oppNum])
 	{
 	logCycle[oppNum] = pVision->Cycle();
 	markingPoint[oppNum] = generatePos(pVision);
 	}
-	return markingPoint[oppNum];*/
+	return markingPoint[oppNum];
 	checkAllMarkingPos(pVision);
 	oppNum = DefenceInfo::Instance()->getSteadyAttackOppNumByPri(pri);
 	return markingPoint[pri];
@@ -135,13 +135,13 @@ CGeoPoint CMarkingPosV2::getMarkingPosByAbsolutePri(const CVisionModule* pVision
 //根据对手车号选敌
 CGeoPoint CMarkingPosV2::getMarkingPosByNum(const CVisionModule* pVision , const int num)
 {
-	//oppNum = num;
-	//if (pVision->Cycle() > logCycle[oppNum])
-	//{
-	//	logCycle[oppNum] = pVision->Cycle();
-	//	markingPoint[oppNum] = generatePos(pVision);
-	//}
-	//return markingPoint[oppNum];
+	oppNum = num;
+	if (pVision->Cycle() > logCycle[oppNum])
+	{
+		logCycle[oppNum] = pVision->Cycle();
+		markingPoint[oppNum] = generatePos(pVision);
+	}
+	return markingPoint[oppNum];
 	checkAllMarkingPos(pVision);
 	return markingPoint[num];
 }
@@ -172,7 +172,7 @@ void CMarkingPosV2::checkAllMarkingPos(const CVisionModule *pVision)
 		if (areaList.size() > 1){
 			std::sort(areaList.begin(),areaList.end());
 			for (ir = areaList.begin();ir!= areaList.end();ir++){
-				markingPoint[*ir] = markingPoint[*ir]+Utils::Polar2Vector(20*cnt,(ourGoal - pVision->TheirPlayer(*ir).Pos()).dir());
+				markingPoint[*ir] = markingPoint[*ir]+Utils::Polar2Vector(20*cnt,(_ourGoal - pVision->TheirPlayer(*ir).Pos()).dir());
 				cnt = cnt+1;
 				//cout<<*ir<<" "<<cnt<<endl;
 			}
@@ -188,7 +188,7 @@ bool CMarkingPosV2::isNearestBallReceiverBeDenied(const CVisionModule* pVision)
 	int attackNum = DefenceInfo::Instance()->getAttackNum();
 	if (pVision->Ball().Vel().mod() > NO_ADVANCE_BALL_VEL)
 	{
-		if (debug)
+		if (_debug)
 		{
 			cout<<"ball vel mod is  "<<pVision->Ball().Vel().mod()<<endl;
 		}
@@ -205,7 +205,7 @@ bool CMarkingPosV2::isNearestBallReceiverBeDenied(const CVisionModule* pVision)
 				}
 			}
 		}
-		if (debug)
+		if (_debug)
 		{
 			cout<<"receiver is  "<<receiverNum<<endl;
 			cout<<"deny   is   "<<DENY_LOG[receiverNum]<<endl;
@@ -230,7 +230,7 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 		const BallVisionT& ball = pVision->Ball();
 		const CGeoPoint oppPos = opp.Pos();
 		const CVector oppVel = opp.Vel();
-		CVector opp2ourGoalVector = CVector(ourGoal - oppPos);
+		CVector opp2ourGoalVector = CVector(_ourGoal - oppPos);
 
 		//盯人点临时量
 		CGeoPoint finalPoint = oppPos;
@@ -248,7 +248,7 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 			{
 				bool defenderOK = (defenderNum != 0) && pVision->OurPlayer(defenderNum).Valid();
 				CGeoPoint preOppPos = oppPos + Utils::Polar2Vector(oppVel.mod()*predictTime,oppVel.dir());//专对于ImmortalKick，不需要根据对手速度朝向修改predictTime
-				bool oppFrontMe = preOppPos.dist(ourGoal) - Param::Vehicle::V2::PLAYER_SIZE > pVision->OurPlayer(defenderNum).Pos().dist(ourGoal);
+				bool oppFrontMe = preOppPos.dist(_ourGoal) - Param::Vehicle::V2::PLAYER_SIZE > pVision->OurPlayer(defenderNum).Pos().dist(_ourGoal);
 				if (defenderOK && !oppFrontMe)//对方chaseKicker不在我前面
 				{
 					markBuffer = CHASE_MARK_BUFFER;
@@ -271,7 +271,7 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 				{
 					CGeoLine ballVelLine = CGeoLine(ball.Pos(),ball.Vel().dir());
 					CGeoPoint opp2ballVelLineProj = ballVelLine.projection(oppPos);
-					if (debug)
+					if (_debug)
 					{
 						GDebugEngine::Instance()->gui_debug_x(opp2ballVelLineProj,COLOR_YELLOW);
 						GDebugEngine::Instance()->gui_debug_line(ball.Pos(),opp2ballVelLineProj,COLOR_WHITE);
@@ -289,7 +289,7 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 						bool dist1OK = opp2ballVelLineProj.dist(oppPos) < DENY_DIST_LIMIT_1;
 						bool dist2OK = tempPos.dist(pVision->OurPlayer(defenderNum).Pos()) < DENY_DIST_LIMIT_2;
 						bool ballVelOK = ball.Vel().mod() < 500;
-						if (debug)
+						if (_debug)
 						{
 							//cout << opp2ballVelLineProj.dist(ball.Pos()) / (ball.Vel().mod() + 0.1)<<endl;
 							cout<< "deny condition  " << timeOK <<"  " << angleOK <<"  "<< dist1OK <<"  "<< dist2OK <<"  "<< ballVelOK <<endl;;
@@ -303,7 +303,7 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 					{
 						//绕前动作
 						finalPoint = opp2ballVelLineProj + Utils::Polar2Vector(2*Param::Vehicle::V2::PLAYER_SIZE+DENY_BUFFER,Utils::Normalize(ball.Vel().dir()+Param::Math::PI));
-						if (debug)
+						if (_debug)
 						{
 							GDebugEngine::Instance()->gui_debug_x(finalPoint,COLOR_YELLOW);
                             QString denyBall;
@@ -344,7 +344,7 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 			CGeoPoint oppPrePos = oppPos + Utils::Polar2Vector(oppVelModified.mod() * predictTime,oppVelModified.dir());
 			//GDebugEngine::Instance()->gui_debug_x(oppPrePos,COLOR_WHITE);
 			//cout<<"sinPre is "<<sinPre<<" cosPre is "<<cosPre<<endl;
-			CVector oppPre2ourGoal = ourGoal - oppPrePos;
+			CVector oppPre2ourGoal = _ourGoal - oppPrePos;
 			basePoint = oppPrePos + Utils::Polar2Vector(2*Param::Vehicle::V2::PLAYER_SIZE+5,oppPre2ourGoal.dir());
 			if (oppPrePos.x() > -NORMAL_DIST)//要依据效果仔细调参数
 			{
@@ -383,13 +383,13 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 				{
 					//GDebugEngine::Instance()->gui_debug_line(ballPos,basePoint);
 					CGeoCirlce ballCircle = CGeoCirlce(ballPos,REF_AVOID_BALL);
-					CGeoLine markLine = CGeoLine(basePoint,ourGoal);
+					CGeoLine markLine = CGeoLine(basePoint,_ourGoal);
 					CGeoLineCircleIntersection markIntersect = CGeoLineCircleIntersection(markLine,ballCircle);
 					if (markIntersect.intersectant())
 					{
 						p1 = markIntersect.point1();
 						p2 = markIntersect.point2();
-						if (p1.dist(ourGoal) < p2.dist(ourGoal))
+						if (p1.dist(_ourGoal) < p2.dist(_ourGoal))
 						{
 							basePoint = p1;
 						} else basePoint = p2;
@@ -413,13 +413,13 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 				if (true == BACK_LOG[oppNum])
 				{
 					//动作点计算
-					if (debug){
+					if (_debug){
                         QString backLine;
                         backLine = QString("%1: back line").arg(oppNum);
                         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(25+oppNum*10,50),backLine.toLatin1(),COLOR_YELLOW);
                     }
 					CGeoPoint RtargetPoint = DefendUtils::reversePoint(oppPrePos);
-					CGeoPoint Rgoal = DefendUtils::reversePoint(ourGoal);
+					CGeoPoint Rgoal = DefendUtils::reversePoint(_ourGoal);
 					finalPoint = DefendUtils::reversePoint(DefendUtils::calcDefenderPointV2(RtargetPoint,CVector(Rgoal - RtargetPoint).dir(),POS_SIDE_MIDDLE,0,1.0));
 					//判断退出
 					if (opp2ourGoalDist > BACK_BUFFER_OUT && false == isInSpecialAreaBackLineMode(pVision,oppNum))
@@ -437,16 +437,16 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 		for (ir = fieldList.begin();ir!= fieldList.end(); ir++){
 			if (DefenceInfo::Instance()->checkInRecArea(oppNum,pVision,*ir)){
 				CGeoRectangle rect = CGeoRectangle((*ir)._upLeft,(*ir)._downRight);
-				CGeoLine line = CGeoLine(pVision->TheirPlayer(oppNum).Pos(),ourGoal);
+				CGeoLine line = CGeoLine(pVision->TheirPlayer(oppNum).Pos(),_ourGoal);
 				CGeoLineRectangleIntersection intersect = CGeoLineRectangleIntersection(line,rect);
 				if (intersect.intersectant()){
 					CGeoPoint tmpPoint;
-					if (intersect.point1().dist(ourGoal)>intersect.point2().dist(ourGoal)){
+					if (intersect.point1().dist(_ourGoal)>intersect.point2().dist(_ourGoal)){
 						tmpPoint = intersect.point2();
 					}else{
 						tmpPoint = intersect.point1();
 					}
-					tmpPoint = tmpPoint+Utils::Polar2Vector(10,(ourGoal - oppPos).dir());
+					tmpPoint = tmpPoint+Utils::Polar2Vector(10,(_ourGoal - oppPos).dir());
 					if (tmpPoint.dist(oppPos)>finalPoint.dist(oppPos)){
 						finalPoint = tmpPoint;
 						areaList.push_back(oppNum);
@@ -507,7 +507,7 @@ bool CMarkingPosV2::checkInSpecialArea_A(const CGeoPoint p,const CGeoPoint ballP
 	double goal2oppDir = CVector(p - CGeoPoint(-Param::Field::PITCH_LENGTH/2.0,0)).dir();
 	if (p.x() < SPECIAL_AREA_X_BUFFER && (goal2oppDir*theFlag > refDir*theFlag))
 	{
-		if (debug){
+		if (_debug){
             QString backLine;
             backLine.append(QString("%1: special line").arg(oppNum));
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(125+oppNum*10,50),backLine.toLatin1(),COLOR_YELLOW);
