@@ -1,6 +1,6 @@
 #include "Marking.h"
 #include <skill/Factory.h>
-#include "BestPlayer.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include "Vision/VisionModule.h"
 #include "utils.h"
 #include "GDebugEngine.h"
@@ -98,7 +98,7 @@ void CMarking::plan(const CVisionModule* pVision)
 	*      ÅÐ¶ÏÊÇ·ñÒªÈÆÇ°½ØÇò      *
 	*	    By Soap 2015-4-27     *
 	*****************************/
-	const PlayerVisionT* theirKicker = &pVision->TheirPlayer(BestPlayer::Instance()->theirFastestPlayerToBallList().front().num);
+	const PlayerVisionT* theirKicker = &pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	double ballToEnemyDir = (enemy.Pos() - ball.Pos()).dir();
 	double meToBallDist = me.Pos().dist(ball.Pos());
 	double enemyToBallDist = enemy.Pos().dist(ball.Pos());

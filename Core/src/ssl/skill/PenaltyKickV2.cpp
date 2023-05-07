@@ -13,7 +13,7 @@
 #include "WorldModel/DribbleStatus.h"
 #include "PointCalculation/IndirectDefender.h"
 #include <utils.h>
-#include <BestPlayer.h>
+#include "defenceNew/DefenceInfoNew.h"
 #include "KickDirection.h"
 #include <GDebugEngine.h>
 #include <iostream>
@@ -379,9 +379,9 @@ bool CPenaltyKickV2::checkOppHasBall(const CVisionModule* pVision) {
     const CVector self2ball = ball.Pos() - me.Pos();
     opponentID = 0;
 
-    const CBestPlayer::PlayerList& oppList = BestPlayer::Instance()->theirFastestPlayerToBallList();
+    const auto& oppList = DefenceInfoNew::Instance()->getSteadyBallChaserList();
     if (oppList.size() < 1)return false;
-    else opponentID = oppList[0].num;
+    else opponentID = oppList[0];
     if (!pVision->TheirPlayer(opponentID).Valid()) {
         opponentID = getTheirMostClosetoPosPlayerNum(pVision, pVision->Ball().Pos());
     }

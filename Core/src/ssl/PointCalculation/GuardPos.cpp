@@ -3,6 +3,7 @@
 #include "Global.h"
 #include "param.h"
 #include "TaskMediator.h"
+#include "defenceNew/DefenceInfoNew.h"
 
 namespace {
     const CGeoPoint GOAL_MIDDLE = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
@@ -167,7 +168,7 @@ void CGuardPos::adjustBackPos(int guardNum)
 {
     if (!CheckBackPos || (guardNum != 3 && guardNum != 2)) return;
     const BallVisionT& Ball = vision->Ball();
-    int bestenemy = BestPlayer::Instance()->getTheirBestPlayer();
+    int bestenemy = DefenceInfoNew::Instance()->getBestBallChaser();
     double defendTargetPosX = Ball.Valid() ? Ball.X() : vision->TheirPlayer(bestenemy).X();
     double defendTargetPosY = Ball.Valid() ? Ball.Y() : vision->TheirPlayer(bestenemy).Y();
     double defendTargetVelX = Ball.Valid() ? Ball.VelX() : vision->TheirPlayer(bestenemy).VelX();

@@ -12,6 +12,7 @@
 #include "WorldModel/WorldModel.h"
 #include <TaskMediator.h>
 #include <cstring>
+#include "defenceNew/DefenceInfoNew.h"
 
 namespace{
 	const double dangerFactor = 2.5;
@@ -44,7 +45,7 @@ void CGoalie2013::plan(const CVisionModule* pVision)
 	const BallVisionT& ball = pVision->Ball();
 	int preTime = (int)ball.Vel().mod();
 	CGeoPoint ballPre = BallSpeedModel::Instance()->posForTime(preTime,pVision);
-	const PlayerVisionT enemy = pVision->TheirPlayer(BestPlayer::Instance()->getTheirBestPlayer());
+	const PlayerVisionT enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	CGeoPoint goalCenter = CGeoPoint(-Param::Field::PITCH_LENGTH/2,0);
 
 	TaskT myTask(task());
@@ -233,7 +234,7 @@ bool	CGoalie2013::needtoClearBall(const CVisionModule* pVision)
 	bool result = false;
 	const BallVisionT& ball = pVision->Ball();
 	int advancer = BestPlayer::Instance()->getOurBestPlayer(); 
-	const PlayerVisionT enemy = pVision->TheirPlayer(BestPlayer::Instance()->getTheirBestPlayer());
+	const PlayerVisionT enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	if (((ball.Vel().mod() < 120 && Utils::InOurPenaltyArea(ball.Pos(),-5))||
 		(ball.Vel().mod() < 50 && Utils::InOurPenaltyArea(ball.Pos(),PENALTY_BUFFER))
 		&& checkWeHaveHelper(pVision) || Utils::InOurPenaltyArea(ball.Pos(), PENALTY_BUFFER) && !Utils::InOurPenaltyArea(enemy.Pos(),DEFEND_PENALTY_BUFFER))){
@@ -246,7 +247,7 @@ bool	CGoalie2013::needtoClearBall(const CVisionModule* pVision)
 bool CGoalie2013::needtoAttackEnemy(const CVisionModule* pVision)
 {
 	bool result = false;
-	const PlayerVisionT enemy = pVision->TheirPlayer(BestPlayer::Instance()->getTheirBestPlayer());
+	const PlayerVisionT enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	const PlayerVisionT& me = pVision->OurPlayer(task().executor);
 	const BallVisionT& ball = pVision->Ball();
 	if ((Utils::InOurPenaltyArea(enemy.Pos(),DEFEND_PENALTY_BUFFER) && ball.Vel().mod()>120 &&  DefendUtils::BallIsToPenaltyArea()

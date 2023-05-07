@@ -10,6 +10,7 @@
 #include "GDebugEngine.h"
 #include "TaskMediator.h"
 #include "BestPlayer.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include <string>
 #include <ctime>
 #include <algorithm>
@@ -142,7 +143,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     //记录目前执行车号和最具威胁车号
     int vecNumber = task().executor;
-    int oppNum = BestPlayer::Instance()->getTheirBestPlayer();
+    int oppNum = DefenceInfoNew::Instance()->getBestBallChaser();
     int goalieNum = pVision->TheirGoalie();
 
     //由视觉和lua获得变量

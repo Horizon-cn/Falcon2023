@@ -11,7 +11,7 @@
 #include "BallSpeedModel.h"
 #include "WorldModel/WorldModel.h"
 #include <TaskMediator.h>
-//#include <atlstr.h>
+#include "defenceNew/DefenceInfoNew.h"
 
 #define DEBUGING
 #ifdef DEBUGING
@@ -84,7 +84,7 @@ int CGoalie2022::evaluate(const CVisionModule* pVision)
 {
     int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
-    const PlayerVisionT enemy = pVision->TheirPlayer(BestPlayer::Instance()->getTheirBestPlayer());
+    const PlayerVisionT& enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
     const BallVisionT& ball = pVision->Ball();
 
     if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") {
@@ -133,7 +133,7 @@ bool CGoalie2022::ShouldAttack(const CVisionModule* pVision)
     if (!AGGRESSIVE_GOALIE)
         return false;
     int robotNum = task().executor;
-    const PlayerVisionT& enemy = pVision->TheirPlayer(BestPlayer::Instance()->getTheirBestPlayer());
+    const PlayerVisionT& enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
     const BallVisionT& ball = pVision->Ball();
 
     if (abs(enemy.Pos().y()) > Param::Field::PENALTY_AREA_WIDTH / 2.0 + 30
@@ -257,7 +257,7 @@ CPlayerTask* CGoalie2022::attackEnemyTask(const CVisionModule* pVision)
 
     int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
-    const PlayerVisionT& enemy = pVision->TheirPlayer(BestPlayer::Instance()->getTheirBestPlayer());
+    const PlayerVisionT& enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
     const BallVisionT& ball = pVision->Ball();
 
     //距敌人过近时会因路径不可达而跑歪，此时直接抢球即可
@@ -292,7 +292,7 @@ double CGoalie2022::CalClearBallDir(const CVisionModule * pVision)
     int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
     const BallVisionT& ball = pVision->Ball();
-    const PlayerVisionT enemy = pVision->TheirPlayer(BestPlayer::Instance()->getTheirBestPlayer());
+    const PlayerVisionT& enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
     double clearBallDir = 0;
     if (TaskMediator::Instance()->singleBack() == 0 && TaskMediator::Instance()->leftBack() != 0) {
         CGeoPoint leftpos = DefPos2015::Instance()->getDefPos2015(pVision).getLeftPos();

@@ -10,7 +10,7 @@ yangda
 #include "DefendUtils.h"
 #include "WorldModel/DribbleStatus.h"
 #include "WorldModel/KickStatus.h"
-
+#include "defenceNew/DefenceInfoNew.h"
 #include "RobotSensor.h"
 #include "TaskMediator.h"
 #include "Vision/VisionModule.h"
@@ -113,7 +113,7 @@ void CShootoutGoalie::plan(const CVisionModule *pVision) {
 	iRobotNum = task().executor;
 	me = pVision->OurPlayer(iRobotNum);
 	ball = pVision->Ball();
-	him = pVision->TheirPlayer(BestPlayer::Instance()->getTheirBestPlayer());
+	him = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	ballx = ball.Pos().x();
 	bally = ball.Pos().y();
 	himx = him.Pos().x();
