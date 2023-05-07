@@ -224,6 +224,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     begin = clock();
     CGeoPoint target = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     end = clock();
+    
     std::cout << "best break point calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
     if (isSetPoint(pVision, point, me.Pos())) {
         move_point = target;
@@ -284,6 +285,8 @@ void CBreak::plan(const CVisionModule* pVision) {
     //cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
 
     bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
+    cout << "canShoot____" << ' ' << canShoot << endl;
+    cout << "dirok____" << ' ' << dirok << endl;
     //if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 20) {
     if (canShoot && dirok){
         cout << "shoot!!!" << endl;
@@ -292,7 +295,6 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     }
     DribbleStatus::Instance()->setDribbleCommand(vecNumber, 3);
-
     _lastCycle = pVision->Cycle();
     return CStatedTask::plan(pVision);
 }
@@ -664,6 +666,13 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
 
     bool flag = true;
     double x1 = me.X(), y1 = me.Y(), theta = dir;
+    if (Param::Field::MAX_PLAYER == 0)
+    {
+        double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
+        if (fabs(projection) > Param::Field::GOAL_WIDTH / 2) {
+            flag = false;
+        }
+    }
     for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
         if (!pVision->TheirPlayer(i).Valid()) continue;
         auto enemy = pVision->TheirPlayer(i);
@@ -671,10 +680,11 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
         
-        if (r < radius || fabs(projection) > Param::Field::GOAL_WIDTH / 2) {
+        if (r < radius || fabs(projection) + 5 > Param::Field::GOAL_WIDTH / 2 ) {
             flag = false;
         }
     }
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("CanScore:" + to_string(flag)).c_str(), COLOR_YELLOW);
     return flag;
 
 }

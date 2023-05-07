@@ -229,6 +229,9 @@ void CAdvance::plan(const CVisionModule* pVision)
         if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
         break;
 	}
+	
+	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3)_state = BREAKSHOOT;
+	else _state = GET;
 	//_state = GET;
 	/**********************************************************
 	* Description: ×´Ì¬Ö´ÐÐ

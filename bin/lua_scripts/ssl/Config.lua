@@ -21,7 +21,7 @@ gSwitchNum = {
 }
 
 gRoleFixNum = {
-	["Kicker"]   = {5},
+	["Kicker"]   = {2},
 	["Goalie"]   = {4},
 	["Tier"]	 = {3},
 	["Receiver"] = {1}

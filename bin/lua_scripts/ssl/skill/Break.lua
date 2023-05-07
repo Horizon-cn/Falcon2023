@@ -1,7 +1,7 @@
 function Break(task)
   
     execute = function(runner)
-      return CBreak(runner,600,0)
+      return CBreak(runner)
     end
   
     matchPos = function()
