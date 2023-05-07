@@ -32,9 +32,13 @@ public:
 private:
 	void updateBallChaserList(const CVisionModule* pVision);
 	void updateBallReceiverList(const CVisionModule* pVision);
+	void checkPass(const CVisionModule* pVision);
+	int matchReceiver(const CVisionModule* pVision);
 private:
 	TenemyList _ballChaserList, _ballChaserSteadyList, _ballReceiverList, _ballReceiverSteadyList;
 	TpotientialList _chaserPotientialList, _lastChaserPotientialList, _receiverPotientialList, _lastReceiverPotientialList;
+	bool isInTheirPass;
+	int _kicker, _receiver;
 };
 
 typedef Falcon::NormalSingleton<CDefenceInfoNew> DefenceInfoNew;
