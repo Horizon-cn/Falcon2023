@@ -8,7 +8,7 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_Advance" --"Test_Run"
+		return "Test_Goalie" --"Test_Run"
 	else
 		return "Test_Advance" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
@@ -22,7 +22,7 @@ gSwitchNum = {
 
 gRoleFixNum = {
 	["Kicker"]   = {5},
-	["Goalie"]   = {4},
+	["Goalie"]   = {0},
 	["Tier"]	 = {3},
 	["Receiver"] = {1}
 }

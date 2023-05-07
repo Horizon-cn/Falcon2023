@@ -86,15 +86,8 @@ void CGuardPos::generatePos(int guardNum)
     int bestenemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
     int potentialenemy = DefenceInfo::Instance()->getAttackOppNumByPri(1);
     if (!defend_break_or_not) {
-        _intersecMiddle = intersecMiddleNoBall(potentialenemy);
-        if (_intersecMiddle.intersectant()) {
-            _backPos[guardNum-1] = _intersecMiddle.point2().dist(GOAL_MIDDLE) < 1e-8 ? _intersecMiddle.point1() : _intersecMiddle.point2();
-            //GDebugEngine::Instance()->gui_debug_line(_backPos[guardNum-1], vision->TheirPlayer(potentialenemy).Pos());
-            guardNum = guardNum - 1;
-        }
-        else {
-            std::cout << "GUARDPOS: NO INTERSECTION!!!\n";
-        }
+        _backPos[guardNum - 1] = MarkingPosV2::Instance()->getMarkingPosByAbsolutePri(vision, 1);
+        guardNum = guardNum - 1;
     }
     _intersecMiddle = intersecMiddle(bestenemy);
     if (_intersecMiddle.intersectant()) {
