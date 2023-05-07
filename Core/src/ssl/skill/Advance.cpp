@@ -235,8 +235,11 @@ void CAdvance::plan(const CVisionModule* pVision)
 		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
 		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
         break;
-	}
-	//_state = GET;
+	}/*
+	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
+		KickStatus::Instance()->setKick(_executor, RELIEF_POWER);
+	}*/
+	_state = GET;
 	/**********************************************************
 	* Description: 状态执行
 	* Author: 谭宇宏
@@ -283,7 +286,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			//KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 			/*此处朝向可持久化即可 不需要进行改变*/
             LastPassDirToJudge = -999;
-			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, generateGetballDir(pVision, _executor), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, me2goal.dir(), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		}
 		break;
 	case KICK:   // 射门

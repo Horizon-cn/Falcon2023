@@ -2,10 +2,10 @@ local ALL_AVOID = flag.dodge_ball + flag.avoid_stop_ball_circle + flag.avoid_sho
 local ALL_NOT_AVOID = flag.not_avoid_their_vehicle + flag.not_avoid_our_vehicle + flag.not_dodge_penalty
 local FLAG = ALL_NOT_AVOID --+ flag.dribbling
 
-local TargetPos1  = CGeoPoint:new_local(280,200)
-local TargetPos2  = CGeoPoint:new_local(220,170)
-local TargetPos3  = CGeoPoint:new_local(220,-170)
-local TargetPos4  = CGeoPoint:new_local(-280,-200)
+local TargetPos1  = CGeoPoint:new_local(100,-200)
+local TargetPos2  = CGeoPoint:new_local(100,200)
+local TargetPos3  = CGeoPoint:new_local(-100,-200)
+local TargetPos4  = CGeoPoint:new_local(-100,200)
 
 local DIR1  = 1.57
 local DIR2  = 1.57
@@ -24,7 +24,7 @@ firstState = "run1",
 			return "run2";
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos2, 1.57),
+	Kicker = task.goCmuRush(TargetPos1, 1.57),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
@@ -36,7 +36,7 @@ firstState = "run1",
 			return "run1";
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos3, 1.57),
+	Kicker = task.goCmuRush(TargetPos2, 1.57),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
@@ -48,7 +48,7 @@ firstState = "run1",
 			return "run1";
 		end
 	end,
-	Goalie = task.goCmuRush(TargetPos4, 0),
+	Kicker = task.goCmuRush(TargetPos3, 1.57),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
