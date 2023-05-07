@@ -46,6 +46,8 @@ namespace gpuCalcArea {
 	const double PI = 3.1415926;
 	const int Color_Size = 256;
 
+	const double differenceX = Param::Field::PITCH_LENGTH / 9;
+
 	const double middleFrontBorderX = Param::Field::PITCH_LENGTH / 6;
 	const double middleBackBorderX = -Param::Field::PITCH_LENGTH / 6;
 	const double centerLeftBorderY = -Param::Field::PENALTY_AREA_WIDTH / 2;
@@ -78,12 +80,12 @@ namespace gpuCalcArea {
 
 	FieldRectangle fieldRectangleArray[AREANUM] = {
 		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX, sideLineLeftBorderY)),
-        FieldRectangle(CGeoPoint(middleFrontBorderX + 150.0,centerRightBorderY),CGeoPoint(goalLineFrontBorderX - 50,centerLeftBorderY)),
-        //FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
+        FieldRectangle(CGeoPoint(middleFrontBorderX + differenceX,centerRightBorderY),CGeoPoint(goalLineFrontBorderX,centerLeftBorderY)),
+        //FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)), 
         FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
-        FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + 150.0,centerLeftBorderY)),
+        FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + differenceX,centerLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleBackBorderX,sideLineRightBorderY),CGeoPoint(middleFrontBorderX,centerRightBorderY)),
 
 		// FieldRectangle(CGeoPoint(goalLineBackBorderX,centerLeftBorderY),CGeoPoint(middleBackBorderX,sideLineLeftBorderY)),
@@ -92,12 +94,12 @@ namespace gpuCalcArea {
 	};
 	FieldRectangle processed_fieldRectangleArray[AREANUM] = {
 		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
-		FieldRectangle(CGeoPoint(middleFrontBorderX + 150.0,centerRightBorderY),CGeoPoint(goalLineFrontBorderX - 50,centerLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX + differenceX,centerRightBorderY),CGeoPoint(goalLineFrontBorderX,centerLeftBorderY)),
 		//FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
 		FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
-		FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + 150.0,centerLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + differenceX,centerLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleBackBorderX,sideLineRightBorderY),CGeoPoint(middleFrontBorderX,centerRightBorderY)),
 
 		// FieldRectangle(CGeoPoint(goalLineBackBorderX,centerLeftBorderY),CGeoPoint(middleBackBorderX,sideLineLeftBorderY)),
@@ -723,10 +725,10 @@ void CGPUBestAlgThread::processPointValue() {
 	int area_idx;
 
 	if (ParamManager::Instance()->boundaryVersion == 1) {
-		obscureBoundary();//动态模糊边界
+		obscureBoundaryV2();//动态模糊边界
 	}
 	else if (ParamManager::Instance()->boundaryVersion == 2) {
-		obscureBoundaryV2();
+		obscureBoundary();
 	}
 
 
@@ -775,10 +777,10 @@ void CGPUBestAlgThread::processPointValue() {
 
 
 	if (ParamManager::Instance()->boundaryVersion == 1) {
-		supportSort(); // 按照重要性对支撑点进行排序
+		supportSortV2(); // 按照重要性对支撑点进行排序
 	}
 	else if (ParamManager::Instance()->boundaryVersion == 2) {
-		supportSortV2();
+		supportSort();
 	}
 
 }
