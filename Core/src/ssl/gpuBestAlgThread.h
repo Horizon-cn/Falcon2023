@@ -284,7 +284,7 @@ private:
 
 	int _start_pos_x, _start_pos_y, _width, _height, _step;     ///搜索区域参数，分别为左上角坐标、区域长与宽、搜索步长
 	int _w, _h;                                       /// 申请空间参数  
-	int _palyer_pos_num;                              //一个机器人所需传递的信息数目，目前为小车的位置、朝向、速度（首位为是否valid）
+	int _player_pos_num;                              //一个机器人所需传递的信息数目，目前为小车的位置、朝向、速度（首位为是否valid）
 
 	CGeoPoint sendPoint;				///<传球点，一般为球所在的点
 	int halfLength; // 场地半长

@@ -208,8 +208,8 @@ __device__ void MakeOutOfTheirPenaltyArea(float* point) {
 /* 评价函数：距离评价                                                   */
 /************************************************************************/
 inline __device__ float evaluate_dist(float dist) {
-    if (dist < 200) { // 距离开球点一定距离之外
-        return 200 - dist + 100;  // 200 - dist
+    if (dist < 100) { // 距离开球点一定距离之外
+        return 100 - dist + 100;  // 200 - dist
     }
     else if (dist > 500) {
         return (dist - 500) / 100;  // dist - 500
@@ -270,10 +270,10 @@ __device__ float evaluate_receive(float *me_pos, float *ball_pos, float * their_
     else {
         reverseReceiveP += 20.0 / (blockMyself + 0.1);
     }
-
+    
     // 不能过于靠近底线，底线处容易接不到球
-    if (abs(me_pos[1]) > PITCH_WIDTH / 2 - 100) {
-        reverseReceiveP += (abs(me_pos[1]) - (PITCH_WIDTH / 2 - 100));
+    if (abs(me_pos[0]) > PITCH_WIDTH / 2 - 20) { // 100
+        reverseReceiveP += (abs(me_pos[0]) - (PITCH_WIDTH / 2 - 20));
     }
 
     return reverseReceiveP;
