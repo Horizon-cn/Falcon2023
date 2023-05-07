@@ -122,12 +122,13 @@ void CAdvance::plan(const CVisionModule* pVision)
 	for(int i=0;i<9;++i)
 		SupportPoint[i] = GPUBestAlgThread::Instance()->getBestPointFromArea(i);/* Gpu算点 */
 	// 可视化球的预测位置
+	/*
 	for (int i = 0; i < 6; i++) {
 		CGeoPoint ball_predict_pos = GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), i * 8);
 		GDebugEngine::Instance()->gui_debug_msg(ball_predict_pos, (to_string(i * 8)).c_str(), COLOR_YELLOW);
 		GDebugEngine::Instance()->gui_debug_x(ball_predict_pos, COLOR_BLUE);
 	}
-	
+	*/
 
 //	NormalPlayUtils::generatePassPoint(ball.Pos(), SupportPoint[0], SupportPoint[1], SupportPoint[2], SupportPoint[3]);
 	NumberOfSupport = 6;/*暂时只考虑对面半场六个*/
@@ -174,7 +175,7 @@ void CAdvance::plan(const CVisionModule* pVision)
                     NowIsShoot = 1;
 					_state = KICK; break;
 				}
-				else if(Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor)) {
+				else if(Me2OppTooclose(pVision, _executor) && isInBreakArea(pVision, _executor)) {
 
                     NowIsShoot = 2;
 					_state = BREAKSHOOT; break;
@@ -206,27 +207,33 @@ void CAdvance::plan(const CVisionModule* pVision)
 		else { _state = GET; break; }
 	case KICK:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push KICK", COLOR_YELLOW);
-		if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
 	case PASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push PASS", COLOR_YELLOW);
-		if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
 	case JUSTCHIPPASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHIP", COLOR_YELLOW);
-		if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
 	case BREAKSHOOT:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push BREAK", COLOR_YELLOW);
-		if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
     case PUSHOUT:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push OUT", COLOR_YELLOW);
-        if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
     case BREAKPASS:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push OUT", COLOR_YELLOW);
-        if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
         break;
 	}
 	
@@ -279,7 +286,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			//KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 			/*此处朝向可持久化即可 不需要进行改变*/
             LastPassDirToJudge = -999;
-			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, generateGetballDir(pVision, _executor), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, me2goal.dir(), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		}
 		break;
 	case KICK:   // 射门
@@ -842,8 +849,9 @@ double CAdvance::generateGetballDir(const CVisionModule* pVision, const int vecN
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
 	const BallVisionT& ball = pVision->Ball();
+	const CVector me2ball = me.Pos() - ball.Pos();
 	double faceDir = 0.0;
-	if (ball.Vel().mod() > 30) {
+	if (ball.Vel().mod() > 20) {
 		faceDir = Utils::Normalize(Param::Math::PI + ball.Vel().dir());
 	}
 	else {

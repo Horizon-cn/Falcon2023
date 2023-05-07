@@ -10,7 +10,9 @@ firstState = "chase",
 
 ["chase"] = {
 	switch = function ()
-		if bufcnt(robotSensor:IsInfraredOn(1), 5)then
+		if world:getBallPossession(true, gRoleNum["Kicker"]) > 0.3 then
+		--if bufcnt(world:getBallToucher() == gRoleNum["Kicker"], 5) then
+		--if bufcnt(robotSensor:IsInfraredOn(1), 5)then
 			return "break";
 		end
 	end,
@@ -20,7 +22,9 @@ firstState = "chase",
 },
 ["break"] = {
 	switch = function ()
-		if bufcnt(not robotSensor:IsInfraredOn(1), 10)then
+		if world:getBallPossession(true, gRoleNum["Kicker"]) == 0 then
+		--if bufcnt(world:getBallToucher() ~= gRoleNum["Kicker"], 10) then
+		--if bufcnt(not robotSensor:IsInfraredOn(1), 10)then
 			return "chase";
 		end
 	end,

@@ -7,7 +7,7 @@
 
 ## Attention！motion参数注意
 
-![image-20230428171606774](./READMEimage/image-20230428171606774.png)
+![Motion](./wiki/Motion.png)
 
 **仿真**下PERIOD-MOVE-X设为0.01到0.05效果较好
 

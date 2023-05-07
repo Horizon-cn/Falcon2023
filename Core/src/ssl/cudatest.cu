@@ -14,8 +14,9 @@
 //    const float POINT_PASS_OFF = 200;
 //}
 
-#define ENEMY_NUM 8
-#define SELF_NUM 8  // 己方机器人数目
+// 小场参数
+#define ENEMY_NUM 6
+#define SELF_NUM 6  // 己方机器人数目
 #define POS_INFO_LENGTH 6 // 每个机器人位置所占的float数目
 #define GPU_COEF_BLOCKSCORE -1
 #define GPU_COEF_DISTSCORE 0
@@ -25,11 +26,29 @@
 #define OUTPUT_DIM 50
 __constant__ float PI = 3.1415926;
 __constant__ float M_2PI = 6.2831852;
-__constant__ float PITCH_WIDTH = 900;
-__constant__ float PITCH_LENGTH = 1200;
-__constant__ float PENALTY_WIDTH = 240;
-__constant__ float PENALTY_DEPTH = 120;
+__constant__ float PITCH_WIDTH = 600;
+__constant__ float PITCH_LENGTH = 900;
+__constant__ float PENALTY_WIDTH = 200;
+__constant__ float PENALTY_DEPTH = 100;
 __constant__ float POINT_PASS_OFF = 80.0;
+// 大场参数
+//#define ENEMY_NUM 8
+//#define SELF_NUM 8  // 己方机器人数目
+//#define POS_INFO_LENGTH 6 // 每个机器人位置所占的float数目
+//#define GPU_COEF_BLOCKSCORE -1
+//#define GPU_COEF_DISTSCORE 0
+//#define GPU_COEF_NEARSCORE 1.5
+//#define INPUT_DIM 10
+//#define HIDDEN_LAYER_DIM 80
+//#define OUTPUT_DIM 50
+//__constant__ float PI = 3.1415926;
+//__constant__ float M_2PI = 6.2831852;
+//__constant__ float PITCH_WIDTH = 900;
+//__constant__ float PITCH_LENGTH = 1200;
+//__constant__ float PENALTY_WIDTH = 280;
+//__constant__ float PENALTY_DEPTH = 120;
+//__constant__ float POINT_PASS_OFF = 80.0;
+
 // 尝试使用constant提高速度，但代码没有调通
 //__constant__ float GPU_A1_MATRIX[INPUT_DIM * HIDDEN_LAYER_DIM];
 //__constant__ float GPU_BIAS1_MATRIX[HIDDEN_LAYER_DIM];

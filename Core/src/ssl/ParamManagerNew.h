@@ -247,6 +247,8 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(ourVisionJudgeDir, "BallStatus/ourVisionJudgeDir", 30);
             loadParam(theirVisionJudgeDist, "BallStatus/theirVisionJudgeDist", 20);
             loadParam(theirVisionJudgeDir, "BallStatus/theirVisionJudgeDir", 30);
+
+            loadParam(boundaryVersion, "GpuBestAlg/boundaryVersion", 1);
         }
     public:
         // GotoPosition 中的调试开关
@@ -421,6 +423,8 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double ourVisionJudgeDir;
         double theirVisionJudgeDist;
         double theirVisionJudgeDir;
+        // GpuBestAlg
+        int boundaryVersion;
 };
 typedef Falcon::NormalSingleton< CParamManagerSkill > ParamManager;
 
