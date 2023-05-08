@@ -24,6 +24,7 @@ private:
     void adjustBackPos(int guardNum);
     int ready_cnt;
     int ready_index;
+    int _cycle;
     CGeoLineRectangleIntersection _intersecMiddle;
     CGeoPoint _backPos[Param::Field::MAX_PLAYER];
     int _backNum[Param::Field::MAX_PLAYER];
