@@ -9,7 +9,7 @@ DEFINE_ATTRIBUTE_NEW(BallMovingCost);//追球模型，源代码移植，合理性存疑
 //attribute evaluate
 EVALUATE_ATTRIBUTE_NEW(ballChaserTest)
 {
-	setValue(vision->TheirPlayer(num).Valid());
+	setValue(pVision->TheirPlayer(num).Valid());
 }
 
 EVALUATE_ATTRIBUTE_NEW(Dist2BallNormalized)
@@ -69,8 +69,8 @@ EVALUATE_ATTRIBUTE_NEW(Dist2BallProjModified)
 
 EVALUATE_ATTRIBUTE_NEW(BallMovingCost)
 {
-	const BallVisionT& ball = vision->Ball();
-	const PlayerVisionT& player = vision->TheirPlayer(num);
+	const BallVisionT& ball = pVision->Ball();
+	const PlayerVisionT& player = pVision->TheirPlayer(num);
 
 	if (ball.Valid() && ball.Vel().mod() < 70)
 	{

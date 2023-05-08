@@ -19,11 +19,14 @@ public:
 	//每帧更新
 	void updateDefenceInfoNew(const CVisionModule* pVision);
 	//防守信息接口
+	bool isBestBallChaserChanged() { return _ballChaserChanged; }
 	int getBestBallChaser() { return _ballChaserList[0]; }
 	int getBallChaserNum() { return _ballChaserList.size(); }
 	const TenemyList& getBallChaserList() { return _ballChaserList; }
 	int getSteadyBallChaserNum() { return _ballChaserSteadyList.size(); }
 	const TenemyList& getSteadyBallChaserList() { return _ballChaserSteadyList; }
+
+	bool isBestBallReceiverChanged() { return _ballReceiverChanged; }
 	int getBestBallReceiver() { if (_ballReceiverSteadyList.empty()) return 0; else return _ballReceiverSteadyList[0]; }
 	int getBallReceiverNum() { return _ballReceiverList.size(); }
 	const TenemyList& getBallReceiverList() { return _ballReceiverList; }
@@ -38,7 +41,7 @@ private:
 private:
 	TenemyList _ballChaserList, _ballChaserSteadyList, _ballReceiverList, _ballReceiverSteadyList;
 	TpotientialList _chaserPotientialList, _lastChaserPotientialList, _receiverPotientialList, _lastReceiverPotientialList;
-	bool isInTheirPass;
+	bool isInTheirPass,_ballChaserChanged,_ballReceiverChanged;
 	int _kicker, _receiver;
 };
 

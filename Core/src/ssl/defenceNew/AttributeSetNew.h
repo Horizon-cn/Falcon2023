@@ -48,6 +48,6 @@ public:	\
 void attr_class::evaluate(const CVisionModule *pVision, const int num)
 
 #define ADD_ATTRIBUTE_NEW(attr_class) \
-_attributePairList.emplace_back(paramManager->factor_##attr_class,(CAttributeNew*)new attr_class)
+_attributePairList.emplace_back(ParamManager::Instance()->factor_##attr_class,(CAttributeNew*)new attr_class)
 
 #endif

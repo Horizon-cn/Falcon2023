@@ -17,7 +17,7 @@ DEFINE_ATTRIBUTE_NEW(EasyShoot);//只考虑投影，我方是否有球员能够阻挡射门
 //attribute evaluate
 EVALUATE_ATTRIBUTE_NEW(TooFar4Pass)
 {
-	double dist = vision->TheirPlayer(num).Pos().dist(vision->Ball().Pos());
+	double dist = pVision->TheirPlayer(num).Pos().dist(pVision->Ball().Pos());
 	setValue(max(0.0, dist - 500));
 	if (dist < 200)
 		setValue(200 - dist + 100);
@@ -25,7 +25,7 @@ EVALUATE_ATTRIBUTE_NEW(TooFar4Pass)
 
 EVALUATE_ATTRIBUTE_NEW(TooClose4Pass)
 {
-	double dist = vision->TheirPlayer(num).Pos().dist(vision->Ball().Pos());
+	double dist = pVision->TheirPlayer(num).Pos().dist(pVision->Ball().Pos());
 	if (dist < 200)
 		setValue(300 - dist);
 	else
@@ -34,19 +34,19 @@ EVALUATE_ATTRIBUTE_NEW(TooClose4Pass)
 
 EVALUATE_ATTRIBUTE_NEW(TooFar4Shoot)
 {
-	double dist = vision->TheirPlayer(num).Pos().dist(goalCentre);
+	double dist = pVision->TheirPlayer(num).Pos().dist(goalCentre);
 	setValue(max(0.0, dist - 200.0));
 }
 
 EVALUATE_ATTRIBUTE_NEW(EasyBlock)
 {
 	double tempValue = 0;
-	const BallVisionT& ball = vision->Ball();
-	const PlayerVisionT& enemy = vision->TheirPlayer(num);
+	const BallVisionT& ball = pVision->Ball();
+	const PlayerVisionT& enemy = pVision->TheirPlayer(num);
 	CGeoLine passLine(ball.Pos(), enemy.Pos());
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 	{
-		const PlayerVisionT& blocker = vision->OurPlayer(i);
+		const PlayerVisionT& blocker = pVision->OurPlayer(i);
 		if (!blocker.Valid())
 			continue;
 		CGeoPoint blockerProj = passLine.projection(blocker.Pos());
@@ -65,19 +65,19 @@ EVALUATE_ATTRIBUTE_NEW(EasyBlock)
 
 EVALUATE_ATTRIBUTE_NEW(NearSideLine)
 {
-	const PlayerVisionT& enemy = vision->TheirPlayer(num);
+	const PlayerVisionT& enemy = pVision->TheirPlayer(num);
 	setValue(std::max(0.0, fabs(enemy.Y()) - Param::Field::PITCH_WIDTH / 2 + 100));
 }
 
 EVALUATE_ATTRIBUTE_NEW(EasyShoot)
 {
 	double tempValue = 0;
-	const BallVisionT& ball = vision->Ball();
-	const PlayerVisionT& enemy = vision->TheirPlayer(num);
+	const BallVisionT& ball = pVision->Ball();
+	const PlayerVisionT& enemy = pVision->TheirPlayer(num);
 	CGeoLine shootLine(goalCentre, enemy.Pos());
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 	{
-		const PlayerVisionT& blocker = vision->OurPlayer(i);
+		const PlayerVisionT& blocker = pVision->OurPlayer(i);
 		if (!blocker.Valid()||i==0)//0:目前我方Goalie
 			continue;
 		CGeoPoint blockerProj = shootLine.projection(blocker.Pos());

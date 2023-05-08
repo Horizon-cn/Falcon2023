@@ -15,6 +15,7 @@
 #include "WorldModel/WorldModel.h"
 #include "GDebugEngine.h"
 #include "CornerAreaPos.h"
+#include "defence/DefenceInfo.h"
 #include "defenceNew/DefenceInfoNew.h"
 #include <ssl/ParamManagerNew.h>
 
