@@ -41,8 +41,8 @@ void CDefenceInfoNew::updateDefenceInfoNew(const CVisionModule* pVision)
 	checkPass(pVision);
 	updateSteady();
 	//debug输出
-	//debug_arr(_ballChaserList, CGeoPoint(100, -350));
-	//debug_arr(_ballChaserSteadyList, CGeoPoint(-400, -350));
+	debug_arr(_ballChaserList, CGeoPoint(100, -350));
+	debug_arr(_ballChaserSteadyList, CGeoPoint(-400, -350));
 	debug_arr(_ballReceiverList, CGeoPoint(100, -250));
 	debug_arr(_ballReceiverSteadyList, CGeoPoint(-400, -250));
 
@@ -87,7 +87,7 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 	for (int num = 0; num < Param::Field::MAX_PLAYER; num++)
 		_receiverPotientialList.push_back(ballReceiverAttributeSet::Instance()->evaluate(pVision, num));
 	//ballChaser不能是Receiver
-	_receiverPotientialList[_ballChaserList[0]] = 255;
+	_receiverPotientialList[_ballChaserList[0]] = 1000;
 	//门将不应太容易成为最优
 	_receiverPotientialList[pVision->TheirGoalie()] *= 1.5;
 	//与上一帧加权
@@ -108,20 +108,25 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 //传球时的特殊处理
 void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 {
+	const BallVisionT& ball = pVision->Ball();
 	if (isInTheirPass)
 	{
 		//判断是否仍在传球状态
-		const BallVisionT& ball = pVision->Ball();
 		const PlayerVisionT& receiver = pVision->TheirPlayer(_receiver);
 		double ball2ReceiverDir = (receiver.Pos() - ball.Pos()).dir();
 		double angleDiff = fabs(Utils::Normalize(ball2ReceiverDir - ball.Vel().dir()));
 		double ball2ReceiverDist = ball.Pos().dist(receiver.Pos());
 		if (angleDiff > Param::Math::PI / 2.0 || ball2ReceiverDist > 450 || ball2ReceiverDist < 100)
 			isInTheirPass = false;
-	} else
+	}
+	else
 	{
 		if (BallStatus::Instance()->IsBallKickedOut())
 		{
+			if (display_debug_info) {
+				GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "ball kick!!!!!!!!!!!!!!!!!");
+				qDebug() << "ball kick!!!!!!!!!";
+			}
 			for (_kicker = 0; _kicker < 2 * Param::Field::MAX_PLAYER; _kicker++)
 				if (BallStatus::Instance()->IsBallKickedOut(_kicker))
 					break;
@@ -137,7 +142,9 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 	//接球者作为新的BallChaser，同时从BallReceiver移除
 	if (isInTheirPass)
 	{
-		auto temp = find(_ballChaserList.begin(), _ballChaserList.end(), _receiver);
+		if (display_debug_info)
+			GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "new: in pass");
+			auto temp = find(_ballChaserList.begin(), _ballChaserList.end(), _receiver);
 		if (temp != _ballChaserList.end())
 			rotate(_ballChaserList.begin(), temp, temp + 1);
 		else
@@ -175,7 +182,7 @@ void CDefenceInfoNew::updateSteady()
 		updateReceiver = true;
 	if (!_ballReceiverSteadyList.empty()) {
 		auto newRank = find(_ballReceiverList.begin(), _ballReceiverList.end(), _ballReceiverSteadyList[0]);
-		if (newRank != _ballReceiverList.end() && newRank - _ballReceiverList.begin() < 2)
+		if (newRank == _ballReceiverList.end() || newRank - _ballReceiverList.begin() >= 2)
 			updateReceiver = true;
 	}
 	if (updateReceiver)

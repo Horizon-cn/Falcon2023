@@ -123,7 +123,7 @@ void CGuardPos::generatePos(int guardNum)
 	}
 	if (DEBUG_GUARD_POS) {
 		for (int i = 0; i < guardNum + 1; i++) {
-			GDebugEngine::Instance()->gui_debug_line(_backPos[i], CGeoPoint(100,100), COLOR_CYAN);
+			GDebugEngine::Instance()->gui_debug_line(_backPos[i], Ball.Pos(), COLOR_CYAN);
 		}
 	}
 }
