@@ -10,7 +10,7 @@ gTestPlay = function ()
 	if not IS_YELLOW then
 		return "Test_play6" --"Test_ChaseKick" --"Test_Advance" --"Test_Run"
 	else
-		return "Test_Defence" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "Test_defend6" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -21,10 +21,10 @@ gSwitchNum = {
 }
 
 gRoleFixNum = {
-	["Kicker"]   = {5},
-	["Goalie"]   = {4},
-	["Tier"]	 = {3},
-	["Receiver"] = {1}
+	["Kicker"]   = {6},
+	["Goalie"]   = {1},
+	["Tier"]	 = {7},
+	["Receiver"] = {8}
 }
 
 -- 用来进行定位球的保持
@@ -103,6 +103,7 @@ gRefPlayTable = {
 
 	--角球进攻
 	"Ref/CornerKick/Ref_CornerKickV1",
+	"Ref/CornerKick/Ref_CornerKickV6",
 	"Ref/CornerKick/Ref_CornerKickV8",
 	"Ref/CornerKick/Ref_CornerKickV30",
 	"Ref/CornerKick/Ref_CornerKickV201",
@@ -166,6 +167,7 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_StopV3",
 	"Ref/GameStop/Ref_Stop4CornerDef",
 	"Ref/GameStop/Ref_Stop4CornerKick",
+	"Ref/GameStop/Ref_Stop4CornerKick6",
 	"Ref/GameStop/Ref_Stop4SideLine",
 	"Ref/GameStop/Ref_Stop4FrontKick",
 	"Ref/GameStop/Ref_Stop4MiddleKick",
@@ -206,5 +208,6 @@ gTestPlayTable = {
 	"Test_AvoidFoulDefend",
 	"Test_NormalMiddleDefend",
 	"Test_Circle",
-	"Test_play6"
+	"Test_play6",
+	"Test_defend6"
 }

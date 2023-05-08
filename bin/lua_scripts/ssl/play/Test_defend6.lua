@@ -60,11 +60,11 @@ firstState = "CM",
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Assister",0),
-    Middle = task.support("Middle",1), --task.marking("First"),
-    Special = task.defendMiddle(),
-	Defender = task.singleBack(),
+    Middle = task.marking("First"), --task.marking("First"),
+    Special = task.leftBack(),
+	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DAS][M]"
+    match = "[L][DS][AM]"
 },
 
 ["SWOurBall"] = {
@@ -72,21 +72,21 @@ firstState = "CM",
     Leader = task.advance(),
 	Assister = task.support("Assister",0),
     Middle = task.support("Middle",1),
-    Special = task.support("Special",2),
-	Defender = task.singleBack(),
+    Special = task.leftBack(),
+	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DAS][M]"
+    match = "[L][DS][AM]"
 },
 
 ["CF"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Assister",0),
-    Middle = task.support("Middle",1),
-    Special = task.defendMiddle(),
-	Defender = task.singleBack(),
+    Middle = task.marking("First"),
+    Special = task.leftBack(),
+	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DAS][M]"
+    match = "[L][DS][AM]"
 },
 
 ["CFOurBall"] = {
@@ -94,10 +94,10 @@ firstState = "CM",
 	Leader = task.advance(),
 	Assister = task.support("Assister",0),
     Middle = task.support("Middle",1),
-    Special = task.support("Special",2),
-	Defender = task.singleBack(),
+    Special = task.leftBack(),
+	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DAS][M]"
+    match = "[L][DS][AM]"
 },
 
 
@@ -106,10 +106,10 @@ firstState = "CM",
 	Leader = task.advance(),
 	Assister = task.support("Assister",0),
 	Middle = task.marking("First"),
-    Special = task.defendHead(),
-	Defender = task.singleBack(),
+    Special = task.leftBack(),
+	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DA][SM]"
+    match = "[L][DS][AM]"
 },
 
 ["SMOurBall"] = {
@@ -117,10 +117,10 @@ firstState = "CM",
 	Leader = task.advance(),
 	Assister = task.support("Assister",0),
 	Middle = task.support("Middle",1),
-    Special = task.defendHead(),
-	Defender = task.singleBack(),
+    Special = task.leftBack(),
+	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DA][MS]"
+    match = "[L][DS][AM]"
 },
 
 ["CM"] = {
@@ -131,7 +131,7 @@ firstState = "CM",
     Special = task.leftBack(),
 	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DA][SM]"
+    match = "[L][DS][AM]"
 },
 
 ["CMOurBall"] = {
@@ -139,37 +139,37 @@ firstState = "CM",
 	Leader = task.advance(),
 	Assister = task.support("Assister",0),
 	Middle = task.support("Middle",1),
-    Special = task.defendMiddle(),
-	Defender = task.singleBack(),
+    Special = task.leftBack(),
+	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DA][MS]"
+    match = "[L][DS][AM]"
 },
 
 
 ["SB"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Assister",0),
-	Middle = task.marking("First"),
+	Assister = task.marking("First"),
+	Middle = task.marking("Second"),
     Special = task.leftBack(),
 	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DA][SM]"
+    match = "[L][DS][AM]"
 },
 
 ["CB"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Assister",0),
-	Middle = task.marking("First"),
+	Assister = task.marking("First"),
+	Middle = task.marking("Second"),
     Special = task.leftBack(),
 	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DA][SM]"
+    match = "[L][DS][AM]"
 },
 
 
-name = "Test_play6",
+name = "Test_defend6",
 applicable ={
 	exp = "a",
 	a = true

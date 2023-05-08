@@ -114,7 +114,7 @@ firstState = "start",
   Middle   = task.leftBack(),
   Defender = task.rightBack(),
   Goalie   = task.goalieNew(),
-  match    = "{LASMD}"
+  match    = "[L][AD][MS]"
 },
 
 ["temp"] = {
@@ -123,13 +123,13 @@ firstState = "start",
       return "kickof"
     end
   end,
-  Leader   = task.getBall(RECEIVE_POS),
+  Leader   = task.staticGetBall(-3),
   Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss),
   Special  = task.goCmuRush(RIGHT_POS_1,_,_,flag.allow_dss),
   Middle   = task.leftBack(),
   Defender = task.rightBack(),
   Goalie   = task.goalieNew(),
-  match    = "{LASMD}"
+  match    = "[L][AD][MS]"
 },
 
 
@@ -146,7 +146,7 @@ firstState = "start",
   Middle   = task.leftBack(),
   Defender = task.rightBack(),
   Goalie   = task.goalieNew(),
-  match    = "{LASMD}"
+  match    = "[L][AD][MS]"
 },
 
 ["receive"] = {
@@ -161,7 +161,7 @@ firstState = "start",
   Middle   = task.leftBack(),
   Defender = task.rightBack(),
   Goalie   = task.goalieNew(),
-  match    = "{ALSMD}"
+  match    = "[A][DL][MS]"
 },
 
 
