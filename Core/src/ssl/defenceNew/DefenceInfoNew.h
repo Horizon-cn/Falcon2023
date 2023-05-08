@@ -24,7 +24,7 @@ public:
 	const TenemyList& getBallChaserList() { return _ballChaserList; }
 	int getSteadyBallChaserNum() { return _ballChaserSteadyList.size(); }
 	const TenemyList& getSteadyBallChaserList() { return _ballChaserSteadyList; }
-	int getBestBallReceiver() { if (_ballReceiverList.empty()) return 0; else return _ballReceiverList[0]; }
+	int getBestBallReceiver() { if (_ballReceiverSteadyList.empty()) return 0; else return _ballReceiverSteadyList[0]; }
 	int getBallReceiverNum() { return _ballReceiverList.size(); }
 	const TenemyList& getBallReceiverList() { return _ballReceiverList; }
 	int getSteadyBallReceiverNum() { return _ballReceiverSteadyList.size(); }
@@ -34,6 +34,7 @@ private:
 	void updateBallReceiverList(const CVisionModule* pVision);
 	void checkPass(const CVisionModule* pVision);
 	int matchReceiver(const CVisionModule* pVision);
+	void updateSteady();
 private:
 	TenemyList _ballChaserList, _ballChaserSteadyList, _ballReceiverList, _ballReceiverSteadyList;
 	TpotientialList _chaserPotientialList, _lastChaserPotientialList, _receiverPotientialList, _lastReceiverPotientialList;

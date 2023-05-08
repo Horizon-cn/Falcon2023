@@ -1078,7 +1078,7 @@ end
 
 -- 强行绕前盯人
 function markingFront(p)
-	local mexe, mpos = Marking{pri = p, front = true, dir = dir.shoot(),flag=flag.allow_dss}
+	local mexe, mpos = Marking{pri = p, front = true, flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 

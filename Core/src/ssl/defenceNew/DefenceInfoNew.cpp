@@ -25,7 +25,9 @@ CDefenceInfoNew::CDefenceInfoNew() :isInTheirPass(false)
 	_ballChaserSteadyList.reserve(Param::Field::MAX_PLAYER);
 	_ballChaserSteadyList.push_back(0);
 	_ballReceiverList.reserve(Param::Field::MAX_PLAYER);
+	_ballReceiverList.push_back(0);
 	_ballReceiverSteadyList.reserve(Param::Field::MAX_PLAYER);
+	_ballReceiverSteadyList.push_back(0);
 }
 
 CDefenceInfoNew::~CDefenceInfoNew()
@@ -37,6 +39,13 @@ void CDefenceInfoNew::updateDefenceInfoNew(const CVisionModule* pVision)
 	updateBallChaserList(pVision);
 	updateBallReceiverList(pVision);
 	checkPass(pVision);
+	updateSteady();
+	//debug输出
+	//debug_arr(_ballChaserList, CGeoPoint(100, -350));
+	//debug_arr(_ballChaserSteadyList, CGeoPoint(-400, -350));
+	debug_arr(_ballReceiverList, CGeoPoint(100, -250));
+	debug_arr(_ballReceiverSteadyList, CGeoPoint(-400, -250));
+
 }
 
 void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
@@ -68,14 +77,6 @@ void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 	//目前使用接口的地方不判断是否存在ballChaser，故需要保底
 	if (_ballChaserList.empty())
 		_ballChaserList.push_back(0);
-	//特定情况下更新Steady
-	//todo 原defenceinfo的设计考虑的是具体人员是否相同，以及考虑了接球车nomark，这个再想想
-	if (_ballChaserList[0] != _ballChaserSteadyList[0] ||
-		_ballChaserList.size() != _ballChaserSteadyList.size())
-		_ballChaserSteadyList = _ballChaserList;
-	//debug输出
-	//debug_arr(_ballChaserList, CGeoPoint(100, -350));
-	//debug_arr(_ballChaserSteadyList, CGeoPoint(-400, -350));
 }
 
 void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
@@ -85,10 +86,8 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 	//加权计算接球潜力，越小越容易作为接球者被传球
 	for (int num = 0; num < Param::Field::MAX_PLAYER; num++)
 		_receiverPotientialList.push_back(ballReceiverAttributeSet::Instance()->evaluate(pVision, num));
-	//持球者不能是Receiver
-	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
-		if (BallStatus::Instance()->getBallPossession(false, i))
-			_receiverPotientialList[i] = 255;
+	//ballChaser不能是Receiver
+	_receiverPotientialList[_ballChaserList[0]] = 255;
 	//门将不应太容易成为最优
 	_receiverPotientialList[pVision->TheirGoalie()] *= 1.5;
 	//与上一帧加权
@@ -103,13 +102,8 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 		_ballReceiverList.end());
 	sort(_ballReceiverList.begin(), _ballReceiverList.end(),
 		[&](int num1, int num2) {return _receiverPotientialList[num1] < _receiverPotientialList[num2]; });
-	//特定情况下更新Steady
-	if (_ballReceiverList[0] != _ballReceiverSteadyList[0] ||
-		_ballReceiverList.size() != _ballReceiverSteadyList.size())
-		_ballReceiverSteadyList = _ballReceiverList;
-	//debug输出
-	debug_arr(_ballReceiverList, CGeoPoint(100, -250));
-	debug_arr(_ballReceiverSteadyList, CGeoPoint(-400, -250));
+	if (_ballReceiverList.empty())
+		_ballReceiverList.push_back(0);
 }
 //传球时的特殊处理
 void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
@@ -124,8 +118,7 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 		double ball2ReceiverDist = ball.Pos().dist(receiver.Pos());
 		if (angleDiff > Param::Math::PI / 2.0 || ball2ReceiverDist > 450 || ball2ReceiverDist < 100)
 			isInTheirPass = false;
-	}
-	else
+	} else
 	{
 		if (BallStatus::Instance()->IsBallKickedOut())
 		{
@@ -169,4 +162,22 @@ int CDefenceInfoNew::matchReceiver(const CVisionModule* pVision)
 		return maybeReceiverNum;
 	}
 	return -1;
+}
+
+void CDefenceInfoNew::updateSteady()
+{
+	//todo 原defenceinfo的设计考虑的是具体人员是否相同，以及考虑了接球车nomark，这个再想想
+	if (_ballChaserList[0] != _ballChaserSteadyList[0] ||
+		_ballChaserList.size() != _ballChaserSteadyList.size())
+		_ballChaserSteadyList = _ballChaserList;
+	bool updateReceiver = false;
+	if (_ballChaserList[0] != _ballChaserSteadyList[0])
+		updateReceiver = true;
+	if (!_ballReceiverSteadyList.empty()) {
+		auto newRank = find(_ballReceiverList.begin(), _ballReceiverList.end(), _ballReceiverSteadyList[0]);
+		if (newRank != _ballReceiverList.end() && newRank - _ballReceiverList.begin() < 2)
+			updateReceiver = true;
+	}
+	if (updateReceiver)
+		_ballReceiverSteadyList = _ballReceiverList;
 }
