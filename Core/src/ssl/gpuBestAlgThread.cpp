@@ -79,10 +79,10 @@ namespace gpuCalcArea {
 	// 目前这个区域已经更新
 
 	FieldRectangle fieldRectangleArray[AREANUM] = {
-		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX, sideLineLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(sideLineFrontBorderX, sideLineLeftBorderY)),
         FieldRectangle(CGeoPoint(middleFrontBorderX + differenceX,centerRightBorderY),CGeoPoint(goalLineFrontBorderX,centerLeftBorderY)),
         //FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)), 
-        FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
+        FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(sideLineFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
         FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + differenceX,centerLeftBorderY)),
@@ -93,10 +93,10 @@ namespace gpuCalcArea {
 		// FieldRectangle(CGeoPoint(goalLineBackBorderX,sideLineRightBorderY),CGeoPoint(middleBackBorderX,centerRightBorderY)),
 	};
 	FieldRectangle processed_fieldRectangleArray[AREANUM] = {
-		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(sideLineFrontBorderX,sideLineLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleFrontBorderX + differenceX,centerRightBorderY),CGeoPoint(goalLineFrontBorderX,centerLeftBorderY)),
 		//FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
-		FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(sideLineFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + differenceX,centerLeftBorderY)),
@@ -252,26 +252,31 @@ void CGPUBestAlgThread::generatePointValue() {
 		// 己方机器人信息
 		int our_start_idx = 7;    // 在数组中开始存储的位置
 		float* our_player_info = _start_pos_cpu + our_start_idx;
-		for (int i = 0; i < OURPLAYER_NUM; i++) {
+		int count = 0;
+		for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
 			if (_pVision->OurPlayer(i).Valid()) {
 				const PlayerVisionT& ourPlayer = _pVision->OurPlayer(i);
-				our_player_info[_player_pos_num * i] = 1.0;
-				our_player_info[_player_pos_num * i + 1] = ourPlayer.X();
-				our_player_info[_player_pos_num * i + 2] = ourPlayer.Y();
-				our_player_info[_player_pos_num * i + 3] = ourPlayer.Dir();
-				our_player_info[_player_pos_num * i + 4] = ourPlayer.VelX();
-				our_player_info[_player_pos_num * i + 5] = ourPlayer.VelY();
+				our_player_info[_player_pos_num * count] = 1.0;
+				our_player_info[_player_pos_num * count + 1] = ourPlayer.X();
+				our_player_info[_player_pos_num * count + 2] = ourPlayer.Y();
+				our_player_info[_player_pos_num * count + 3] = ourPlayer.Dir();
+				our_player_info[_player_pos_num * count + 4] = ourPlayer.VelX();
+				our_player_info[_player_pos_num * count + 5] = ourPlayer.VelY();
+				count++;
 			}
-			else {
+		}
+		if (count < OURPLAYER_NUM) {
+			for (int i = count; i < OURPLAYER_NUM; i++) {
 				for (int j = 0; j < _player_pos_num; j++) {
 					our_player_info[_player_pos_num * i + j] = 0.0;
 				}
 			}
 		}
+		count = 0;
 		// 敌方机器人信息
 		int their_start_idx = 7 + _player_pos_num * OURPLAYER_NUM; // 在数组中开始存储的位置
 		float* their_player_info = _start_pos_cpu + their_start_idx;
-		for (int i = 0; i < THEIRPLAYER_NUM; i++) {
+		for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
 			if (_pVision->TheirPlayer(i).Valid()) {
 				const PlayerVisionT& theirPlayer = _pVision->TheirPlayer(i);
 				their_player_info[_player_pos_num * i] = 1.0;
@@ -280,8 +285,11 @@ void CGPUBestAlgThread::generatePointValue() {
 				their_player_info[_player_pos_num * i + 3] = theirPlayer.Dir();
 				their_player_info[_player_pos_num * i + 4] = theirPlayer.VelX();
 				their_player_info[_player_pos_num * i + 5] = theirPlayer.VelY();
+				count++;
 			}
-			else {
+		}
+		if (count < THEIRPLAYER_NUM) {
+			for (int i = count; i < THEIRPLAYER_NUM; i++) {
 				for (int j = 0; j < _player_pos_num; j++) {
 					their_player_info[_player_pos_num * i + j] = 0.0;
 				}

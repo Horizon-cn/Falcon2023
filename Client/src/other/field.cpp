@@ -1148,7 +1148,7 @@ void Field::receiveYellow(){
                     int point_num_width = opm->field_width / skpm->drawStep; //宽边可以绘制的点数
                     float pos_x = skpm->startPosX + int(pos / point_num_width) * skpm->drawStep; //mm，默认从左上角开始，纵向给点编号
                     float pos_y = skpm->startPosY + pos % point_num_width * skpm->drawStep;
-                    heatPainter.drawRect(QRectF(::x(pos_x), ::y(-pos_y), ::w(skpm->drawStep), ::h(-skpm->drawStep)));
+                    heatPainter.drawRect(QRectF(::x(-pos_x), ::y(pos_y), ::w(skpm->drawStep), ::h(-skpm->drawStep)));
                     //heatPainter.drawRect(QRectF(::x(pos.x()*10), ::y(-pos.y()*10), ::w(RECT_SIZE), ::h(-RECT_SIZE)));
                     GlobalData::Instance()->yellowHeatMutex.unlock();
                 }

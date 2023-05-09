@@ -44,16 +44,18 @@ __constant__ float ROBOT_RADIUS = 9.0;
 __constant__ float ROBOT_FRONT_TO_CENTER = 7.6;
 __constant__ float ROBOT_MAX_HEIGHT = 15.0;
 __constant__ float ROBOT_CHIP_ANGLE = 45.0;
-__constant__ float ROBOT_MAX_ACC = 300.0;
-__constant__ float ROBOT_MAX_DEC = 300.0;
-__constant__ float ROBOT_MAX_VEL = 300.0;
+__constant__ float ROBOT_MAX_ACC = 200.0; // 不考虑超调，所以慢一些
+__constant__ float ROBOT_MAX_DEC = 200.0;
+__constant__ float ROBOT_MAX_VEL = 200.0;
 __constant__ float ROBOT_MAX_ROTACC = 5.0;
 __constant__ float ROBOT_MAX_ROTDEC = 5.0;
 __constant__ float ROBOT_MAX_ROTVEL = 10.0;
 // 决策相关阈值
+__constant__ float FASTEST_RECEIVE_VEL = 80.0; // 能接住的最快球速
 __constant__ float LARGEST_GOAL_ANGLE = 80.0; // 和球门夹角太大不打门
 __constant__ float SHORTEST_PASS_DIST = 100.0; // 距离太近不传球
 __constant__ float CHIP_TIME_FACTOR = 1.5; // 延长球的飞行时间，影响挑射是否被拦截的判断
+__constant__ float LARGEST_TOUCH_ANGLE = 80.0;
 // 大场参数
 //#define ENEMY_NUM 8
 //#define SELF_NUM 8  // 己方机器人数目
@@ -102,8 +104,8 @@ extern "C" void get_gpu_info() {
 }
 
 // 判断一个点是否在禁区
-inline __device__ bool is_in_penalty(float pos_x, float pos_y) {
-    if (abs(pos_y) <= PENALTY_WIDTH / 2 + ROBOT_RADIUS && abs(pos_x) >= (PITCH_LENGTH / 2 - PENALTY_DEPTH - ROBOT_RADIUS)) {
+inline __device__ bool is_in_penalty(float pos_x, float pos_y, float buffer) {
+    if (abs(pos_y) <= PENALTY_WIDTH / 2 + buffer && abs(pos_x) >= (PITCH_LENGTH / 2 - PENALTY_DEPTH - buffer)) {
         return true;
     }
     else {
@@ -276,13 +278,53 @@ inline __device__ bool if_collide_theirPlayer(float* pos, float* their_player_pt
     for (int i = 0; i < ENEMY_NUM; i++)
     {
         if (their_player_ptr[i * POS_INFO_LENGTH]) {
-            // 球到敌方的距离
+            // 点位到敌方的距离
             float* their_player_pos = their_player_ptr + i * POS_INFO_LENGTH + 1;
             if (dist(their_player_pos, pos) < 2 * ROBOT_RADIUS)
                 return true;
         }
     }
     return false;
+}
+
+// 判断对方的门将
+inline __device__ int check_their_goalie(float* their_player_ptr) {
+    int their_goalie = 0;
+    float min_dist = 9999;
+    float goal[2] = { PITCH_LENGTH / 2, 0 };
+    for (int i = 0; i < ENEMY_NUM; i++)
+    {
+        if (their_player_ptr[i * POS_INFO_LENGTH]) {
+            float* their_player_pos = their_player_ptr + i * POS_INFO_LENGTH + 1;
+            if (is_in_penalty(their_player_pos[0], their_player_pos[1], 0)) {
+                float temp_min_dist = dist(their_player_pos, goal);
+                if (temp_min_dist < min_dist) {
+                    min_dist = temp_min_dist;
+                    their_goalie = i;
+                }
+            }
+        }
+    }
+    return their_goalie;
+}
+
+// 判断对方的门将
+inline __device__ int rolematch(float* me_pos, float* our_player_ptr) {
+    int our_match_player = 0;
+    // 猜一个RoleMatch结果
+    float min_dist = 9999;
+    float match_player_pos[2];
+    for (int j = 0; j < SELF_NUM; j++) {
+        if (our_player_ptr[j * POS_INFO_LENGTH]) {
+            float* our_player_pos = our_player_ptr + j * POS_INFO_LENGTH + 1;
+            float temp_dist = dist(our_player_pos, me_pos);
+            if (temp_dist < min_dist) {
+                min_dist = temp_dist;
+                our_match_player = j;
+            }
+        }
+    }
+    return our_match_player;
 }
 
 /************************************************************************/
@@ -360,7 +402,7 @@ __device__ float evaluate_receive(float *me_pos, float *ball_pos, float * their_
     return reverseReceiveP;
 }
 
-__device__ float evaluate_flat_pass(float* me_pos, float* ball_pos, float* their_player_ptr) {
+__device__ float evaluate_flat_pass_their(float* me_pos, float* ball_pos, float* their_player_ptr, int their_goalie) {
     float reverseReceiveP = 0.0;
     float a, b;
     int line_status;
@@ -370,7 +412,8 @@ __device__ float evaluate_flat_pass(float* me_pos, float* ball_pos, float* their
         reverseReceiveP = MAX_SCORE;
     }
     else {
-        float ball_kicked_vel = sqrt(2 * BALL_DEC * ball2me_dist); // 传球的初始速度
+        float ball_kicked_vel = sqrt(FASTEST_RECEIVE_VEL * FASTEST_RECEIVE_VEL + 2 * BALL_DEC * ball2me_dist); // 传球的初始速度，尽量快
+        ball_kicked_vel = min(ball_kicked_vel, BALL_MAX_VEL);
         line_status = get_line(ball_pos, me_pos, a, b);
         for (int j = 0; j < ENEMY_NUM; j++) {
             if (their_player_ptr[j * POS_INFO_LENGTH]) {
@@ -381,26 +424,39 @@ __device__ float evaluate_flat_pass(float* me_pos, float* ball_pos, float* their
                 get_projection(a, b, line_status, their_player_pos, projection_point);
                 // 投影点是否在球和点位之间
                 if ((projection_point[0] - ball_pos[0]) * (projection_point[0] - me_pos[0]) + (projection_point[1] - ball_pos[1]) * (projection_point[1] - me_pos[1]) > 0) {
-                    intercept_point[0] = (ball_pos[0] - me_pos[0]) * 2 * ROBOT_RADIUS / ball2me_dist + me_pos[0];
-                    intercept_point[1] = (ball_pos[1] - me_pos[1]) * 2 * ROBOT_RADIUS / ball2me_dist + me_pos[1];
+                    intercept_point[0] = me_pos[0];
+                    intercept_point[1] = me_pos[1];
                 }
                 else {
-                    intercept_point[0] = projection_point[0];
-                    intercept_point[1] = projection_point[1];
+                    bool in_penalty = is_in_penalty(projection_point[0], projection_point[1], 0);
+                    if (j != their_goalie && in_penalty) { // 非守门员不能进禁区
+                        intercept_point[0] = me_pos[0];
+                        intercept_point[1] = me_pos[1];
+                    }
+                    else if (j == their_goalie && !in_penalty) // 守门员不出禁区
+                        continue;
+                    else {
+                        intercept_point[0] = projection_point[0];
+                        intercept_point[1] = projection_point[1];
+                    }                    
                 }
                 // 球刚好过敌方截球点的时间
                 float ball2inter_dist = dist(intercept_point, ball_pos) + BALL_RADIUS;
                 float ball2inter_vel = sqrt(ball_kicked_vel * ball_kicked_vel - 2 * BALL_DEC * ball2inter_dist);
                 float ball2inter_time = (ball_kicked_vel - ball2inter_vel) / BALL_DEC;
-                if (ball2inter_time == 0) // 被除数不能为0
-                    ball2inter_time = 1e-6;
                 // 敌方身体区域刚好接触到截球点的时间
                 float opp2inter_dist = dist(intercept_point, their_player_pos) - ROBOT_RADIUS;
                 if (opp2inter_dist < 0)
                     opp2inter_dist = 0;
                 float opp2inter_time = TrapezoidalMotionTime(opp2inter_dist, 0);
 
-                float temp_score = MAX_SCORE * (1 - opp2inter_time / ball2inter_time);
+                float temp_score = 0.0;
+                if (opp2inter_time == 0)
+                    temp_score = MAX_SCORE;
+                else {
+                    float score_factor = min(ball2inter_time / opp2inter_time, 1.0);
+                    temp_score = MAX_SCORE * pow(score_factor, 3);
+                }
                 if (reverseReceiveP < temp_score) // 取最大的分值，即最容易被拦截的地方
                     reverseReceiveP = temp_score;
             }
@@ -410,7 +466,42 @@ __device__ float evaluate_flat_pass(float* me_pos, float* ball_pos, float* their
     return reverseReceiveP;
 }
 
-__device__ float evaluate_chip_pass(float* me_pos, float* ball_pos, float* their_player_ptr) {
+__device__ float evaluate_flat_pass_our(float* me_pos, float* ball_pos, float* our_player_ptr) {
+    float reverseReceiveP = 0.0;
+    float ball_max_dist = BALL_MAX_VEL * BALL_MAX_VEL / (2 * BALL_DEC); // 球自由滚动的最大距离
+    float ball2me_dist = dist(ball_pos, me_pos); // 球到点位的距离
+    if (ball2me_dist - ROBOT_FRONT_TO_CENTER - BALL_RADIUS > ball_max_dist || ball2me_dist < SHORTEST_PASS_DIST) { // 太远传不过去或者太近没必要传
+        reverseReceiveP = MAX_SCORE;
+    }
+    else {
+        float ball_kicked_vel = sqrt(FASTEST_RECEIVE_VEL * FASTEST_RECEIVE_VEL + 2 * BALL_DEC * ball2me_dist); // 传球的初始速度，尽量快
+        ball_kicked_vel = min(ball_kicked_vel, BALL_MAX_VEL);
+        float intercept_point[2];
+        intercept_point[0] = me_pos[0];
+        intercept_point[1] = me_pos[1];
+        // 球刚好过敌方截球点的时间
+        float ball2inter_dist = dist(intercept_point, ball_pos) + BALL_RADIUS;
+        float ball2inter_vel = sqrt(ball_kicked_vel * ball_kicked_vel - 2 * BALL_DEC * ball2inter_dist);
+        float ball2inter_time = (ball_kicked_vel - ball2inter_vel) / BALL_DEC;
+        
+        // 我方身体区域刚好接触到截球点的时间
+        float our2inter_dist = dist(intercept_point, our_player_ptr) - ROBOT_RADIUS;
+        if (our2inter_dist < 0)
+            our2inter_dist = 0;
+        float our2inter_time = TrapezoidalMotionTime(our2inter_dist, 0);
+
+        if (ball2inter_time == 0)
+            reverseReceiveP = MAX_SCORE;
+        else {
+            float score_factor = min(our2inter_time / ball2inter_time, 1.0);
+            reverseReceiveP = MAX_SCORE * pow(score_factor, 3);
+        }
+    }
+
+    return reverseReceiveP;
+}
+
+__device__ float evaluate_chip_pass_their(float* me_pos, float* ball_pos, float* their_player_ptr, int their_goalie) {
     float reverseReceiveP = 0.0;
     float a, b;
     int line_status;
@@ -431,29 +522,67 @@ __device__ float evaluate_chip_pass(float* me_pos, float* ball_pos, float* their
                 get_projection(a, b, line_status, their_player_pos, projection_point);
                 // 投影点是否在球和点位之间
                 if ((projection_point[0] - ball_pos[0]) * (projection_point[0] - me_pos[0]) + (projection_point[1] - ball_pos[1]) * (projection_point[1] - me_pos[1]) < 0) {
-                    if (dist(their_player_pos, ball_pos) - ROBOT_RADIUS < (ROBOT_MAX_HEIGHT + BALL_RADIUS) / tan(chip_angle)) {
+                    if (dist(their_player_pos, ball_pos) - ROBOT_RADIUS < (ROBOT_MAX_HEIGHT + BALL_RADIUS) / tan(chip_angle)) { // 距离球太近挑不出去
                         reverseReceiveP = MAX_SCORE;
                         break;
                     }
                 }
+                if (j == their_goalie) // 守门员不出禁区
+                    continue;
                 // 计算落点
                 float intercept_point[2];
-                intercept_point[0] = (me_pos[0] - ball_pos[0]) * ball2me_dist / dist(ball_pos, me_pos) + ball_pos[0];
-                intercept_point[1] = (me_pos[1] - ball_pos[1]) * ball2me_dist / dist(ball_pos, me_pos) + ball_pos[1];
+                intercept_point[0] = me_pos[0];
+                intercept_point[1] = me_pos[1];
                 // 球刚好落地的时间，适当延时考虑空气阻力          
                 float ball2inter_time = ball_kicked_vel * sin(chip_angle) / G * 2 * CHIP_TIME_FACTOR;
-                if (ball2inter_time == 0) // 被除数不能为0
-                    ball2inter_time = 1e-6;
                 // 敌方身体区域刚好接触到截球点的时间
                 float opp2inter_dist = dist(intercept_point, their_player_pos) - ROBOT_RADIUS;
                 if (opp2inter_dist < 0)
                     opp2inter_dist = 0;
                 float opp2inter_time = TrapezoidalMotionTime(opp2inter_dist, 0);
 
-                float temp_score = MAX_SCORE * (1 - opp2inter_time / ball2inter_time);
+                float temp_score = 0.0;
+                if (opp2inter_time == 0)
+                    temp_score = MAX_SCORE;
+                else {
+                    float score_factor = min(ball2inter_time / opp2inter_time, 1.0);
+                    temp_score = MAX_SCORE * pow(score_factor, 3);
+                }
                 if (reverseReceiveP < temp_score) // 取最大的分值，即最容易被拦截的地方
                     reverseReceiveP = temp_score;
             }
+        }
+    }
+
+    return reverseReceiveP;
+}
+
+__device__ float evaluate_chip_pass_our(float* me_pos, float* ball_pos, float* our_player_ptr) {
+    float reverseReceiveP = 0.0;
+    float chip_angle = d2r(ROBOT_CHIP_ANGLE);
+    float ball_max_dist = BALL_MAX_VEL * cos(chip_angle) * BALL_MAX_VEL * sin(chip_angle) / G * 2; // 球自由飞行的最大距离
+    float ball2me_dist = dist(ball_pos, me_pos) - ROBOT_FRONT_TO_CENTER - BALL_RADIUS; // 球到点位的距离，进行了修正
+    if (ball2me_dist > ball_max_dist || ball2me_dist < SHORTEST_PASS_DIST) { // 太远传不过去或者太近没必要传
+        reverseReceiveP = MAX_SCORE;
+    }
+    else {
+        float ball_kicked_vel = sqrt(G * ball2me_dist / (2 * sin(chip_angle) * cos(chip_angle))); // 传球的初始速度
+        float intercept_point[2];
+        intercept_point[0] = me_pos[0];
+        intercept_point[1] = me_pos[1];
+        // 球刚好落地的时间，适当延时考虑空气阻力
+        float ball2inter_time = ball_kicked_vel * sin(chip_angle) / G * 2 * CHIP_TIME_FACTOR;
+        // 我方身体区域刚好接触到截球点的时间
+        float our2inter_dist = dist(intercept_point, our_player_ptr) - ROBOT_RADIUS;
+        if (our2inter_dist < 0)
+            our2inter_dist = 0;
+        float our2inter_time = TrapezoidalMotionTime(our2inter_dist, 0);
+
+        if (ball2inter_time == 0)
+            reverseReceiveP = MAX_SCORE;
+        else {
+            float score_factor = min(our2inter_time / ball2inter_time, 1.0);
+            reverseReceiveP = MAX_SCORE * pow(score_factor, 3);
         }
     }
 
@@ -507,7 +636,7 @@ __device__ float evaluate_goal(float* me_pos, float* ball_pos, float* their_play
     return reverseGoalP;
 }
 
-__device__ float evaluate_goal_v2(float* me_pos, float* ball_pos_ptr, float* their_player_ptr) {
+__device__ float evaluate_goal_v2(float* me_pos, float* ball_pos_ptr, float* their_player_ptr, int their_goalie) {
     float reverseGoalP = MAX_SCORE;
     float temp_reverseGoalP[3] = { 0.0, 0.0, 0.0 };
     float a, b;
@@ -532,29 +661,51 @@ __device__ float evaluate_goal_v2(float* me_pos, float* ball_pos_ptr, float* the
                 float* their_player_pos = their_player_ptr + j * POS_INFO_LENGTH + 1;
                 // 计算投影点
                 float projection_point[2];
+                float intercept_point[2];
                 get_projection(a, b, line_status, their_player_pos, projection_point);
-                // 投影点是否在球和球门之间
-                if ((projection_point[0] - ball_pos[0]) * (projection_point[0] - goal_pos[i][0]) + (projection_point[1] - ball_pos[1]) * (projection_point[1] - goal_pos[i][1]) > 0)
-                    continue;
-                // 考虑转向时间
+                // 投影点不在球和球门之间
+                if ((projection_point[0] - ball_pos[0]) * (projection_point[0] - goal_pos[i][0]) + (projection_point[1] - ball_pos[1]) * (projection_point[1] - goal_pos[i][1]) > 0) {
+                    if (j == their_goalie) { // 敌方守门员的特殊处理
+                        intercept_point[0] = goal_pos[i][0];
+                        intercept_point[1] = goal_pos[i][1];
+                    }
+                    else
+                        continue;
+                }
+                else {
+                    if (j != their_goalie && is_in_penalty(projection_point[0], projection_point[1], 0)) // 非守门员不能进禁区
+                        continue;
+                    else if (j == their_goalie && !is_in_penalty(projection_point[0], projection_point[1], 0)) // 守门员不出禁区
+                        continue;
+                    intercept_point[0] = projection_point[0];
+                    intercept_point[1] = projection_point[1];
+                }
+                // 考虑转向时间，角度小直接touch，否则turn，目前很慢
                 float me2ball_dir = Normalize(dir(me_pos, ball_pos_ptr));
                 float turn_dir = fabs(ball2goal_dir - me2ball_dir);
                 if (turn_dir > PI) // 转劣弧的角度
                     turn_dir = M_2PI - turn_dir;
-                float me_turn_time = TrapezoidalMotionTime(turn_dir, 1);
+                float me_turn_time = 0.0;
+                if (turn_dir > d2r(LARGEST_TOUCH_ANGLE))
+                    me_turn_time = TrapezoidalMotionTime(turn_dir, 1);
                 // 球刚好过敌方投影点的时间
-                float ball2proj_dist = dist(projection_point, ball_pos) + BALL_RADIUS;
-                float ball2proj_vel = sqrt(BALL_MAX_VEL * BALL_MAX_VEL - 2 * BALL_DEC * ball2proj_dist);
-                float ball2proj_time = (BALL_MAX_VEL - ball2proj_vel) / BALL_DEC;
-                if (ball2proj_time == 0) // 被除数不能为0
-                    ball2proj_time = 1e-6;
+                float ball2inter_dist = dist(intercept_point, ball_pos) + BALL_RADIUS;
+                float ball2inter_vel = sqrt(BALL_MAX_VEL * BALL_MAX_VEL - 2 * BALL_DEC * ball2inter_dist);
+                float ball2inter_time = (BALL_MAX_VEL - ball2inter_vel) / BALL_DEC;
                 // 敌方身体区域刚好接触到投影点的时间
-                float opp2proj_dist = dist(projection_point, their_player_pos) - ROBOT_RADIUS;
-                if (opp2proj_dist < 0) // 已经进入机器人身体范围，可以截住球
-                    opp2proj_dist = 0;
-                float opp2proj_time = TrapezoidalMotionTime(opp2proj_dist, 0);
+                float opp2inter_dist = dist(intercept_point, their_player_pos) - ROBOT_RADIUS;
+                if (opp2inter_dist < 0) // 已经进入机器人身体范围，可以截住球
+                    opp2inter_dist = 0;
+                float opp2inter_time = TrapezoidalMotionTime(opp2inter_dist, 0);
 
-                float temp_score = MAX_SCORE * (1 - opp2proj_time / (me_turn_time + ball2proj_time));
+                // 重要假设，射门时车追不上球，都是就近截球
+                float temp_score = 0.0;
+                if (opp2inter_time == 0)
+                    temp_score = MAX_SCORE;
+                else {
+                    float score_factor = min((ball2inter_time + me_turn_time) / opp2inter_time, 1.0);
+                    temp_score = MAX_SCORE * pow(score_factor, 3);
+                }                    
                 if (temp_reverseGoalP[i] < temp_score) // 取最大的分值，即最容易被拦截的地方
                     temp_reverseGoalP[i] = temp_score;
             }
@@ -570,20 +721,6 @@ __device__ float evaluate_goal_v2(float* me_pos, float* ball_pos_ptr, float* the
     return reverseGoalP;
 }
 
-__device__ float calculate_final_score(float* weight_set, float* score_set) {
-    float final_score = 0.0;
-    for (int i = 0; i < SCORE_NUM; i++) {
-        final_score += weight_set[i] * score_set[i];
-    }
-    if (final_score < 0) {
-        final_score = 0;
-    }
-    else if (final_score > MAX_SCORE) {
-        final_score = MAX_SCORE;
-    }
-    return final_score;
-}
-
 __global__ void gpu_calc(float startPos[], float map[])
 {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
@@ -597,7 +734,7 @@ __global__ void gpu_calc(float startPos[], float map[])
     float* our_player_ptr = startPos + 7;
     float* their_player_ptr = startPos + (7 + POS_INFO_LENGTH * SELF_NUM);
     // 为了与颜色一一对应，最大值不要超过MAX_SCORE
-    if (is_in_penalty(me_x, me_y) || if_collide_theirPlayer(me_pos_ptr, their_player_ptr)) { // 不能进禁区，不能冲撞对方机器人
+    if (is_in_penalty(me_x, me_y, ROBOT_RADIUS) || if_collide_theirPlayer(me_pos_ptr, their_player_ptr)) { // 不能进禁区，不能冲撞对方机器人
         map[i] = MAX_SCORE;
     }
     else {    
@@ -605,17 +742,25 @@ __global__ void gpu_calc(float startPos[], float map[])
         // 需要使用的一些变量
 
         // float me2ball_dist = dist(me_pos_ptr, ball_pos_ptr);
+        int their_goalie = check_their_goalie(their_player_ptr);
 
         // 场势值，越小越好
         // float dist_value = evaluate_dist(me2ball_dist);
-        float flat_pass_value = evaluate_flat_pass(me_pos_ptr, ball_pos_ptr, their_player_ptr);
-        float chip_pass_value = evaluate_chip_pass(me_pos_ptr, ball_pos_ptr, their_player_ptr);
+        float flat_pass_value_their = evaluate_flat_pass_their(me_pos_ptr, ball_pos_ptr, their_player_ptr, their_goalie);
+        float chip_pass_value_their = evaluate_chip_pass_their(me_pos_ptr, ball_pos_ptr, their_player_ptr, their_goalie);
+        int our_match_player = rolematch(me_pos_ptr, our_player_ptr);
+        float flat_pass_value_our = evaluate_flat_pass_our(me_pos_ptr, ball_pos_ptr, our_player_ptr + our_match_player * POS_INFO_LENGTH + 1);
+        float chip_pass_value_our = evaluate_chip_pass_our(me_pos_ptr, ball_pos_ptr, our_player_ptr + our_match_player * POS_INFO_LENGTH + 1);
+        float flat_pass_value = flat_pass_value_their * 0.7 + flat_pass_value_our * 0.3; // 经验系数
+        float chip_pass_value = chip_pass_value_their * 0.7 + chip_pass_value_our * 0.3;
         // 只要有一种传球方式可行即可
         float receive_value = min(flat_pass_value, chip_pass_value); // evaluate_receive(me_pos_ptr, ball_pos_ptr, their_player_ptr);
-        float goal_value = evaluate_goal_v2(me_pos_ptr, ball_pos_ptr, their_player_ptr); // evaluate_goal(me_pos_ptr, ball_pos_ptr, their_player_ptr);
-        float score_set[SCORE_NUM] = { receive_value, goal_value }; // dist_value, receive_value
-        float weight_set[SCORE_NUM] = { 0.5, 0.5 }; // {1, 1, 1};
-        map[i] = calculate_final_score(weight_set, score_set);
+        float goal_value = evaluate_goal_v2(me_pos_ptr, ball_pos_ptr, their_player_ptr, their_goalie); // evaluate_goal(me_pos_ptr, ball_pos_ptr, their_player_ptr);
+        
+        float goal_factor = min(max(ball_pos_ptr[0] + PITCH_LENGTH / 6, 0.0) / (PITCH_LENGTH - PENALTY_DEPTH + PITCH_LENGTH / 6), 1.0);
+        float receive_factor = 1 - goal_factor;
+        float final_score = receive_factor * receive_value + goal_factor * goal_value;
+        map[i] = min(max(final_score, 0.0), MAX_SCORE);
         // map[i] = me2ball_dist;
     }
 }
