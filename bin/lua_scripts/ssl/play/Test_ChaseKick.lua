@@ -17,7 +17,7 @@ firstState = "chase",
 		end
 	end,
     
-	Kicker = task.getBall(ball.pos()), --task.slowGetBall(),
+	Kicker = task.getBall(ball.pos()),
     match = ""
 },
 ["break"] = {

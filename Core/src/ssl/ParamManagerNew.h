@@ -155,7 +155,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(BREAK_VEL, "BREAK/VEL", 500);
             loadParam(BREAK_ROT_ACC, "BREAK/ROT_ACC", 50);
             loadParam(BREAK_ROT_VEL, "BREAK/ROT_VEL", 100);
-            loadParam(BREAK_OBSTACLE_RADIUS, "BREAK/OBSTACLE_RADIUS", 7);
+            loadParam(BREAK_OBSTACLE_RADIUS, "BREAK/OBSTACLE_RADIUS", 8);
 
 
 

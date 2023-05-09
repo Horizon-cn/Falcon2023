@@ -149,7 +149,18 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
     // 运动参数设置
     _capability = setCapability(pVision);
+    if (task().player.max_acceleration)_capability.maxAccel = task().player.max_acceleration;
+    if (task().player.max_deceleration)_capability.maxDec = task().player.max_deceleration;
+    if (task().player.max_rot_acceleration)_capability.maxAngularDec = task().player.max_rot_acceleration;
+    if (task().player.max_rot_acceleration)_capability.maxAngularAccel = task().player.max_rot_acceleration;
+    if (task().player.max_rot_speed)_capability.maxAngularSpeed = task().player.max_rot_speed;
 
+    /*
+    grabTask.player.max_acceleration = MAX_ACC;
+    grabTask.player.max_deceleration = MAX_ACC;
+    grabTask.player.max_rot_acceleration = MAX_ROT_ACC;
+    grabTask.player.max_rot_speed = MAX_ROT_VEL;
+    */
     /************************************************************************/
     /* 避障区域生成                                                          */
     /************************************************************************/
