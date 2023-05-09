@@ -44,7 +44,9 @@ local SwitchBallArea = function()
 			return "RightBack"
 	end
 end
-
+local TEST = function()
+	return "LeftFront"
+end
 -- Leader + Assister + Powerhouse
 -- Special + Defender
 -- Goalie + Middle + Hawk
@@ -53,12 +55,12 @@ gPlayTable.CreatePlay{
 firstState = "LeftFront",
 
 ["LeftFront"] = {
-	switch = SwitchBallArea,
+	switch = TEST,
 	Leader = task.advance(),
-	Assister = task.goMWPassPos("Leader"),
-	Powerhouse = task.goRWPassPos("Leader"),
-    Special = task.protectBall(), --task.marking("First"),
-    Defender = task.goMMPassPos("Leader"),
+	Assister = task.support("Leader", 0),
+	Powerhouse = task.support("Leader", 1),
+    Special = task.support("Leader", 2),
+    Defender = task.support("Leader", 3),
     Hawk = task.leftBack(),
 	Middle = task.rightBack(),
 	Goalie = task.goalieNew(),

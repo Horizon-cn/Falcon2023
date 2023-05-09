@@ -23,6 +23,7 @@ protected:
 	bool LARGECanToROTATE(const CVisionModule* pVision, const double finalDir);
 	bool ROTATECanToDIRECT(const CVisionModule* pVision, const double finalDir);
 	bool WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir);
+	bool MustUseLargeToAdjust(const CVisionModule* pVision, const int _executor, const double finalDir);
 private:
 	enum {
 		BEGIN = 0,
@@ -30,9 +31,11 @@ private:
 		ROTATAE,
 		DIRECT,
 		HAVE,
+		LEAVEBACK,
 	};
 	int _state;
 	int _lastCycle;
+	int _RotateCnt;
 };
 
 #endif //_GET_BALL_V4_H__

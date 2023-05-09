@@ -175,7 +175,7 @@ void CAdvance::plan(const CVisionModule* pVision)
                     NowIsShoot = 1;
 					_state = KICK; break;
 				}
-				else if(Me2OppTooclose(pVision, _executor) && isInBreakArea(pVision, _executor)) {
+				else if(Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor)) {
 
                     NowIsShoot = 2;
 					_state = BREAKSHOOT; break;
@@ -190,7 +190,7 @@ void CAdvance::plan(const CVisionModule* pVision)
                 else if(Me2OppTooclose(pVision, _executor)) {
                     _state = BREAKPASS; break;
 				}
-                else { _state = KICK; break; }
+                else { _state = BREAKSHOOT; break; }
 			}
 			else {
 				/*人在后场  此处作为一个框架的TODO*/
@@ -239,7 +239,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 		KickStatus::Instance()->setKick(_executor, RELIEF_POWER);
 	}*/
-	_state = GET;
+
 	/**********************************************************
 	* Description: 状态执行
 	* Author: 谭宇宏
@@ -286,7 +286,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			//KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 			/*此处朝向可持久化即可 不需要进行改变*/
             LastPassDirToJudge = -999;
-			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, me2goal.dir(), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		}
 		break;
 	case KICK:   // 射门
@@ -574,7 +574,7 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 }
 bool CAdvance::isInBreakArea(const CVisionModule* pVision, int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	if (abs(me.Y()) < 180 && me.X() < 540 && me.X() > 315)return true;
+	if (abs(me.Y()) < 180 && me.X() < 540 && me.X() > 210)return true;
 	return false;
 }
 bool CAdvance::JudgeIsMeSupport(const CVisionModule* pVision, int vecNumber) {
@@ -633,7 +633,7 @@ bool CAdvance::tendToShoot(const CVisionModule* pVision, int vecNumber) {
 	const PlayerVisionT& opp = pVision->TheirPlayer(best_n);
 	double me2theirbest = (me.Pos() - opp.Pos()).mod();
 	double me2goal = (me.Pos() - theirCenter).mod();
-    if(me2goal < 130.0 * sqrt(2.0) && (!Me2OppTooclose(pVision, vecNumber))) return true;
+    //if(me2goal < 130.0 * sqrt(2.0) && (!Me2OppTooclose(pVision, vecNumber))) return true;
 	if (shootBlocked) return false;
 	else return kickValid;
 }

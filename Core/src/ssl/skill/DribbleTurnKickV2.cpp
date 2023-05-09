@@ -7,6 +7,7 @@
 #include <RobotSensor.h>
 #include <CommandFactory.h>
 #include <WorldModel/KickStatus.h>
+#include "Global.h"
 
 namespace {
 	
@@ -27,17 +28,28 @@ void CDribbleTurnKickV2::plan(const CVisionModule* pVision)
 	const CGeoPoint Target = task().player.pos;
 	const PlayerVisionT& me = pVision->OurPlayer(runner);
 	const BallVisionT& ball = pVision->Ball();
+	
+	int DoNotEnterDefenseBox = PlayerStatus::DODGE_OUR_DEFENSE_BOX;
+	int AllowDribbleFlag = PlayerStatus::DRIBBLING;
+	int ShootAllowDribble = DoNotEnterDefenseBox | AllowDribbleFlag;
+	int ShootNotNeedDribble = DoNotEnterDefenseBox & (~AllowDribbleFlag);
 
 	CPlayerTask* pTask;
-	DribbleStatus::Instance()->setDribbleCommand(runner, 3);
-	if (abs(Utils::Normalize(me.Dir() - finalDir)) > precision)
+
+	if (abs(Utils::Normalize(me.Dir() - finalDir)) > 80.0 * Param::Math::PI / 180 || (BallStatus::Instance()->getBallPossession(true, runner) == 0 )) {
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 100), "GET");
+		pTask = PlayerRole::makeItNoneTrajGetBall(runner, finalDir, CVector(0, 0), ShootNotNeedDribble, 0);
+	}
+	else if (abs(Utils::Normalize(me.Dir() - finalDir)) > precision)
 	{
+		DribbleStatus::Instance()->setDribbleCommand(runner, 3);
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 100), "turn");
 		pTask = PlayerRole::makeItSimpleGoto(runner, me.Pos(), finalDir);
 		//KickStatus::Instance()->clearAll();
 	}
 	else
 	{
+		DribbleStatus::Instance()->setDribbleCommand(runner, 3);
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 100), "turn");
 		KickStatus::Instance()->setKick(runner, power);
 		pTask = PlayerRole::makeItJustKick(runner, ischipkick, power);
