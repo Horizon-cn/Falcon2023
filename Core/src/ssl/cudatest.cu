@@ -38,18 +38,22 @@ __constant__ float LINE_WIDTH = 1;
 __constant__ float POINT_PASS_OFF = 80.0;
 // 机器人和球的物理参数
 __constant__ float BALL_RADIUS = 2.15;
-__constant__ float BALL_DEC = 98.0; // 仿真里是98.0
+__constant__ float BALL_DEC = 98.0; // 仿真器里是98.0
 __constant__ float BALL_MAX_VEL = 650.0;
 __constant__ float ROBOT_RADIUS = 9.0;
 __constant__ float ROBOT_FRONT_TO_CENTER = 7.6;
 __constant__ float ROBOT_MAX_HEIGHT = 15.0;
-__constant__ float ROBOT_CHIP_ANGLE = 45.0 * 3.1415926 / 180.0;
+__constant__ float ROBOT_CHIP_ANGLE = 45.0;
 __constant__ float ROBOT_MAX_ACC = 300.0;
 __constant__ float ROBOT_MAX_DEC = 300.0;
 __constant__ float ROBOT_MAX_VEL = 300.0;
 __constant__ float ROBOT_MAX_ROTACC = 5.0;
 __constant__ float ROBOT_MAX_ROTDEC = 5.0;
 __constant__ float ROBOT_MAX_ROTVEL = 10.0;
+// 决策相关阈值
+__constant__ float LARGEST_GOAL_ANGLE = 80.0; // 和球门夹角太大不打门
+__constant__ float SHORTEST_PASS_DIST = 100.0; // 距离太近不传球
+__constant__ float CHIP_TIME_FACTOR = 1.5; // 延长球的飞行时间，影响挑射是否被拦截的判断
 // 大场参数
 //#define ENEMY_NUM 8
 //#define SELF_NUM 8  // 己方机器人数目
@@ -143,6 +147,14 @@ inline __device__ float Normalize(float angle)
     return angle;
 }
 
+// 角度值转为弧度制
+inline __device__ float d2r(float degree)
+{
+    float rad = degree * PI / 180.0;
+    rad = Normalize(rad);
+    return rad;
+}
+
 // line_status为1表示直线斜率不为无穷的情况，此时记直线方程 y=ax+b
 // line_status为0表示直线斜率为无穷的情况，此时记直线方程为x=a
 __device__ int get_line(float* line_point1, float* line_point2, float& a, float& b) {
@@ -223,7 +235,7 @@ __device__ void MakeOutOfTheirPenaltyArea(float* point) {
     }
 }
 
-// 梯形速度规划，计算零速到点时间
+// 梯形速度规划，计算零速到点时间，dist必须为正数
 inline __device__ float TrapezoidalMotionTime(float dist, int mode) {
     float max_acc;
     float max_dec;
@@ -354,7 +366,7 @@ __device__ float evaluate_flat_pass(float* me_pos, float* ball_pos, float* their
     int line_status;
     float ball_max_dist = BALL_MAX_VEL * BALL_MAX_VEL / (2 * BALL_DEC); // 球自由滚动的最大距离
     float ball2me_dist = dist(ball_pos, me_pos); // 球到点位的距离
-    if (ball2me_dist - ROBOT_FRONT_TO_CENTER - BALL_RADIUS > ball_max_dist || ball2me_dist < 100) { // 太远传不过去或者太近没必要传
+    if (ball2me_dist - ROBOT_FRONT_TO_CENTER - BALL_RADIUS > ball_max_dist || ball2me_dist < SHORTEST_PASS_DIST) { // 太远传不过去或者太近没必要传
         reverseReceiveP = MAX_SCORE;
     }
     else {
@@ -402,13 +414,14 @@ __device__ float evaluate_chip_pass(float* me_pos, float* ball_pos, float* their
     float reverseReceiveP = 0.0;
     float a, b;
     int line_status;
-    float ball_max_dist = BALL_MAX_VEL * cos(ROBOT_CHIP_ANGLE) * BALL_MAX_VEL * sin(ROBOT_CHIP_ANGLE) / G * 2; // 球自由飞行的最大距离
+    float chip_angle = d2r(ROBOT_CHIP_ANGLE);
+    float ball_max_dist = BALL_MAX_VEL * cos(chip_angle) * BALL_MAX_VEL * sin(chip_angle) / G * 2; // 球自由飞行的最大距离
     float ball2me_dist = dist(ball_pos, me_pos) - ROBOT_FRONT_TO_CENTER - BALL_RADIUS; // 球到点位的距离，进行了修正
-    if (ball2me_dist > ball_max_dist || ball2me_dist < 100) { // 太远传不过去或者太近没必要传
+    if (ball2me_dist > ball_max_dist || ball2me_dist < SHORTEST_PASS_DIST) { // 太远传不过去或者太近没必要传
         reverseReceiveP = MAX_SCORE;
     }
     else {
-        float ball_kicked_vel = sqrt(G * ball2me_dist / (2 * sin(ROBOT_CHIP_ANGLE) * cos(ROBOT_CHIP_ANGLE))); // 传球的初始速度
+        float ball_kicked_vel = sqrt(G * ball2me_dist / (2 * sin(chip_angle) * cos(chip_angle))); // 传球的初始速度
         line_status = get_line(ball_pos, me_pos, a, b);
         for (int j = 0; j < ENEMY_NUM; j++) {
             if (their_player_ptr[j * POS_INFO_LENGTH]) {
@@ -418,7 +431,7 @@ __device__ float evaluate_chip_pass(float* me_pos, float* ball_pos, float* their
                 get_projection(a, b, line_status, their_player_pos, projection_point);
                 // 投影点是否在球和点位之间
                 if ((projection_point[0] - ball_pos[0]) * (projection_point[0] - me_pos[0]) + (projection_point[1] - ball_pos[1]) * (projection_point[1] - me_pos[1]) < 0) {
-                    if (dist(their_player_pos, ball_pos) - ROBOT_RADIUS < (ROBOT_MAX_HEIGHT + BALL_RADIUS) / tan(ROBOT_CHIP_ANGLE)) {
+                    if (dist(their_player_pos, ball_pos) - ROBOT_RADIUS < (ROBOT_MAX_HEIGHT + BALL_RADIUS) / tan(chip_angle)) {
                         reverseReceiveP = MAX_SCORE;
                         break;
                     }
@@ -428,7 +441,7 @@ __device__ float evaluate_chip_pass(float* me_pos, float* ball_pos, float* their
                 intercept_point[0] = (me_pos[0] - ball_pos[0]) * ball2me_dist / dist(ball_pos, me_pos) + ball_pos[0];
                 intercept_point[1] = (me_pos[1] - ball_pos[1]) * ball2me_dist / dist(ball_pos, me_pos) + ball_pos[1];
                 // 球刚好落地的时间，适当延时考虑空气阻力          
-                float ball2inter_time = ball_kicked_vel * sin(ROBOT_CHIP_ANGLE) / G * 2 * 1.5;
+                float ball2inter_time = ball_kicked_vel * sin(chip_angle) / G * 2 * CHIP_TIME_FACTOR;
                 if (ball2inter_time == 0) // 被除数不能为0
                     ball2inter_time = 1e-6;
                 // 敌方身体区域刚好接触到截球点的时间
@@ -509,7 +522,7 @@ __device__ float evaluate_goal_v2(float* me_pos, float* ball_pos_ptr, float* the
         float ball_pos[2] = { ball_pos_x, ball_pos_y };
         float ball2goal_dist = dist(ball_pos, goal_pos[i]) + BALL_RADIUS + LINE_WIDTH; // 球刚好进门需要滚动的距离
         float ball2goal_dir = Normalize(dir(ball_pos, goal_pos[i]));
-        if (me2goal_dist > ball_max_dist || fabs(ball2goal_dir) > PI / 180 * 83) { // 太远进不去球门或角度太小打不进去
+        if (me2goal_dist > ball_max_dist || fabs(ball2goal_dir) > d2r(LARGEST_GOAL_ANGLE)) { // 太远进不去球门或角度太大（靠近底线）打不进去
             temp_reverseGoalP[i] = MAX_SCORE;
             continue;
         }
@@ -526,8 +539,8 @@ __device__ float evaluate_goal_v2(float* me_pos, float* ball_pos_ptr, float* the
                 // 考虑转向时间
                 float me2ball_dir = Normalize(dir(me_pos, ball_pos_ptr));
                 float turn_dir = fabs(ball2goal_dir - me2ball_dir);
-                if (turn_dir > PI)
-                    turn_dir = PI * 2 - turn_dir;
+                if (turn_dir > PI) // 转劣弧的角度
+                    turn_dir = M_2PI - turn_dir;
                 float me_turn_time = TrapezoidalMotionTime(turn_dir, 1);
                 // 球刚好过敌方投影点的时间
                 float ball2proj_dist = dist(projection_point, ball_pos) + BALL_RADIUS;
@@ -593,10 +606,11 @@ __global__ void gpu_calc(float startPos[], float map[])
 
         // float me2ball_dist = dist(me_pos_ptr, ball_pos_ptr);
 
-        // 场势值
+        // 场势值，越小越好
         // float dist_value = evaluate_dist(me2ball_dist);
         float flat_pass_value = evaluate_flat_pass(me_pos_ptr, ball_pos_ptr, their_player_ptr);
         float chip_pass_value = evaluate_chip_pass(me_pos_ptr, ball_pos_ptr, their_player_ptr);
+        // 只要有一种传球方式可行即可
         float receive_value = min(flat_pass_value, chip_pass_value); // evaluate_receive(me_pos_ptr, ball_pos_ptr, their_player_ptr);
         float goal_value = evaluate_goal_v2(me_pos_ptr, ball_pos_ptr, their_player_ptr); // evaluate_goal(me_pos_ptr, ball_pos_ptr, their_player_ptr);
         float score_set[SCORE_NUM] = { receive_value, goal_value }; // dist_value, receive_value
