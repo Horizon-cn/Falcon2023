@@ -24,7 +24,6 @@
 #define INPUT_DIM 10
 #define HIDDEN_LAYER_DIM 80
 #define OUTPUT_DIM 50
-#define SCORE_NUM 2 // 所用分值种类数目
 __constant__ float MAX_SCORE = 255; // 最大分值，与颜色对应
 __constant__ float PI = 3.1415926;
 __constant__ float G = 980.0;
@@ -51,6 +50,8 @@ __constant__ float ROBOT_MAX_ROTACC = 5.0;
 __constant__ float ROBOT_MAX_ROTDEC = 5.0;
 __constant__ float ROBOT_MAX_ROTVEL = 10.0;
 // 决策相关阈值
+__constant__ float BEST_TIME_RATIO = 0.333;
+__constant__ float WOREST_TIME_RATIO = 1.0;
 __constant__ float FASTEST_RECEIVE_VEL = 80.0; // 能接住的最快球速
 __constant__ float LARGEST_GOAL_ANGLE = 80.0; // 和球门夹角太大不打门
 __constant__ float SHORTEST_PASS_DIST = 100.0; // 距离太近不传球
@@ -655,6 +656,14 @@ __device__ float evaluate_goal_v2(float* me_pos, float* ball_pos_ptr, float* the
             temp_reverseGoalP[i] = MAX_SCORE;
             continue;
         }
+        // 考虑转向时间，角度小直接touch，否则turn，目前很慢
+        float me2ball_dir = Normalize(dir(me_pos, ball_pos_ptr));
+        float turn_dir = fabs(ball2goal_dir - me2ball_dir);
+        if (turn_dir > PI) // 转劣弧的角度
+            turn_dir = M_2PI - turn_dir;
+        float me_turn_time = 0.0;
+        if (turn_dir > d2r(LARGEST_TOUCH_ANGLE))
+            me_turn_time = TrapezoidalMotionTime(turn_dir, 1);
         line_status = get_line(goal_pos[i], ball_pos, a, b);
         for (int j = 0; j < ENEMY_NUM; j++) {
             if (their_player_ptr[j * POS_INFO_LENGTH]) {
@@ -680,14 +689,6 @@ __device__ float evaluate_goal_v2(float* me_pos, float* ball_pos_ptr, float* the
                     intercept_point[0] = projection_point[0];
                     intercept_point[1] = projection_point[1];
                 }
-                // 考虑转向时间，角度小直接touch，否则turn，目前很慢
-                float me2ball_dir = Normalize(dir(me_pos, ball_pos_ptr));
-                float turn_dir = fabs(ball2goal_dir - me2ball_dir);
-                if (turn_dir > PI) // 转劣弧的角度
-                    turn_dir = M_2PI - turn_dir;
-                float me_turn_time = 0.0;
-                if (turn_dir > d2r(LARGEST_TOUCH_ANGLE))
-                    me_turn_time = TrapezoidalMotionTime(turn_dir, 1);
                 // 球刚好过敌方投影点的时间
                 float ball2inter_dist = dist(intercept_point, ball_pos) + BALL_RADIUS;
                 float ball2inter_vel = sqrt(BALL_MAX_VEL * BALL_MAX_VEL - 2 * BALL_DEC * ball2inter_dist);
@@ -751,13 +752,17 @@ __global__ void gpu_calc(float startPos[], float map[])
         int our_match_player = rolematch(me_pos_ptr, our_player_ptr);
         float flat_pass_value_our = evaluate_flat_pass_our(me_pos_ptr, ball_pos_ptr, our_player_ptr + our_match_player * POS_INFO_LENGTH + 1);
         float chip_pass_value_our = evaluate_chip_pass_our(me_pos_ptr, ball_pos_ptr, our_player_ptr + our_match_player * POS_INFO_LENGTH + 1);
-        float flat_pass_value = flat_pass_value_their * 0.7 + flat_pass_value_our * 0.3; // 经验系数
-        float chip_pass_value = chip_pass_value_their * 0.7 + chip_pass_value_our * 0.3;
+        float pass_value_their = min(flat_pass_value_their, chip_pass_value_their);
+        // 如果对方截球比较困难，只考虑我方接球难易程度，用时间比例判断
+        float pass_factor_their = min(max(pass_value_their - MAX_SCORE * BEST_TIME_RATIO, 0.0) / (MAX_SCORE * (WOREST_TIME_RATIO - BEST_TIME_RATIO)), 1.0); // 0.7;
+        float pass_factor_our = 1 - pass_factor_their; // 0.3;
+        float flat_pass_value = flat_pass_value_their * pass_factor_their + flat_pass_value_our * pass_factor_our; // 经验系数
+        float chip_pass_value = chip_pass_value_their * pass_factor_their + chip_pass_value_our * pass_factor_our;
         // 只要有一种传球方式可行即可
         float receive_value = min(flat_pass_value, chip_pass_value); // evaluate_receive(me_pos_ptr, ball_pos_ptr, their_player_ptr);
         float goal_value = evaluate_goal_v2(me_pos_ptr, ball_pos_ptr, their_player_ptr, their_goalie); // evaluate_goal(me_pos_ptr, ball_pos_ptr, their_player_ptr);
-        
-        float goal_factor = min(max(ball_pos_ptr[0] + PITCH_LENGTH / 6, 0.0) / (PITCH_LENGTH - PENALTY_DEPTH + PITCH_LENGTH / 6), 1.0);
+        // 后场只考虑传球，角球区只考虑射门，中间区域线性比例渐变，与gpuBestAlgThread里面的边界对应
+        float goal_factor = min(max(ball_pos_ptr[0] + PITCH_LENGTH / 6, 0.0) / (PITCH_LENGTH / 2 - PENALTY_DEPTH + PITCH_LENGTH / 6), 1.0);
         float receive_factor = 1 - goal_factor;
         float final_score = receive_factor * receive_value + goal_factor * goal_value;
         map[i] = min(max(final_score, 0.0), MAX_SCORE);
