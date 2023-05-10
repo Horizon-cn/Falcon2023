@@ -104,6 +104,15 @@ extern "C" void get_gpu_info() {
     }
 }
 
+inline __device__ float pow(float a, int n) {
+    float result = 1.0;
+    if (n < 0 && a != 0)
+        a = 1.0 / a;
+    for (int i = 0; i < n; i++)
+        result *= a;
+    return result;
+}
+
 // 判断一个点是否在禁区
 inline __device__ bool is_in_penalty(float pos_x, float pos_y, float buffer) {
     if (abs(pos_y) <= PENALTY_WIDTH / 2 + buffer && abs(pos_x) >= (PITCH_LENGTH / 2 - PENALTY_DEPTH - buffer)) {
