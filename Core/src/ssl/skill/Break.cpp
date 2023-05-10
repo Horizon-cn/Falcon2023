@@ -285,11 +285,12 @@ void CBreak::plan(const CVisionModule* pVision) {
     //cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
 
     bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
-    //cout << "canShoot____" << ' ' << canShoot << endl;
-    //cout << "dirok____" << ' ' << dirok << endl;
     //if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 20) {
-    //if (canShoot && dirok){
-    if (dirok) {
+    calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
+
+    cout << "canShoot____" << ' ' << canShoot << endl;
+    cout << "dirok____" << ' ' << dirok << endl;
+    if (canShoot && dirok ) {
         cout << "shoot!!!" << endl;
         DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
         KickStatus::Instance()->setKick(vecNumber, power);//力度可调
@@ -385,14 +386,12 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             cout << "projection_dist__" << ' ' << projection_dist << endl;
             cout << "to_projection_dist__" << ' ' << to_projection_dist << endl;*/
             //if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist/to_projection_dist) < (15*Param::Math::PI/180.0))||(to_projection_dist<15&&projection_dist<15))) {
-            if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / to_projection_dist) < (15 * Param::Math::PI / 180.0)) || (to_projection_dist < 10 && projection_dist < 10))) {
+            if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / to_projection_dist) < (15 * Param::Math::PI / 180.0))  )) {
             /*if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {*/
                 canShoot = false;
                 needBreakThrough = true;
                 break;
             }
-
-
         }
         if (canShoot)
         {
@@ -681,7 +680,6 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
     }
     for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
         if (!pVision->TheirPlayer(i).Valid()) continue;
-        cout << "enemy__" << i << endl;
         auto enemy = pVision->TheirPlayer(i);
         double x = enemy.X(), y = enemy.Y();
         double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
@@ -693,7 +691,6 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         }
     }
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("CanScore:" + to_string(flag)).c_str(), COLOR_YELLOW);
-    cout << "dirok__" << ' ' << flag << endl;
     return flag;
 
 }
