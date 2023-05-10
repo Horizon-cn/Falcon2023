@@ -741,6 +741,25 @@ void CGPUBestAlgThread::obscureBoundary() {
 	return;
 }
 
+void CGPUBestAlgThread::increaseRobust(int now, int pre) {
+	if ((_pointPotential[now] - _prePointPotential[pre]) < thresholdValue)
+	{
+		_pointPotential[now] = _prePointPotential[pre];
+		_bestSupport[now] = _preBestSupport[pre];
+		increaseRobust(now+1, pre+1);
+	}
+	else
+		increaseRobust(now+1, pre);
+}
+
+void CGPUBestAlgThread::storeState() {
+	for (int i = 0; i < AREANUM; i++) {
+		_preBestSupport[i] = _bestSupport[i];
+		_prePointPotential[i] = _pointPotential[i];
+	}
+}
+
+
 // 处理每个区域，在generatePointValue中已经加了进程锁，所以这里没有加，所以这个函数不准在外面调用
 void CGPUBestAlgThread::processPointValue() {
 	// 对_PointPotential数据进行处理，并找出前六区域中的最优值，并存储在_bestPoint中
@@ -803,10 +822,13 @@ void CGPUBestAlgThread::processPointValue() {
 
 	if (ParamManager::Instance()->boundaryVersion == 1) {
 		supportSortV2(); // 按照重要性对支撑点进行排序
+		
 	}
 	else if (ParamManager::Instance()->boundaryVersion == 2) {
 		supportSortV2(); 
 	}
+	increaseRobust(0,0); // 防止跳变的设定，从0开始进行筛选
+	storeState(); // 存储上一帧的状态
 
 }
 

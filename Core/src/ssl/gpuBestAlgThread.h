@@ -256,6 +256,12 @@ private:
 	double limitPosY(double);
 
 	/**
+	@brief	增大仿真鲁棒性*/
+	void increaseRobust(int,int);
+	void storeState();
+
+
+	/**
 	@brief 处理全场势能点，并搜索前六个区域中的最优点
 	目前处理的目的为：避免区域生成的点过近*/
 	void processPointValue();
@@ -277,9 +283,12 @@ private:
 	CVisionModule* _pVision;			             ///<图像指针
 	int _lastGPUCycle;					 ///上一帧GPU帧号
 	int _lastCycle[AREANUM] = { 0 };           ///  上一帧9个区域的CPU帧号
-	float _pointPotential[AREANUM];        /// 9个区域最优点的分值  
+	float _prePointPotential[AREANUM];        /// 9个区域最优点的分值 
+	float _pointPotential[AREANUM];        /// 9个区域最优点的分值 
+	CGeoPoint _preBestSupport[AREANUM];         /// 上一帧9个区域的最优点
 	CGeoPoint _bestPoint[AREANUM];         /// 当前帧9个区域的最优点
 	CGeoPoint _bestSupport[AREANUM];         /// 按照支撑点重要性进行排序后的最优点
+	float thresholdValue = 5.0;			//防止跳变的阈值
 
 
 	int _start_pos_x, _start_pos_y, _width, _length, _step;     ///搜索区域参数，分别为左上角坐标、区域长与宽、搜索步长
