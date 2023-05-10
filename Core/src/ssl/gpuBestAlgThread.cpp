@@ -26,7 +26,6 @@
 #include <sstream>
 extern Semaphore vision_to_cuda;
 
-#define ENABLE_CUDA true
 
 #ifdef ENABLE_CUDA
 extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int length, int width, int pos_num, float* pitch_info);
