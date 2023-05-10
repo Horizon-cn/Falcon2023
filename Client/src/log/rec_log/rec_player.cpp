@@ -222,6 +222,7 @@ void CRecPlayer::sendMessage(const ZSS::Protocol::RecMessage& recMsg) {
     ZSS::Protocol::Debug_Msgs debugMsgs;
     for (int team = PARAM::BLUE; team <= PARAM::YELLOW; team++) {
         debugMsgs = recMsg.debugmsgs(team);
+        debugMsgs.set_login_name(opm->LoginName); // 重要，不然画不出来
         int size = debugMsgs.ByteSize();
         if (team == 0) {
             GlobalData::Instance()->debugBlueMessages.resize(size);

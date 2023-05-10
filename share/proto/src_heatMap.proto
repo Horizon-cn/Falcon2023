@@ -7,7 +7,7 @@ message Point{
 	required float y = 2;
 }
 message Heat_Points{
-    required int32 color = 1;
+    required float color = 1;
     repeated Point pos = 2;
 }
 message Heat_Map{
@@ -15,7 +15,7 @@ message Heat_Map{
 	optional string login_name = 2;
 }
 message Heat_Points_New{
-    required int32 color = 1;
+    required float color = 1;
     repeated int32 pos = 2;
 }
 message Heat_Map_New{

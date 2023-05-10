@@ -320,7 +320,7 @@ void Field::leftAltModifierPressEvent(QMouseEvent *e) {}
 void Field::leftAltModifierMoveEvent(QMouseEvent *e) {}
 void Field::leftAltModifierReleaseEvent(QMouseEvent *e) {}
 void Field::leftCtrlModifierPressEvent(QMouseEvent *e) {
-    checkClosestBall(rx(e->x()), ry(e->y()));
+    checkClosestBall(rx(e->x()), ry(e->y()), 500); // 太难点了，点到Focus里面就行
 }
 void Field::leftCtrlModifierMoveEvent(QMouseEvent *e) {
     QLineF line(start, end);
@@ -331,12 +331,14 @@ void Field::leftCtrlModifierMoveEvent(QMouseEvent *e) {
 void Field::leftCtrlModifierReleaseEvent(QMouseEvent *e) {
     QLineF line(start, end);
     if(pressedBall) {
-        Simulator::Instance()->setBall(start.x()/1000.0, start.y()/1000.0, ballRatio*line.dx()/1000.0, ballRatio*line.dy()/1000.0);
+        const Owl::Ball& ball = GlobalData::Instance()->maintain[0].ball[0];
+        Simulator::Instance()->setBall(ball.pos.x()/1000.0, ball.pos.y()/1000.0, ballRatio*line.dx()/1000.0, ballRatio*line.dy()/1000.0);
         pressedBall = false;
     }
 }
 void Field::leftDoubleClickEvent(QMouseEvent * e){
-    checkClosestBall(rx(e->x()), ry(e->y()));
+    double limit = sipm->BallRadius; //opm->ballDiameter;
+    checkClosestBall(rx(e->x()), ry(e->y()), limit);
     if (pressedBall) {
         QDialog dialog;
         QFormLayout form(&dialog);
@@ -363,12 +365,11 @@ void Field::leftDoubleClickEvent(QMouseEvent * e){
         pressedBall = false;
     }
 }
-void Field::checkClosestBall(double x, double y) {
-    double limit = pow(sipm->BallRadius*2, 2) / 4; //pow(opm->ballDiameter, 2) / 4;
+void Field::checkClosestBall(double x, double y, double limit) {
     auto& vision = GlobalData::Instance()->maintain[0];
     if (vision.ball[0].valid) {
         const Owl::Ball& ball = vision.ball[0];
-        if(distance2(ball.pos.x() - x, ball.pos.y() - y) < limit) {
+        if(distance2(ball.pos.x() - x, ball.pos.y() - y) < pow(limit, 2)) {
             pressedBall = true;
             return;
         }
