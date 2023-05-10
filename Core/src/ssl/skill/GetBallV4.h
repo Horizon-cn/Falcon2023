@@ -1,15 +1,15 @@
-#ifndef _GET_BALL_V3_H__
-#define _GET_BALL_V3_H__
+#ifndef _GET_BALL_V4_H__
+#define _GET_BALL_V4_H__
 #include <skill/PlayerTask.h>
 
 /**********************************************************
-* Skill: GetBallV3
-* Description:拿球第三版，适用于小嘴巴底盘
+* Skill: GetBallV4
+* Description:拿球第4版，适用于小嘴巴底盘
 ***********************************************************/
 
-class CGetBallV3 :public CStatedTask {
+class CGetBallV4 :public CStatedTask {
 public:
-	CGetBallV3();
+	CGetBallV4();
 	virtual void plan(const CVisionModule* pVision);
 	virtual bool isEmpty()const { return false; }
 	virtual CPlayerCommand* execute(const CVisionModule* pVision);
@@ -20,8 +20,22 @@ protected:
 	CGeoPoint PredictForBall(int frame, const CVisionModule* pVision);
 	CGeoPoint GenerateLargeAnglePoint(const CVisionModule* pVision, const double finalDir, const bool debug);
 	bool JudgeLargeBack(const CVisionModule* pVision, CGeoPoint target);
+	bool LARGECanToROTATE(const CVisionModule* pVision, const double finalDir);
+	bool ROTATECanToDIRECT(const CVisionModule* pVision, const double finalDir);
+	bool WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir);
+	bool MustUseLargeToAdjust(const CVisionModule* pVision, const int _executor, const double finalDir);
 private:
+	enum {
+		BEGIN = 0,
+		LARGE,
+		ROTATAE,
+		DIRECT,
+		HAVE,
+		LEAVEBACK,
+	};
+	int _state;
 	int _lastCycle;
+	int _RotateCnt;
 };
 
-#endif //_GET_BALL_V3_H__
+#endif //_GET_BALL_V4_H__

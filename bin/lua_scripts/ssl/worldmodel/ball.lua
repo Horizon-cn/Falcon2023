@@ -344,6 +344,12 @@ function refIsOurBall(p)
 	return gRefMsg.isOurBall
 end
 
+function supportPassPos(num)
+	return function ()
+		local passPos = bestAlg:getBestPointFromArea(num)
+		return passPos
+	end
+end
 
 -- 以下四个函数通过WorldModel调用NormalPlayUtils，现改为直接调用gpuBestAlgThread，但是原路径仍未删除，建议中国赛后整理lua到C++接口
 function LWPassPos()

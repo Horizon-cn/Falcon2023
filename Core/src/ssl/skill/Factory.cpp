@@ -44,6 +44,7 @@
 #include "JustKick.h"
 #include "WaitTouch.h"
 #include "GetBallV3.h"
+#include "GetBallV4.h"
 #include "SlowGetBall.h"
 #include "TimeDelayTest.h"
 #include "Marking.h"
@@ -135,7 +136,7 @@ CPlayerTask* CTaskFactoryV2::OpenSpeed(const TaskT& task) {
 }
 
 CPlayerTask* CTaskFactoryV2::NoneTrajGetBall(const TaskT& task) {
-	return MakeTask< CGetBallV3 >(task);
+	return MakeTask< CGetBallV4 >(task);
 }
 CPlayerTask* CTaskFactoryV2::ForceStartRush(const TaskT& task) {
 	return MakeTask< CForceStartRush >(task);

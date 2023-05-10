@@ -25,7 +25,7 @@
 #include "NormalPlayUtils.h"
 #include "param.h"
 
-#define AREANUM 9 // 区域数目
+#define AREANUM 6 // 区域数目
 
 struct PointValueStruct {
 	float pos_x;
@@ -101,7 +101,7 @@ typedef std::deque<AreaStruct> AreaStructList;
 // 构造时传入左下点与右上点
 // centerArea返回一个中心点不变，长宽变为0.9倍的区域
 struct FieldRectangle {
-	FieldRectangle(CGeoPoint ld, CGeoPoint ru) {
+	FieldRectangle(CGeoPoint ld, CGeoPoint ru) { 
 		_leftDownPos = ld;
 		_rightUpPos = ru;
 		_leftUpPos = CGeoPoint(ld.x(), ru.y());
@@ -111,6 +111,30 @@ struct FieldRectangle {
 		_rangeX = (ru.x() - ld.x()) * 0.45;
 		_rangeY = (ld.y() - ru.y()) * 0.45;
 	}
+
+	void processField(CGeoPoint lu, CGeoPoint rd) {
+		_leftUpPos = lu;
+		_rightDownPos = rd;
+
+		_leftDownPos = CGeoPoint(lu.x(), rd.y());
+		_rightUpPos = CGeoPoint(rd.x(), lu.y());
+
+		double tempX = (lu.x() + rd.x()) / 2, tempY = (lu.y() + rd.y()) / 2;
+		_centerPos = CGeoPoint(tempX, tempY);
+		_rangeX = (rd.x() - lu.x()) * 0.45;
+		_rangeY = (rd.y() - lu.y()) * 0.45;
+	}
+
+	bool check4inclusion(CGeoPoint point) {
+		if ( ((point.x() >= _leftUpPos.x() && point.x() <= _rightUpPos.x())  ||
+			  (point.x() <= _leftUpPos.x() && point.x() >= _rightUpPos.x())) &&
+			 ((point.y() >= _leftUpPos.y() && point.y() <= _leftDownPos.y()) ||
+			  (point.y() <= _leftUpPos.y() && point.y() >= _leftDownPos.y()))  )
+			return true;
+		else
+			return false;
+	}
+
 	// 区域相加功能重构后还未实现，此部分代码需要结合x轴向右，y轴向上的的坐标系理解 from siyuan chen
 	//FieldRectangle operator +(FieldRectangle& param){
 	//	if (param._leftDownPos.x()<this->_leftDownPos.x()
@@ -187,7 +211,7 @@ public:
 	double getPosPotential(const CGeoPoint p);
 
 	// 返回场势图的size
-	int getMapSize() { return _w * _h * sizeof(float); }
+	int getMapSize() { return _w * _l * sizeof(float); }
 
 	// owl2可视化所需函数
 	void startComm();
@@ -208,6 +232,15 @@ private:
 	void erasePointPotentialValue(const CGeoPoint centerPoint, float length, float width);
 
 	/**
+	@brief	按照重要性排序调整bestpoint顺序*/
+	void supportSort();
+	void supportSortV2();
+
+	/**
+	@brief	获取球所在区域index*/
+	int getBallArea();
+
+	/**
 	@brief	寻找一定区域里的最优点
 	@param	leftUp 取点区域的左上点(x轴向正右方向的直角坐标系中)
 	@param	rightDown 取点区域的右下点(x轴向正右方向的直角坐标系中)
@@ -217,6 +250,10 @@ private:
 	/**
 	@brief	动态模糊边界*/
 	void obscureBoundary();
+	void obscureBoundaryV2();
+
+	double limitPosX(double);
+	double limitPosY(double);
 
 	/**
 	@brief 处理全场势能点，并搜索前六个区域中的最优点
@@ -240,11 +277,14 @@ private:
 	CVisionModule* _pVision;			             ///<图像指针
 	int _lastGPUCycle;					 ///上一帧GPU帧号
 	int _lastCycle[AREANUM] = { 0 };           ///  上一帧9个区域的CPU帧号
+	float _pointPotential[AREANUM];        /// 9个区域最优点的分值  
 	CGeoPoint _bestPoint[AREANUM];         /// 当前帧9个区域的最优点
+	CGeoPoint _bestSupport[AREANUM];         /// 按照支撑点重要性进行排序后的最优点
 
-	int _start_pos_x, _start_pos_y, _width, _height, _step;     ///搜索区域参数，分别为左上角坐标、区域长与宽、搜索步长
-	int _w, _h;                                       /// 申请空间参数  
-	int _palyer_pos_num;                              //一个机器人所需传递的信息数目，目前为小车的位置、朝向、速度（首位为是否valid）
+
+	int _start_pos_x, _start_pos_y, _width, _length, _step;     ///搜索区域参数，分别为左上角坐标、区域长与宽、搜索步长
+	int _w, _l;                                       /// 申请空间参数  
+	int _player_pos_num;                              //一个机器人所需传递的信息数目，目前为小车的位置、朝向、速度（首位为是否valid）
 
 	CGeoPoint sendPoint;				///<传球点，一般为球所在的点
 	int halfLength; // 场地半长

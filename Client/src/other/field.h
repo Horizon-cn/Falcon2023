@@ -79,7 +79,7 @@ private:
     void leftCtrlModifierMoveEvent(QMouseEvent *);
     void leftCtrlModifierReleaseEvent(QMouseEvent *);
     void leftDoubleClickEvent(QMouseEvent * );
-    void checkClosestBall(double,double);
+    void checkClosestBall(double,double,double);
     void rightPressEvent(QMouseEvent *);
     void rightMoveEvent(QMouseEvent *);
     void rightReleaseEvent(QMouseEvent *);

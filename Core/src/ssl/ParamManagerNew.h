@@ -163,7 +163,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(BREAK_VEL, "BREAK/VEL", 500);
             loadParam(BREAK_ROT_ACC, "BREAK/ROT_ACC", 50);
             loadParam(BREAK_ROT_VEL, "BREAK/ROT_VEL", 100);
-            loadParam(BREAK_OBSTACLE_RADIUS, "BREAK/OBSTACLE_RADIUS", 7);
+            loadParam(BREAK_OBSTACLE_RADIUS, "BREAK/OBSTACLE_RADIUS", 8);
 
 
 
@@ -256,6 +256,11 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(ourVisionJudgeDir, "BallStatus/ourVisionJudgeDir", 30);
             loadParam(theirVisionJudgeDist, "BallStatus/theirVisionJudgeDist", 20);
             loadParam(theirVisionJudgeDir, "BallStatus/theirVisionJudgeDir", 30);
+
+            loadParam(boundaryVersion, "GpuBestAlg/boundaryVersion", 1);
+            loadParam(step, "GpuBestAlg/step", 10);
+            loadParam(startPosX, "GpuBestAlg/startPosX", -600);
+            loadParam(startPosY, "GpuBestAlg/startPosY", -450);
         }
     public:
         // GotoPosition 中的调试开关
@@ -439,6 +444,11 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double ourVisionJudgeDir;
         double theirVisionJudgeDist;
         double theirVisionJudgeDir;
+        // GpuBestAlg
+        int boundaryVersion;
+        int step;
+        int startPosX;
+        int startPosY;
 };
 typedef Falcon::NormalSingleton< CParamManagerSkill > ParamManager;
 

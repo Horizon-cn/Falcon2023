@@ -51,11 +51,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
       loadParam(type_points, "DebugMessages/type_points", true);
       loadParam(type_text, "DebugMessages/type_text", true);
       loadParam(type_robot, "DebugMessages/type_robot", true);
-      //HeatMap
-      loadParam(HeatMap, "HeatMap/HeatMap", false);
-      loadParam(drawStep, "HeatMap/drawStep", 100);
-      loadParam(startPosX, "HeatMap/startPosX", -6000);
-      loadParam(startPosY, "HeatMap/startPosY", -4500);
+      loadParam(heatMap, "DebugMessages/heatMap", false);
       //Size
       loadParam(ballDiameter, "Size/ballDiameter", 100);
       loadParam(shadowDiameter, "Size/shadowDiameter", 30);
@@ -114,12 +110,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     int canvasWidth, canvasHeight;
     int param_canvasWidth, param_canvasHeight;
     //DebugMessages
-    bool debug, type_arc, type_line, type_points, type_text, type_robot;
-     //HeatMap
-    bool HeatMap;
-    int drawStep;
-    int startPosX;
-    int startPosY;
+    bool debug, type_arc, type_line, type_points, type_text, type_robot, heatMap;    
     //Size
     int ballDiameter, shadowDiameter, carDiameter, carFaceWidth, numberSize, debugPointSize;
     //Field
@@ -369,9 +360,15 @@ public:
     void loadParamFromFile() {
         qDebug() << "load" + filename;
         MAX_BALL_SPEED = value("Rule/MAX_BALL_SPEED", 630).toDouble() / 100.0;
+        drawStep = value("GpuBestAlg/step", 10).toInt() * 10;
+        startPosX = value("GpuBestAlg/startPosX", -600).toInt() * 10;
+        startPosY = value("GpuBestAlg/startPosY", -450).toInt() * 10;
     }
 public:
     double MAX_BALL_SPEED;
+    int drawStep;
+    int startPosX;
+    int startPosY;
 };
 typedef Falcon::MeyersSingleton<ParamManagerOwl> OParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerCfg> CParamManager;

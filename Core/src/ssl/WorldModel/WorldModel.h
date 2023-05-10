@@ -124,6 +124,9 @@ public:
 		CGeoPoint tandemPos=CGeoPoint(0,0);
 		return NormalPlayUtils::generateTandemCond(_pVision,tandemPos,myNum);
 	}
+	const double getBallPossession(bool isOurPlayer, int id) {
+		return BallStatus::Instance()->getBallPossession(isOurPlayer, id);
+	}
 	const int getBallToucher(){
 		return BallStatus::Instance()->getBallToucher();
 	}
