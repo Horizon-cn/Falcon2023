@@ -104,6 +104,15 @@ extern "C" void get_gpu_info() {
     }
 }
 
+inline __device__ float pow(float a, int n) {
+    float result = 1.0;
+    if (n < 0 && a != 0)
+        a = 1.0 / a;
+    for (int i = 0; i < n; i++)
+        result *= a;
+    return result;
+}
+
 // 判断一个点是否在禁区
 inline __device__ bool is_in_penalty(float pos_x, float pos_y, float buffer) {
     if (abs(pos_y) <= PENALTY_WIDTH / 2 + buffer && abs(pos_x) >= (PITCH_LENGTH / 2 - PENALTY_DEPTH - buffer)) {
@@ -456,7 +465,7 @@ __device__ float evaluate_flat_pass_their(float* me_pos, float* ball_pos, float*
                     temp_score = MAX_SCORE;
                 else {
                     float score_factor = min(ball2inter_time / opp2inter_time, 1.0);
-                    temp_score = MAX_SCORE * pow(score_factor, 3);
+                    temp_score = MAX_SCORE * powf(score_factor, 3);
                 }
                 if (reverseReceiveP < temp_score) // 取最大的分值，即最容易被拦截的地方
                     reverseReceiveP = temp_score;
@@ -495,7 +504,7 @@ __device__ float evaluate_flat_pass_our(float* me_pos, float* ball_pos, float* o
             reverseReceiveP = MAX_SCORE;
         else {
             float score_factor = min(our2inter_time / ball2inter_time, 1.0);
-            reverseReceiveP = MAX_SCORE * pow(score_factor, 3);
+            reverseReceiveP = MAX_SCORE * powf(score_factor, 3);
         }
     }
 
@@ -547,7 +556,7 @@ __device__ float evaluate_chip_pass_their(float* me_pos, float* ball_pos, float*
                     temp_score = MAX_SCORE;
                 else {
                     float score_factor = min(ball2inter_time / opp2inter_time, 1.0);
-                    temp_score = MAX_SCORE * pow(score_factor, 3);
+                    temp_score = MAX_SCORE * powf(score_factor, 3);
                 }
                 if (reverseReceiveP < temp_score) // 取最大的分值，即最容易被拦截的地方
                     reverseReceiveP = temp_score;
@@ -583,7 +592,7 @@ __device__ float evaluate_chip_pass_our(float* me_pos, float* ball_pos, float* o
             reverseReceiveP = MAX_SCORE;
         else {
             float score_factor = min(our2inter_time / ball2inter_time, 1.0);
-            reverseReceiveP = MAX_SCORE * pow(score_factor, 3);
+            reverseReceiveP = MAX_SCORE * powf(score_factor, 3);
         }
     }
 
@@ -705,7 +714,7 @@ __device__ float evaluate_goal_v2(float* me_pos, float* ball_pos_ptr, float* the
                     temp_score = MAX_SCORE;
                 else {
                     float score_factor = min((ball2inter_time + me_turn_time) / opp2inter_time, 1.0);
-                    temp_score = MAX_SCORE * pow(score_factor, 3);
+                    temp_score = MAX_SCORE * powf(score_factor, 3);
                 }                    
                 if (temp_reverseGoalP[i] < temp_score) // 取最大的分值，即最容易被拦截的地方
                     temp_reverseGoalP[i] = temp_score;

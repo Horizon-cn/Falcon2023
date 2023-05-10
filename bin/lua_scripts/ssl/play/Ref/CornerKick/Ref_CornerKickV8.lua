@@ -1,27 +1,23 @@
 
 local function def_chipPower()
-  if math.abs(ball.posY()) > 450 then 
-    return 550
-  elseif math.abs(ball.posY())>350 then
-    return 420
-  elseif math.abs(ball.posY()) > 270 then 
-    return 350
+  if math.abs(ball.posY()) > 270 then 
+    return 180
   else 
-    return 280
+    return 100
   end
 end
 
-local ANTI_POS_1 = ball.refAntiYPos(CGeoPoint:new_local(150, 50))
-local ANTI_POS_2 = ball.refAntiYPos(CGeoPoint:new_local(300, 100))
-local ANTI_POS_3 = ball.refAntiYPos(CGeoPoint:new_local(450, 130))
+local ANTI_POS_1 = ball.refAntiYPos(CGeoPoint:new_local(112, 33))
+local ANTI_POS_2 = ball.refAntiYPos(CGeoPoint:new_local(225, 66))
+local ANTI_POS_3 = ball.refAntiYPos(CGeoPoint:new_local(337, 86))
 
 
-local SYNT_POS_1 = ball.refSyntYPos(CGeoPoint:new_local(200, 50))
-local SYNT_POS_2 = ball.refSyntYPos(CGeoPoint:new_local(400, 60))
-local SYNT_POS_3 = ball.refSyntYPos(CGeoPoint:new_local(300,180))
+local SYNT_POS_1 = ball.refSyntYPos(CGeoPoint:new_local(150, 33))
+local SYNT_POS_2 = ball.refSyntYPos(CGeoPoint:new_local(300, 40))
+local SYNT_POS_3 = ball.refSyntYPos(CGeoPoint:new_local(225,120))
 
 
-local SHOOT_POS = pos.passForTouch(ball.refAntiYPos(CGeoPoint:new_local(400, 130)))
+local SHOOT_POS = pos.passForTouch(ball.refAntiYPos(CGeoPoint:new_local(300, 86)))
 
 local dangerous = true
 
@@ -32,11 +28,11 @@ gPlayTable.CreatePlay{
 
   ["start"] = {
     switch = function ()
-      if bufcnt(player.toTargetDist("Defender") < 20 , 30, 180) then
+      if bufcnt(player.toTargetDist("Defender") < 20 , 10, 180) then
         return "passBall"
       end
     end,
-    Assister = task.staticGetBall(SHOOT_POS()),
+    Assister = task.getBall(SHOOT_POS()),
     Leader   = task.rightBack(),
     Special  = task.leftBack(),
     Middle   = task.goCmuRush(SYNT_POS_1,_,_,flag.allow_dss),

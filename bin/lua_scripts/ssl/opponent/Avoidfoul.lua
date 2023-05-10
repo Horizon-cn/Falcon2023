@@ -1,13 +1,11 @@
 gOppoConfig = {
   ----------------------play---------------------------------------------------------------
 
-	CornerKick  = {2}, -- kf
+	CornerKick  = {8}, -- kf
 	
-	FrontKick   = {2},
+	FrontKick   = {61},
 
-	MiddleKick  = {2},
-
-	BackKick    = {2}, --{10, "Ref_ImmortalKickV1"}
+	BackKick    = {"Ref_ImmortalKickV61"}, --{10, "Ref_ImmortalKickV1"}
 -------------------------------Def---------------------------------------------------
 
 	CornerDef   = "Ref_CornerDefV2", -- 可能要用v4，防头球
@@ -16,9 +14,9 @@ gOppoConfig = {
 	FrontDef    = "Ref_FrontDefV2", --四车markfront用v9,若挑就用V7，若他们四车全上就用V11,保守打法用Ref_FrontDefV2
 	PenaltyKick = "Ref_PenaltyKickV1", --Ref_PenaltyKick2017V5
 	PenaltyDef  = "Ref_PenaltyDefV1", --Ref_PenaltyDefV3
-	KickOff		= "Ref_KickOffV6",
-	KickOffDef  = "Ref_KickOffDefV1",
-	NorPlay     = "Test_NormalDefend"
+	KickOff		= "Ref_KickOffV23",
+	KickOffDef  = "Ref_KickOffDefV23",
+	NorPlay     = "Test_play6"
 }
 
 

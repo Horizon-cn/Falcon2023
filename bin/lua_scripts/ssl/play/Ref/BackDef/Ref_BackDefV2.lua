@@ -9,15 +9,14 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
+
   Leader = task.defendKick(),
-  Hawk = task.multiBack(3,1),
-  Middle = task.multiBack(3,2),
-  Special = task.goMWPassPos("Leader"),
-    Assister = task.goCmuRush(CGeoPoint:new_local(-460, 0)),
-    Powerhouse = task.goCmuRush(CGeoPoint:new_local(-460, 140)),
-  Defender = task.multiBack(3,3),
+  Middle = task.leftBack(),
+  Defender = task.rightBack(),
+  Special = task.marking("First"),
+  Assister = task.support("Assister",0),
   Goalie = task.goalieNew(),
-  match    = "[L][HM][SAPD]"
+  match    = "[L][DM][SA]"
 },
   name = "Ref_BackDefV2",
   applicable = {

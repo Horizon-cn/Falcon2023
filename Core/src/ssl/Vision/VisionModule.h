@@ -241,6 +241,7 @@ public:
 	int  OurGoal() const { return _ourGoal; }
 	int  TheirGoal() const { return _theirGoal; }
 	int TheirGoalie() const { return _theirGoalie; }
+	int TheirPenaltyGoalie() const { return _theirPenaltyGoalie; }
 
 	const CVector OurRawPlayerSpeed(int num) const {return _ourPlayerPredictor[num].getResult(_timeCycle).Vel(); }
 	const CVector TheirRawPlayerSpeed(int num) const {return _theirPlayerPredictor[num].getResult(_timeCycle).Vel();}
@@ -324,6 +325,7 @@ private:
 	int _theirGoal;
 	int _ourGoalie;
 	int _theirGoalie;
+	int _theirPenaltyGoalie;
 	int _theirGoalieStrategyNum;
 	int _theirPenaltyNum; // 对方第几个点球
 
