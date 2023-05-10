@@ -123,7 +123,7 @@ firstState = "start",
       return "kickof"
     end
   end,
-  Leader   = task.staticGetBall(-3),
+  Leader   = task.getBall(-3),
   Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss),
   Special  = task.goCmuRush(RIGHT_POS_1,_,_,flag.allow_dss),
   Middle   = task.leftBack(),

@@ -147,26 +147,23 @@ function backShootPos(p)
 end
 
 function toPointDir(p, role)
-	if role == nil then
+
+	return function ()
+		local idir
 		if type(p) == "function" then
-			return function ( role1 )
-				return (p() - player.pos(role1)):dir()
-			end
-		elseif p == nil then
-			return function ( role1 )
-				return (ball.pos() - player.pos(role1)):dir()
-			end
-		elseif type(p) ~= "CGeoPoint" then
-			return function ( role1 )
-				return p
-			end
-		else 
-			return function ( role1 )
-				return (p - player.pos(role1)):dir()
-			end
+			idir = p()
+		elseif type(p) == "number" then
+			idir = p
+		elseif type(p) == "userdata" then
+			idir = Utils.Normalize((p - ball.pos()):dir())
+		elseif type(p) == "string" then
+			idir = Utils.Normalize((player.pos(p) - ball.pos()):dir())
 		end
-	else
-		return (p - player.pos(role)):dir()
+
+		if type(idir) == "userdata" then
+			idir = Utils.Normalize((idir - ball.pos()):dir())
+		end
+		return idir
 	end
 end
 

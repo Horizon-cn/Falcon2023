@@ -3,9 +3,9 @@ gOppoConfig = {
 
 	CornerKick  = {8}, -- kf
 	
-	FrontKick   = {2},
+	FrontKick   = {61},
 
-	BackKick    = {2}, --{10, "Ref_ImmortalKickV1"}
+	BackKick    = {"Ref_ImmortalKickV61"}, --{10, "Ref_ImmortalKickV1"}
 -------------------------------Def---------------------------------------------------
 
 	CornerDef   = "Ref_CornerDefV2", -- 可能要用v4，防头球
@@ -16,7 +16,7 @@ gOppoConfig = {
 	PenaltyDef  = "Ref_PenaltyDefV1", --Ref_PenaltyDefV3
 	KickOff		= "Ref_KickOffV23",
 	KickOffDef  = "Ref_KickOffDefV23",
-	NorPlay     = "Test_NormalDefend"
+	NorPlay     = "Test_play6"
 }
 
 
