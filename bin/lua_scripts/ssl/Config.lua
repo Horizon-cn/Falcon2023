@@ -10,7 +10,7 @@ gTestPlay = function ()
 	if not IS_YELLOW then
 		return "Test_play6" --"Test_ChaseKick" --"Test_Advance" --"Test_Run"
 	else
-		return "Test_defend6" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "Test_Defence" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -157,9 +157,11 @@ gRefPlayTable = {
 
 	--点球进攻
 	"Ref/PenaltyKick/Ref_PenaltyKickV1",
+	"Ref/PenaltyKick/Ref_PenaltyKickV6",
 
 	--点球防守
 	"Ref/PenaltyDef/Ref_PenaltyDefV1",
+	"Ref/PenaltyDef/Ref_PenaltyDefV6",
 
 	--停止站位
 	"Ref/GameStop/Ref_Stop4BackKick",
