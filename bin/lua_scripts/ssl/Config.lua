@@ -21,10 +21,10 @@ gSwitchNum = {
 }
 
 gRoleFixNum = {
-	["Kicker"]   = {2},
-	["Goalie"]   = {0},
-	["Tier"]	 = {3},
-	["Receiver"] = {1}
+	["Kicker"]   = {6},
+	["Goalie"]   = {1},
+	["Tier"]	 = {7},
+	["Receiver"] = {8}
 }
 
 -- 用来进行定位球的保持
@@ -99,9 +99,11 @@ gSkill = {
 gRefPlayTable = {
 	--开球进攻
 	"Ref/KickOff/Ref_KickOffV6",
+	"Ref/KickOff/Ref_KickOffV23",
 
 	--角球进攻
 	"Ref/CornerKick/Ref_CornerKickV1",
+	"Ref/CornerKick/Ref_CornerKickV6",
 	"Ref/CornerKick/Ref_CornerKickV8",
 	"Ref/CornerKick/Ref_CornerKickV30",
 	"Ref/CornerKick/Ref_CornerKickV201",
@@ -112,6 +114,7 @@ gRefPlayTable = {
 	"Ref/FrontKick/Ref_FrontKickV23",
 	"Ref/FrontKick/Ref_FrontKickV41",
 	"Ref/FrontKick/Ref_FrontKickV2",
+	"Ref/FrontKick/Ref_FrontKickV61",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
@@ -122,9 +125,11 @@ gRefPlayTable = {
 	"Ref/BackKick/Ref_BackKickV1",
 	"Ref/BackKick/Ref_ImmortalKickV1",
 	"Ref/BackKick/Ref_BackKickV2",
+	"Ref/BackKick/Ref_ImmortalKickV61",
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
+	"Ref/KickOffDef/Ref_KickOffDefV23",
 
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDefV5",
@@ -154,9 +159,11 @@ gRefPlayTable = {
 
 	--点球进攻
 	"Ref/PenaltyKick/Ref_PenaltyKickV1",
+	"Ref/PenaltyKick/Ref_PenaltyKickV6",
 
 	--点球防守
 	"Ref/PenaltyDef/Ref_PenaltyDefV1",
+	"Ref/PenaltyDef/Ref_PenaltyDefV6",
 
 	--停止站位
 	"Ref/GameStop/Ref_Stop4BackKick",
@@ -164,6 +171,7 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_StopV3",
 	"Ref/GameStop/Ref_Stop4CornerDef",
 	"Ref/GameStop/Ref_Stop4CornerKick",
+	"Ref/GameStop/Ref_Stop4CornerKick6",
 	"Ref/GameStop/Ref_Stop4SideLine",
 	"Ref/GameStop/Ref_Stop4FrontKick",
 	"Ref/GameStop/Ref_Stop4MiddleKick",
@@ -203,5 +211,7 @@ gTestPlayTable = {
 	"Test_NormalDefend",
 	"Test_AvoidFoulDefend",
 	"Test_NormalMiddleDefend",
-	"Test_Circle"
+	"Test_Circle",
+	"Test_play6",
+	"Test_defend6"
 }

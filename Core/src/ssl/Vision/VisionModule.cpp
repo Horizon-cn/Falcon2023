@@ -49,7 +49,7 @@ namespace {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CVisionModule::CVisionModule() 
-:_timeCycle(0), _lastTimeCycle(0), _ballKicked(false), _ourGoalie(0), _theirGoalie(-1), _theirGoalieStrategyNum(0)
+:_timeCycle(0), _lastTimeCycle(0), _ballKicked(false), _ourGoalie(0), _theirGoalie(-1), _theirPenaltyGoalie(-1), _theirGoalieStrategyNum(0)
 {	
 	WorldModel::Instance()->registerVision(this);
 	{
@@ -89,12 +89,14 @@ void CVisionModule::SetRefRecvMsg(const GameInfoT msg)
 		_theirGoal = msg.refMsg.yellowGoal;
 		_ourGoalie = msg.refMsg.blueGoalie;
 		_theirGoalie = msg.refMsg.yellowGoalie;
+		_theirPenaltyGoalie = msg.refMsg.yellowGoalie;
 	}
 	else {
 		_ourGoal = msg.refMsg.yellowGoal;
 		_theirGoal = msg.refMsg.blueGoal;
 		_ourGoalie = msg.refMsg.yellowGoalie;
 		_theirGoalie = msg.refMsg.blueGoalie;
+		_theirPenaltyGoalie = msg.refMsg.blueGoalie;
 	}
 	_ballPlacementPosition.setX(invertFactor * msg.refMsg.ballPlacement.x);
 	_ballPlacementPosition.setY(invertFactor * msg.refMsg.ballPlacement.y);
@@ -338,7 +340,11 @@ void CVisionModule::CheckBothSidePlayerNum()
 //    if (_theirGoalie >=0 && _theirGoalie < Param::Field::MAX_PLAYER && !Utils::InTheirPenaltyArea(TheirPlayer(_theirGoalie).Pos(),0))
 //        return;	
 	int dist = 1000;
+	//2022 ChinaOpen, new Penalty rules introduced: For Division A(1200*900), dist = 800, for Division B(900*600), dist = 600 
+	double penaltydist = Param::Field::PITCH_LENGTH / 1.5;
+	
     int tempTheirGoalie=_theirGoalie;
+	int tempTheirPenaltyGoalie = _theirPenaltyGoalie;
     for(int i=0;i<Param::Field::MAX_PLAYER;i++)
     {
         double d = TheirPlayer(i).Pos().dist(CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0));
@@ -347,11 +353,20 @@ void CVisionModule::CheckBothSidePlayerNum()
             dist=d;
             tempTheirGoalie=i;
         }
+		if(d<penaltydist)
+		{
+			penaltydist = d;
+			tempTheirPenaltyGoalie = i;
+		}
     }
     if(Utils::InTheirPenaltyArea(TheirPlayer(tempTheirGoalie).Pos(),0) && !Utils::InTheirPenaltyArea(TheirPlayer(_theirGoalie).Pos(),0))
     {
         _theirGoalie = tempTheirGoalie;
     }
+	if(true)
+	{
+		_theirPenaltyGoalie = tempTheirPenaltyGoalie;
+	}
 
 	return;
 }

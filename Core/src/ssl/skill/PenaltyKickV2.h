@@ -3,13 +3,12 @@
 
 #include <skill/PlayerTask.h>
 #include "DefendUtils.h"
-/**********************************************************
-* High Level Skill: Advance Ball Up Field / Down Field
-* Description: Íš¹ý£ºÄÃÇò-->Ž«Çò-->ÉäÃÅ£ºœøÐÐœø¹¥»òÕßœÇÇòÖÆÔì
-*			   ÍÕ·åÃüÃû
-* Author: Ì·Óîºê
-* Created Date: 2022/10/10
-***********************************************************/
+/************************************************************************/
+/*		modified by jlc
+        2023.5
+        long dist penalty, rebuilt based on Advance
+*/
+/************************************************************************/
 class CPenaltyKickV2 : public CStatedTask {
 public:
     CPenaltyKickV2();
@@ -93,47 +92,32 @@ private:
     * Created Date: 2022/10/10
     ***********************************************************/
     bool isVisionHasBall(const CVisionModule* pVision, const int vecNumber);
-    bool checkOppHasBall(const CVisionModule* pVision);
-    int getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
-    bool checkBallFront(const CVisionModule* pVision, double angle);
-    bool IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber);
 
+    //Use _theirPenaltyGoalie here
     bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
-    bool isPassBalltoMe(const CVisionModule* pVision, int vecNumber);
     bool isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int ShootOrPass);
     /**********************************************************
-    * Description: ×ŽÌ¬ÇÐ»»ÅÐ¶šÀàº¯Êý£¬ÓÃÓÚ×ŽÌ¬×ª»¯Ö®ŒäµÄÅÐ¶Ï
-    * Author: Ì·Óîºê
-    * Created Date: 2022/10/10
-***********************************************************/
-    int toChipOrToFlat(const CVisionModule* pVision, int vecNumber);
+        * Description: 状态切换判定类函数，用于状态转化之间的判断
+        * Author: 谭宇宏
+        * Created Date: 2022/10/10
+    ***********************************************************/
     bool tendToShoot(const CVisionModule* pVision, int vecNumber);
-    int CanSupportKick(const CVisionModule* pVision, int vecNumber);
     bool isTheLineBlocked(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint);
 
     /**********************************************************
-    * Description: ·ÀÊØÀàº¯Êý£¬œöÏÞÓÚGETÖÐÊ¹ÓÃ
-    * Author: Ì·Óîºê
-    * Created Date: 2022/10/10
-***********************************************************/
-    bool isOppFaceOurDoor(const CVisionModule* pVision, double angle);
-    bool checkTheyCanShoot(const CVisionModule* pVision, int vecNumber);
-    /**********************************************************
-        * Description: Éú³ÉÀàº¯Êý£¬ŸßÓÐŸßÌåÊµÒå
-        * Author: Ì·Óîºê
+        * Description: 生成类函数，具有具体实义
+        * Author: 谭宇宏
         * Created Date: 2022/10/10
     ***********************************************************/
-    double flatPassDir(const CVisionModule* pVision, int vecNumber);
     double JustChipDir(const CVisionModule* pVision, int vecNumber);
     CGeoPoint GenerateBreakShootPoint(const CVisionModule* pVision, int vecNumber);
-    CGeoPoint GenerateBreakPassPoint(const CVisionModule* pVision, int vecNumber);
 
     /**********************************************************
         * Description: fornormalpush
         * Author: jlc
         * Created Date: 2022/11/18
     ***********************************************************/
-    bool isMePassedOpp(const CVisionModule* pVision, const int vecNumber);
+    //bool isMePassedOpp(const CVisionModule* pVision, const int vecNumber);
     double generateNormalPushDir(const CVisionModule* pVision, const int vecNumber);
 
 protected:

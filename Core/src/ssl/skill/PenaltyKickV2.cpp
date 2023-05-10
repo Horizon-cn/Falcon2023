@@ -1,7 +1,7 @@
 /************************************************************************/
-/*		modified by jlc
-        22.7.10
-        新设计思路：lua里面跑点判断距离直接跳penaltykick ： break + chase
+/*		modified by 江亮成
+        2023.5
+        long dist penalty, rebuilt based on Advance
 */
 /************************************************************************/
 #include "PenaltyKickV2.h"
@@ -24,7 +24,7 @@
 
 CPenaltyKickV2::CPenaltyKickV2()
 {
-    KICK_DIST = paramManager->KICK_DIST - 250;  /*射门允许范围 越高越容易射门*/
+    KICK_DIST = paramManager->KICK_DIST;  /*射门允许范围 越高越容易射门*/
     WantToLessShoot = paramManager->WantToLessShoot; /*射门倾向，越低越容易射门 最低为0 最高为5*/
     RELIEF_DIST = paramManager->RELIEF_DIST;  /*GET中紧急状况下的RELIEF判断距离*/
     OPP_HAS_BALL_DIST = paramManager->OPP_HAS_BALL_DIST; /*判断敌方是否有球的距离 需要调整*/
@@ -78,7 +78,6 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
     const PlayerVisionT& me = pVision->OurPlayer(_executor);
     const BallVisionT& ball = pVision->Ball();
     int GoalieNumber = 0;
-    int NumofPlayerInFrontfiled = 0;
     bool isMeHasBall = false;
     bool isMechHasBall = infraredOn >= 2;
     printf("%d\n", infraredOn);
@@ -92,15 +91,13 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         meHasBall = 0;
         meLoseBall = meLoseBall >= maxMeHasBall ? maxMeHasBall : meLoseBall + 1;
     }
+    opponentID = pVision->TheirPenaltyGoalie();
     double BallToOurGoal = (ball.Pos() - ourGoal).mod();
     CVector me2goal = theirCenter - me.Pos();
-    bool isOppHasBall = checkOppHasBall(pVision);
     const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
     const CVector opp2ball = ball.Pos() - opp.Pos();
     double ball2oppDist = opp2ball.mod();
     double ball2meDist = (ball.Pos() - me.Pos()).mod();
-    double Me2Receiver = (me.Pos() - pVision->OurPlayer(tandemNum).Pos()).mod();
-    double me2BestOppDist = CVector(pVision->TheirPlayer(opponentID).Pos() - me.Pos()).mod();
     KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
     CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
 
@@ -120,16 +117,11 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-545, -300), "HAS", COLOR_BLACK);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-575, -300), "LOSE", COLOR_BLACK);
     }
-    for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
-        if (pVision->OurPlayer(i).Valid() && i != GoalieNumber)
-            if (pVision->OurPlayer(i).Pos().x() > Param::Field::PITCH_LENGTH / 10)
-                NumofPlayerInFrontfiled++;
-    }
 
     /**********************************************************
     * Description: 状态分配
-    * Author: 谭宇宏
-    * Created Date: 2022/10/10
+    * Author: 江亮成
+    * Created Date: 2023/5/9
     ***********************************************************/
     switch (_state) {
     case BEGIN:
@@ -143,18 +135,18 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
                     _state = KICK; break;
                 }
                 else if (Me2OppTooclose(pVision, _executor)) {
-                    _state = BREAKSHOOT; break;
+                    _state = CHIP; break;
                 }
                 else {
                     _state = BREAKSHOOT; break;
                 }
             }
             else {
-                if (fabs(opp.VelX()) > 300 ) {
+                if (fabs(opp.VelX()) > 200 ) {
                     _state = CHIP; break;
                 }
                 else if (Me2OppTooclose(pVision, _executor)) {
-                    _state = BREAKSHOOT; break;
+                    _state = CHIP; break;
                 }
                 else if (me2goal.mod() > KICK_DIST + 30){
                     _state = NORMAL_PUSH; break;
@@ -293,7 +285,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Chip", COLOR_ORANGE);
         if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
             if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip isDirOK", COLOR_ORANGE);
-            KickStatus::Instance()->setChipKick(_executor, me2goal.mod() - 18);
+            KickStatus::Instance()->setChipKick(_executor, me2goal.mod() - 50);
         }
         else {
             //setSubTask(PlayerRole::makeItGoAndTurnKickV4(_executor, kickDir));
@@ -335,14 +327,12 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         break;
     case LIGHT_KICK:
         KickStatus::Instance()->clearAll();
-        if(pVision->Ball().X() <= -180)
-            KickStatus::Instance()->setKick(_executor, 150);
-        else if(pVision->Ball().X() <= 100)
-            KickStatus::Instance()->setKick(_executor, 280); // kick lightly
-        else if(pVision->Ball().X() <= 450 - KICK_DIST)
-            KickStatus::Instance()->setKick(_executor, 120);
+        if(pVision->Ball().X() <= -80)
+            KickStatus::Instance()->setKick(_executor, 100);
+        else if(pVision->Ball().X() <= 50)
+            KickStatus::Instance()->setKick(_executor, 80); // kick lightly
         else
-            KickStatus::Instance()->setKick(_executor, 80);
+            KickStatus::Instance()->setKick(_executor, 50);
         break;
     }
 
@@ -372,67 +362,7 @@ bool CPenaltyKickV2::isVisionHasBall(const CVisionModule* pVision, const int vec
     return isVisionPossession;
 }
 
-bool CPenaltyKickV2::checkOppHasBall(const CVisionModule* pVision) {
-    int _executor = task().executor;
-    const BallVisionT& ball = pVision->Ball();
-    const PlayerVisionT& me = pVision->OurPlayer(_executor);
-    const CVector self2ball = ball.Pos() - me.Pos();
-    opponentID = 0;
 
-    const CBestPlayer::PlayerList& oppList = BestPlayer::Instance()->theirFastestPlayerToBallList();
-    if (oppList.size() < 1)return false;
-    else opponentID = oppList[0].num;
-    if (!pVision->TheirPlayer(opponentID).Valid()) {
-        opponentID = getTheirMostClosetoPosPlayerNum(pVision, pVision->Ball().Pos());
-    }
-    const PlayerVisionT& opponent = pVision->TheirPlayer(opponentID);
-    if (Advance_DEBUG_ENGINE)GDebugEngine::Instance()->gui_debug_msg(opponent.Pos(), "Best Opp!", COLOR_WHITE);
-    CVector opponent2ball = ball.Pos() - opponent.Pos();
-    CVector opp2ourGoal = ourGoal - opponent.Pos();
-    double opponent2ball_diff = fabs(Utils::Normalize(opponent2ball.dir() - opponent.Dir()));
-    double judgeDist = OPP_HAS_BALL_DIST;
-    if (opponent2ball.mod() < judgeDist && opponent2ball_diff < Param::Math::PI * 70 / 180)
-        return true; // take opponent's direction into consideration.If direction not towards the ball,ignore it
-    else
-        return false;
-}
-
-int CPenaltyKickV2::getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos) {
-    double dist = 1000;
-    int num = 0;
-    for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
-        if (pVision->TheirPlayer(i).Valid()) {
-            if (pVision->TheirPlayer(i).Pos().dist(pos) < dist) {
-                dist = pVision->TheirPlayer(i).Pos().dist(pos);
-                num = i;
-            }
-        }
-    }
-    return num;
-}
-
-bool CPenaltyKickV2::checkBallFront(const CVisionModule* pVision, double angle) {
-    /*判断球是否在敌人前面 存在夹角要求*/
-    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-    const BallVisionT& ball = pVision->Ball();
-    CVector opp2ball = ball.Pos() - opp.Pos();
-    bool ballDirFrontOpp = abs(Utils::Normalize(opp.Dir() - opp2ball.dir())) < angle;
-    bool ballDistFrontOpp = opp2ball.mod() < OPP_HAS_BALL_DIST + 10;
-    //GDebugEngine::Instance()->gui_debug_line(opp.Pos(),opp.Pos() + Utils::Polar2Vector(200 , 0),COLOR_BLACK);
-    bool isBallFrontOpp = ballDirFrontOpp && ballDistFrontOpp;
-    return isBallFrontOpp;
-}
-
-bool CPenaltyKickV2::isPassBalltoMe(const CVisionModule* pVision, int vecNumber) {
-    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-    const BallVisionT& ball = pVision->Ball();
-    CVector ball2me = me.Pos() - ball.Pos();
-    double diff_ballMoving2Me = Utils::Normalize(ball2me.dir() - ball.Vel().dir());
-    if (ball.Valid() && abs(diff_ballMoving2Me) < Param::Math::PI / 12 && ball.Vel().mod() > BalltoMeVel) {//
-        return true;
-    }
-    return false;
-}
 
 bool CPenaltyKickV2::isTheLineBlocked(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint) {
     /*该条路径上是否会被敌人阻挡*/
@@ -459,22 +389,7 @@ bool CPenaltyKickV2::isTheLineBlocked(const CVisionModule* pVision, CGeoPoint st
     return passBlocked;
 }
 
-bool CPenaltyKickV2::IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber) {
-    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-    const BallVisionT& ball = pVision->Ball();
-
-    for (int i = 0; i < 8; i++) {
-        if (vecNumber == i)continue;
-        if (pVision->OurPlayer(i).Valid()) {
-            const PlayerVisionT& me = pVision->OurPlayer(i);
-            if ((me.Pos() - checkPoint).mod() < 150) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
+//bug here: opp2Ball
 bool CPenaltyKickV2::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber) { //是否太近了
     const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
     const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
@@ -592,70 +507,6 @@ bool CPenaltyKickV2::tendToShoot(const CVisionModule* pVision, int vecNumber) {
     else return kickValid;
 }
 
-int CPenaltyKickV2::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
-    CGeoPoint passPointLeft = SupportPos2022::Instance()->getSupportPos(pVision).getLeftSupportPos();
-    CGeoPoint passPointRight = SupportPos2022::Instance()->getSupportPos(pVision).getRightSupportPos();
-    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-    bool isBlockLeft = isTheLineBlocked(pVision, me.Pos(), passPointLeft);
-    bool isBlockRight = isTheLineBlocked(pVision, me.Pos(), passPointRight);
-    double LeftShootDir = KickDirection::Instance()->getPointShootDir(pVision, passPointLeft);
-
-    double RightShootDir = KickDirection::Instance()->getPointShootDir(pVision, passPointRight);
-    double kickDir = KickDirection::Instance()->getPointShootDir(pVision, me.Pos());
-    double me2left = (me.Pos() - passPointLeft).mod();
-    double me2right = (me.Pos() - passPointRight).mod();
-    double left2goal = (CGeoPoint(Param::Field::PITCH_LENGTH / 2.0, 0) - passPointLeft).mod();
-    double right2goal = (CGeoPoint(Param::Field::PITCH_LENGTH / 2.0, 0) - passPointRight).mod();
-
-    if (!isBlockLeft && LeftShootDir != 1000 && me2left < CanPassToWingDist && left2goal < CanWingShootDist)
-        return 1;
-    if (!isBlockRight && RightShootDir != 1000 && me2right < CanPassToWingDist && right2goal < CanWingShootDist)
-        return 1;
-    return 0;
-}
-
-int CPenaltyKickV2::toChipOrToFlat(const CVisionModule* pVision, int vecNumber) {
-    /*返回0表示需要CHIP，返回1表示需要FLAT*/
-    CGeoPoint passPointLeft = SupportPos2022::Instance()->getSupportPos(pVision).getLeftSupportPos();
-    CGeoPoint passPointRight = SupportPos2022::Instance()->getSupportPos(pVision).getRightSupportPos();
-    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-    bool isBlockLeft = isTheLineBlocked(pVision, me.Pos(), passPointLeft);
-    bool isBlockRight = isTheLineBlocked(pVision, me.Pos(), passPointRight);
-    double LeftShootDir = KickDirection::Instance()->getPointShootDir(pVision, passPointLeft);
-    double RightShootDir = KickDirection::Instance()->getPointShootDir(pVision, passPointRight);
-    if (isBlockLeft && isBlockRight) return 0;
-    else return 1;
-}
-
-/**********************************************************
-    * Description: 防守类函数，仅限于GET中使用
-    * Author: 谭宇宏
-    * Created Date: 2022/10/10
-***********************************************************/
-bool CPenaltyKickV2::isOppFaceOurDoor(const CVisionModule* pVision, double angle) {
-    //判断是否球距离opp很近，opp距离我们球门很近
-    const BallVisionT& ball = pVision->Ball();
-    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-    double opp2BallDist = (opp.Pos() - ball.Pos()).mod();
-    bool isBallNearOpp = opp2BallDist < OPP_HAS_BALL_DIST;
-    double judgeAngle = abs(Utils::Normalize((opp.Dir() - CVector(CGeoPoint(-Param::Field::PITCH_LENGTH / 2.0, 0) - opp.Pos()).dir())));
-    bool isFaceOurDoor = judgeAngle < angle || judgeAngle == angle;
-    return isFaceOurDoor && isBallNearOpp;
-}
-
-bool CPenaltyKickV2::checkTheyCanShoot(const CVisionModule* pVision, int vecNumber) {
-    const BallVisionT& ball = pVision->Ball();
-    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-    CVector opp2ball = ball.Pos() - opp.Pos();
-    CVector me2ball = ball.Pos() - me.Pos();
-    double opp2ballDist = opp2ball.mod();
-    double me2ballDist = me2ball.mod();
-    if (isOppFaceOurDoor(pVision, Param::Math::PI / 6.0) && checkBallFront(pVision, Param::Math::PI / 6.0) && ((me2ballDist - opp2ballDist) > -5) && (opp.Pos() - ourGoal).mod() < Param::Field::GOAL_WIDTH / 2) {
-        return true;
-    }
-    else { return false; }
-}
 
 /**********************************************************
     * Description: 生成类函数，具有具体实义
@@ -705,115 +556,6 @@ double CPenaltyKickV2::JustChipDir(const CVisionModule* pVision, int vecNumber) 
     last_pass = pass;
     return passDir;
 }
-double CPenaltyKickV2::flatPassDir(const CVisionModule* pVision, int vecNumber) {
-    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-    /*
-      CGeoPoint passPointLeft = SupportPos2022::Instance()->getSupportPos(pVision).getLeftSupportPos();
-      CGeoPoint passPointRight = SupportPos2022::Instance()->getSupportPos(pVision).getRightSupportPos();
-    */
-    CGeoPoint passPointLeft = SupportPoint[0];
-    CGeoPoint passPointRight = SupportPoint[1];
-
-    bool isOursNearLeft = IsOurNearHere(pVision, passPointLeft, vecNumber);
-    bool isOursNearRight = IsOurNearHere(pVision, passPointRight, vecNumber);
-
-    bool isBlockLeft = isTheLineBlocked(pVision, me.Pos(), passPointLeft);
-    bool isBlockRight = isTheLineBlocked(pVision, me.Pos(), passPointRight);
-    double LeftShootDir = KickDirection::Instance()->getPointShootDir(pVision, passPointLeft);
-    double RightShootDir = KickDirection::Instance()->getPointShootDir(pVision, passPointRight);
-    double passDir = 0;
-    int pass = 0;
-
-    /*判断是否有没人的情况*/
-    if (!isOursNearLeft) {
-        passDir = (passPointRight - me.Pos()).dir();
-        last_pass = pass;
-        return passDir;
-    }
-    if (!isOursNearRight) {
-        passDir = (passPointLeft - me.Pos()).dir();
-        last_pass = pass;
-        return passDir;
-    }
-
-    if (!isBlockLeft && isBlockRight) {
-        pass = 1;
-        passDir = (passPointLeft - me.Pos()).dir();
-    }
-    if (isBlockLeft && !isBlockRight) {
-        pass = 2;
-        passDir = (passPointRight - me.Pos()).dir();
-    }
-    if (!isBlockLeft && !isBlockRight) {
-        if (LeftShootDir != 1000 && RightShootDir == 1000) {
-            pass = 1;
-            passDir = (passPointLeft - me.Pos()).dir();
-        }
-        if (LeftShootDir == 1000 && RightShootDir != 1000) {
-            pass = 2;
-            passDir = (passPointRight - me.Pos()).dir();
-        }
-        if (LeftShootDir != 1000 && RightShootDir != 1000) {
-            double me2left = (me.Pos() - passPointLeft).mod();
-            double me2right = (me.Pos() - passPointRight).mod();
-
-            if (me2left > me2right) {
-                pass = 1;
-                passDir = (passPointLeft - me.Pos()).dir();
-            }
-            if (me2left < me2right) {
-                pass = 2;
-                passDir = (passPointRight - me.Pos()).dir();
-            }
-            if (abs(me2left - me2right) < 50) {/*提高稳定性*/
-                if (last_pass == 1) {
-                    passDir = (passPointLeft - me.Pos()).dir();
-                    pass = 1;
-                }
-                if (last_pass == 2) {
-                    passDir = (passPointRight - me.Pos()).dir();
-                    pass = 2;
-                }
-                if (last_pass == 0) {
-                    passDir = (passPointLeft - me.Pos()).dir();
-                    pass = 1;
-                }
-
-            }
-
-        }
-    }
-
-    if (isBlockLeft && isBlockRight) {
-        double me2left = (me.Pos() - passPointLeft).mod();
-        double me2right = (me.Pos() - passPointRight).mod();
-        if (me2left > me2right) {
-            pass = 1;
-            passDir = (passPointLeft - me.Pos()).dir();
-        }
-        if (me2left < me2right) {
-            pass = 2;
-            passDir = (passPointRight - me.Pos()).dir();
-        }
-        if (abs(me2left - me2right) < 50) {
-            if (last_pass == 1) {
-                pass = 1;
-                passDir = (passPointLeft - me.Pos()).dir();
-            }
-            if (last_pass == 2) {
-                pass = 2;
-                passDir = (passPointRight - me.Pos()).dir();
-            }
-            if (last_pass == 0) {
-                passDir = (passPointLeft - me.Pos()).dir();
-                pass = 1;
-            }
-
-        }
-    }
-    last_pass = pass;
-    return passDir;
-}
 
 CGeoPoint CPenaltyKickV2::GenerateBreakShootPoint(const CVisionModule* pVision, int vecNumber) {
     const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
@@ -828,94 +570,12 @@ CGeoPoint CPenaltyKickV2::GenerateBreakShootPoint(const CVisionModule* pVision, 
     return ShootPoint;
 }
 
-CGeoPoint CPenaltyKickV2::GenerateBreakPassPoint(const CVisionModule* pVision, int vecNumber) {
-    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-    /*
-      CGeoPoint passPointLeft = SupportPos2022::Instance()->getSupportPos(pVision).getLeftSupportPos();
-      CGeoPoint passPointRight = SupportPos2022::Instance()->getSupportPos(pVision).getRightSupportPos();
-    */
-    CGeoPoint passPointLeft = SupportPoint[0];
-    CGeoPoint passPointRight = SupportPoint[1];
-    bool isOursNearLeft = IsOurNearHere(pVision, passPointLeft, vecNumber);
-    bool isOursNearRight = IsOurNearHere(pVision, passPointRight, vecNumber);
-
-    bool isBlockLeft = isTheLineBlocked(pVision, me.Pos(), passPointLeft);
-    bool isBlockRight = isTheLineBlocked(pVision, me.Pos(), passPointRight);
-    double LeftShootDir = KickDirection::Instance()->getPointShootDir(pVision, passPointLeft);
-    double RightShootDir = KickDirection::Instance()->getPointShootDir(pVision, passPointRight);
-    double passDir = 0;
-    int pass = 0;
-
-    if (!isOursNearLeft) {
-        last_pass = pass;
-        return passPointRight;
-    }
-    if (!isOursNearRight) {
-        last_pass = pass;
-        return passPointLeft;
-    }
-
-    if (!isBlockLeft && isBlockRight) pass = 1;
-    if (isBlockLeft && !isBlockRight) pass = 2;
-    if (!isBlockLeft && !isBlockRight) {
-        if (LeftShootDir != 1000 && RightShootDir == 1000) pass = 1;
-        if (LeftShootDir == 1000 && RightShootDir != 1000) pass = 2;
-        if (LeftShootDir != 1000 && RightShootDir != 1000) {
-            double me2left = (me.Pos() - passPointLeft).mod();
-            double me2right = (me.Pos() - passPointRight).mod();
-
-            if (me2left > me2right) pass = 1;
-            if (me2left < me2right) pass = 2;
-            if (abs(me2left - me2right) < 50) {/*提高稳定性*/
-                if (last_pass == 1) pass = 1;
-                if (last_pass == 2) pass = 2;
-                if (last_pass == 0) pass = 1;
-            }
-        }
-    }
-
-    if (isBlockLeft && isBlockRight) {
-        double me2left = (me.Pos() - passPointLeft).mod();
-        double me2right = (me.Pos() - passPointRight).mod();
-        if (me2left > me2right) pass = 1;
-        if (me2left < me2right) pass = 2;
-        if (abs(me2left - me2right) < 50) {
-            if (last_pass == 1) pass = 1;
-            if (last_pass == 2) pass = 2;
-            if (last_pass == 0) pass = 1;
-        }
-    }
-    last_pass = pass;
-    if (pass == 1)return passPointLeft;
-    else return passPointRight;
-}
-
 /**********************************************************
     * Description: for normalpush
     * Author: jlc
     * Created Date: 2022/11/18
 ***********************************************************/
-/*bool CPenaltyKickV2::isMePassedOpp(const CVisionModule* pVision, const int vecNumber) {
-    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-    const BallVisionT& ball = pVision->Ball();
 
-    CVector me2opp = opp.Pos() - me.Pos();
-    CVector opp2Ball = ball.Pos() - opp.Pos();
-    CVector ball2Opp = opp.Pos() - ball.Pos();
-    CVector me2Ball = ball.Pos() - me.Pos();
-    bool meDirControlBall = abs(Utils::Normalize(me2Ball.dir() - me.Dir())) < Param::Math::PI / 4;
-    bool meDistControlBall = me2Ball.mod() < Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + 10.5;
-    bool mePassOpp_1 = abs(Utils::Normalize(me2Ball.dir() - me2opp.dir())) > Param::Math::PI / 2.5;
-    bool mePassOpp_2 = abs(Utils::Normalize(opp.Dir() - ball2Opp.dir())) < Param::Math::PI / 3.0;
-    if (meDistControlBall && meDistControlBall && (mePassOpp_1 || mePassOpp_2) || me2opp.mod() > 25) {
-        // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), "PASS!!!!!!!!!!!", COLOR_WHITE);
-        return true;
-    }
-    else {
-        return false;
-    }
-}*/
 double CPenaltyKickV2::generateNormalPushDir(const CVisionModule* pVision, const int vecNumber) {
     const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
     const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
@@ -951,6 +611,27 @@ double CPenaltyKickV2::generateNormalPushDir(const CVisionModule* pVision, const
         }
     }
 }
+/*bool CPenaltyKickV2::isMePassedOpp(const CVisionModule* pVision, const int vecNumber) {
+    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+    const BallVisionT& ball = pVision->Ball();
+
+    CVector me2opp = opp.Pos() - me.Pos();
+    CVector opp2Ball = ball.Pos() - opp.Pos();
+    CVector ball2Opp = opp.Pos() - ball.Pos();
+    CVector me2Ball = ball.Pos() - me.Pos();
+    bool meDirControlBall = abs(Utils::Normalize(me2Ball.dir() - me.Dir())) < Param::Math::PI / 4;
+    bool meDistControlBall = me2Ball.mod() < Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + 10.5;
+    bool mePassOpp_1 = abs(Utils::Normalize(me2Ball.dir() - me2opp.dir())) > Param::Math::PI / 2.5;
+    bool mePassOpp_2 = abs(Utils::Normalize(opp.Dir() - ball2Opp.dir())) < Param::Math::PI / 3.0;
+    if (meDistControlBall && meDistControlBall && (mePassOpp_1 || mePassOpp_2) || me2opp.mod() > 25) {
+        // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), "PASS!!!!!!!!!!!", COLOR_WHITE);
+        return true;
+    }
+    else {
+        return false;
+    }
+}*/
 
 CPlayerCommand* CPenaltyKickV2::execute(const CVisionModule* pVision) {
     if (subTask()) {

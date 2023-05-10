@@ -17,8 +17,8 @@ gOppoConfig = {
 	FrontDef    = "Ref_FrontDefV9", --四车markfront用v9,若挑就用V7，若他们四车全上就用V11,保守打法用Ref_FrontDefV2
 	PenaltyKick = "Ref_PenaltyKickV1", --Ref_PenaltyKick2017V5
 	PenaltyDef  = "Ref_PenaltyDefV1", --Ref_PenaltyDefV3
-	KickOff		= "Ref_KickOffV6",
-	KickOffDef  = "Ref_KickOffDefV1",
+	KickOff		= "Ref_KickOffV23",
+	KickOffDef  = "Ref_KickOffDefV23",
 	NorPlay     = "NormalPlayMark"
 }
 

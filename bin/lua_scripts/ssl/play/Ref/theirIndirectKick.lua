@@ -3,10 +3,8 @@
 gNorPass2NorDefBallVel = 80
 if ball.refPosX() < -360 then
 	dofile("../lua_scripts/ssl/play/Ref/CornerDef/CornerDef.lua")
-elseif ball.refPosX() > 250 then
+elseif ball.refPosX() > 0 then
 	dofile("../lua_scripts/ssl/play/Ref/FrontDef/FrontDef.lua")
-elseif ball.refPosX() > -5 then
-	dofile("../lua_scripts/ssl/play/Ref/MiddleDef/MiddleDef.lua")
 else
 	dofile("../lua_scripts/ssl/play/Ref/BackDef/BackDef.lua")
 end
