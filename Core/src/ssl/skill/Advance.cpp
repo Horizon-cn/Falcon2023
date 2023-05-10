@@ -164,7 +164,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		break;
 	case GET:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
-        if (NowIsShoot == 1) { _state = KICK; break; }
+        if (NowIsShoot == 1) { _state = BREAKSHOOT; break; }
 		//if (meHasBall>3) {
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 			KickStatus::Instance()->resetAdvancerPassTo();
@@ -173,7 +173,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			if (me2goal.mod() < KICK_DIST) {
                 if (tendToShoot(pVision, _executor)) {
                     NowIsShoot = 1;
-					_state = KICK; break;
+					_state = BREAKSHOOT; break;
 				}
 				else if(Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor)) {
 
