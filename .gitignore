@@ -31,6 +31,7 @@ Client/qrc_*.cpp
 Client/ui_*.h
 Client/Makefile*
 Client/*build*
+Client/zh_CN.ts
 Client/*.ts
 Client/*.qm
 

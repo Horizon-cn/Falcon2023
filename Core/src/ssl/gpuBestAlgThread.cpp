@@ -842,6 +842,7 @@ void CGPUBestAlgThread::setPointValue() {
 	int size = _l * _w;
 	for (int i = 0; i < size; i++) {
 		if (_PointPotentialOrigin[i] < 0) _PointPotentialOrigin[i] = 0;
+		else if (_PointPotentialOrigin[i] > 255) _PointPotentialOrigin[i] = 255;
 		PointValueStruct p;
 		p.pos = i;
 		p.value = _PointPotentialOrigin[i];
@@ -862,7 +863,7 @@ void CGPUBestAlgThread::sendPointValue() {
 		auto points = msgs.add_points();
 		for (int n = m * point_size / gpuCalcArea::Color_Size; n < (m + 1) * point_size / gpuCalcArea::Color_Size; n++) {
 			points->add_pos(pointValueList.at(n).pos);
-			points->set_color(max(255 - (int)pointValueList.at(n).value, 0));
+			points->set_color(255 - pointValueList.at(n).value);
 			//auto pos = points->add_pos();
 			//pos->set_x(pointValueList.at(n).pos_x);
 			//pos->set_y(pointValueList.at(n).pos_y);
