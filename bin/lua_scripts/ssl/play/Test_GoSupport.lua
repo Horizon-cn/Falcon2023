@@ -8,7 +8,7 @@ firstState = "support",
 			return "support";
 		end
 	end,
-    Leader = task.advance(), --task.advanceV4(),
+    Leader = task.stop(), --task.advance(), --task.advanceV4(),
     Special = task.support("Leader", 1), --task.goRightSupport(),
 	Middle = task.support("Leader", 0), --task.goLeftSupport(),
     Defender = task.leftBack(),

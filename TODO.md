@@ -5,7 +5,7 @@
 ## 开发须知
 
 - git push 前，注意将以下配置归为默认值：
-	- gpuBestAlgThread.cpp 中，#define has_GPU false
+	- ~~gpuBestAlgThread.cpp 中，#define has_GPU false~~
 	- 并行编译所用核数为4
 	- 关闭 Client 的 Debug 信息，在 Client/CMakeLists.txt 中都不要注释
 	```bash

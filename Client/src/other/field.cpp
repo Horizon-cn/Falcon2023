@@ -55,6 +55,7 @@ const int ballRatio = 3;
 auto opm = Owl::OParamManager::Instance();
 auto cpm = Owl::CParamManager::Instance();
 auto sipm = Owl::SIParamManager::Instance();
+auto skpm = Owl::SKParamManager::Instance();
 qreal zoomRatio = 1;
 QPoint zoomStart = QPoint(0, 0);
 QRect area;
@@ -1075,7 +1076,7 @@ void Field::receiveBlue(){
     static OWL::Protocol::Heat_Map_New blueHeatMap;
     while(true) {
         std::this_thread::sleep_for(std::chrono::microseconds(500)); //微秒
-        if (!opm->HeatMap || _type != 2) continue;
+        if (!opm->heatMap || _type != 2) continue;
         while (receiverBlue->state() == QUdpSocket::BoundState && receiverBlue->hasPendingDatagrams()) {
             datagram.resize(receiverBlue->pendingDatagramSize());
             receiverBlue->readDatagram(datagram.data(),datagram.size());
@@ -1100,10 +1101,10 @@ void Field::receiveBlue(){
                     auto pos = heatPoints.pos(k); // 以传入的点为端点画方框，减少复杂度
                     GlobalData::Instance()->blueHeatMutex.lock();
                     //heatPainter.drawRect(QRectF(::x(pos.x()*10), ::y(-pos.y()*10), ::w(RECT_SIZE), ::h(-RECT_SIZE)));
-                    int point_num_width = opm->field_width / opm->drawStep; //宽边可以绘制的点数
-                    float pos_x = opm->startPosX + int(pos / point_num_width) * opm->drawStep; //mm，默认从左上角开始，纵向给点编号
-                    float pos_y = opm->startPosY + pos % point_num_width * opm->drawStep;
-                    heatPainter.drawRect(QRectF(::x(pos_x), ::y(-pos_y), ::w(opm->drawStep), ::h(-opm->drawStep)));
+                    int point_num_width = opm->field_width / skpm->drawStep; //宽边可以绘制的点数
+                    float pos_x = skpm->startPosX + int(pos / point_num_width) * skpm->drawStep; //mm，默认从左上角开始，纵向给点编号
+                    float pos_y = skpm->startPosY + pos % point_num_width * skpm->drawStep;
+                    heatPainter.drawRect(QRectF(::x(pos_x), ::y(-pos_y), ::w(skpm->drawStep), ::h(-skpm->drawStep)));
                     GlobalData::Instance()->blueHeatMutex.unlock();
                 }
             }
@@ -1120,7 +1121,7 @@ void Field::receiveYellow(){
     static OWL::Protocol::Heat_Map_New yellowHeatMap;
     while(true) {
         std::this_thread::sleep_for(std::chrono::microseconds(500));
-        if (!opm->HeatMap || _type != 3) continue;
+        if (!opm->heatMap || _type != 3) continue;
         while (receiverYellow->state() == QUdpSocket::BoundState && receiverYellow->hasPendingDatagrams()) {
             datagram.resize(receiverYellow->pendingDatagramSize());
             receiverYellow->readDatagram(datagram.data(),datagram.size());
@@ -1144,10 +1145,10 @@ void Field::receiveYellow(){
                 for(int k = 0; k < size; k++) {
                     auto pos = heatPoints.pos(k); // 以传入的点为端点画方框，减少复杂度
                     GlobalData::Instance()->yellowHeatMutex.lock();
-                    int point_num_width = opm->field_width / opm->drawStep; //宽边可以绘制的点数
-                    float pos_x = opm->startPosX + int(pos / point_num_width) * opm->drawStep; //mm，默认从左上角开始，纵向给点编号
-                    float pos_y = opm->startPosY + pos % point_num_width * opm->drawStep;
-                    heatPainter.drawRect(QRectF(::x(pos_x), ::y(-pos_y), ::w(opm->drawStep), ::h(-opm->drawStep)));
+                    int point_num_width = opm->field_width / skpm->drawStep; //宽边可以绘制的点数
+                    float pos_x = skpm->startPosX + int(pos / point_num_width) * skpm->drawStep; //mm，默认从左上角开始，纵向给点编号
+                    float pos_y = skpm->startPosY + pos % point_num_width * skpm->drawStep;
+                    heatPainter.drawRect(QRectF(::x(-pos_x), ::y(pos_y), ::w(skpm->drawStep), ::h(-skpm->drawStep)));
                     //heatPainter.drawRect(QRectF(::x(pos.x()*10), ::y(-pos.y()*10), ::w(RECT_SIZE), ::h(-RECT_SIZE)));
                     GlobalData::Instance()->yellowHeatMutex.unlock();
                 }
@@ -1156,7 +1157,7 @@ void Field::receiveYellow(){
     }
 }
 void Field::drawHeatMap(int team) {
-    if(!opm->HeatMap) return;
+    if(!opm->heatMap) return;
     auto& heat_mutex = team == PARAM::BLUE? GlobalData::Instance()->blueHeatMutex : GlobalData::Instance()->yellowHeatMutex;
     heat_mutex.lock();
     pixmapPainter.drawPixmap(0, 0, *heat_pixmap);
