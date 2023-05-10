@@ -36,7 +36,7 @@ private:
 	void updateBallChaserList(const CVisionModule* pVision);
 	void updateBallReceiverList(const CVisionModule* pVision);
 	void checkPass(const CVisionModule* pVision);
-	int matchReceiver(const CVisionModule* pVision);
+	void matchReceiver(const CVisionModule* pVision);
 	void updateSteady();
 private:
 	TenemyList _ballChaserList, _ballChaserSteadyList, _ballReceiverList, _ballReceiverSteadyList;

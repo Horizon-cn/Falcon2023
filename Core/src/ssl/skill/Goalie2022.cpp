@@ -154,6 +154,8 @@ bool CGoalie2022::ShouldAttack(const CVisionModule* pVision)
 		if (robotNum != i)
 		{
 			const PlayerVisionT& helper_i = pVision->OurPlayer(i);
+			if (!helper_i.Valid())
+				continue;
 			if (helper_i.Pos().dist(enemy.Pos()) < CLOSE_DIST
 				|| helper_i.Pos().dist(ball.Pos()) < CLOSE_DIST)//已经有帮手了
 				return false;

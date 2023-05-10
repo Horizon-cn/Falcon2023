@@ -57,7 +57,7 @@ void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 		_chaserPotientialList.push_back(ballChaserAttributeSet::Instance()->evaluate(pVision, num));
 	//持球者直接覆盖计算结果为最优
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
-		if (BallStatus::Instance()->getBallPossession(false, i))
+		if (BallStatus::Instance()->getBallPossession(false, i) > 0.5)
 			_chaserPotientialList[i] = 0;
 	//门将不应太容易成为最优
 	_chaserPotientialList[pVision->TheirGoalie()] *= 1.5;
@@ -118,8 +118,7 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 		double ball2ReceiverDist = ball.Pos().dist(receiver.Pos());
 		if (angleDiff > Param::Math::PI / 2.0 || ball2ReceiverDist > 450 || ball2ReceiverDist < 100)
 			isInTheirPass = false;
-	}
-	else
+	} else
 	{
 		if (BallStatus::Instance()->IsBallKickedOut())
 		{
@@ -144,7 +143,7 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 	{
 		if (display_debug_info)
 			GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "new: in pass");
-			auto temp = find(_ballChaserList.begin(), _ballChaserList.end(), _receiver);
+		auto temp = find(_ballChaserList.begin(), _ballChaserList.end(), _receiver);
 		if (temp != _ballChaserList.end())
 			rotate(_ballChaserList.begin(), temp, temp + 1);
 		else
@@ -155,7 +154,7 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 	}
 }
 
-int CDefenceInfoNew::matchReceiver(const CVisionModule* pVision)
+void CDefenceInfoNew::matchReceiver(const CVisionModule* pVision)
 {
 	const BallVisionT& ball = pVision->Ball();
 	for (int maybeReceiverNum : _ballReceiverList)
@@ -166,9 +165,10 @@ int CDefenceInfoNew::matchReceiver(const CVisionModule* pVision)
 		double ball2ReceiverDist = ball.Pos().dist(maybeReceiver.Pos());
 		if (angleDiff > Param::Math::PI / 2.0 || ball2ReceiverDist > 450 || ball2ReceiverDist < 100)
 			continue;
-		return maybeReceiverNum;
+		_receiver = maybeReceiverNum;
+		return;
 	}
-	return -1;
+	_receiver = -1;
 }
 
 void CDefenceInfoNew::updateSteady()
