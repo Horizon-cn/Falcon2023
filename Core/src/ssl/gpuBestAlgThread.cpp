@@ -742,14 +742,15 @@ void CGPUBestAlgThread::obscureBoundary() {
 }
 
 void CGPUBestAlgThread::increaseRobust() {
-	if ((_pointPotential[0] - _prePointPotential[0]) < thresholdValue)
+	cum = (cum+1)%10;
+	if (abs(_prePointPotential[0] - _pointPotential[0]) < thresholdValue)
 	{
 		for (int i = 0; i < AREANUM; i++) {
 			_bestSupport[i] = _preBestSupport[i];
 			_pointPotential[i] = _prePointPotential[i];
 		}
 	}
-	for (int i = 0; i < AREANUM; i++) {
+	for (int i = 0; cum == 0 && i < AREANUM; i++) {
 		_preBestSupport[i] = _bestSupport[i];
 		_prePointPotential[i] = _pointPotential[i];
 	}
@@ -950,10 +951,12 @@ void CGPUBestAlgThread::sendFieldRectangle() {
 		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(_pointPotential[i]).toStdString().c_str(), COLOR_BLACK);
 	}
 	//支撑点顺序debug信息
-	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], "000", COLOR_YELLOW);
-	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[1], "111", COLOR_YELLOW);
-	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[2], "222", COLOR_YELLOW);
-	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[3], "333", COLOR_YELLOW);
-	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[4], "444", COLOR_YELLOW);
-	// GDebugEngine::Instance()->gui_debug_msg(_bestSupport[5], "555", COLOR_YELLOW);
+
+	//GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], QString::number(cum).toStdString().c_str(), COLOR_BLACK);
+	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], "000", COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[1], "111", COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[2], "222", COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[3], "333", COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[4], "444", COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[5], "555", COLOR_YELLOW);
 }
