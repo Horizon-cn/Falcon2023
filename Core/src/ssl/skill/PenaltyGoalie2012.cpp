@@ -5,6 +5,7 @@
 #include <utils.h>
 #include "WorldModel/WorldModel.h"
 #include "BestPlayer.h"
+#include "defenceNew/DefenceInfoNew.h"
 
 namespace{
 	const bool debug = true;
@@ -68,7 +69,7 @@ void CPenaltyGoalie2012::plan(const CVisionModule* pVision)
 	int robotNum = task().executor;
 	const PlayerVisionT& me = pVision->OurPlayer(robotNum);
 	const BallVisionT& ball = pVision->Ball();
-	const int enemyNum = BestPlayer::Instance()->getTheirBestPlayer();
+	const int enemyNum = DefenceInfoNew::Instance()->getBestBallChaser();
 	//门将站位基线
 	const CGeoLine defendLine = CGeoLine(DEF_LEFT,DEF_RIGHT);
 	//待计算的门将站位点

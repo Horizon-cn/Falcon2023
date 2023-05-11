@@ -14,6 +14,7 @@ CIndirectDefender* indirectDefender;
 CTandemPos* tandemPos;
 CBestPlayer* bestPlayer;
 CDefenceInfo* defenceInfo;
+CDefenceInfoNew* defenceInfoNew;
 CChipBallJudge* chipBallJudge;
 CSupportPos* supportPos;
 CSupportPos2022* supportPos2022;
@@ -45,6 +46,7 @@ void initializeSingleton()
 	defPos2013		= DefPos2013::Instance();
 	bestPlayer		= BestPlayer::Instance();
 	defenceInfo		= DefenceInfo::Instance();
+	defenceInfoNew  = DefenceInfoNew::Instance();
 	tandemPos		= TandemPos::Instance();
 	chipBallJudge	= ChipBallJudge::Instance();
 	indirectDefender= IndirectDefender::Instance();

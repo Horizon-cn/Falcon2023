@@ -1,6 +1,7 @@
 $pfile "bestalg.pkg"
 $pfile "bestplayer.pkg"
 $pfile "defenceinfo.pkg"
+$pfile "defenceinfonew.pkg"
 $pfile "defendutils.pkg"
 $pfile "defpos2015.pkg"
 $pfile "gamestate.pkg"

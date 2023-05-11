@@ -113,6 +113,12 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(factor_Dist2BallNormalized, "DefenceNew/factor_Dist2BallNormalized", 0.7);
             loadParam(factor_Dist2BallProjModified, "DefenceNew/factor_Dist2BallProjModified", 0.7);
             loadParam(factor_BallMovingCost, "DefenceNew/factor_BallMovingCost", 0.35);
+            loadParam(factor_TooFar4Pass, "DefenceNew/factor_TooFar4Pass", 0.01);
+            loadParam(factor_TooClose4Pass, "DefenceNew/factor_TooClose4Pass", 1);
+            loadParam(factor_TooFar4Shoot, "DefenceNew/factor_TooFar4Shoot", 0.1);
+            loadParam(factor_EasyBlock, "DefenceNew/factor_EasyBlock", 100);
+            loadParam(factor_NearSideLine, "DefenceNew/factor_NearSideLine", 1);
+            loadParam(factor_EasyShoot, "DefenceNew/factor_EasyShoot", 50);
 
             loadParam(PERIOD_MOVE_X, "Motion/PERIOD_MOVE_X", 0.07692);
             loadParam(PERIOD_MOVE_Y, "Motion/PERIOD_MOVE_Y", 0.013);
@@ -138,6 +144,8 @@ class CParamManagerSkill : public Falcon::ParamManager {
 
             loadParam(SUPPORT_DIST, "Support/SUPPORT_DIST", 1);
 
+            loadParam(GOALIE_DEBUG, "Goalie/GOALIE_DEBUG", 1);
+            loadParam(AGGRESSIVE_GOALIE, "Goalie/AGGRESSIVE_GOALIE", 1);
             loadParam(SLOW_BALL_SPD, "Goalie/SLOW_BALL_SPD", 25.0);
             loadParam(KICKPOWER_GOALIE, "Goalie/KICKPOWER_GOALIE", 550);
             loadParam(HAVE_BALL_DIST, "Goalie/HAVE_BALL_DIST", 30);
@@ -214,6 +222,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(CheckBackPos, "MultiBack/CheckBackPos", true);
             loadParam(dangerVel, "MultiBack/dangerVel", 15);
             loadParam(dangerDist, "MultiBack/dangerDist", 50);
+            loadParam(defendBreak, "MultiBack/defendBreak", true);
 
             loadParam(BAYESLIST, "CMatchState/BAYESLIST", "BayesParams1");
             loadParam(BAYESPARAM, "CMatchState/BAYESPARAM", "Skuba_Attack");
@@ -290,6 +299,12 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double factor_Dist2BallNormalized;
         double factor_Dist2BallProjModified;
         double factor_BallMovingCost;
+        double factor_TooFar4Pass;
+        double factor_TooClose4Pass;
+        double factor_TooFar4Shoot;
+        double factor_EasyBlock;
+        double factor_NearSideLine;
+        double factor_EasyShoot;
         // 电机参数
         double PERIOD_MOVE_X;
         double PERIOD_MOVE_Y;
@@ -317,6 +332,8 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double SUPPORT_DIST;
         //GetBallParam GET_BALL_PARAM;
         // Goalie2022参数 by SYLG
+        bool GOALIE_DEBUG;
+        bool AGGRESSIVE_GOALIE;
         double SLOW_BALL_SPD;
         int KICKPOWER_GOALIE;
         double HAVE_BALL_DIST;
@@ -392,6 +409,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
         bool CheckBackPos;
         int dangerVel;
         int dangerDist;
+        bool defendBreak;
         // MatchState
         QString BAYESLIST;
         QString BAYESPARAM;

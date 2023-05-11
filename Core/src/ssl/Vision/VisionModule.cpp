@@ -294,8 +294,7 @@ void CVisionModule::CheckKickoffStatus(const GameInfoT& info)
 					_ballKicked = true;
 				}
 			} else {
-				CBestPlayer::PlayerList theirList =  BestPlayer::Instance()->theirFastestPlayerToBallList();
-				if (theirList.empty()) {
+				if (DefenceInfoNew::Instance()->getSteadyBallChaserList().size()==0) {
 					_ballKicked = false;
 				} else {
 					const double THEIR_BALL_KICKED_BUFFER = 5 + 5;

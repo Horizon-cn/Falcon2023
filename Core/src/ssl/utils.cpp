@@ -89,7 +89,8 @@ namespace Utils {
     // ?§Ø?¦Ë??????????????. Modified by HXY.
     bool InOurPenaltyArea(const CGeoPoint& p, const double buffer) {
         // buffer??????????????
-        return (p.x() < -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + buffer
+        return (p.x()>-Param::Field::PITCH_LENGTH/2-buffer
+            &&p.x() < -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + buffer
             && std::fabs(p.y()) < Param::Field::PENALTY_AREA_WIDTH / 2 + buffer);
     }
 

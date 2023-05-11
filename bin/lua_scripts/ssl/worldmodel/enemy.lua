@@ -113,7 +113,7 @@ function getTheirGoaliePos()
 end
 
 function best()
-	return bestPlayer:getTheirBestPlayer()
+	return defenceInfoNew:getBestBallChaser()
 end
 
 function bestVelMod()

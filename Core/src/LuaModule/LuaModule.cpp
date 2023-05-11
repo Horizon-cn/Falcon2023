@@ -12,6 +12,7 @@
 #include "PointCalculation/MarkingPosV2.h"
 #include "PenaltyPosCleaner.h"
 #include "defence/EnemyDefendTacticAnalys.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include "PointCalculation/WaitKickPos.h"
 #include "PointCalculation/TouchKickPos.h"
 #include "PointCalculation/MarkingTouchPos.h"
@@ -788,13 +789,13 @@ extern "C" int Skill_Marking(lua_State * L)
 	int flag = LuaModule::Instance()->GetNumberArgument(5, NULL);
 	bool front = LuaModule::Instance()->GetBoolArgument(6);
 	double dir = LuaModule::Instance()->GetNumberArgument(7, NULL);
-	int bestEnemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
-	if (DefenceInfo::Instance()->getOppPlayerByNum(bestEnemy)->isTheRole("RReceiver")) {
-		if (pri > 0) {
-			pri -= 1;
-		}
-	}
-	int enemy = DefenceInfo::Instance()->getSteadyAttackOppNumByPri(pri);
+	//int bestEnemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
+	//if (DefenceInfo::Instance()->getOppPlayerByNum(bestEnemy)->isTheRole("RReceiver")) {
+	//	if (pri > 0) {
+	//		pri -= 1;
+	//	}
+	//}
+	int enemy = DefenceInfoNew::Instance()->getSteadyBallReceiverList()[pri-1];
 
 	CPlayerTask* pTask = PlayerRole::makeItMarkEnemy(runner, enemy, front, flag, CGeoPoint(x, y), dir);
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
@@ -821,14 +822,14 @@ extern "C" int FUNC_GetMarkingPos(lua_State * L)
 	int pri = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	bool front = LuaModule::Instance()->GetBoolArgument(2);
 	CGeoPoint p;
-	int bestEnemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
+	//int bestEnemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
 	//当receiver为最高优先级的时候，这句话可以理解为场上对方是否有receiver
-	if (DefenceInfo::Instance()->getOppPlayerByNum(bestEnemy)->isTheRole("RReceiver")) {
+	/*if (DefenceInfo::Instance()->getOppPlayerByNum(bestEnemy)->isTheRole("RReceiver")) {
 		if (pri > 0) {
 			pri -= 1;
 		}
-	}
-	int oppNum = DefenceInfo::Instance()->getSteadyAttackOppNumByPri(pri);
+	}*/
+	int oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverList()[pri-1];
 	const string refMsg = WorldModel::Instance()->CurrentRefereeMsg();
 	static bool kickOffSide = false;
 	bool checkKickOffArea = false;

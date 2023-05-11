@@ -21,6 +21,7 @@
 #include <cmath>
 #include <WorldModel/DribbleStatus.h>
 #include <BestPlayer.h>
+#include "defenceNew/DefenceInfoNew.h"
 
 using namespace Param;
 namespace
@@ -94,7 +95,7 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 	const int realNum = robotNum;
 	const PlayerVisionT& me = pVision->OurPlayer(robotNum);
 	const int playerFlag = task().player.flag;
-	const int enemyLeaderNum = BestPlayer::Instance()->getTheirBestPlayer();          //敌方最有威胁车
+	const int enemyLeaderNum = DefenceInfoNew::Instance()->getBestBallChaser();          //敌方最有威胁车
 	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(enemyLeaderNum);
 
 

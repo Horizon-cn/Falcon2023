@@ -1,7 +1,8 @@
 #ifndef __ATTRIBUTE_NEW_H__
 #define __ATTRIBUTE_NEW_H__
 
-#include "Global.h"
+#include "Vision/VisionModule.h"
+#include "ParamManagerNew.h"
 
 using namespace std;
 

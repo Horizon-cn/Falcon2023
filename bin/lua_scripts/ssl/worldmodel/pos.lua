@@ -275,7 +275,7 @@ end
 
 function protectBall()
 	local protectBallPos
-	local robotNum = bestPlayer:getTheirBestPlayer()
+	local robotNum = defenceInfoNew:getBestBallChaser()
 	protectBallPos = enemy.pos(robotNum)
 	return protectBallPos
 end
@@ -423,7 +423,7 @@ function testTwoKickOffPos2()
 end
 
 function theirBestPlayer()
-	local oppNum = bestPlayer:getTheirBestPlayer()
+	local oppNum = defenceInfoNew:getBestBallChaser()
 	return enemy.pos(oppNum)
 end
 
