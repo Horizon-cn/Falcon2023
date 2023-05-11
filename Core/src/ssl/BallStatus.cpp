@@ -1,6 +1,7 @@
 #include "BallStatus.h"
 #include <RobotSensor.h>
 #include "BestPlayer.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include "KickDirection.h"
 #include "Global.h"
 #include "utils.h"
@@ -412,7 +413,7 @@ string CBallStatus::checkBallState(const CVisionModule* pVision,int meNum){
             ourAdvancerNum = 1;
         }
     }
-    int theirAdvancerNum=BestPlayer::Instance()->getTheirBestPlayer();
+    int theirAdvancerNum= DefenceInfoNew::Instance()->getBestBallChaser();
     if (! Utils::PlayerNumValid(theirAdvancerNum)){
         theirAdvancerNum=NormalPlayUtils::getTheirMostClosetoPos(pVision,pVision->OurPlayer(meNum).Pos());
     }
@@ -618,7 +619,7 @@ string CBallStatus::checkBallState(const CVisionModule* pVision,int meNum){
         break;
     }
     if (ball.Valid()){
-        lastTheirBestPlayer=BestPlayer::Instance()->getTheirBestPlayer();
+        lastTheirBestPlayer= DefenceInfoNew::Instance()->getBestBallChaser();
         lastOurBestPlayer=BestPlayer::Instance()->getOurBestPlayer();
     }
     switch(_ballState){

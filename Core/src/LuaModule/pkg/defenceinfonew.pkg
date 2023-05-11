@@ -1,0 +1,7 @@
+$#include "defenceNew/DefenceInfoNew.h"
+
+class CDefenceInfoNew
+{
+	int getBestBallChaser();
+	bool isBestBallChaserChanged();
+};

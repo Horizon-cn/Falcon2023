@@ -18,6 +18,7 @@ CDefPos2013* defPos2013;
 CTandemPos* tandemPos;
 CBestPlayer* bestPlayer;
 CDefenceInfo* defenceInfo;
+CDefenceInfoNew* defenceInfoNew;
 CChipBallJudge* chipBallJudge;
 CIndirectDefender* indirectDefender;
 CSupportPos* supportPos;

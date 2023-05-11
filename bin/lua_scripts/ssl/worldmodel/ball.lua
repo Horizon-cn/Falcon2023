@@ -154,7 +154,7 @@ function syntYDir(p)
 end
 
 function toBestEnemyDist()
-	local enemyNum = bestPlayer:getTheirBestPlayer()
+	local enemyNum = defenceInfoNew:getBestBallChaser()
 	if Utils.PlayerNumValid(enemyNum) then
 		return toEnemyDist(enemyNum)
 	else

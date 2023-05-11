@@ -16,6 +16,7 @@
 #include "gpuBestAlgThread.h"
 #include "BestPlayer.h"
 #include "defence/DefenceInfo.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include "PointCalculation/IndirectDefender.h"
 #include "PointCalculation/SupportPos.h"
 #include "PointCalculation/GuardPos.h"
@@ -41,6 +42,7 @@ extern CDefPos2013* defPos2013;
 extern CTandemPos* tandemPos;
 extern CBestPlayer* bestPlayer;
 extern CDefenceInfo* defenceInfo;
+extern CDefenceInfoNew* defenceInfoNew;
 extern CChipBallJudge* chipBallJudge;
 extern CIndirectDefender* indirectDefender;
 extern CSupportPos* supportPos;

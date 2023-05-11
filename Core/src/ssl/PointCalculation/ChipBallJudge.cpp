@@ -1,7 +1,7 @@
 #include "PointCalculation/ChipBallJudge.h"
 #include <Vision/VisionModule.h>
 #include <WorldModel/WorldModel.h>
-#include <BestPlayer.h>
+#include "defenceNew/DefenceInfoNew.h"
 #include <utils.h>
 #include "GDebugEngine.h"
 namespace
@@ -13,9 +13,9 @@ CChipBallJudge::CChipBallJudge()
 	_cycle = 99999;
 	_lastCycle = 99999;
 	isFirstGetRefereeMsg = true;
-	ballInialPos = CGeoPoint(0,0);
+	ballInialPos = CGeoPoint(0, 0);
 	count = 0;
-	goKickAlrealdy= false;
+	goKickAlrealdy = false;
 }
 
 CChipBallJudge::~CChipBallJudge()
@@ -23,7 +23,7 @@ CChipBallJudge::~CChipBallJudge()
 
 }
 
-bool CChipBallJudge::doJudge(const CVisionModule* pVision,double & ballActualMovingDir, CGeoPoint& ballStartPos)
+bool CChipBallJudge::doJudge(const CVisionModule* pVision, double& ballActualMovingDir, CGeoPoint& ballStartPos)
 {
 	bool isChipKick = false;
 	const BallVisionT& ball = pVision->Ball();
@@ -39,24 +39,24 @@ bool CChipBallJudge::doJudge(const CVisionModule* pVision,double & ballActualMov
 		//cout << "isFirstGetRefereeMsg:" <<isFirstGetRefereeMsg<< endl;
 		//cout << "theirIndirectKick == refMsg:" <<("theirIndirectKick" == refMsg)<< endl;
 	}
-	
-	if (("theirIndirectKick" == refMsg || "theirDirectKick" == refMsg || "theirKickOff" == refMsg ) )
+
+	if (("theirIndirectKick" == refMsg || "theirDirectKick" == refMsg || "theirKickOff" == refMsg))
 	{
 		if (isFirstGetRefereeMsg)
 		{
 			if (DEBUG)
 			{
-				cout << "Fuck ball Initial Pos!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" <<endl;
+				cout << "Fuck ball Initial Pos!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 			}
 
 			ballInialPos = ball.Pos();
 			ballStartPos = ballInialPos;
 			isFirstGetRefereeMsg = false;
 		}
-		
+
 	}
 	//获取开球车开球时候的朝向。
-	if (checkKickerGoKick(pVision) && !goKickAlrealdy && ("theirIndirectKick" == refMsg || "theirDirectKick" == refMsg || "theirKickOff" == refMsg ) )
+	if (checkKickerGoKick(pVision) && !goKickAlrealdy && ("theirIndirectKick" == refMsg || "theirDirectKick" == refMsg || "theirKickOff" == refMsg))
 	{
 		initialKickerDir = pVision->TheirPlayer(theirKickerID).Dir();
 		goKickAlrealdy = true;
@@ -64,33 +64,33 @@ bool CChipBallJudge::doJudge(const CVisionModule* pVision,double & ballActualMov
 	//如果开球车去开球了，开始判断
 	if (goKickAlrealdy)
 	{
-	//	cout << "Kicker Go Kick"<<endl;
-		double currentBallMovingDir =ball.Vel().dir();
+		//	cout << "Kicker Go Kick"<<endl;
+		double currentBallMovingDir = ball.Vel().dir();
 		/*if ( ((ball.Pos() - ballInialPos).mod() > 5))
 		{*/
-	//		cout <<"start Judge" <<endl;
-			if (isChip(pVision))
+		//		cout <<"start Judge" <<endl;
+		if (isChip(pVision))
+		{
+			if (DEBUG)
 			{
-				if (DEBUG)
-				{
-					cout << "ChipChip" << endl;
-				}
-			
-				ballActualMovingDir = initialKickerDir;
-				isChipKick = true;
-			}else
-			{
-				if (DEBUG)
-				{
-					//cout << "Not Chip"<<endl;
-				}
-				
-				ballActualMovingDir = ball.Vel().dir();
-				isChipKick =false;
+				cout << "ChipChip" << endl;
 			}
+
+			ballActualMovingDir = initialKickerDir;
+			isChipKick = true;
+		} else
+		{
+			if (DEBUG)
+			{
+				//cout << "Not Chip"<<endl;
+			}
+
+			ballActualMovingDir = ball.Vel().dir();
+			isChipKick = false;
+		}
 		//}
 	}
-	
+
 	//if ((ball.Pos() - ballInialPos).mod()>100)
 	//{
 	//	//cout << "reset" <<endl;
@@ -99,17 +99,13 @@ bool CChipBallJudge::doJudge(const CVisionModule* pVision,double & ballActualMov
 	////	count = 0;
 	//	goKickAlrealdy= false;
 	//}
-	GDebugEngine::Instance()->gui_debug_x(ballInialPos,COLOR_BLACK);
+	GDebugEngine::Instance()->gui_debug_x(ballInialPos, COLOR_BLACK);
 	return isChipKick;
 }
 
 void CChipBallJudge::checkKickCarNum(const CVisionModule* pVision)
 {
-	const CBestPlayer::PlayerList& oppList = BestPlayer::Instance()->theirFastestPlayerToBallList();
-	if ( oppList.size() < 1)
-		theirKickerID = 0;
-	else
-		theirKickerID = oppList[0].num;
+	theirKickerID = DefenceInfoNew::Instance()->getBestBallChaser();
 }
 
 bool CChipBallJudge::checkKickerGoKick(const CVisionModule* pVision)
@@ -117,12 +113,11 @@ bool CChipBallJudge::checkKickerGoKick(const CVisionModule* pVision)
 	const PlayerVisionT& theirKicker = pVision->TheirPlayer(theirKickerID);
 	const BallVisionT& ball = pVision->Ball();
 	double distTheirKicker2Ball = (theirKicker.Pos() - ball.Pos()).mod();
-	bool isTheirKickerFaceBall  = abs(Utils::Normalize(theirKicker.Dir() - (ball.Pos() - theirKicker.Pos()).dir()) )< Param::Math::PI / 6;
+	bool isTheirKickerFaceBall = abs(Utils::Normalize(theirKicker.Dir() - (ball.Pos() - theirKicker.Pos()).dir())) < Param::Math::PI / 6;
 	if (isTheirKickerFaceBall && (distTheirKicker2Ball < (Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + Param::Field::BALL_SIZE + 3)))
 	{
 		return true;
-	}
-	else
+	} else
 	{
 		return false;
 	}
@@ -134,14 +129,14 @@ bool CChipBallJudge::isChip(const CVisionModule* pVision)
 	bool distJudgeChip = false;
 
 	const BallVisionT& ball = pVision->Ball();
-	double InitialBallDir2currentBall =(ball.Pos() - ballInialPos ).dir();
+	double InitialBallDir2currentBall = (ball.Pos() - ballInialPos).dir();
 	double ballMovingDir = ball.Vel().dir();
 	//////////////////////////////////////
 	//距离判断
 	/////////////////
-	
-	CGeoLine ballLine = CGeoLine(ballInialPos,initialKickerDir);
-//	GDebugEngine::Instance()->gui_debug_line(ballInialPos,ballInialPos + Utils::Polar2Vector(100,initialKickerDir));
+
+	CGeoLine ballLine = CGeoLine(ballInialPos, initialKickerDir);
+	//	GDebugEngine::Instance()->gui_debug_line(ballInialPos,ballInialPos + Utils::Polar2Vector(100,initialKickerDir));
 	double flyingBall2LineDist = (ballLine.projection(ball.Pos()) - ball.Pos()).mod();
 	if ((ball.Pos() - ballInialPos).mod() > 10)
 	{
@@ -151,20 +146,19 @@ bool CChipBallJudge::isChip(const CVisionModule* pVision)
 	////////////////////////
 	//角度判断
 	///////////////
-	
+
 	//cout << abs(Utils::Normalize(ballMovingDir - InitialBallDir2currentBall)) << endl;
-	if (abs(ball.Vel().mod() > 10)&&abs(Utils::Normalize(ballMovingDir - InitialBallDir2currentBall)) > Param::Math::PI / 40)
+	if (abs(ball.Vel().mod() > 10) && abs(Utils::Normalize(ballMovingDir - InitialBallDir2currentBall)) > Param::Math::PI / 40)
 	{
 		//cout  << "DIRjudeg CHIP" << endl;
 		dirJudgeChip = true;
-	}
-	else
+	} else
 	{
 		//cout  << "DIRjudeg FLAT" << endl;
 		dirJudgeChip = false;
 	}
-//cout << "dirJudge:"  << dirJudgeChip <<" "<<"distJudge:"<<distJudgeChip<<endl;
-//	cout << "flyingBall2LineDist:" << flyingBall2LineDist << "  " <<"dir:" << abs(Utils::Normalize(ballMovingDir - InitialBallDir2currentBall)) * 180 / Param::Math::PI;
+	//cout << "dirJudge:"  << dirJudgeChip <<" "<<"distJudge:"<<distJudgeChip<<endl;
+	//	cout << "flyingBall2LineDist:" << flyingBall2LineDist << "  " <<"dir:" << abs(Utils::Normalize(ballMovingDir - InitialBallDir2currentBall)) * 180 / Param::Math::PI;
 	double finalJudge = distJudgeChip || dirJudgeChip;
 	return finalJudge;
 }

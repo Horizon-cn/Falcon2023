@@ -8,10 +8,11 @@ firstState = "goalie",
 			return "goalie";
 		end
 	end,
-	--Defender = task.leftBack(),
-    --Assister = task.rightBack(),
+	Defender = task.multiBack(3,1),
+    Assister = task.multiBack(3,2),
+    Hawk = task.multiBack(3,3),
     Goalie = task.goalieNew(),
-    match=""
+    match="[ADH]"
     --match = "[AD]"
 },
 

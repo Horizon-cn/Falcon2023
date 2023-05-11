@@ -13,7 +13,7 @@
 #include "WorldModel/DribbleStatus.h"
 #include "PointCalculation/IndirectDefender.h"
 #include <utils.h>
-#include <BestPlayer.h>
+#include "defenceNew/DefenceInfoNew.h"
 #include "KickDirection.h"
 #include <GDebugEngine.h>
 #include <iostream>

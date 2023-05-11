@@ -15,14 +15,19 @@ namespace {
 	GDebugEngine::Instance()->gui_debug_msg(p, str_##arr.toLatin1(), COLOR_YELLOW);\
 }
 
-CDefenceInfoNew::CDefenceInfoNew()
+CDefenceInfoNew::CDefenceInfoNew() :isInTheirPass(false)
 {
 	display_debug_info = paramManager->display_debug_info;
-	_potientialList.resize(Param::Field::MAX_PLAYER, 0);
+	_chaserPotientialList.resize(Param::Field::MAX_PLAYER, 0);
+	_receiverPotientialList.resize(Param::Field::MAX_PLAYER, 0);
 	_ballChaserList.reserve(Param::Field::MAX_PLAYER);
 	_ballChaserList.push_back(0);
 	_ballChaserSteadyList.reserve(Param::Field::MAX_PLAYER);
 	_ballChaserSteadyList.push_back(0);
+	_ballReceiverList.reserve(Param::Field::MAX_PLAYER);
+	_ballReceiverList.push_back(0);
+	_ballReceiverSteadyList.reserve(Param::Field::MAX_PLAYER);
+	_ballReceiverSteadyList.push_back(0);
 }
 
 CDefenceInfoNew::~CDefenceInfoNew()
@@ -33,73 +38,153 @@ void CDefenceInfoNew::updateDefenceInfoNew(const CVisionModule* pVision)
 {
 	updateBallChaserList(pVision);
 	updateBallReceiverList(pVision);
+	checkPass(pVision);
+	updateSteady();
+	//debug输出
+	debug_arr(_ballChaserList, CGeoPoint(100, -350));
+	debug_arr(_ballChaserSteadyList, CGeoPoint(-400, -350));
+	debug_arr(_ballReceiverList, CGeoPoint(100, -250));
+	debug_arr(_ballReceiverSteadyList, CGeoPoint(-400, -250));
+
 }
 
 void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 {
-	_lastPotientialList = _potientialList;
-	_potientialList.clear();
+	_lastChaserPotientialList = _chaserPotientialList;
+	_chaserPotientialList.clear();
 	//加权计算追球潜力，越小越容易拿球
 	for (int num = 0; num < Param::Field::MAX_PLAYER; num++)
-		_potientialList.push_back(ballChaserAttributeSet::Instance()->evaluate(pVision, num));
+		_chaserPotientialList.push_back(ballChaserAttributeSet::Instance()->evaluate(pVision, num));
 	//持球者直接覆盖计算结果为最优
-	//todo 等待BallStatus移植
-	/*{
-		double OurLooseBallCtrlDist = Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 3.5;
-		double OurLooseBallCtrlAngle = Param::Math::PI * 15 / 180;
-		double OurStrictBallCtrlDist = Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 1.5;
-		double OurStrictBallCtrlAngle = Param::Math::PI * 10 / 180;
-		for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
-		{
-			if (!pVision->TheirPlayer(i).Valid())
-				continue;
-			CVector player2Ball = pVision->Ball().Pos() - pVision->TheirPlayer(i).Pos();
-			double distPlayer2Ball = player2Ball.mod();
-			double dAnglePlayer2Ball = fabs(Utils::Normalize(player2Ball.dir() - pVision->TheirPlayer(i).Dir()));
-			bool ballLooseCtrl = (distPlayer2Ball < OurLooseBallCtrlDist && dAnglePlayer2Ball < OurLooseBallCtrlAngle);
-			bool ballStrictCtrl = (distPlayer2Ball < OurStrictBallCtrlDist && dAnglePlayer2Ball < OurStrictBallCtrlAngle);
-			extern bool IS_SIMULATION;
-			if (!IS_SIMULATION) {
-				ballLooseCtrl = ballLooseCtrl || RobotSensor::Instance()->IsInfraredOn(i);
-				ballStrictCtrl = ballStrictCtrl || RobotSensor::Instance()->IsInfraredOn(i);
-			}
-			if (ballLooseCtrl)
-				_potientialList[i] = 0.1;
-			if (ballStrictCtrl)
-				_potientialList[i] = 0;
-		}
-	}*/
-	for(int i=0;i<Param::Field::MAX_PLAYER;i++)
-		if(BallStatus::Instance()->getBallPossession(false,i))
-			_potientialList[i] = 0;
+	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
+		if (BallStatus::Instance()->getBallPossession(false, i) > 0.5)
+			_chaserPotientialList[i] = 0;
 	//门将不应太容易成为最优
-	_potientialList[pVision->TheirGoalie()] *= 1.5;
-	_potientialList[pVision->TheirGoalie()] += 0.2;
+	_chaserPotientialList[pVision->TheirGoalie()] *= 1.5;
+	_chaserPotientialList[pVision->TheirGoalie()] += 0.2;
 	//与上一帧加权
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
-		_potientialList[i] = _potientialList[i] * 0.75 + _lastPotientialList[i] * 0.25;
+		_chaserPotientialList[i] = _chaserPotientialList[i] * 0.75 + _lastChaserPotientialList[i] * 0.25;
 	//不可见球员排除，在阈值内的成为BallChaser并按潜力排序
 	_ballChaserList.clear();
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 		_ballChaserList.push_back(i);
 	_ballChaserList.erase(remove_if(_ballChaserList.begin(), _ballChaserList.end(),
-		[&](int num) {return (!pVision->TheirPlayer(num).Valid()) || _potientialList[num] >= 0.75; }),
+		[&](int num) {return (!pVision->TheirPlayer(num).Valid()) || _chaserPotientialList[num] >= 0.75; }),
 		_ballChaserList.end());
 	sort(_ballChaserList.begin(), _ballChaserList.end(),
-		[&](int num1, int num2) {return _potientialList[num1] < _potientialList[num2]; });
+		[&](int num1, int num2) {return _chaserPotientialList[num1] < _chaserPotientialList[num2]; });
 	//目前使用接口的地方不判断是否存在ballChaser，故需要保底
 	if (_ballChaserList.empty())
 		_ballChaserList.push_back(0);
-	//特定情况下更新Steady
-	//todo 原defenceinfo的设计考虑的是具体人员是否相同，以及考虑了接球车nomark，这个再想想
-	if (_ballChaserList[0] != _ballChaserSteadyList[0] ||
-		_ballChaserList.size() != _ballChaserSteadyList.size())
-		_ballChaserSteadyList = _ballChaserList;
-	//debug输出
-	//debug_arr(_ballChaserList, CGeoPoint(100, -350));
-	//debug_arr(_ballChaserSteadyList, CGeoPoint(-400, -350));
 }
 
 void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 {
+	_lastReceiverPotientialList = _receiverPotientialList;
+	_receiverPotientialList.clear();
+	//加权计算接球潜力，越小越容易作为接球者被传球
+	for (int num = 0; num < Param::Field::MAX_PLAYER; num++)
+		_receiverPotientialList.push_back(ballReceiverAttributeSet::Instance()->evaluate(pVision, num));
+	//ballChaser不能是Receiver
+	_receiverPotientialList[_ballChaserList[0]] = 1000;
+	//门将不应太容易成为最优
+	_receiverPotientialList[pVision->TheirGoalie()] *= 1.5;
+	//与上一帧加权
+	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
+		_receiverPotientialList[i] = _receiverPotientialList[i] * 0.75 + _lastReceiverPotientialList[i] * 0.25;
+	//不可见球员排除，在阈值内的成为BallReceiver并按潜力排序
+	_ballReceiverList.clear();
+	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
+		_ballReceiverList.push_back(i);
+	_ballReceiverList.erase(remove_if(_ballReceiverList.begin(), _ballReceiverList.end(),
+		[&](int num) {return (!pVision->TheirPlayer(num).Valid()) || _receiverPotientialList[num] >= 1000; }),
+		_ballReceiverList.end());
+	sort(_ballReceiverList.begin(), _ballReceiverList.end(),
+		[&](int num1, int num2) {return _receiverPotientialList[num1] < _receiverPotientialList[num2]; });
+	if (_ballReceiverList.empty())
+		_ballReceiverList.push_back(0);
+}
+//传球时的特殊处理
+void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
+{
+	const BallVisionT& ball = pVision->Ball();
+	if (isInTheirPass)
+	{
+		//判断是否仍在传球状态
+		const PlayerVisionT& receiver = pVision->TheirPlayer(_receiver);
+		double ball2ReceiverDir = (receiver.Pos() - ball.Pos()).dir();
+		double angleDiff = fabs(Utils::Normalize(ball2ReceiverDir - ball.Vel().dir()));
+		double ball2ReceiverDist = ball.Pos().dist(receiver.Pos());
+		if (angleDiff > Param::Math::PI / 2.0 || ball2ReceiverDist > 450 || ball2ReceiverDist < 100)
+			isInTheirPass = false;
+	} else
+	{
+		if (BallStatus::Instance()->IsBallKickedOut())
+		{
+			if (display_debug_info) {
+				GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "ball kick!!!!!!!!!!!!!!!!!");
+				qDebug() << "ball kick!!!!!!!!!";
+			}
+			for (_kicker = 0; _kicker < 2 * Param::Field::MAX_PLAYER; _kicker++)
+				if (BallStatus::Instance()->IsBallKickedOut(_kicker))
+					break;
+			if (_kicker >= Param::Field::MAX_PLAYER)//TheirKick
+			{
+				_kicker -= Param::Field::MAX_PLAYER;
+				matchReceiver(pVision);
+				if (_receiver != -1)
+					isInTheirPass = true;
+			}
+		}
+	}
+	//接球者作为新的BallChaser，同时从BallReceiver移除
+	if (isInTheirPass)
+	{
+		if (display_debug_info)
+			GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "new: in pass");
+		auto temp = find(_ballChaserList.begin(), _ballChaserList.end(), _receiver);
+		if (temp != _ballChaserList.end())
+			rotate(_ballChaserList.begin(), temp, temp + 1);
+		else
+			_ballChaserList.insert(_ballChaserList.begin(), _receiver);
+		auto tmp = find(_ballReceiverList.begin(), _ballReceiverList.end(), _receiver);
+		if (tmp != _ballReceiverList.end())
+			_ballReceiverList.erase(tmp);
+	}
+}
+
+void CDefenceInfoNew::matchReceiver(const CVisionModule* pVision)
+{
+	const BallVisionT& ball = pVision->Ball();
+	for (int maybeReceiverNum : _ballReceiverList)
+	{
+		const PlayerVisionT& maybeReceiver = pVision->TheirPlayer(maybeReceiverNum);
+		double ball2ReceiverDir = (maybeReceiver.Pos() - ball.Pos()).dir();
+		double angleDiff = fabs(Utils::Normalize(ball2ReceiverDir - ball.Vel().dir()));
+		double ball2ReceiverDist = ball.Pos().dist(maybeReceiver.Pos());
+		if (angleDiff > Param::Math::PI / 2.0 || ball2ReceiverDist > 450 || ball2ReceiverDist < 100)
+			continue;
+		_receiver = maybeReceiverNum;
+		return;
+	}
+	_receiver = -1;
+}
+
+void CDefenceInfoNew::updateSteady()
+{
+	//todo 原defenceinfo的设计考虑的是具体人员是否相同，以及考虑了接球车nomark，这个再想想
+	if (_ballChaserList[0] != _ballChaserSteadyList[0] ||
+		_ballChaserList.size() != _ballChaserSteadyList.size())
+		_ballChaserSteadyList = _ballChaserList;
+	bool updateReceiver = false;
+	if (_ballChaserList[0] != _ballChaserSteadyList[0])
+		updateReceiver = true;
+	if (!_ballReceiverSteadyList.empty()) {
+		auto newRank = find(_ballReceiverList.begin(), _ballReceiverList.end(), _ballReceiverSteadyList[0]);
+		if (newRank == _ballReceiverList.end() || newRank - _ballReceiverList.begin() >= 2)
+			updateReceiver = true;
+	}
+	if (updateReceiver)
+		_ballReceiverSteadyList = _ballReceiverList;
 }

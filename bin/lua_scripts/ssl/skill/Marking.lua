@@ -35,14 +35,13 @@ function Marking(task)
 	local mpri
 	local mdir
 	local mpos
+	if task.pri == nil then
+		print("No Priority in Marking Skill!!!!!")
+	elseif type(task.pri) == "string" then
+		mpri = PriToNum(task.pri)
+	end
 
 	execute = function(runner)
-		if task.pri == nil then
-			print("No Priority in Marking Skill!!!!!")
-		elseif type(task.pri) == "string" then
-			mpri = PriToNum(task.pri)
-		end
-
 		for rolename, num in pairs(gRoleNum) do
 			if num == runner and IsRoleActive(rolename) then
 				mpos = gRolePos[rolename]
