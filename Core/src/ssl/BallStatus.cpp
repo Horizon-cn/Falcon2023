@@ -33,6 +33,7 @@ CBallStatus::CBallStatus(void)
     _ballMovingVel = CVector(0,0);
     _isKickedOut = false;
     _ballToucher = -1;
+    _kickerNum = -1;
     _ballState= None;
     _ballStateCouter=0;
 
@@ -46,6 +47,8 @@ void CBallStatus::UpdateBallStatus(const CVisionModule* pVision)
 {
     // UpdateBallMoving(pVision);
     CheckKickOutBall(pVision);
+    // if (_isKickedOut)
+    //     qDebug() << "isKickedOut" << _isKickedOut << "isChipKickOut" << _isChipKickOut << "kickerNum" << _kickerNum;
     // _contactChecker.refereeJudge(pVision);
     _lastBallToucher = _ballToucher;
     // _ballToucher = _contactChecker.getContactNum();

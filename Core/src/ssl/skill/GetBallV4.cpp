@@ -546,7 +546,7 @@ bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double fi
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
     const CVector self2ball = ball.Pos() - me.Pos();
     double ball2meDist = self2ball.mod();
-    cout << ball2meDist << endl;
+    // cout << ball2meDist << endl;
     if (ball.Vel().mod() > 30 || ball2meDist > 30)
         return 1;
     return 0;

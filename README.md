@@ -92,6 +92,23 @@ $ sudo make install
 	- 如果需要使用 GPU，将 cmake 中的 ENABLE_CUDA 置为 ON，~~按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置~~，[cuda 12.0下载](https://jbox.sjtu.edu.cn/l/I1f4um)
 	![ENABLE_CUDA](wiki/ENABLE_CUDA.png)
 
+## 开发须知
+
+- .proto .pkg 文件修改后需要重新 cmake 生成接口文件
+- git push 前，注意将以下配置归为默认值：
+	- ~~gpuBestAlgThread.cpp 中，#define has_GPU false~~
+	- 并行编译所用核数为4
+	- 关闭 Client 的 Debug 信息，在 Client/CMakeLists.txt 中都不要注释
+	```bash
+	if (WIN32)
+    message(${CMAKE_C_FLAGS})
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+	endif()
+	```
+- 国际化语言包：Client 每次编译后文件夹中都会生成 zh_CN.ts，这属于临时文件，不会上传到 git。生成 .qm 文件后将两者都复制到 bin/Language 里面，便于查错
+  - [Linguist入门参考](https://gitlab.com/src-ssl/src/-/wikis/Software/Qt%E5%A4%9A%E8%AF%AD%E8%A8%80%E5%88%87%E6%8D%A2%E7%9A%84%E5%AE%9E%E7%8E%B0)
+
 ## 使用方法
 
 - 启动 run.bat
