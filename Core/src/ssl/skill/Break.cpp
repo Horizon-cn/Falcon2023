@@ -225,7 +225,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     CGeoPoint target = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     end = clock();
     
-    // std::cout << "best break point calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
+    std::cout << "best break point calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
     if (isSetPoint(pVision, point, me.Pos())) {
         move_point = target;
     }
@@ -285,12 +285,13 @@ void CBreak::plan(const CVisionModule* pVision) {
     //cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
 
     bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
-    //cout << "canShoot____" << ' ' << canShoot << endl;
-    //cout << "dirok____" << ' ' << dirok << endl;
     //if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 20) {
-    //if (canShoot && dirok){
-    if (dirok) {
-        // cout << "shoot!!!" << endl;
+    calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
+
+    cout << "canShoot____" << ' ' << canShoot << endl;
+    cout << "dirok____" << ' ' << dirok << endl;
+    if (canShoot && dirok ) {
+        cout << "shoot!!!" << endl;
         DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
         KickStatus::Instance()->setKick(vecNumber, power);//力度可调
 
@@ -385,14 +386,12 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             cout << "projection_dist__" << ' ' << projection_dist << endl;
             cout << "to_projection_dist__" << ' ' << to_projection_dist << endl;*/
             //if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist/to_projection_dist) < (15*Param::Math::PI/180.0))||(to_projection_dist<15&&projection_dist<15))) {
-            if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / to_projection_dist) < (15 * Param::Math::PI / 180.0)) || (to_projection_dist < 10 && projection_dist < 10))) {
+            if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / to_projection_dist) < (15 * Param::Math::PI / 180.0))  )) {
             /*if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {*/
                 canShoot = false;
                 needBreakThrough = true;
                 break;
             }
-
-
         }
         if (canShoot)
         {
@@ -402,7 +401,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         }
         else
         {
-            // std::cout << "============break calc with gpu===============" << std::endl;
+            std::cout << "============break calc with gpu===============" << std::endl;
             // 使用GPU
             int _palyer_pos_num = 6;
             int pos_num = 2 + 1 + 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
@@ -418,7 +417,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             float* vis_points = (float*)malloc(3 * (ANGEL_MOD * 2 - 1) * (MOD_NUM - 1) * sizeof(float));
 
             if (pos_info == nullptr || target_info == nullptr || results == nullptr) {
-                // std::cout << "break malloc fail" << std::endl;
+                std::cout << "break malloc fail" << std::endl;
                 return test_point;
             }
 
@@ -478,11 +477,11 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                 target_info[2 * i + 1] = -Param::Field::GOAL_WIDTH / 2 + i * target_step;
             }
 
-            // std::cout << "break start calc with gpu" << std::endl;
+            std::cout << "break start calc with gpu" << std::endl;
             // 这里会返回值，如果是0则可能GPU计算出现问题，建议切换为CPU去计算
             break_calc_with_gpu(target_info, target_point_num, pos_info, pos_num, ANGEL_MOD, MOD_NUM, results, vis_points);
 
-            // std::cout << "break start find best point" << std::endl;
+            std::cout << "break start find best point" << std::endl;
             float best_score = 10000;
             float best_idx = -1;
             CGeoPoint best_point(-100, -100);
@@ -497,7 +496,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                     best_idx = i;
                 }
             }
-            // std::cout << "best point: " << best_point << " | best idx: " << best_idx << " | best score: " << best_score << std::endl;
+            std::cout << "best point: " << best_point << " | best idx: " << best_idx << " | best score: " << best_score << std::endl;
             if (DEBUG) {
                 for (int i = 0; i < target_point_num; i++) {
                     CGeoPoint target_point(target_info[2 * i], target_info[2 * i + 1]);
@@ -681,7 +680,6 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
     }
     for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
         if (!pVision->TheirPlayer(i).Valid()) continue;
-        // cout << "enemy__" << i << endl;
         auto enemy = pVision->TheirPlayer(i);
         double x = enemy.X(), y = enemy.Y();
         double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
@@ -693,7 +691,6 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         }
     }
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("CanScore:" + to_string(flag)).c_str(), COLOR_YELLOW);
-    // cout << "dirok__" << ' ' << flag << endl;
     return flag;
 
 }
