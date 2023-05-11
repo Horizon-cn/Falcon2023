@@ -741,18 +741,14 @@ void CGPUBestAlgThread::obscureBoundary() {
 	return;
 }
 
-void CGPUBestAlgThread::increaseRobust(int now, int pre) {
-	if ((_pointPotential[now] - _prePointPotential[pre]) < thresholdValue)
+void CGPUBestAlgThread::increaseRobust() {
+	if ((_pointPotential[0] - _prePointPotential[0]) < thresholdValue)
 	{
-		_pointPotential[now] = _prePointPotential[pre];
-		_bestSupport[now] = _preBestSupport[pre];
-		increaseRobust(now+1, pre+1);
+		for (int i = 0; i < AREANUM; i++) {
+			_bestSupport[i] = _preBestSupport[i];
+			_pointPotential[i] = _prePointPotential[i];
+		}
 	}
-	else
-		increaseRobust(now+1, pre);
-}
-
-void CGPUBestAlgThread::storeState() {
 	for (int i = 0; i < AREANUM; i++) {
 		_preBestSupport[i] = _bestSupport[i];
 		_prePointPotential[i] = _pointPotential[i];
@@ -827,8 +823,7 @@ void CGPUBestAlgThread::processPointValue() {
 	else if (ParamManager::Instance()->boundaryVersion == 2) {
 		supportSortV2(); 
 	}
-	increaseRobust(0,0); // 防止跳变的设定，从0开始进行筛选
-	storeState(); // 存储上一帧的状态
+	increaseRobust(); // 防止跳变的设定，从0开始进行筛选
 
 }
 

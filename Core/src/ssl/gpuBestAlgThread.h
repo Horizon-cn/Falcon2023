@@ -257,8 +257,7 @@ private:
 
 	/**
 	@brief	增大仿真鲁棒性*/
-	void increaseRobust(int,int);
-	void storeState();
+	void increaseRobust();
 
 
 	/**
