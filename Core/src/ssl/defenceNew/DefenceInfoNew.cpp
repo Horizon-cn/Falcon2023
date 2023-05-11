@@ -2,6 +2,7 @@
 #include "DefenceInfoNew.h"
 #include "TaskMediator.h"
 #include "GDebugEngine.h"
+#include "defence/DefenceInfo.h"
 
 namespace {
 	bool display_debug_info;
@@ -74,7 +75,7 @@ void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 		_ballChaserList.end());
 	sort(_ballChaserList.begin(), _ballChaserList.end(),
 		[&](int num1, int num2) {return _chaserPotientialList[num1] < _chaserPotientialList[num2]; });
-	//目前使用接口的地方不判断是否存在ballChaser，故需要保底
+	//目前使用接口的地方不判断是否存在，故需要保底
 	if (_ballChaserList.empty())
 		_ballChaserList.push_back(0);
 }
@@ -116,15 +117,18 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 		double ball2ReceiverDir = (receiver.Pos() - ball.Pos()).dir();
 		double angleDiff = fabs(Utils::Normalize(ball2ReceiverDir - ball.Vel().dir()));
 		double ball2ReceiverDist = ball.Pos().dist(receiver.Pos());
-		if (angleDiff > Param::Math::PI / 2.0 || ball2ReceiverDist > 450 || ball2ReceiverDist < 100)
+		if (angleDiff > Param::Math::PI / 2.0 || ball2ReceiverDist > 450 || ball2ReceiverDist < 100 || ball.Vel().mod() < 70)
+		{
 			isInTheirPass = false;
+			KickStatus::Instance()->resetAdvancerPassTo();
+		}
 	} else
 	{
 		if (BallStatus::Instance()->IsBallKickedOut())
 		{
 			if (display_debug_info) {
 				GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "ball kick!!!!!!!!!!!!!!!!!");
-				qDebug() << "ball kick!!!!!!!!!";
+				//qDebug() << "ball kick!!!!!!!!!";
 			}
 			for (_kicker = 0; _kicker < 2 * Param::Field::MAX_PLAYER; _kicker++)
 				if (BallStatus::Instance()->IsBallKickedOut(_kicker))
@@ -138,7 +142,7 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 			}
 		}
 	}
-	//接球者作为新的BallChaser，同时从BallReceiver移除
+	//接球者作为新的BallChaser，同时从BallReceiver移除。同时如果有对应marking车，使其成为我们的advance
 	if (isInTheirPass)
 	{
 		if (display_debug_info)
@@ -151,6 +155,9 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 		auto tmp = find(_ballReceiverList.begin(), _ballReceiverList.end(), _receiver);
 		if (tmp != _ballReceiverList.end())
 			_ballReceiverList.erase(tmp);
+
+		if (DefenceInfo::Instance()->queryMarked(_receiver))
+			KickStatus::Instance()->setAdvancerPassTo(pVision->OurPlayer(DefenceInfo::Instance()->getOurMarkDenfender(_receiver)).Pos());
 	}
 }
 
@@ -173,6 +180,11 @@ void CDefenceInfoNew::matchReceiver(const CVisionModule* pVision)
 
 void CDefenceInfoNew::updateSteady()
 {
+	//目前使用接口的地方不判断是否存在，故需要保底
+	if (_ballChaserList.empty())
+		_ballChaserList.push_back(0);
+	if (_ballReceiverList.empty())
+		_ballReceiverList.push_back(0);
 	//todo 原defenceinfo的设计考虑的是具体人员是否相同，以及考虑了接球车nomark，这个再想想
 	if (_ballChaserList[0] != _ballChaserSteadyList[0] ||
 		_ballChaserList.size() != _ballChaserSteadyList.size())
