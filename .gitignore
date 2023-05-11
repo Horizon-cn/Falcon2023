@@ -65,6 +65,7 @@ Core/*.lai
 Core/*.so
 Core/*.dll
 Core/*.dylib
+Core/Core.aps
 
 # Qt-es
 

@@ -62,7 +62,7 @@ namespace gpuCalcArea {
     //-450
     const double sideLineRightBorderY = ParamManager::Instance()->SUPPORT_DIST * Param::Field::PITCH_WIDTH / 2;
     //450
-	const double goalLineFrontBorderX = Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH;
+	const double goalLineFrontBorderX = Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH * 2 / 3;
     //480
 	const double goalLineBackBorderX = -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH;
     //-480
@@ -80,10 +80,10 @@ namespace gpuCalcArea {
 	// 目前这个区域已经更新
 
 	FieldRectangle fieldRectangleArray[AREANUM] = {
-		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(sideLineFrontBorderX, sideLineLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX, sideLineLeftBorderY)),
         FieldRectangle(CGeoPoint(middleFrontBorderX + differenceX,centerRightBorderY),CGeoPoint(goalLineFrontBorderX,centerLeftBorderY)),
         //FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)), 
-        FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(sideLineFrontBorderX,centerRightBorderY)),
+        FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
         FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + differenceX,centerLeftBorderY)),
@@ -94,10 +94,10 @@ namespace gpuCalcArea {
 		// FieldRectangle(CGeoPoint(goalLineBackBorderX,sideLineRightBorderY),CGeoPoint(middleBackBorderX,centerRightBorderY)),
 	};
 	FieldRectangle processed_fieldRectangleArray[AREANUM] = {
-		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(sideLineFrontBorderX,sideLineLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleFrontBorderX + differenceX,centerRightBorderY),CGeoPoint(goalLineFrontBorderX,centerLeftBorderY)),
 		//FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
-		FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(sideLineFrontBorderX,centerRightBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + differenceX,centerLeftBorderY)),
@@ -364,15 +364,14 @@ int CGPUBestAlgThread::getBallArea() {
 		if (gpuCalcArea::processed_fieldRectangleArray[areaNum].check4inclusion(ballPos))
 			break;
 	}
-	if (areaNum != AREANUM)
-		return areaNum;
-	else
-		return 1;//防止越界，返回对方禁区所在区域
+	return areaNum;
 }
 
 // 按照打表的方式返回支撑点列表
 void CGPUBestAlgThread::supportSort() {
 	int ball_area = getBallArea();
+	if (ball_area == AREANUM)
+		ball_area = 1; //防止越界，返回对方禁区所在区域
 	//           3 0  
 	//  己方球门 4 1  敌方球门
 	//           5 2
@@ -460,17 +459,24 @@ void CGPUBestAlgThread::supportSort() {
 
 // 按照点的分值返回支撑点列表
 void CGPUBestAlgThread::supportSortV2() {
+	int ball_area = getBallArea();
 	std::vector<PointValueStruct> pointValueList;
 	for (int areaNum = 0; areaNum < AREANUM; areaNum++) {
-		PointValueStruct p;
-		p.pos = areaNum;
-		p.value = _pointPotential[areaNum];
-		pointValueList.push_back(p);
+		if (areaNum != ball_area) { // 不考虑球所在区域
+			PointValueStruct p;
+			p.pos = areaNum;
+			p.value = _pointPotential[areaNum];
+			pointValueList.push_back(p);
+		}
 	}
 	sort(pointValueList.begin(), pointValueList.end()); // 排序，从小到大
-	for (int areaNum = 0; areaNum < AREANUM; areaNum++) {
-		_bestSupport[areaNum] = _bestPoint[(int)pointValueList.at(areaNum).pos];
+	int needRemove = (int)(ball_area < AREANUM);
+	if (needRemove) { // 将球所在区域的放在最后
+		_bestSupport[AREANUM - 1] = _bestPoint[ball_area];
 	}
+	for (int index = 0; index < AREANUM - needRemove; index++) {
+		_bestSupport[index] = _bestPoint[(int)pointValueList.at(index).pos];
+	}	
 }
 
 CGeoPoint CGPUBestAlgThread::getBestPointFromArea(int support_idx) {
@@ -816,15 +822,13 @@ void CGPUBestAlgThread::processPointValue() {
 		}
 	}
 
-
-	if (ParamManager::Instance()->boundaryVersion == 1) {
-		supportSortV2(); // 按照重要性对支撑点进行排序
-		
-	}
-	else if (ParamManager::Instance()->boundaryVersion == 2) {
-		supportSortV2(); 
-	}
-	increaseRobust(); // 防止跳变的设定，从0开始进行筛选
+	// if (ParamManager::Instance()->boundaryVersion == 1) {
+	 	supportSortV2(); // 按照重要性对支撑点进行排序	
+	// }
+	// else if (ParamManager::Instance()->boundaryVersion == 2) {
+	// 	supportSortV2(); 
+	// }
+	// increaseRobust(); // 防止跳变的设定，从0开始进行筛选
 
 }
 
