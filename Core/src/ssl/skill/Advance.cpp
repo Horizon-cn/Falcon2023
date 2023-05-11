@@ -164,13 +164,13 @@ void CAdvance::plan(const CVisionModule* pVision)
 		break;
 	case GET:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
-        if (NowIsShoot == 1) { _state = BREAKSHOOT; break; }
+        if (NowIsShoot == 1 && fabs(me.Y() < 250) && me.X() < 400) { _state = BREAKSHOOT; break; }
 		//if (meHasBall>3) {
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 			KickStatus::Instance()->resetAdvancerPassTo();
             /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
-            if (NowIsShoot == 2) { _state = BREAKSHOOT; break; }
-			if (me2goal.mod() < KICK_DIST) {
+            if (NowIsShoot == 2 && fabs(me.Y() < 250) && me.X() < 400) { _state = BREAKSHOOT; break; }
+			if (me2goal.mod() < KICK_DIST && fabs(me.Y() < 250) && me.X() < 400) {
                 if (tendToShoot(pVision, _executor)) {
                     NowIsShoot = 1;
 					_state = BREAKSHOOT; break;

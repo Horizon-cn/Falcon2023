@@ -6,7 +6,8 @@ local distThreshold = 50
 local TargetPos1  = CGeoPoint:new_local(280,200)
 
 local Xfront = 200
-local Xback = -180
+local Xmid = -100
+local Xback = -250
 
 local Lside = -150
 local Rside = 150
@@ -27,19 +28,34 @@ local SwitchBallArea = function()
 			return "SW"
 		end
 
-	elseif ball.posX() > Xback and ball.posY() > Lside and ball.posY() < Rside then
+	elseif ball.posX() > Xmid and ball.posY() > Lside and ball.posY() < Rside then
 		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
 		if ballStatus == "OurBall" then
 			return "CM"..ballStatus
 		else 
 			return "CM"
 		end
-	elseif ball.posX() > Xback then
+	elseif ball.posX() > Xmid then
 		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
 		if ballStatus == "OurBall" then
 			return "SM"..ballStatus
 		else 
 			return "SM"
+		end
+
+	elseif ball.posX() > Xback and ball.posY() > Lside and ball.posY() < Rside then
+		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
+		if ballStatus == "OurBall" then
+			return "CDM"..ballStatus
+		else 
+			return "CDM"
+		end
+	elseif ball.posX() > Xback then
+		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
+		if ballStatus == "OurBall" then
+			return "SDM"..ballStatus
+		else 
+			return "SDM"
 		end
 
 	elseif ball.posY() > Lside and ball.posY() < Rside then
@@ -56,6 +72,7 @@ gPlayTable.CreatePlay{
 
 firstState = "CM",
 
+--front
 ["SW"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
@@ -100,13 +117,13 @@ firstState = "CM",
     match = "[L][DAS][M]"
 },
 
-
+-- mid
 ["SM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",0),
-	Middle = task.marking("First"),
-    Special = task.defendHead(),
+	Middle = task.support("Leader",1),
+    Special = task.task.markingFront("First"),
 	Defender = task.singleBack(),
 	Goalie = task.goalieNew(),
     match = "[L][DA][SM]"
@@ -116,8 +133,8 @@ firstState = "CM",
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",0),
-	Middle = task.support("Middle",1),
-    Special = task.defendHead(),
+	Middle = task.support("Leader",1),
+    Special = task.support("Leader",2),
 	Defender = task.singleBack(),
 	Goalie = task.goalieNew(),
     match = "[L][DA][MS]"
@@ -127,9 +144,9 @@ firstState = "CM",
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",0),
-	Middle = task.marking("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+	Middle = task.support("Leader",1),
+    Special = task.markingFront("First"),
+	Defender = task.singleBack(),
 	Goalie = task.goalieNew(),
     match = "[L][DA][SM]"
 },
@@ -138,19 +155,65 @@ firstState = "CM",
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",0),
-	Middle = task.support("Middle",1),
-    Special = task.defendMiddle(),
+	Middle = task.support("Leader",1),
+    Special = task.support("Leader",2),
 	Defender = task.singleBack(),
 	Goalie = task.goalieNew(),
     match = "[L][DA][MS]"
 },
 
+--middldDefence
 
+["CDM"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.support("Leader",0),
+	Middle = task.support("Leader",1),
+    Special = task.markingFront("First"),
+	Defender = task.singleBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][DA][SM]"
+},
+
+["CDMOurBall"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.support("Leader",0),
+	Middle = task.support("Leader",1),
+    Special = task.markingFront("First"),
+	Defender = task.singleBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][DA][MS]"
+},
+
+["SDM"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.support("Leader",0),
+	Middle = task.support("Leader",1),
+    Special = task.defendHead(),
+	Defender = task.singleBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][DA][MS]"
+},
+
+["SDMOurBall"] = {
+    switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.support("Leader",0),
+	Middle = task.support("Leader",1),
+    Special = task.markingFront("First"),
+	Defender = task.singleBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][DA][SM]"
+},
+
+--back
 ["SB"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",0),
-	Middle = task.marking("First"),
+	Middle = task.markingFront("First"),
     Special = task.leftBack(),
 	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),
@@ -161,7 +224,7 @@ firstState = "CM",
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",0),
-	Middle = task.marking("First"),
+	Middle = task.markingFront("First"),
     Special = task.leftBack(),
 	Defender = task.rightBack(),
 	Goalie = task.goalieNew(),

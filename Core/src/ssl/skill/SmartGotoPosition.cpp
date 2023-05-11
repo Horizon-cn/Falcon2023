@@ -139,6 +139,9 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         (vecNumber == TaskMediator::Instance()->defendMiddle())  ||
         (TaskMediator::Instance()->isMultiBack(vecNumber))
     );
+
+
+
     const bool isAdvancer = (vecNumber == TaskMediator::Instance()->advancer());
 
     // 判断为，判断需要躲避的指定区域，包括圆圈和放球椭圆
@@ -332,6 +335,8 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
             GDebugEngine::Instance()->gui_debug_x(tree[vecNumber].second[i].first.pos, COLOR_YELLOW);
         }
     }
+
+    if ((!isGoalie) && !(isBack)) newTask.player.flag |= PlayerStatus::ALLOW_DSS;
 
     /************************************************************************/
     /* 下达子任务                                                            */
