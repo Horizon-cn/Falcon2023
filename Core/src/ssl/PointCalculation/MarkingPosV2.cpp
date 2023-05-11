@@ -114,7 +114,7 @@ CGeoPoint CMarkingPosV2::getMarkingPos(const CVisionModule* pVision, const int p
 	//		oppPriority -= 1;
 	//	}		
 	//}
-	oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverList()[oppPriority - 1];
+	oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(oppPriority - 1);
 	return markingPoint[oppNum];
 }
 
@@ -129,7 +129,7 @@ CGeoPoint CMarkingPosV2::getMarkingPosByAbsolutePri(const CVisionModule* pVision
 	}
 	return markingPoint[oppNum];
 	checkAllMarkingPos(pVision);
-	oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverList()[pri];
+	oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(pri);
 	return markingPoint[oppNum];
 }
 
@@ -155,7 +155,7 @@ void CMarkingPosV2::checkAllMarkingPos(const CVisionModule* pVision)
 		areaList.clear();
 		for (int i = 0; i < attackCnt; i++) {
 			int bestEnemy = DefenceInfoNew::Instance()->getBestBallChaser();
-			oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverList()[i];
+			oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(i);
 			markingPoint[oppNum] = generatePos(pVision);
 		}
 	}
@@ -186,7 +186,7 @@ bool CMarkingPosV2::isNearestBallReceiverBeDenied(const CVisionModule* pVision)
 		}
 		for (int i = 0; i < attackNum; ++i)
 		{
-			int oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverList()[i];
+			int oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(i);
 			double dist_opp_ball = pVision->TheirPlayer(oppNum).Pos().dist(pVision->Ball().Pos());
 			if (dist_opp_ball < minDist)
 			{

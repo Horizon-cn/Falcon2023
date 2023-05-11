@@ -795,7 +795,7 @@ extern "C" int Skill_Marking(lua_State * L)
 	//		pri -= 1;
 	//	}
 	//}
-	int enemy = DefenceInfoNew::Instance()->getSteadyBallReceiverList()[pri-1];
+	int enemy = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(pri - 1);
 
 	CPlayerTask* pTask = PlayerRole::makeItMarkEnemy(runner, enemy, front, flag, CGeoPoint(x, y), dir);
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
@@ -829,7 +829,7 @@ extern "C" int FUNC_GetMarkingPos(lua_State * L)
 			pri -= 1;
 		}
 	}*/
-	int oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverList()[pri-1];
+	int oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(pri - 1);
 	const string refMsg = WorldModel::Instance()->CurrentRefereeMsg();
 	static bool kickOffSide = false;
 	bool checkKickOffArea = false;
