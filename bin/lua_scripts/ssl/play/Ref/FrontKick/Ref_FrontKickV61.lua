@@ -37,7 +37,7 @@ firstState = "getready",
     end
   end,
   --Assister = task.goCmuRush(ball.pos())
-  Assister = task.getBall(MAKE_POS_ORG),
+  Assister = task.staticGetBall(MAKE_POS_ORG),
   Leader   = task.goCmuRush(CGeoPoint:new_local(0,120)),
   Special  = task.goCmuRush(CGeoPoint:new_local(0,-120)),
  Defender = task.goCmuRush(READY_POS),
@@ -53,7 +53,7 @@ firstState = "getready",
       return "getball"
     end
   end,
-  Assister = task.getBall(MAKE_POS_ORG),
+  Assister = task.staticGetBall(MAKE_POS_ORG),
   Middle   = task.goCmuRush(RIGHT_POS2),
   Special  = task.goCmuRush(RIGHT_POS),
   Leader   = task.goCmuRush(MAKE_POS, player.toBallDir("Leader")),
@@ -68,7 +68,7 @@ firstState = "getready",
       return "chippass"
     end
   end,
-  Assister = task.getBall(MAKE_POS_ORG),
+  Assister = task.staticGetBall(MAKE_POS_ORG),
   Middle   = task.goCmuRush(RIGHT_POS2),
   Special  = task.goCmuRush(RIGHT_POS),
   Leader   = task.goCmuRush(MAKE_POS, player.toBallDir("Leader")),

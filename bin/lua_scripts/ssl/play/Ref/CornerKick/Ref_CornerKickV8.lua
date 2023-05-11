@@ -32,7 +32,7 @@ gPlayTable.CreatePlay{
         return "passBall"
       end
     end,
-    Assister = task.getBall(SHOOT_POS()),
+    Assister = task.staticGetBall(SHOOT_POS()),
     Leader   = task.rightBack(),
     Special  = task.leftBack(),
     Middle   = task.goCmuRush(SYNT_POS_1,_,_,flag.allow_dss),
