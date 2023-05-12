@@ -911,7 +911,7 @@ function defendFront(p)
 end
 
 function defendHead()
-	local mexe, mpos = GotoMatchPos{ pos = pos.defendHeadPos, dir = player.toBallDir, acc = 800,flag = flag.not_avoid_their_vehicle}
+	local mexe, mpos = GotoMatchPos{ pos = pos.defendHeadPos, dir = player.toBallDir, acc = 800,flag = flag.not_avoid_their_vehicle, srole = "defendHead"}
 	return {mexe, mpos}
 end
 

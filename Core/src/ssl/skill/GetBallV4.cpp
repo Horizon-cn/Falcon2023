@@ -292,7 +292,7 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         break;
     case HAVE:
         getball_task.player.pos = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, reverse_finalDir); // 预测球的位置 + 5.85     
-        getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
+        // getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
 

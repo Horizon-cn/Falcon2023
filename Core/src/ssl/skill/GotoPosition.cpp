@@ -139,11 +139,8 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	const bool IsGoMiddle = task().player.IsGoMiddle; // 现在是否走在中间点
 	const bool isDribble = playerFlag & PlayerStatus::DRIBBLING;
 
-	const bool isBack = (vecNumber == TaskMediator::Instance()->leftBack()) ||
-		(vecNumber == TaskMediator::Instance()->rightBack()) ||
-		(vecNumber == TaskMediator::Instance()->singleBack()) ||
-		(vecNumber == TaskMediator::Instance()->sideBack()) ||
-		(vecNumber == TaskMediator::Instance()->defendMiddle());
+	const bool isGoalie = (vecNumber == TaskMediator::Instance()->goalie());
+	const bool isBack = TaskMediator::Instance()->isBack(vecNumber);
     const bool isMultiBack = TaskMediator::Instance()->isMultiBack(vecNumber);
 
 	/************************************************************************/
@@ -200,9 +197,10 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	// 获取轨迹生成模块在全局坐标系中的速度指令
 	CVector globalVel = control.getNextStep().Vel();
 	//cout << "vel:  "<<globalVel.mod() << endl;
-	// 如果是后卫且距离禁区比较远，需要打开DSS避障，防止刚匹配的后卫发生碰撞
+	// 如果是门将或者后卫且距离禁区比较远，需要打开DSS避障，防止刚匹配的后卫和出击较远的门将发生碰撞
 	// 在禁区边的后卫允许撞车，否则容易被进球!!!
-    if ((isBack || isMultiBack) && !Utils::InOurPenaltyArea(vecPos, 40)) {
+	// 其他球员强制全部开DSS
+	if (!((isGoalie || isBack || isMultiBack) && Utils::InOurPenaltyArea(vecPos, 40))) {
 		playerFlag |= PlayerStatus::ALLOW_DSS;
 	}
 
@@ -260,18 +258,14 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 PlayerCapabilityT CGotoPosition::setCapability(const CVisionModule *pVision) {
 	const int vecNumber = task().executor;
 	const bool isGoalie = (vecNumber == TaskMediator::Instance()->goalie());
-	const bool isBack = (vecNumber == TaskMediator::Instance()->leftBack()) ||
-		(vecNumber == TaskMediator::Instance()->rightBack()) ||
-		(vecNumber == TaskMediator::Instance()->singleBack()) ||
-		(vecNumber == TaskMediator::Instance()->sideBack()) ||
-		(vecNumber == TaskMediator::Instance()->defendMiddle());
+	const bool isBack = TaskMediator::Instance()->isBack(vecNumber);
     const bool isMultiBack = TaskMediator::Instance()->isMultiBack(vecNumber);
 
 	const int playerFlag = task().player.flag;
 	PlayerCapabilityT capability;
 
 	// Traslation 确定运动参数
-	if (vecNumber == TaskMediator::Instance()->goalie()) {
+	if (isGoalie) {
 		capability.maxSpeed = MAX_TRANSLATION_SPEED_GOALIE;
 		capability.maxAccel = MAX_TRANSLATION_ACC_GOALIE;
 		capability.maxDec = MAX_TRANSLATION_DEC_GOALIE;
@@ -280,11 +274,7 @@ PlayerCapabilityT CGotoPosition::setCapability(const CVisionModule *pVision) {
 		capability.maxAngularAccel = MAX_ROTATION_ACC_GOALIE;
 		capability.maxAngularDec = MAX_ROTATION_ACC_GOALIE;
 	}
-	else if (TaskMediator::Instance()->leftBack() != 0 && vecNumber == TaskMediator::Instance()->leftBack()
-		|| TaskMediator::Instance()->rightBack() != 0 && vecNumber == TaskMediator::Instance()->rightBack()
-		|| TaskMediator::Instance()->singleBack() != 0 && vecNumber == TaskMediator::Instance()->singleBack()
-        || TaskMediator::Instance()->sideBack() != 0 && vecNumber == TaskMediator::Instance()->sideBack()
-        || isMultiBack) {
+	else if (isBack || isMultiBack) {
 		capability.maxSpeed = MAX_TRANSLATION_SPEED_BACK;
 		capability.maxAccel = MAX_TRANSLATION_ACC_BACK;
 		capability.maxDec = MAX_TRANSLATION_DEC_BACK;

@@ -33,8 +33,8 @@ CBallStatus::CBallStatus(void)
 {
     _ballMovingVel = CVector(0,0);
     _isKickedOut = false;
-    _ballToucher = -1;
-    _kickerNum = -1;
+    _ballToucher = 0;
+    _kickerNum = 0;
     _ballState= None;
     _ballStateCouter=0;
 
@@ -88,10 +88,7 @@ void CBallStatus::updateBallPossession(const CVisionModule* pVision)
                 }
             }
         }
-        // 大家都没有球
-        if (maxBallPossession == 0) {
-            _ballToucher = -1;
-        }
+        // 大家都没有球，维持上一帧的触球者
     }
 }
 

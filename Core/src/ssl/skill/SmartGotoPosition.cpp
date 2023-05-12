@@ -130,15 +130,8 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
     // 标志位，判断是否为后卫或者守门员
     const bool isGoalie = (vecNumber == TaskMediator::Instance()->goalie());
-    const bool isBack =
-    (
-        (vecNumber == TaskMediator::Instance()->leftBack())      ||
-        (vecNumber == TaskMediator::Instance()->rightBack())     ||
-        (vecNumber == TaskMediator::Instance()->singleBack())    ||
-        (vecNumber == TaskMediator::Instance()->sideBack())      ||
-        (vecNumber == TaskMediator::Instance()->defendMiddle())  ||
-        (TaskMediator::Instance()->isMultiBack(vecNumber))
-    );
+    const bool isBack = TaskMediator::Instance()->isBack(vecNumber);
+    const bool isMultiBack = TaskMediator::Instance()->isMultiBack(vecNumber);
 
 
 
@@ -182,7 +175,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     if ((self.Pos() - finalTargetPos).mod() < 100) {
         buffer /= 2;
     }
-    if (isGoalie || (isBack && Utils::InOurPenaltyArea(myPos, 40)) || WorldModel::Instance()->CurrentRefereeMsg() == "ourTimeout") {
+    if (isGoalie || ((isBack || isMultiBack) && Utils::InOurPenaltyArea(myPos, 40)) || WorldModel::Instance()->CurrentRefereeMsg() == "ourTimeout") {
         buffer = 0;
     }
     double avoidLength = Param::Vehicle::V2::PLAYER_SIZE + buffer;
@@ -336,8 +329,6 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         }
     }
 
-    if ((!isGoalie) && !(isBack)) newTask.player.flag |= PlayerStatus::ALLOW_DSS;
-
     /************************************************************************/
     /* 下达子任务                                                            */
     /************************************************************************/
@@ -350,11 +341,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 PlayerCapabilityT CSmartGotoPosition::setCapability(const CVisionModule* pVision) {
     const int vecNumber = task().executor;
     const bool isGoalie = (vecNumber == TaskMediator::Instance()->goalie());
-    const bool isBack = ((vecNumber == TaskMediator::Instance()->leftBack())   ||
-                         (vecNumber == TaskMediator::Instance()->rightBack())  ||
-                         (vecNumber == TaskMediator::Instance()->singleBack()) ||
-                         (vecNumber == TaskMediator::Instance()->sideBack())   ||
-                         (vecNumber == TaskMediator::Instance()->defendMiddle()));
+    const bool isBack = TaskMediator::Instance()->isBack(vecNumber);
     const bool isMultiBack = TaskMediator::Instance()->isMultiBack(vecNumber);
     const CGeoPoint mePos = pVision->OurPlayer(vecNumber).Pos();
     const int playerFlag = task().player.flag;
