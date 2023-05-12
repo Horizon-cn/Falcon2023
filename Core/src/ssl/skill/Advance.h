@@ -85,7 +85,7 @@ private:
     CGeoPoint theirCenter = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
     CGeoPoint ourGoal = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
 
-    CGeoPoint SupportPoint[9];
+    CGeoPoint SupportPoint[6];
 
     int LastPassPoint = 0; /*????????????*/
     double last_dir_deviation = 100;

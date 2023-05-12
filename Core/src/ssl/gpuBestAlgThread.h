@@ -153,6 +153,7 @@ public:
 	/**
 	@brief	本模块的对外接口
 	@param	传入区域的id，区域具体位置在gpuBestAlgThread.cpp中定义
+	@fix	给出的不再是区域内部最优点，而是经过全局排序后的最优点
 	目前所有需要GPU算点的功能均调用该接口，日后如果需要也可以根据getBestPoint()自定义其它接口，但为了代码的规范性不推荐*/
 	CGeoPoint getBestPointFromArea(int area_idx);
 

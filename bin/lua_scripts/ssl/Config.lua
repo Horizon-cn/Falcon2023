@@ -8,7 +8,7 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_Run"
+		return "Test_Advance"
 	else
 		return "Test_NormalMiddleDefend"
 	end

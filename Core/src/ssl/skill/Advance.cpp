@@ -744,7 +744,7 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 	//参数定义部分
 
 	PassDirOrPos ReturnValue; 
-	/*判断SupportPoint点位是否可以使用*/
+	//返回值
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	//当前持球车号
     bool isOurNearPoint[9] = { 0 }/*, isBlockPoint[9] = { 0 }*/, isCanUse[9] = { 0 }, OneOfUsCanShoot = 0;
@@ -761,9 +761,9 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 	for (int i = 0; i < NumberOfSupport; ++i) {
 		isOurNearPoint[i] = IsOurNearHere(pVision, SupportPoint[i], vecNumber);						//我方有人在旁边
         //isBlockPoint[i] = isTheLineBlocked(pVision, me.Pos(), SupportPoint[i]);
-		DistOppToTheLine[i] = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), SupportPoint[i]);//对手队员离传球线最短距离
+		//DistOppToTheLine[i] = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), SupportPoint[i]);//对手队员离传球线最短距离
 		ShootDir[i] = KickDirection::Instance()->getPointShootDir(pVision, SupportPoint[i]);		//射门角度
-		DistToPoint[i] = (SupportPoint[i] - me.Pos()).mod();										//支撑点到“我”的距离
+		//DistToPoint[i] = (SupportPoint[i] - me.Pos()).mod();										//支撑点到“我”的距离
 		ChangeDir[i] = me.Dir() - (SupportPoint[i] - me.Pos()).dir();								//传球到点“我”需要改变的角度
 
 		//最终的判定条件
@@ -778,7 +778,7 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 
 	/**********************************************************************************************************************/
 
-	//保持系统稳定性，返回上一次决策的情况
+	/*//保持系统稳定性，返回上一次决策的情况
 
     ReturnValue.dir = (SupportPoint[LastPassPoint] - me.Pos()).dir();
     ReturnValue.pos = SupportPoint[LastPassPoint];
@@ -787,7 +787,7 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 		(abs(me.Dir() - (SupportPoint[LastPassPoint] - me.Pos()).dir()) < 0.5 * Param::Math::PI / SHOOT_PRECISION)) //“我”传球需要转动的角度合适
 	{
         return ReturnValue;
-	}
+	}*/
 
 	/**********************************************************************************************************************/
 
@@ -835,29 +835,35 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
     }
 	*/
 
-	//按照需要转的角度进行排序
-
-	double NowValue = -1, MinValue = 1e9; 
-	int Maxidx = -1;
-
-	for (int i = 0; i < TheNumberOfCanShootPoint; ++i) {
-		int NowIdx = TheidxOfCanShootPoint[i];
-		NowValue = ChangeDir[NowIdx];
-		if (NowValue < MinValue)
-			Maxidx = NowIdx, MinValue = NowValue;
+	if (!OneOfUsCanShoot)
+	{
+		NowShootNumber = 0;
 	}
-    if (Maxidx < 0)
-		Maxidx = 1;
-	NowShootNumber = Maxidx;
+	else { //按照需要转的角度进行排序
+
+		double NowValue = -1, MinValue = 1e9;
+		int Maxidx = -1;
+
+		for (int i = 0; i < TheNumberOfCanShootPoint; ++i) {
+			int NowIdx = TheidxOfCanShootPoint[i];
+			NowValue = ChangeDir[NowIdx];
+			if (NowValue < MinValue)
+				Maxidx = NowIdx, MinValue = NowValue;
+		}
+		if (Maxidx < 0)
+			Maxidx = 0;
+		NowShootNumber = Maxidx;
+	}
 
 	/**********************************************************************************************************************/
 
-	//经过两轮筛选返回值，保存当前状态
+	//经过两轮筛选得到返回值
 
 	ReturnValue.dir = (SupportPoint[NowShootNumber] - me.Pos()).dir();
 	ReturnValue.pos = SupportPoint[NowShootNumber];
-	LastPassPoint = NowShootNumber;
+	//LastPassPoint = NowShootNumber;//保存当前状态
 	return ReturnValue;
+
 }
 
 double CAdvance::PassDir(const CVisionModule* pVision, int vecNumber) {
