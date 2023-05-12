@@ -48,8 +48,8 @@ void CBallStatus::UpdateBallStatus(const CVisionModule* pVision)
 {
     // UpdateBallMoving(pVision);
     CheckKickOutBall(pVision);
-    // if (_isKickedOut)
-    //     qDebug() << "isKickedOut" << _isKickedOut << "isChipKickOut" << _isChipKickOut << "kickerNum" << _kickerNum;
+    if (_isKickedOut)
+        qDebug() << "isKickedOut" << _isKickedOut << "isChipKickOut" << _isChipKickOut << "kickerNum" << _kickerNum;
     // _contactChecker.refereeJudge(pVision);
     _lastBallToucher = _ballToucher;
     // _ballToucher = _contactChecker.getContactNum();
@@ -232,7 +232,9 @@ void CBallStatus::CheckKickOutBall(const CVisionModule* pVision)
                 int isKickDeviceOn = RobotSensor::Instance()->IsKickerOn(num);
                 if (!_isKickedOut) {
                     if (sensorValid && isKickDeviceOn > 0) { // 视觉判为没踢但有踢球反馈，核实踢球反馈与指令是否匹配
-                        _isKickedOut = (isKickCmdSent && isKickDeviceOn == 1) || (_isChipKickOut && isKickDeviceOn == 2);
+                        // 防止是敌方堵在嘴部导致没踢出去，让球离开一段距离再确认
+                        double ballLeaveDist = pVision->Ball().Pos().dist(pVision->OurPlayer(num).Pos());
+                        _isKickedOut = ((isKickCmdSent && isKickDeviceOn == 1) || (_isChipKickOut && isKickDeviceOn == 2)) && ballLeaveDist > 20;
                         if (_isKickedOut) {
                             _isChipKickOut = _isChipKickOut && (isKickDeviceOn == 2);
                             _kickerNum = num;

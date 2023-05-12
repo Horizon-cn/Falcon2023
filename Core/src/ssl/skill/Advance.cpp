@@ -41,6 +41,8 @@ CAdvance::CAdvance()
 	RELIEF_POWER = paramManager->RELIEF_POWER;
     BACK_POWER = paramManager->BACK_POWER;
 	Advance_DEBUG_ENGINE = paramManager->Advance_DEBUG_ENGINE;
+	// GetBallV4
+	LARGE_ADJUST_ANGLE = paramManager->LARGE_ADJUST_ANGLE;
 }
 
 
@@ -119,7 +121,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 	CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
 	ShootPoint= GenerateBreakShootPoint(pVision, _executor);
-	for(int i=0;i<9;++i)
+	NumberOfSupport = min(6, AREANUM);/*暂时只考虑对面半场六个*/
+	for(int i=0;i<NumberOfSupport;++i)
 		SupportPoint[i] = GPUBestAlgThread::Instance()->getBestPointFromArea(i);/* Gpu算点 */
 	// 可视化球的预测位置
 	/*
@@ -131,7 +134,6 @@ void CAdvance::plan(const CVisionModule* pVision)
 	*/
 
 //	NormalPlayUtils::generatePassPoint(ball.Pos(), SupportPoint[0], SupportPoint[1], SupportPoint[2], SupportPoint[3]);
-	NumberOfSupport = 6;/*暂时只考虑对面半场六个*/
 	IsMeSupport = JudgeIsMeSupport(pVision, _executor);/*判断我是不是support 用于传中*/
 
 	/**********************************************************
@@ -167,7 +169,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         if (NowIsShoot == 1 && fabs(me.Y() < 250) && me.X() < 400) { _state = BREAKSHOOT; break; }
 		//if (meHasBall>3) {
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-			KickStatus::Instance()->resetAdvancerPassTo();
+			TaskMediator::Instance()->resetAdvancerPassTo();
             /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
             if (NowIsShoot == 2 && fabs(me.Y() < 250) && me.X() < 400) { _state = BREAKSHOOT; break; }
 			if (me2goal.mod() < KICK_DIST && fabs(me.Y() < 250) && me.X() < 400) {
@@ -334,6 +336,7 @@ void CAdvance::plan(const CVisionModule* pVision)
             if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHIPPASS", COLOR_CYAN);
 			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, GetCPassPower(me.Pos(), PassPos), 1, PassPos));
         }
+		TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);
 		break;
 
 	case JUSTCHIPPASS:
@@ -343,6 +346,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         KickorPassDir = TMP.dir;
         PassPos = TMP.pos;
 		setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, GetCPassPower(me.Pos(), PassPos), 1, PassPos));
+		TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);
 		break;
 
 	case BREAKSHOOT:
@@ -357,7 +361,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS", COLOR_YELLOW);
         KickStatus::Instance()->setBothKick(_executor, 0, 0);
         PassPoint = GenerateBreakPassPoint(pVision, _executor);
-        //KickStatus::Instance()->setAdvancerPassTo(PassPos);  //breakpass具有连续性 不适合采用setpass的技术
+        TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);  //breakpass具有连续性 不适合采用setpass的技术
         setSubTask(PlayerRole::makeItBreak(_executor, PassPoint));
         break;
 
@@ -481,11 +485,17 @@ bool CAdvance::isTheLineBlocked(const CVisionModule* pVision, CGeoPoint startPoi
 	return false;
 }
 
+bool CAdvance::IsOurNearHere(const CVisionModule* pVision, int supportIndex) {
+	int supporter = TaskMediator::Instance()->supporter(supportIndex);
+	if (supporter != 0 && pVision->OurPlayer(supporter).Pos().dist(SupportPoint[supportIndex]) < 100)
+		return true;
+	return false;
+}
 bool CAdvance::IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber) {
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
 	const BallVisionT& ball = pVision->Ball();
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
 		if (vecNumber == i)continue;
 		if (pVision->OurPlayer(i).Valid()) {
 			const PlayerVisionT& me = pVision->OurPlayer(i); 
@@ -713,7 +723,7 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 	//判定支撑点是否可用
 
 	for (int i = 0; i < NumberOfSupport; ++i) {
-		isOurNearPoint[i] = IsOurNearHere(pVision, SupportPoint[i], vecNumber);						//我方有人在旁边
+		isOurNearPoint[i] = IsOurNearHere(pVision, i); // IsOurNearHere(pVision, SupportPoint[i], vecNumber);						//我方有人在旁边
         //isBlockPoint[i] = isTheLineBlocked(pVision, me.Pos(), SupportPoint[i]);
 		//DistOppToTheLine[i] = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), SupportPoint[i]);//对手队员离传球线最短距离
 		ShootDir[i] = KickDirection::Instance()->getPointShootDir(pVision, SupportPoint[i]);		//射门角度
@@ -795,7 +805,7 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 	}
 	else { //按照需要转的角度进行排序
 
-		double NowValue = -1, MinValue = 1e9, threshValue = 0.166666667 * Param::Math::PI;
+		double NowValue = -1, MinValue = 1e9, threshValue = LARGE_ADJUST_ANGLE * Param::Math::PI / 180.0;
 		int Maxidx = -1;
 
 		for (int i = 0; i < TheNumberOfCanShootPoint; ++i) {
@@ -870,12 +880,16 @@ CGeoPoint CAdvance::GenerateBreakPassPoint(const CVisionModule* pVision, int vec
 }
 
 double CAdvance::GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
-    double dist = (StartPoint - targetPoint).mod();
-    return max(min(650.0, ADV_FPASSPOWER_Alpha* dist ), 200.0);
+	double dist = (StartPoint - targetPoint).mod() -Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER;
+	double passPower = sqrt(powf(ParamManager::Instance()->FASTEST_RECEIVE_VEL, 2) + 2 * ParamManager::Instance()->BALL_DEC * dist);
+	// std::cout << "passPower" << passPower << std::endl;
+	return min(passPower, (double)Param::Rule::MAX_BALL_SPEED);
+    // return max(min(650.0, ADV_FPASSPOWER_Alpha* dist ), 200.0);
 }
 double CAdvance::GetCPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
-    double dist = (StartPoint - targetPoint).mod() - 9.0 * Param::Vehicle::V2::PLAYER_SIZE;
-    return min(460.0, ADV_CPASSPOWER_Alpha * dist);
+	double dist = (StartPoint - targetPoint).mod() - 9.0 * Param::Vehicle::V2::PLAYER_SIZE;
+	return min(ParamManager::Instance()->maxChipDist, dist);
+	// return min(460.0, ADV_CPASSPOWER_Alpha * dist);
 }
 
 

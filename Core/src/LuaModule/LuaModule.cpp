@@ -340,6 +340,16 @@ extern "C" int Skill_Stop(lua_State * L)
 	return 0;
 }
 
+extern "C" int Get_AdvancerPassTo(lua_State * L)
+{
+	int nextAdvancer = TaskMediator::Instance()->getNextAdvancer();
+	CGeoPoint advancerPassTo = TaskMediator::Instance()->getAdvancerPassTo();
+	LuaModule::Instance()->PushNumber(nextAdvancer);
+	LuaModule::Instance()->PushNumber(advancerPassTo.x());
+	LuaModule::Instance()->PushNumber(advancerPassTo.y());
+	return 3; // 给lua的数字数量
+}
+
 extern "C" int Register_Role(lua_State * L)
 {
 	int num = LuaModule::Instance()->GetNumberArgument(1, NULL);
@@ -1259,6 +1269,7 @@ luaDef GUIGlue[] =
 	//其他
 	{"CGoSupport",          Skill_GoSupport},
 	{"CStopRobot",			Skill_Stop},
+	{"CGetAdvancerPassTo",  Get_AdvancerPassTo},
 	{"CRegisterRole",		Register_Role},
 	{"TestSkill",			Skill_Test},
 	{"CTouchKick",			Skill_TouchKick},

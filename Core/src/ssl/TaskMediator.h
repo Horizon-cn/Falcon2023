@@ -26,6 +26,7 @@ public:
         for(int i=0; i<Param::Field::MAX_PLAYER; ++i ){
             _playerTask[i] = 0;
         }
+        resetAdvancerPassTo();
     }
     // ???????
     void setBallHandler(int num){ _ballHandler = num; }
@@ -138,6 +139,20 @@ public:
         _multiBack[num].lastCycle = vision->Cycle();
     }
 
+    int supporter(const int index) {
+        if (vision->Cycle() - _supporter[index].lastCycle > 5) // 包含一段时间没被调用和丢失视觉的情况
+            _supporter[index].num = 0;
+        return _supporter[index].num;
+    }
+
+    void setSupporter(const int index, const int vecNumber) {
+        // std::cout << index << " " << vecNumber << std::endl;
+        if (index < 0 || index >= AREANUM)
+            return;
+        _supporter[index].num = vecNumber;
+        _supporter[index].lastCycle = vision->Cycle();
+    }
+
     // ????
     void setPlayerTask(const int num, CPlayerTask* pTask, const int priority)
     {
@@ -206,9 +221,64 @@ public:
             _advancer.num = num;
             _advancer.lastCycle = vision->Cycle();
         }else{
-            cout<<"Error In setRoleInLua!!!  "<<role<<endl;
+            int support_size = string("support").size();
+            auto role_str = role.substr(0, support_size);
+            if (role_str == "support") {
+                auto num_str = role.substr(support_size, role.size());
+                setSupporter(std::stoi(num_str), num);
+            }
+            else {
+                cout << "Error In setRoleInLua!!!  " << role << endl;
+            }
         }
     }
+
+    void setAdvancerPassTo(CGeoPoint pos) {
+        advancerPassTo_store = pos;
+        double minDist = 9999;
+        for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+            CGeoPoint mePos = vision->OurPlayer(i).Pos();
+            if (mePos.dist(pos) < minDist) {
+                minDist = mePos.dist(pos);
+                nextAdvancer_store = i;
+            }
+        }
+    }
+
+    void setAdvancerPassTo(CGeoPoint pos, int supportNum) {
+        double minDist = 9999;
+        for (int i = 0; i < supportNum; i++) {
+            CGeoPoint supportPos = GPUBestAlgThread::Instance()->getBestPointFromArea(i);
+            if (supportPos.dist(pos) < minDist) {
+                minDist = supportPos.dist(pos);
+                advancerPassTo_store = supportPos;
+                nextAdvancer_store = _supporter[i].num;
+            }
+        }      
+    }
+
+    void resetAdvancerPassTo() {
+        advancerPassTo_store = CGeoPoint(9999, 9999);
+        nextAdvancer_store = 0;
+        advancerPassTo = CGeoPoint(9999, 9999);
+        nextAdvancer = 0;
+    }
+
+    int getNextAdvancer() {
+        if (BallStatus::Instance()->IsBallKickedOut(_advancer.num)) {
+            std::cout << "here___________________" << std::endl;
+            nextAdvancer = nextAdvancer_store;
+            std::cout << nextAdvancer << std::endl;
+        }
+        return nextAdvancer;
+    }
+
+    CGeoPoint getAdvancerPassTo() {
+        if (BallStatus::Instance()->IsBallKickedOut(_advancer.num))
+            advancerPassTo = advancerPassTo_store;
+        return advancerPassTo;
+    }
+
 private:
     bool USE_LUA_SCRIPTS;
     SpecialRole _goalie;
@@ -222,6 +292,11 @@ private:
     SpecialRole _sideBack;
     SpecialRole _advancer;
     SpecialRole _multiBack[Param::Field::MAX_PLAYER];
+    SpecialRole _supporter[AREANUM];
+    int nextAdvancer;
+    CGeoPoint advancerPassTo;
+    int nextAdvancer_store;
+    CGeoPoint advancerPassTo_store;
     int _ballHandler; // ???????
     CPlayerTask* _playerTask[Param::Field::MAX_PLAYER]; // ?????????
     int _playerTaskPriority[Param::Field::MAX_PLAYER]; // ??????????????

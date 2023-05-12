@@ -15,8 +15,6 @@
 
 #include <param.h>
 #include <singleton.h>
-#include "VisionModule.h"
-#include "NormalPlayUtils.h"
 
 /// <summary>	Kick status, for kick handling.  </summary>
 ///
@@ -31,7 +29,6 @@ public:
 
 	CKickStatus() {
 		clearAll();
-		resetAdvancerPassTo();
 	}
 
 	/// <summary>	Sets flat kick. </summary>
@@ -151,24 +148,6 @@ public:
 		return _forceClose;
 	}
 
-	CGeoPoint getAdvancerPassTo() const{
-		return advancerPassTo;
-	}
-
-    void setAdvancerPassTo(CGeoPoint pos) {
-		advancerPassTo = pos;
-        nextAdvancer = NormalPlayUtils::getOurMostClosetoPos(VisionModule::Instance(), pos);
-	}
-	
-	void resetAdvancerPassTo() {
-		advancerPassTo = CGeoPoint(-9999, -9999);
-        nextAdvancer = Param::Field::MAX_PLAYER;
-	}
-
-    int getNextAdvancer() const{
-        return nextAdvancer;
-    }
-
 private:
 
 	/// <summary> The kicker </summary>
@@ -189,9 +168,6 @@ private:
 	bool _forceClose;
 
 	int _forceCloseCycle;
-
-	CGeoPoint advancerPassTo;
-    int nextAdvancer;
 };
 
 /// <summary>	Defines an alias representing the kick status. . </summary>
