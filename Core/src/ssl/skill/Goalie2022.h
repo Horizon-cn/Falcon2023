@@ -22,6 +22,7 @@ private:
 	CPlayerTask* supportTask(const CVisionModule* pVision);
 	CPlayerTask* clearBallTask(const CVisionModule* pVision);
 	CPlayerTask* attackEnemyTask(const CVisionModule* pVision);
+	CPlayerTask* penaltyTask(const CVisionModule* pVision);
 	void generateRescuePoint(const CVisionModule* pVision);
 	double CalClearBallDir(const CVisionModule* pVision);
 
