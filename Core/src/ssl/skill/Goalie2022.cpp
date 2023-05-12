@@ -15,7 +15,7 @@
 #define DEBUG_EVALUATE(x) {if(goalie_debug) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,-300), x);}
 
 namespace {
-	bool goalie_debug;
+	bool goalie_debug,is_penalty;
 	const CGeoPoint goalCenter(-Param::Field::PITCH_LENGTH / 2, 0);
 	const CGeoPoint RLeftGoalPost(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
 	const CGeoPoint RRightGoalPost(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
@@ -45,13 +45,14 @@ CGoalie2022::CGoalie2022() :this_shoot_cycle(0), rescuePoint(goalCenter)
 
 void CGoalie2022::plan(const CVisionModule* pVision)
 {
+	is_penalty = task().player.isPenalty;
 	int purpose = evaluate(pVision);
 	CPlayerTask* pTask;
 	switch (purpose) {
 	case TEST:
 		break;
 	case NORMAL:
-		if (pVision->gameState().theirPenaltyKick())
+		if (is_penalty)
 			pTask = penaltyTask(pVision);
 		else
 			pTask = normalTask(pVision);
@@ -146,7 +147,7 @@ bool CGoalie2022::ShouldAttack(const CVisionModule* pVision)
 	   /************************************************************************/
 	if (!AGGRESSIVE_GOALIE)
 		return false;
-	if (pVision->gameState().theirPenaltyKick())
+	if (is_penalty)
 		return false;
 	int robotNum = task().executor;
 	const PlayerVisionT& enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());

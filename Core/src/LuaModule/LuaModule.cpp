@@ -289,7 +289,7 @@ extern "C" int Skill_BezierRush(lua_State * L)
 	return 0;
 }
 
-extern "C" int Skill_GoCmuRush(lua_State *L)
+extern "C" int Skill_GoCmuRush(lua_State * L)
 {
 	TaskT playerTask;
 	playerTask.player.is_specify_ctrl_method = true;
@@ -416,7 +416,7 @@ extern "C" int Skill_GoPIDCircle(lua_State * L)
 	return 0;
 }
 
-extern "C" int Skill_ShootBall(lua_State *L)
+extern "C" int Skill_ShootBall(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
@@ -727,8 +727,9 @@ extern "C" int Skill_Goalie2013(lua_State * L)
 extern "C" int Skill_Goalie2022(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
-	int flag = LuaModule::Instance()->GetNumberArgument(2, NULL);
-	CPlayerTask* pTask = PlayerRole::makeItGoalie2022(runner, flag);
+	bool isPenalty = LuaModule::Instance()->GetBoolArgument(2);
+	int flag = LuaModule::Instance()->GetNumberArgument(3, NULL);
+	CPlayerTask* pTask = PlayerRole::makeItGoalie2022(runner, isPenalty, flag);
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
@@ -836,8 +837,7 @@ extern "C" int FUNC_GetMarkingPos(lua_State * L)
 	if ("theirIndirectKick" == refMsg || "theirDirectKick" == refMsg) {
 		if (vision->Ball().Y() > 0) {
 			kickOffSide = false;
-		}
-		else {
+		} else {
 			kickOffSide = true;
 		}
 	}
@@ -847,8 +847,7 @@ extern "C" int FUNC_GetMarkingPos(lua_State * L)
 		if (DefenceInfo::Instance()->checkInRecArea(oppNum, vision, MarkField(leftUp, rightDown))) {
 			checkKickOffArea = true;
 		}
-	}
-	else {
+	} else {
 		CGeoPoint leftUp = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::PITCH_WIDTH / 2);
 		CGeoPoint rightDown = CGeoPoint(80, -30 - 20);
 		if (DefenceInfo::Instance()->checkInRecArea(oppNum, vision, MarkField(leftUp, rightDown))) {
@@ -858,8 +857,7 @@ extern "C" int FUNC_GetMarkingPos(lua_State * L)
 	if (front && vision->TheirPlayer(oppNum).Pos().x() > -190 && false == checkKickOffArea) {
 		double dir = (vision->Ball().Pos() - vision->TheirPlayer(oppNum).Pos()).dir();
 		p = vision->TheirPlayer(oppNum).Pos() + Utils::Polar2Vector(35, dir);
-	}
-	else {
+	} else {
 		p = MarkingPosV2::Instance()->getMarkingPos(vision, pri);
 	}
 	LuaModule::Instance()->PushNumber(p.x());
@@ -888,8 +886,7 @@ extern "C" int FUNC_TimeOut(lua_State * L)
 
 	if (BufferCounter::Instance()->timeOut(vision->Cycle(), cond)) {
 		LuaModule::Instance()->PushNumber(1);
-	}
-	else {
+	} else {
 		LuaModule::Instance()->PushNumber(0);
 	}
 	return 1;
@@ -1058,8 +1055,7 @@ extern "C" int Skill_TouchBetweenPos(lua_State * L) {
 		vision->Ball().Vel().mod() < 50) {
 		CPlayerTask* pTask = PlayerRole::makeItNoneTrajGetBall(runner, dir, CVector(0, 0), 0, -2);
 		TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
-	}
-	else {
+	} else {
 		WaitKickPos::Instance()->GenerateWaitKickPos(CGeoPoint(x1, y1), CGeoPoint(x2, y2), runner, dir);
 		playerTask.player.pos = WaitKickPos::Instance()->getKickPos(runner);
 		playerTask.player.angle = dir;
@@ -1088,8 +1084,7 @@ extern "C" int Skill_MarkingField(lua_State * L) {
 		vision->Ball().Vel().mod() < 50) {
 		CPlayerTask* pTask = PlayerRole::makeItNoneTrajGetBall(runner, dir, CVector(0, 0), 0, -2);
 		TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
-	}
-	else {
+	} else {
 		WaitKickPos::Instance()->GenerateWaitKickPos(CGeoPoint(x1, y1), CGeoPoint(x2, y2), runner, dir);
 		playerTask.player.pos = WaitKickPos::Instance()->getKickPos(runner);
 		playerTask.player.angle = dir;
@@ -1234,8 +1229,7 @@ extern "C" int FUNC_GetMarkingTouchPos(lua_State * L) {
 	CGeoPoint p = CGeoPoint(0, 0);
 	if (markingDirection == 1) {
 		p = MarkingTouchPos::Instance()->caculMarkingTouchPos(mAreaNum, CGeoPoint(x1, y1), CGeoPoint(x2, y2), true);
-	}
-	else {
+	} else {
 		p = MarkingTouchPos::Instance()->caculMarkingTouchPos(mAreaNum, CGeoPoint(x1, y1), CGeoPoint(x2, y2), false);
 	}
 	//GDebugEngine::Instance()->gui_debug_msg(p,"P",COLOR_WHITE);
