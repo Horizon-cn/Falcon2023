@@ -722,7 +722,7 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 
 		//最终的判定条件
         isCanUse[i] = isOurNearPoint[i] && /*(!isBlockPoint[i]) &&*/ (ShootDir[i] != 1000) && (SupportPoint[i].x() > me.X());
-		//当前点可以射门的条件：我方有人在旁边，//没有阻挡//，射门可以
+		//当前点可以射门的条件：我方有人在旁边，//没有阻挡//，射门可以，向前传球
 		if (isCanUse[i])
 		{
 			OneOfUsCanShoot = 1;
@@ -795,12 +795,16 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 	}
 	else { //按照需要转的角度进行排序
 
-		double NowValue = -1, MinValue = 1e9;
+		double NowValue = -1, MinValue = 1e9, threshValue = 0.166666667 * Param::Math::PI;
 		int Maxidx = -1;
 
 		for (int i = 0; i < TheNumberOfCanShootPoint; ++i) {
 			int NowIdx = TheidxOfCanShootPoint[i];
 			NowValue = ChangeDir[NowIdx];
+			if (NowValue < threshValue) {
+				Maxidx = NowIdx;
+				break;
+			}//角度合适立刻返回
 			if (NowValue < MinValue)
 				Maxidx = NowIdx, MinValue = NowValue;
 		}
