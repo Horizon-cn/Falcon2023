@@ -274,8 +274,8 @@ ScrollView {
                                 Owl.RecSlider.setStopped(true);
                                 Owl.RecSlider.recName = qsTr("Done")+translator.emptyString;
                             }
-                            //else
-                                //Owl.RecSlider.recName = Owl.RecSlider.getFilename();
+                            else
+                                Owl.RecSlider.recName = Owl.RecSlider.getFilename();
                         }
                     }
                     Text{

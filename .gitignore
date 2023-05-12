@@ -1,3 +1,4 @@
+.vs/
 *.pdb
 *.user
 # C++ objects and libs
@@ -30,6 +31,7 @@ Client/qrc_*.cpp
 Client/ui_*.h
 Client/Makefile*
 Client/*build*
+Client/zh_CN.ts
 Client/*.ts
 Client/*.qm
 
@@ -63,6 +65,7 @@ Core/*.lai
 Core/*.so
 Core/*.dll
 Core/*.dylib
+Core/Core.aps
 
 # Qt-es
 
@@ -101,7 +104,7 @@ Core/CMakeLists.txt.user*
 # Protobuf
 Core/*.pb.*
 Core/*_pb2.py
-# Core/src/LuaModule/lua_zeus.cpp
+Core/src/LuaModule/lua_zeus.cpp
 Core/share/proto/cpp/
 
 ZBin/*

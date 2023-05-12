@@ -10,21 +10,25 @@ firstState = "chase",
 
 ["chase"] = {
 	switch = function ()
-		if bufcnt(ball.toPlayerHeadDist("Kicker") < 2, 50,200)then
+		if world:getBallPossession(true, gRoleNum["Kicker"]) > 0.3 then
+		--if bufcnt(world:getBallToucher() == gRoleNum["Kicker"], 5) then
+		--if bufcnt(robotSensor:IsInfraredOn(1), 5)then
 			return "break";
 		end
 	end,
     
-	Kicker = task.slowGetBall(),
+	Kicker = task.getBall(ball.pos()),
     match = ""
 },
 ["break"] = {
 	switch = function ()
-		if bufcnt(ball.toPlayerHeadDist("Kicker") > 10, "fast")then
+		if world:getBallPossession(true, gRoleNum["Kicker"]) == 0 then
+		--if bufcnt(world:getBallToucher() ~= gRoleNum["Kicker"], 10) then
+		--if bufcnt(not robotSensor:IsInfraredOn(1), 10)then
 			return "chase";
 		end
 	end,
-    Kicker = task.Break(),
+    Kicker = task.testBreak(),
     match = ""
 },
 

@@ -1,0 +1,36 @@
+$#include <Vision/VisionModule.h>
+
+class CVisionModule{
+	CVisionModule();
+	~CVisionModule(void);
+	void registerOption(const COptionModule* pOption);
+	const int& getValidNum() const;
+	const int& getTheirValidNum() const;
+	void SetRefRecvMsg(const GameInfoT msg);
+	void SetNewVision(const GameInfoT& vInfo);
+	const PlayerVisionT& AllPlayer(int num) const;
+	const PlayerVisionT& OurPlayer(int num) const;
+	const PlayerVisionT& TheirPlayer(int num) const;
+	const BallVisionT& Ball() const;
+	const PlayerVisionT& OurPlayer(int cycle, int num) const;
+	const PlayerVisionT& TheirPlayer(int cycle, int num) const;
+	const BallVisionT& Ball(int cycle) const;
+	void SetPlayerCommand(int num, const CPlayerCommand* pCmd);
+	const GameState& gameState() const;
+	int Cycle() const;
+	int LastCycle() const;
+	int Side() const;
+	const string GetCurrentRefereeMsg()const;
+	const string GetLastRefereeMsg()const;
+	int  OurGoal() const;
+	int  TheirGoal() const;
+	int TheirGoalie() const;
+	const CVector OurRawPlayerSpeed(int num) const;
+	const CVector TheirRawPlayerSpeed(int num) const;
+	const int GetTheirPenaltyNum() const;
+	void ResetTheirPenaltyNum();
+	int GetTheirGoalieStrategyNum() const;
+	bool getBallVelStable() const;
+	const CGeoPoint& getBallPlacementPosition() const;
+	bool ballVelValid();
+};

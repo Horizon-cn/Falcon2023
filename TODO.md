@@ -2,22 +2,6 @@
 
 革命尚未成功，同志们仍需努力！！！
 
-## 开发须知
-
-- git push 前，注意将以下配置归为默认值：
-	- gpuBestAlgThread.cpp 中，#define has_GPU false
-	- 并行编译所用核数为4
-	- 关闭 Client 的 Debug 信息，在 Client/CMakeLists.txt 中都不要注释
-	```bash
-	if (WIN32)
-    message(${CMAKE_C_FLAGS})
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
-	endif()
-	```
-- 国际化语言包：Client 每次编译后文件夹中都会生成 zh_CN.ts，这属于临时文件，不会上传到 git。生成 .qm 文件后将两者都复制到 bin/Language 里面，便于查错
-  - [Linguist入门参考](https://gitlab.com/src-ssl/src/-/wikis/Software/Qt%E5%A4%9A%E8%AF%AD%E8%A8%80%E5%88%87%E6%8D%A2%E7%9A%84%E5%AE%9E%E7%8E%B0)
-
 ## 重构进度
 
 - [x] windows上能编译通过，步骤比较简洁

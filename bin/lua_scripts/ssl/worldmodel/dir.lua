@@ -247,7 +247,7 @@ function defendMiddleClear(role)
 end
 
 function backSmartGotoDir()
-	local oppnum = bestPlayer:getTheirBestPlayer()
+	local oppnum = defenceInfoNew:getBestBallChaser()
 	if Utils.InOurPenaltyArea(ball.pos(),5) and enemy.posX(oppnum)<0 then
 		return (enemy.pos(oppnum) - pos.ourGoal()):dir()
 	else

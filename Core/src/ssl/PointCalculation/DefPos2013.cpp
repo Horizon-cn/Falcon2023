@@ -2,7 +2,7 @@
 #include "param.h"
 #include "utils.h"
 #include "WorldModel/WorldModel.h"
-#include "BestPlayer.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include "GDebugEngine.h"
 #include <math.h>
 #include "BallSpeedModel.h"
@@ -487,7 +487,7 @@ void CDefPos2013::generatePos(const CVisionModule* pVision){
 	}
 	
 	//当后卫站位点附近有我方车且对方车距离较远时强行将车移开一车身
-	int oppnum =  BestPlayer::Instance()->theirFastestPlayerToBallList().at(0).num;	
+	int oppnum = DefenceInfoNew::Instance()->getBestBallChaser();
 	if (TaskMediator::Instance()->leftBack()!=0 && TaskMediator::Instance()->rightBack()!=0
 		&& pVision->TheirPlayer(oppnum).Pos().dist(DefendUtils::reversePoint(RleftPoint))> 100
 		&& pVision->TheirPlayer(oppnum).Pos().dist(DefendUtils::reversePoint(RrightPoint))> 100){

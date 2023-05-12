@@ -130,15 +130,11 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
     // 标志位，判断是否为后卫或者守门员
     const bool isGoalie = (vecNumber == TaskMediator::Instance()->goalie());
-    const bool isBack =
-    (
-        (vecNumber == TaskMediator::Instance()->leftBack())      ||
-        (vecNumber == TaskMediator::Instance()->rightBack())     ||
-        (vecNumber == TaskMediator::Instance()->singleBack())    ||
-        (vecNumber == TaskMediator::Instance()->sideBack())      ||
-        (vecNumber == TaskMediator::Instance()->defendMiddle())  ||
-        (TaskMediator::Instance()->isMultiBack(vecNumber))
-    );
+    const bool isBack = TaskMediator::Instance()->isBack(vecNumber);
+    const bool isMultiBack = TaskMediator::Instance()->isMultiBack(vecNumber);
+
+
+
     const bool isAdvancer = (vecNumber == TaskMediator::Instance()->advancer());
 
     // 判断为，判断需要躲避的指定区域，包括圆圈和放球椭圆
@@ -149,7 +145,18 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
     // 运动参数设置
     _capability = setCapability(pVision);
+    if (task().player.max_acceleration)_capability.maxAccel = task().player.max_acceleration;
+    if (task().player.max_deceleration)_capability.maxDec = task().player.max_deceleration;
+    if (task().player.max_rot_acceleration)_capability.maxAngularDec = task().player.max_rot_acceleration;
+    if (task().player.max_rot_acceleration)_capability.maxAngularAccel = task().player.max_rot_acceleration;
+    if (task().player.max_rot_speed)_capability.maxAngularSpeed = task().player.max_rot_speed;
 
+    /*
+    grabTask.player.max_acceleration = MAX_ACC;
+    grabTask.player.max_deceleration = MAX_ACC;
+    grabTask.player.max_rot_acceleration = MAX_ROT_ACC;
+    grabTask.player.max_rot_speed = MAX_ROT_VEL;
+    */
     /************************************************************************/
     /* 避障区域生成                                                          */
     /************************************************************************/
@@ -168,7 +175,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     if ((self.Pos() - finalTargetPos).mod() < 100) {
         buffer /= 2;
     }
-    if (isGoalie || (isBack && Utils::InOurPenaltyArea(myPos, 40)) || WorldModel::Instance()->CurrentRefereeMsg() == "ourTimeout") {
+    if (isGoalie || ((isBack || isMultiBack) && Utils::InOurPenaltyArea(myPos, 40)) || WorldModel::Instance()->CurrentRefereeMsg() == "ourTimeout") {
         buffer = 0;
     }
     double avoidLength = Param::Vehicle::V2::PLAYER_SIZE + buffer;
@@ -246,8 +253,9 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     CGeoPoint middlePoint = finalTargetPos;
 
     // 到达中间点的判据，让整条路径更加连贯
-    double arrivedDist = self.Vel().mod() * 0.1 + 5;
+    double arrivedDist = self.Vel().mod() * 0.2  + 10;
 
+    //cout << arrivedDist << ' ' << (lastPoint[vecNumber] - self.Pos()).mod() << endl;
     // 第一种情况：可以直接到目标点
     if (obsNew.check(startNew.pos, targetNew.pos) || obsNew.check(self.Pos(), targetNew.pos) ||
         self.Pos().dist(finalTargetPos) < Param::Vehicle::V2::PLAYER_SIZE * 2) {
@@ -266,7 +274,10 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         // 规划成功的情况则给中间点赋值，一般都是有中间点的
         if (viaPoint[vecNumber].size() > 2) middlePoint = viaPoint[vecNumber][1].pos;
     }
-    // GDebugEngine::Instance()->gui_debug_x(middlePoint, 0);
+
+    //GDebugEngine::Instance()->gui_debug_x(middlePoint, 0);
+    //GDebugEngine::Instance()->gui_debug_x(lastPoint[vecNumber], 1);
+
     // 记录中间点，作为下一次规划基础
     lastPoint[vecNumber] = middlePoint;
     bool needRush2Ball = Utils::InTheirPenaltyArea(ballPos, 10) && !Utils::InTheirPenaltyArea(ballPos, 0); // 球在禁区外且很靠近禁区，直接冲击
@@ -280,11 +291,15 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         }
         lastPoint[vecNumber] = middlePoint;
     }
-    newTask.player.pos = middlePoint;
-    //GDebugEngine::Instance()->gui_debug_x(middlePoint);
-    // 零速到达中间点，非零速只有在可以直接到时才执行
-    if (middlePoint.dist(task().player.pos) > 1e-8) newTask.player.vel = CVector(0.0, 0.0);
 
+
+    newTask.player.pos = middlePoint;
+    //GDebugEngine::Instance()->gui_debug_x(middlePoint, 1);
+    //GDebugEngine::Instance()->gui_debug_x(finalTargetPos, 2);
+    
+    // 非零速到达中间点，零速只有在可以直接到时才执行
+    if (middlePoint.dist(task().player.pos) > 50) newTask.player.IsGoMiddle = true;
+    else newTask.player.IsGoMiddle = false;
 
     // 控制吸球力度
     if (isDribble || (playerFlag & PlayerStatus::DRIBBLING)) DribbleStatus::Instance()->setDribbleCommand(vecNumber, 2);
@@ -326,11 +341,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 PlayerCapabilityT CSmartGotoPosition::setCapability(const CVisionModule* pVision) {
     const int vecNumber = task().executor;
     const bool isGoalie = (vecNumber == TaskMediator::Instance()->goalie());
-    const bool isBack = ((vecNumber == TaskMediator::Instance()->leftBack())   ||
-                         (vecNumber == TaskMediator::Instance()->rightBack())  ||
-                         (vecNumber == TaskMediator::Instance()->singleBack()) ||
-                         (vecNumber == TaskMediator::Instance()->sideBack())   ||
-                         (vecNumber == TaskMediator::Instance()->defendMiddle()));
+    const bool isBack = TaskMediator::Instance()->isBack(vecNumber);
     const bool isMultiBack = TaskMediator::Instance()->isMultiBack(vecNumber);
     const CGeoPoint mePos = pVision->OurPlayer(vecNumber).Pos();
     const int playerFlag = task().player.flag;

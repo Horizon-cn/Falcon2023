@@ -17,7 +17,7 @@
 #include "GDebugEngine.h"
 #include <math.h>
 #include "defence/DefenceInfo.h"
-#include "BestPlayer.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include <ssl/ParamManagerNew.h>
 
 namespace {
@@ -70,8 +70,8 @@ CGeoPoint CDefendDribble::generateDeDribblePos(const CVisionModule* pVision)
 	//以下部分不进行反向计算
 	const BallVisionT& ball = pVision->Ball();
 	const CGeoPoint ballPos = ball.Pos();
-	const CBestPlayer::PlayerList& oppList = BestPlayer::Instance()->theirFastestPlayerToBallList();
-	int enemyNum = oppList[0].num;     //新版判断bestplayer方法，与advance一致,一般是带球车
+	const auto& oppList = DefenceInfoNew::Instance()->getSteadyBallChaserList();
+	int enemyNum = oppList[0];     //新版判断bestplayer方法，与advance一致,一般是带球车
 	int SecondEnemyNum = 0;
 	_TheirPlayerXList.clear();         //敌方x坐标排序,找出距离我方最近的车
 	int n = 0;
@@ -82,10 +82,10 @@ CGeoPoint CDefendDribble::generateDeDribblePos(const CVisionModule* pVision)
 	}
 	std::sort(_TheirPlayerXList.begin(), _TheirPlayerXList.end());
 	//int enemyNum = BestPlayer::Instance()->getTheirBestPlayer(); //找到对方带球车，目前判断为bestplayer,具体还需实际测试
-	if (_TheirPlayerXList[0].num == oppList[1].num) {
-		SecondEnemyNum = oppList[1].num;    //尝试着对接球车进行判断，即威胁度排第二的车，如果效果不好，选择离我方球门最近的车
+	if (_TheirPlayerXList[0].num == oppList[1]) {
+		SecondEnemyNum = oppList[1];    //尝试着对接球车进行判断，即威胁度排第二的车，如果效果不好，选择离我方球门最近的车
 	}
-	else if (_TheirPlayerXList[0].num == oppList[0].num) {
+	else if (_TheirPlayerXList[0].num == oppList[0]) {
 		SecondEnemyNum = _TheirPlayerXList[1].num;
 	}
 	else { SecondEnemyNum = _TheirPlayerXList[0].num; }

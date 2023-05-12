@@ -12,6 +12,7 @@
 #include <qdebug.h>
 #include "test.h"
 #include "staticparams.h"
+#include "communicator.h"
 namespace Owl {
 namespace {
 bool trans_dribble(double dribble) {
@@ -56,12 +57,12 @@ SimModule::SimModule(QObject *parent) : QObject(parent) {
     //    if(connectSim(i)){
     //        switch (i) {
     //        case PARAM::BLUE:
-                blueReceiveThread = new std::thread([=] {readBlueData();});
-                blueReceiveThread->detach();
+    //            blueReceiveThread = new std::thread([=] {readBlueData();});
+    //            blueReceiveThread->detach();
     //            break;
     //        case PARAM::YELLOW:
-                yellowReceiveThread = new std::thread([=] {readYellowData();});
-                yellowReceiveThread->detach();
+    //            yellowReceiveThread = new std::thread([=] {readYellowData();});
+    //            yellowReceiveThread->detach();
     //            break;
     //        }
     //    }
@@ -81,12 +82,20 @@ bool SimModule::connectSim(bool color) {
     if(color) {
         if(yellowReceiveSocket.bind(QHostAddress::AnyIPv4, cpm->yellow_status, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)) {
             qDebug() << "Yellow connect successfully!!! --simmodule";
+            if (yellowReceiveThread == nullptr) {
+                yellowReceiveThread = new std::thread([=] {readYellowData(); });
+                yellowReceiveThread->detach();
+            }
             return true;
         }
         return false;
     }
     if(blueReceiveSocket.bind(QHostAddress::AnyIPv4, cpm->blue_status, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint)) {
         qDebug() << "Blue connect successfully!!! --simmodule";
+        if (blueReceiveThread == nullptr) {
+            blueReceiveThread = new std::thread([=] {readBlueData(); });
+            blueReceiveThread->detach();
+        }
         return true;
     }
     return false;
@@ -125,7 +134,8 @@ void SimModule::readBlueData() {
                 GlobalData::Instance()->robotInformation[PARAM::BLUE][id].chip = isChipKick;
                 GlobalData::Instance()->robotInfoMutex.unlock();
                 qDebug() << "Blue id: " << id << "  infrared: " << infrared << "  flat: " << isFlatKick << "  chip: " << isChipKick;
-                emit receiveSimInfo(PARAM::BLUE, id);
+                ZCommunicator::Instance()->sendCommand(PARAM::BLUE, id);
+                //emit receiveSimInfo(PARAM::BLUE, id);
             }
         }
     }
@@ -155,7 +165,8 @@ void SimModule::readYellowData() {
                 GlobalData::Instance()->robotInformation[PARAM::YELLOW][id].chip = isChipKick;
                 GlobalData::Instance()->robotInfoMutex.unlock();
     //            qDebug() << "Yellow id: " << id << "  infrared: " << infrared << "  flat: " << isFlatKick << "  chip: " << isChipKick;
-                emit receiveSimInfo(PARAM::YELLOW, id);
+                ZCommunicator::Instance()->sendCommand(PARAM::YELLOW, id);
+                //emit receiveSimInfo(PARAM::YELLOW, id);
             }           
         }
     }

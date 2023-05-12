@@ -1,0 +1,27 @@
+$#include "Global.h"
+
+CParamManagerSkill* paramManager;
+ParamManagerOwl* oParamManager;
+ParamManagerCfg* cParamManager;
+ParamManagerVision* vParamManager;
+ParamManagerSimulator* sParamManager;
+CVisionModule*  vision;
+CKickStatus*    kickStatus;
+CDribbleStatus* dribbleStatus;
+CGDebugEngine*  debugEngine;
+CWorldModel*	   world;
+CKickDirection* kickDirection;
+CGPUBestAlgThread* bestAlg;
+CDefPos2015* defPos2015;
+CGuardPos* guardPos;
+CDefPos2013* defPos2013;
+CTandemPos* tandemPos;
+CBestPlayer* bestPlayer;
+CDefenceInfo* defenceInfo;
+CDefenceInfoNew* defenceInfoNew;
+CChipBallJudge* chipBallJudge;
+CIndirectDefender* indirectDefender;
+CSupportPos* supportPos;
+CSupportPos2022* supportPos2022;
+CRobotSensor* robotSensor;
+void initializeSingleton();

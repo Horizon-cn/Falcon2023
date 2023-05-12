@@ -14,9 +14,7 @@ firstState = "advance",
 			return "advance";
 		end
 	end,
-	Leader = task.advanceV4(),
-    Special = task.goRightSupport(),
-	Middle = task.goLeftSupport(),
+	Kicker = task.advance(),
     --Breaker = task.leftCenterBack(),
     --Crosser = task.rightCenterBack(),
     --match = ""

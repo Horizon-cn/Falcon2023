@@ -10,14 +10,12 @@ gPlayTable.CreatePlay{
       end
     end,
   Leader = task.defendKick(),
-  Hawk = task.multiBack(3,1),
-  Middle = task.multiBack(3,2),
-  Special = task.goMWPassPos("Leader"),
-    Assister = task.goCmuRush(CGeoPoint:new_local(-460, 0)),
-    Powerhouse = task.goCmuRush(CGeoPoint:new_local(-460, 140)),
-  Defender = task.multiBack(3,3),
+  Assister = task.support("Leader",0),
+  Special = task.marking("First"),
+  Middle = task.leftBack(),
+  Defender = task.rightBack(),
   Goalie = task.goalieNew(),
-  match    = "[L][HM][SAPD]"
+  match    = "[L][MD][SA]"
 },
   name = "Ref_CornerDefV2",
   applicable = {

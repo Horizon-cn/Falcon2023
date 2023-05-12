@@ -23,7 +23,7 @@ find_package(VarTypes)
 IF(WIN32)
 	## if you have different Qt visions and CMake cannot link the right one, you can manually set the correct path or use the environment variable    
     #set(CMAKE_PREFIX_PATH $ENV{QT_CMAKE})
-    set(CMAKE_PREFIX_PATH "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5")
+    set(CMAKE_PREFIX_PATH "C:/QT/5.15.2/msvc2019_64/lib/cmake/Qt5")
     #message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}")
 ENDIF()
 find_package(Qt5 COMPONENTS Core Quick QuickControls2 SerialPort Widgets Network Gui Qml OpenGL Gamepad LinguistTools REQUIRED)
@@ -39,3 +39,13 @@ find_package(OpenGL REQUIRED)
 
 ## Eigen
 include(${CMAKE_SOURCE_DIR}/cmake/GetEigen.cmake)
+
+## CUDA
+# define
+option(ENABLE_CUDA OFF)
+message("ENABLE_CUDA : ${ENABLE_CUDA}")
+IF(ENABLE_CUDA)
+    add_definitions(-DENABLE_CUDA)
+    enable_language(CUDA)
+    find_package(CUDA)
+ENDIF()

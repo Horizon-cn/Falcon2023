@@ -8,9 +8,9 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_Advance"
+		return "Test_play6" --"Test_ChaseKick" --"Test_Advance" --"Test_Run"
 	else
-		return "Test_NormalMiddleDefend"
+		return "Test_Defence" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -20,8 +20,10 @@ gSwitchNum = {
 	["state"]   = "normal"
 }
 
+-- 有0号在场门将就是0号，没有0号在场，看这里设置的号码
+-- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
-	["Kicker"]   = {4},
+	["Kicker"]   = {5},
 	["Goalie"]   = {0},
 	["Tier"]	 = {3},
 	["Receiver"] = {1}
@@ -44,12 +46,14 @@ gSkill = {
 	"SmartGoto",
 	"GoCmuRush",
 	"SimpleGoto",
+	"BezierRush",
 	"GotoMatchPos",
 	"RunMultiPos",
 	"RunMultiPosV2",
 	"RunMultiPosVel",
 	"GoTechChalPos",
 	--踢球
+	"JustKick",
 	"WaitKick",
 	"TouchKick",
 	"ShootBall",
@@ -57,6 +61,7 @@ gSkill = {
 	"GoAndTurnKick",
 	"GoAndTurnKickV3",
 	"GoAndTurnKickV4",
+	"DribbleTurnKickV2",
 	--拿球
 	"GetBall",
 	"SlowGetBall",
@@ -78,6 +83,7 @@ gSkill = {
 	--展示
 	"GoAroundBall",
 	"GoAroundRobot",
+	"GoPIDCircle",
 	--放球
 	"FetchBall",
 	--停止
@@ -95,9 +101,11 @@ gSkill = {
 gRefPlayTable = {
 	--开球进攻
 	"Ref/KickOff/Ref_KickOffV6",
+	"Ref/KickOff/Ref_KickOffV23",
 
 	--角球进攻
 	"Ref/CornerKick/Ref_CornerKickV1",
+	"Ref/CornerKick/Ref_CornerKickV6",
 	"Ref/CornerKick/Ref_CornerKickV8",
 	"Ref/CornerKick/Ref_CornerKickV30",
 	"Ref/CornerKick/Ref_CornerKickV201",
@@ -108,6 +116,7 @@ gRefPlayTable = {
 	"Ref/FrontKick/Ref_FrontKickV23",
 	"Ref/FrontKick/Ref_FrontKickV41",
 	"Ref/FrontKick/Ref_FrontKickV2",
+	"Ref/FrontKick/Ref_FrontKickV61",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
@@ -118,9 +127,11 @@ gRefPlayTable = {
 	"Ref/BackKick/Ref_BackKickV1",
 	"Ref/BackKick/Ref_ImmortalKickV1",
 	"Ref/BackKick/Ref_BackKickV2",
+	"Ref/BackKick/Ref_ImmortalKickV61",
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
+	"Ref/KickOffDef/Ref_KickOffDefV23",
 
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDefV5",
@@ -150,9 +161,11 @@ gRefPlayTable = {
 
 	--点球进攻
 	"Ref/PenaltyKick/Ref_PenaltyKickV1",
+	"Ref/PenaltyKick/Ref_PenaltyKickV6",
 
 	--点球防守
 	"Ref/PenaltyDef/Ref_PenaltyDefV1",
+	"Ref/PenaltyDef/Ref_PenaltyDefV6",
 
 	--停止站位
 	"Ref/GameStop/Ref_Stop4BackKick",
@@ -160,6 +173,7 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_StopV3",
 	"Ref/GameStop/Ref_Stop4CornerDef",
 	"Ref/GameStop/Ref_Stop4CornerKick",
+	"Ref/GameStop/Ref_Stop4CornerKick6",
 	"Ref/GameStop/Ref_Stop4SideLine",
 	"Ref/GameStop/Ref_Stop4FrontKick",
 	"Ref/GameStop/Ref_Stop4MiddleKick",
@@ -177,10 +191,12 @@ gBayesPlayTable = {
 gTestPlayTable = {
 
 	"Test_Run",
+	"Test_BezierRun",
 	"Test_GetBall",
 	"Test_ChaseKick",
 	"Test_PassNormal",
 	"Test_ReceivePass",
+	"Test_PassEachOther",
 	
 	"Test_Advance",
 	"Test_GoSupport",
@@ -196,5 +212,8 @@ gTestPlayTable = {
 	"Test_NormalAttack",
 	"Test_NormalDefend",
 	"Test_AvoidFoulDefend",
-	"Test_NormalMiddleDefend"
+	"Test_NormalMiddleDefend",
+	"Test_Circle",
+	"Test_play6",
+	"Test_defend6"
 }

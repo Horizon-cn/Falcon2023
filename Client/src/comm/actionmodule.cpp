@@ -3,10 +3,12 @@
 #include "parammanager.h"
 #include "crc.h"
 #include "globaldata.h"
+#include "communicator.h"
+#include <QTime>
 namespace Owl {
     namespace {
         const int TRANSMIT_PACKET_SIZE = 25;
-        const int TRANS_FEEDBACK_SIZE = 25; //18; //20;
+        const int TRANS_FEEDBACK_SIZE = 16; //18; //20;
         const int ROBOTS_PER_PACKET = 4; //3;
         const int MAX_PACKET_NUM = 4;
 
@@ -27,7 +29,7 @@ namespace Owl {
             power = fabs(power); // ·ÀÖ¹ÀëÆ×µÄ´íÎó²ÎÊý
             if (kpm->convertPower) {
                 if (mode == 0) {
-                    power = (int)(0.00001 * kpm->flat_a[num] * power * power + kpm->flat_b[num] * power + kpm->flat_c[num]);
+                    power = (int)(1e-9 * kpm->flat_a[num] * power * power + kpm->flat_b[num] * power + kpm->flat_c[num]);
                     if (power > kpm->flat_max[num]) {
                         power = kpm->flat_max[num];
                     }
@@ -282,8 +284,8 @@ namespace Owl {
         bool dribble = false;
         int change_num = 0, change_cnt = 0;
         for (unsigned int i = 0; i < data.length(); i++) {
-            if (data[i] == (char)0xff && i + 5 < data.length()) {
-                if (data[i + 1] == (char)0x02) {
+            if (data[i] == (char)0xff && i + TRANS_FEEDBACK_SIZE <= data.length()) {
+                if (data[i + 1] == (char)0x02 && data[i + 6] == (char)0xf0) {
                     id = ((quint8)data[i + 2] & 0x0F) - 1;//old protocal
                     if (id >= PARAM::ROBOTMAXID)
                         break;
@@ -294,8 +296,22 @@ namespace Owl {
                     dribble = (data[i + 3] & 0x08) >> 3;
                     change_num = data[i + 4] & 0xff;
                     change_cnt = data[i + 5] & 0x0f;
+                    for (int j = 0; j < 4; j++) {
+                        int yu = data[i + j * 2 + 7] & 0xFF;
+                        int bei = data[i + j * 2 + 8] & 0xFF;
+                        int sign = (data[i + 15] & (0x01 << j)) > 0 ? -1 : 1;
+                        GlobalData::Instance()->robotInformation[opm->isYellow][id].wheelSpeed[j] = sign * (bei * 255 + yu) * 10;
+                    }
                     GlobalData::Instance()->robotInfoMutex.unlock();
-                    emit receiveRobotInfo(opm->isYellow, id);
+                    static QTime t, last_t = QTime::currentTime();
+                    double dt;
+                    t = QTime::currentTime();
+                    dt = last_t.msecsTo(t);
+                    last_t = t;
+                    qDebug() << "a new packet" << GlobalData::Instance()->robotInformation[opm->isYellow][id].wheelSpeed[0] << GlobalData::Instance()->robotInformation[opm->isYellow][id].wheelSpeed[1] 
+                        << GlobalData::Instance()->robotInformation[opm->isYellow][id].wheelSpeed[2] << GlobalData::Instance()->robotInformation[opm->isYellow][id].wheelSpeed[3] << dt;
+                    ZCommunicator::Instance()->sendCommand(opm->isYellow, id);
+                    //emit receiveRobotInfo(opm->isYellow, id);
                 }
             }
         }

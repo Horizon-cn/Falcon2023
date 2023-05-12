@@ -3,6 +3,7 @@
 
 #include "Vision/VisionModule.h"
 #include "singleton.h"
+#include "PointCalculation/MarkingPosV2.h"
 
 class CGuardPos
 {
@@ -15,12 +16,16 @@ public:
     int missingBackIndex(int i);
 private:
     void generatePos(int guardNum);
+    CGeoLineRectangleIntersection intersecMiddle(int enemyNum);
+    CGeoLineRectangleIntersection intersecMiddleNoBall(int enemyNum);
     bool leftNextPos(CGeoPoint basePos, CGeoPoint& nextPos, double dist=-9999);
     bool rightNextPos(CGeoPoint basePos, CGeoPoint& nextPos, double dist=-9999);
     void checkBackPos(int guardNum);
     void adjustBackPos(int guardNum);
     int ready_cnt;
     int ready_index;
+    int _cycle;
+    CGeoLineRectangleIntersection _intersecMiddle;
     CGeoPoint _backPos[Param::Field::MAX_PLAYER];
     int _backNum[Param::Field::MAX_PLAYER];
     int _missingBack[Param::Field::MAX_PLAYER];

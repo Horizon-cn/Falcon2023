@@ -5,6 +5,7 @@
 #include "matrix2d.h"
 #include "simulator.h"
 #include <iostream>
+#include "communicator.h"
 
 #define MAX_BALL_PER_FRAME 200
 #define MIN_FILT_DIST 150
@@ -237,14 +238,14 @@ void CDealBall::choseBall() {
 }
 
 //void CDealBall::checkInfrared(ReceiveVisionMessage& result) {
-void CDealBall::checkInfrared(Owl::Ball ball) {
+void CDealBall::checkInfrared(Owl::Ball& ball) {/**
     infraredcnt = 0;
     Owl::Ball infraredBall;
+    Owl::ReceiveVisionMessage maintain = GlobalData::Instance()->maintain[0];
     double Threshold_v = 60, Threshold_h = 75;
     for (int team = 0; team < PARAM::TEAMS; team ++) {
         for (int id = 0; id < PARAM::ROBOTMAXID && infraredcnt < 2; id++){
-            if (GlobalData::Instance()->robotInformation[team][id].infrared) {
-                Owl::ReceiveVisionMessage maintain = GlobalData::Instance()->maintain[0];
+            if (GlobalData::Instance()->robotInformation[team][id].infrared) {            
                 if (maintain.robotIndex[team][id] == -1) continue;
                 CGeoPoint botPos = maintain.robot[team][maintain.robotIndex[team][id]].pos;
                 double botDir =  maintain.robot[team][maintain.robotIndex[team][id]].angle;
@@ -260,16 +261,16 @@ void CDealBall::checkInfrared(Owl::Ball ball) {
                 } 
                 if(verticalDist>=0 && verticalDist<Threshold_v && horizontalDist<Threshold_h) infraredcnt++;
 
-                /**bool tooFarFromVisionBall = false;
-                for (int visionball = 0; visionball < result.ballSize; visionball++) {
-                    if(infraredBall.pos.dist(result.ball[visionball].pos)>150) {
-                        tooFarFromVisionBall = true;
+                // bool tooFarFromVisionBall = false;
+                // for (int visionball = 0; visionball < result.ballSize; visionball++) {
+                //     if(infraredBall.pos.dist(result.ball[visionball].pos)>150) {
+                //         tooFarFromVisionBall = true;
                         //GlobalData::Instance()->robotInformation[team][id].infrared = false;
-                    }
-                }
-                if((result.ballSize > 0 && !tooFarFromVisionBall) || result.ballSize == 0) {
-                    infraredcnt ++;
-                }**/
+                //     }
+                // }
+                // if((result.ballSize > 0 && !tooFarFromVisionBall) || result.ballSize == 0) {
+                //     infraredcnt ++;
+                // }
             }
         }
     }
@@ -280,6 +281,32 @@ void CDealBall::checkInfrared(Owl::Ball ball) {
         lastBall = infraredBall;
         validBall = 2;
 //      qDebug()<<"add infrared";
+    }**/
+
+    Owl::ReceiveVisionMessage maintain = GlobalData::Instance()->maintain[0];
+    for (int team = 0; team < PARAM::TEAMS; team++) {
+        for (int id = 0; id < PARAM::ROBOTMAXID; id++) {
+            if (GlobalData::Instance()->robotInformation[team][id].infrared) {
+                if (maintain.robotIndex[team][id] == -1) continue; // 车视觉丢失，无法检验
+                Owl::Robot robot = maintain.robot[team][maintain.robotIndex[team][id]];
+                if (validBall) {	// 球看到，作红外信号假象检查，因为通讯可能会丢
+                    if (ball.pos.dist(robot.pos) > sipm->RobotRadius + 2 * sipm->BallRadius + 50) {
+                        GlobalData::Instance()->robotInformation[team][id].infrared = false;
+                        ZCommunicator::Instance()->sendCommand(team, id);
+                    }
+                }
+                else {				// 球看不到，根据红外信号纠正球的位置
+                    double guessDist = sipm->CenterFromKicker + sipm->BallRadius; //sipm->RobotRadius + sipm->BallRadius;
+                    CGeoPoint infraredBallPos = robot.pos + CVector(guessDist * cos(robot.angle), guessDist * sin(robot.angle));
+                    if (infraredBallPos.dist(ball.pos) <= 150) {
+                        ball.pos = infraredBallPos;
+                        ball.velocity = robot.velocity.vxy;
+                        validBall = 2;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -323,37 +350,8 @@ void CDealBall::run() {
 //    qDebug()<<"maintain"<<GlobalData::Instance()->maintain[0].ball[0].pos.x();
 //    qDebug()<<"visionball"<<result.ball[0].pos.x();
 
-    infraredcnt = 0;
-    Ball infraredBall;
-    for (int team = 0; team < PARAM::TEAMS; team ++) {
-        for (int id = 0; id < PARAM::ROBOTMAXID && infraredcnt < 2; id++){
-            if (GlobalData::Instance()->robotInformation[team][id].infrared) {
-                ReceiveVisionMessage maintain = GlobalData::Instance()->maintain[0];
-                if (maintain.robotIndex[team][id] == -1) continue;
-                CGeoPoint botPos = maintain.robot[team][maintain.robotIndex[team][id]].pos;
-                double botDir =  maintain.robot[team][maintain.robotIndex[team][id]].angle;
-                infraredBall.pos = ( botPos + CVector(cos(botDir), sin(botDir)) * sipm->CenterFromKicker );
-                bool tooFarFromVisionBall = false;
-                for (int visionball = 0; visionball < result.ballSize; visionball++) {
-                    if(infraredBall.pos.dist(result.ball[visionball].pos)>150) {
-                        tooFarFromVisionBall = true;
-                        //GlobalData::Instance()->robotInformation[team][id].infrared = false;
-                    }
-                }
-                if((result.ballSize > 0 && !tooFarFromVisionBall) || result.ballSize == 0) {
-                    infraredcnt ++;
-                }
-            }
-        }
-    }
-    //qDebug()<<"cnt"<<infraredcnt;
-    if (infraredcnt == 1 ) {
-        result.init();
-        result.addBall(infraredBall); // todo: needs sao convert
-        validBall = true;
-//        qDebug()<<"add infrared";
-    }
-    else {
+    checkInfrared(result);
+    if (infraredcnt != 1 ) {
         //result.addBall(GlobalData::Instance()->maintain[0].ball[0].pos + ballTravel);
     }**/
 //    qDebug()<<"ball"<<result.ballSize<<result.ball[0].valid<<result.ball[0].pos.x();
@@ -432,6 +430,8 @@ void CDealBall::updateVel(Owl::ReceiveVisionMessage& result) {
         validBall = 0;
     }
     else lastBall = result.ball[0];
+
+    checkInfrared(lastBall); // 红外特殊处理
 
 /**
     // 1.进行Kalman滤波，估计球的位置以及球速//

@@ -136,6 +136,7 @@ ConfigWidget::ConfigWidget()
     ADD_VALUE(comm_vars,Intz,YellowStatusSendPort,cpm->value("Ports/yellow_status", 30012).toInt(),"Yellow Team status send port")
     ADD_VALUE(comm_vars,Intz,sendDelay,spm->value("Communication", "sendDelay", 0).toInt(),"Sending delay (milliseconds)")
     ADD_VALUE(comm_vars,Intz,sendGeometryEvery,spm->value("Communication/sendGeometryEvery", 120).toInt(),"Send geometry every X frames")
+    ADD_VALUE(comm_vars, Bool, wheelSpeedCallBack, spm->value("Communication", "wheelSpeedCallBack", false).toBool(), "Send wheelSpeed every frame")
     VarListPtr gauss_vars(new VarList("Gaussian noise"));
         comm_vars->addChild(gauss_vars);
         ADD_VALUE(gauss_vars,Bool,noise,spm->value("Noise", "noise", false).toBool(),"Noise")

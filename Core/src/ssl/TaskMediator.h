@@ -90,6 +90,13 @@ public:
         return _defendMiddle.num;
     }
 
+    int defendHead() {
+        if (vision->Cycle() - _defendHead.lastCycle > 5) {
+            _defendHead.num = 0;
+        }
+        return _defendHead.num;
+    }
+
     //?????
     int sideBack(){
         if(vision->Cycle() - _sideBack.lastCycle > 5){
@@ -104,17 +111,19 @@ public:
         }
         return _advancer.num;
     }
-
+    // 0号要么不在场，要么是门将
     bool isGoalie(int vecNumber) {
         return (goalie() == vecNumber);
     }
 
     bool isBack(int vecNumber) {
-        return ((vecNumber == leftBack())    ||
-                (vecNumber == rightBack())   ||
-                (vecNumber == singleBack())  ||
-                (vecNumber == sideBack())    ||
-                (vecNumber == defendMiddle()));
+        return ((vecNumber != 0) &&
+                ((vecNumber == leftBack())    ||
+                 (vecNumber == rightBack())   ||
+                 (vecNumber == singleBack())  ||
+                 (vecNumber == defendHead())  ||
+                 (vecNumber == sideBack())    ||
+                 (vecNumber == defendMiddle())));
     }
 
     bool isMultiBack(int vecNumber) {
@@ -187,7 +196,10 @@ public:
         } else if ("defendMiddle" == role){
             _defendMiddle.num = num;
             _defendMiddle.lastCycle = vision->Cycle();
-        } else if ("sideBack" == role){
+        }else if ("defendHead" == role) {
+            _defendHead.num = num;
+            _defendHead.lastCycle = vision->Cycle();
+        }else if ("sideBack" == role){
             _sideBack.num = num;
             _sideBack.lastCycle = vision->Cycle();
         }else if ("advancer" == role){
@@ -206,6 +218,7 @@ private:
     SpecialRole _rightCenterBack;
     SpecialRole _singleBack;
     SpecialRole _defendMiddle;
+    SpecialRole _defendHead;
     SpecialRole _sideBack;
     SpecialRole _advancer;
     SpecialRole _multiBack[Param::Field::MAX_PLAYER];

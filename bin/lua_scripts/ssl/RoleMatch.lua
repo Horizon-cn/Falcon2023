@@ -221,14 +221,35 @@ function UpdateRole(matchTactic, isPlaySwitched, isStateSwitched)
 		end
 	end
 
-	for _, rolename in pairs(gRolePriority) do
+	local forceMatchGoalie = false
+	-- 0号在场，强制匹配门将
+	if gOurExistNum[0] == 0 then
+		gRoleNum["Goalie"] = DoFixNumMatch({0})
+		CRegisterRole(gRoleNum["Goalie"], "goalie")
+		forceMatchGoalie = true
+	end
+
+	-- 处理固定匹配
+	for rolename, id in pairs(gRoleFixNum) do
 		for existname, _ in pairs(gRolePos) do
-			if rolename == existname and
-				type(gRoleFixNum[rolename]) == "table" then
-				gRoleNum[rolename] = DoFixNumMatch(gRoleFixNum[rolename])
-				if rolename == "Goalie" then
-					CRegisterRole(gRoleNum[rolename], "goalie")
+			if rolename == existname and type(id) == "table" then
+				if rolename ~= "Goalie" then
+					gRoleNum[rolename] = DoFixNumMatch(id)
+				elseif forceMatchGoalie == false then
+					gRoleNum[rolename] = DoFixNumMatch(id)
+					CRegisterRole(gRoleNum["Goalie"], "goalie")
 				end
+			end
+		end
+	end
+
+	for existname, _ in pairs(gRolePos) do
+		if type(existname) == "number" then
+			if existname >= 0 and existname < param.maxPlayer and gOurExistNum[existname] == existname then
+				gOurExistNum[existname] = -1
+				gRoleNum[existname] = existname
+			else
+				gRoleNum[existname] = -1
 			end
 		end
 	end

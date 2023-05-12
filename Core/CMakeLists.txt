@@ -27,12 +27,16 @@ list(APPEND libs ${LUA_LIBRARIES})
 ## tolua++
 list(APPEND incs ${TOLUAPP_INCLUDE_DIR})
 list(APPEND libs ${TOLUAPP_LIBRARIES})
-# EXECUTE_PROCESS(
-#    COMMAND ${TOLUAPP_EXECUTABLE} -n zeus -o ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/lua_zeus.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/zeus.pkg
-#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule
-# )
+EXECUTE_PROCESS(
+    COMMAND ${TOLUAPP_EXECUTABLE} -n zeus -o ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/lua_zeus.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/pkg/zeus.pkg
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule/pkg
+)
 ## Eigen
-# list(APPEND incs ${EIGEN3_INCLUDE_DIR})
+list(APPEND incs ${EIGEN3_INCLUDE_DIR})
+## CUDA
+IF(ENABLE_CUDA)
+	list(APPEND libs cublas.lib)
+ENDIF()
 
 set(PROTO_LIST
     grSim_Commands
@@ -65,6 +69,7 @@ set(PROJECT_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl
     ${CMAKE_CURRENT_SOURCE_DIR}/src/LuaModule
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl/bayes
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl/cmu
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl/cornell
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl/defence
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl/MotionControl
@@ -77,13 +82,14 @@ set(PROJECT_INCLUDE_DIRS
 )
 include_directories(${PROJECT_INCLUDE_DIRS})
 
-file(GLOB HEADERS "./src/*.h")
+file(GLOB HEADERS "./src/*.h" "./src/*.hpp")
 file (GLOB LUAMODULE_HEADERS "./src/LuaModule/*.h" "./src/LuaModule/*.hpp")
 file (GLOB SSL_HEADERS "./src/ssl/*.h" "./src/ssl/*.hpp")
 file (GLOB SSL_BAYES_HEADERS "./src/ssl/bayes/*.h" "./src/ssl/bayes/*.hpp")
 file (GLOB SSL_CMU_HEADERS "./src/ssl/cmu/*.h" "./src/ssl/cmu/*.hpp")
 file (GLOB SSL_CORNELL_HEADERS "./src/ssl/cornell/*.h" "./src/ssl/cornell/*.hpp")
 file (GLOB SSL_DEFENCE_HEADERS "./src/ssl/defence/*.h" "./src/ssl/defence/*.hpp")
+file (GLOB SSL_DEFENCE_NEW_HEADERS "./src/ssl/defenceNew/*.h" "./src/ssl/defenceNew/*.hpp")
 file (GLOB SSL_ROLEMATCH_HEADERS "./src/ssl/rolematch/*.h" "./src/ssl/rolematch/*.hpp")
 file (GLOB SSL_SKILL_HEADERS "./src/ssl/skill/*.h" "./src/ssl/skill/*.hpp")
 file (GLOB SSL_PATHPLAN_HEADERS "./src/ssl/PathPlan/*.h" "./src/ssl/PathPlan/*.hpp")
@@ -96,8 +102,10 @@ aux_source_directory(./src DIR_SRCS)
 aux_source_directory(./src/LuaModule DIR_LUAMODULE_SRCS)
 aux_source_directory(./src/ssl DIR_SSL_SRCS)
 aux_source_directory(./src/ssl/bayes DIR_SSL_BAYES_SRCS)
+aux_source_directory(./src/ssl/cmu DIR_SSL_CMU_SRCS)
 aux_source_directory(./src/ssl/cornell DIR_SSL_CORNELL_SRCS)
 aux_source_directory(./src/ssl/defence DIR_SSL_DEFENCE_SRCS)
+aux_source_directory(./src/ssl/defenceNew DIR_SSL_DEFENCE_NEW_SRCS)
 aux_source_directory(./src/ssl/rolematch DIR_SSL_ROLEMATCH_SRCS)
 aux_source_directory(./src/ssl/skill DIR_SSL_SKILL_SRCS)
 aux_source_directory(./src/ssl/PathPlan DIR_SSL_PATHPLAN_SRCS)
@@ -119,10 +127,13 @@ source_group("src\\ssl" FILES ${DIR_SSL_SRCS})
 source_group("include\\ssl\\bayes" FILES ${SSL_BAYES_HEADERS})
 source_group("src\\ssl\\bayes" FILES ${DIR_SSL_BAYES_SRCS})
 source_group("include\\ssl\\cmu" FILES ${SSL_CMU_HEADERS})
+source_group("src\\ssl\\cmu" FILES ${DIR_SSL_CMU_SRCS})
 source_group("include\\ssl\\cornell" FILES ${SSL_CORNELL_HEADERS})
 source_group("src\\ssl\\cornell" FILES ${DIR_SSL_CORNELL_SRCS})
 source_group("include\\ssl\\defence" FILES ${SSL_DEFENCE_HEADERS})
 source_group("src\\ssl\\defence" FILES ${DIR_SSL_DEFENCE_SRCS})
+source_group("include\\ssl\\defenceNew" FILES ${SSL_DEFENCE_NEW_HEADERS})
+source_group("src\\ssl\\defenceNew" FILES ${DIR_SSL_DEFENCE_NEW_SRCS})
 source_group("include\\ssl\\rolematch" FILES ${SSL_ROLEMATCH_HEADERS})
 source_group("src\\ssl\\rolematch" FILES ${DIR_SSL_ROLEMATCH_SRCS})
 source_group("include\\ssl\\skill" FILES ${SSL_SKILL_HEADERS})
@@ -141,37 +152,45 @@ source_group("include\\share" FILES ${SHARE_HEADERS})
 source_group("src\\share" FILES ${DIR_SHARE_SRCS})
 source_group("rc" FILES ${RCFILES})
 ENDIF()
-add_executable(${TARGET_NAME} 
-		${PROTO_H} 
-		${PROTO_CPP}
-		${DIR_SRCS}
-		${DIR_LUAMODULE_SRCS}
-		${DIR_SSL_SRCS}
-		${DIR_SSL_BAYES_SRCS}
-		${DIR_SSL_CORNELL_SRCS}
-		${DIR_SSL_DEFENCE_SRCS}
-		${DIR_SSL_ROLEMATCH_SRCS}
-		${DIR_SSL_SKILL_SRCS}
-		${DIR_SSL_PATHPLAN_SRCS}
-		${DIR_SSL_MOTIONCONTROL_SRCS}
-		${DIR_SSL_POINTCALCULATION_SRCS}
-		${DIR_SSL_VISION_SRCS}
-		${DIR_SSL_WORLDMODEL_SRCS}
-		${DIR_SHARE_SRCS}
-		${HEADERS}
-		${LUAMODULE_HEADERS}
-		${SSL_HEADERS}
-		${SSL_BAYES_HEADERS}
-		${SSL_CMU_HEADERS}
-		${SSL_CORNELL_HEADERS}
-		${SSL_DEFENCE_HEADERS}
-		${SSL_ROLEMATCH_HEADERS}
-		${SSL_SKILL_HEADERS}
-		${SSL_PATHPLAN_HEADERS}
-		${SSL_MOTIONCONTROL_HEADERS}
-		${SSL_POINTCALCULATION_HEADERS}
-		${SSL_VISION_HEADERS}
-		${SSL_WORLDMODEL_HEADERS}
-		${SHARE_HEADERS}
-                                ${RCFILES})
-target_link_libraries(${TARGET_NAME} PRIVATE ${libs})
+SET(GLOB_FILES
+	${PROTO_H} 
+	${PROTO_CPP}
+	${DIR_SRCS}
+	${DIR_LUAMODULE_SRCS}
+	${DIR_SSL_SRCS}
+	${DIR_SSL_BAYES_SRCS}
+	${DIR_SSL_CMU_SRCS}
+	${DIR_SSL_CORNELL_SRCS}
+	${DIR_SSL_DEFENCE_SRCS}
+	${DIR_SSL_DEFENCE_NEW_SRCS}
+	${DIR_SSL_ROLEMATCH_SRCS}
+	${DIR_SSL_SKILL_SRCS}
+	${DIR_SSL_PATHPLAN_SRCS}
+	${DIR_SSL_MOTIONCONTROL_SRCS}
+	${DIR_SSL_POINTCALCULATION_SRCS}
+	${DIR_SSL_VISION_SRCS}
+	${DIR_SSL_WORLDMODEL_SRCS}
+	${DIR_SHARE_SRCS}
+	${HEADERS}
+	${LUAMODULE_HEADERS}
+	${SSL_HEADERS}
+	${SSL_BAYES_HEADERS}
+	${SSL_CMU_HEADERS}
+	${SSL_CORNELL_HEADERS}
+	${SSL_DEFENCE_HEADERS}
+	${SSL_DEFENCE_NEW_HEADERS}
+	${SSL_ROLEMATCH_HEADERS}
+	${SSL_SKILL_HEADERS}
+	${SSL_PATHPLAN_HEADERS}
+	${SSL_MOTIONCONTROL_HEADERS}
+	${SSL_POINTCALCULATION_HEADERS}
+	${SSL_VISION_HEADERS}
+	${SSL_WORLDMODEL_HEADERS}
+	${SHARE_HEADERS}
+    ${RCFILES})
+IF(ENABLE_CUDA)
+	CUDA_ADD_EXECUTABLE(${TARGET_NAME} ${GLOB_FILES})
+ELSE()
+	add_executable(${TARGET_NAME} ${GLOB_FILES})
+ENDIF()
+target_link_libraries(${TARGET_NAME} ${libs})

@@ -250,22 +250,23 @@ function advance()
 	--local advancerPassTo = kickStatus:getAdvancerPassTo()
 	--if advancerPassTo:x() > -9999 and ball.velMod() > 70 then -- 指定了接球车并已经踢出
 	--	advancePos = advancerPassTo
-	--local nextAdvancer = kickStatus:getNextAdvancer()
-	--local ball2NextAdvancerDir = (player.pos(nextAdvancer) - ball.pos()):dir()
-	--local angleDiff = math.abs(ball2NextAdvancerDir - ball.velDir())
-	--local ball2NextAdvancerDist = ball.pos():dist(player.pos(nextAdvancer))
-	--if nextAdvancer > 0 and nextAdvancer < param.maxPlayer and ball.velMod() > 70 and not (angleDiff > math.pi/2 and ball2NextAdvancerDist > 60) then
-	--	advancePos = player.pos(nextAdvancer)
-	--else
-	if (ball.posX()>=0 and ball.velX()>-300) then
-		--return CGeoPoint(ball.posX()+k_v_1*ball.velX(),ball.posY()+k_v_2*ball.velY())
-		advancePos = CGeoPoint(ball.posX()+k_v_2*math.abs(ball.velX())*ball.velX(),ball.posY()+k_v_2*math.abs(ball.velY())*ball.velY())
+	local nextAdvancer = kickStatus:getNextAdvancer()
+	local ball2NextAdvancerDir = (player.pos(nextAdvancer) - ball.pos()):dir()
+	local angleDiff = math.abs(ball2NextAdvancerDir - ball.velDir())
+	local ball2NextAdvancerDist = ball.pos():dist(player.pos(nextAdvancer))
+	if nextAdvancer > 0 and nextAdvancer < param.maxPlayer and ball.velMod() > 70 and not (angleDiff > math.pi/2 and ball2NextAdvancerDist > 60) then
+		advancePos = player.pos(nextAdvancer)
 	else
-		local robotNum = bestPlayer:getOurBestPlayer()
-		if Utils.PlayerNumValid(robotNum) then
-			advancePos = player.pos(robotNum)
+		if (ball.posX()>=0 and ball.velX()>-300) then
+			--return CGeoPoint(ball.posX()+k_v_1*ball.velX(),ball.posY()+k_v_2*ball.velY())
+			advancePos = CGeoPoint(ball.posX()+k_v_2*math.abs(ball.velX())*ball.velX(),ball.posY()+k_v_2*math.abs(ball.velY())*ball.velY())
 		else
-			advancePos = ball.pos()
+			local robotNum = bestPlayer:getOurBestPlayer()
+			if Utils.PlayerNumValid(robotNum) then
+				advancePos = player.pos(robotNum)
+			else
+				advancePos = ball.pos()
+			end
 		end
 	end
 	debugEngine:gui_debug_x(advancePos, 0)  			
@@ -274,7 +275,7 @@ end
 
 function protectBall()
 	local protectBallPos
-	local robotNum = bestPlayer:getTheirBestPlayer()
+	local robotNum = defenceInfoNew:getBestBallChaser()
 	protectBallPos = enemy.pos(robotNum)
 	return protectBallPos
 end
@@ -422,7 +423,7 @@ function testTwoKickOffPos2()
 end
 
 function theirBestPlayer()
-	local oppNum = bestPlayer:getTheirBestPlayer()
+	local oppNum = defenceInfoNew:getBestBallChaser()
 	return enemy.pos(oppNum)
 end
 

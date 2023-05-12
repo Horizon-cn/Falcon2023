@@ -75,6 +75,11 @@ class PosFilter : public KalmanFilter{
     void update2(CGeoPoint p){
         update2(p.x(), p.y());
     }
+    void update4(double zx, double zy, double zvx, double zvy);
+    void update4(CGeoPoint p, CVector v) {
+        update4(p.x(), p. y(), v.x(), v.y());
+    }
+    void _update4(Matrix2d);
 
     const Matrix2d & postEstimatedState() const{return x;} 
     CGeoPoint postEstimatedPos() const{return CGeoPoint(x(0,0),x(1,0));}
@@ -85,6 +90,9 @@ class PosFilter : public KalmanFilter{
     CVector priorEstimatedVel() const{return CVector(x_(2,0),x_(3,0));}
     CGeoPoint predictedPos(double t = 0) const;
     CVector predictedVel() const{return CVector(x(2,0),x(3,0));}
+private:
+    Matrix2d K2;
+    Matrix2d R2;
 };
 
 class DirFilter : public KalmanFilter{

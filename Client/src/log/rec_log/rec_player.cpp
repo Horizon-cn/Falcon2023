@@ -9,15 +9,36 @@
 #include <QTime>
 #include <QtDebug>
 #include "staticparams.h"
+#include <iostream>
+#include <fstream>
 namespace  {
     auto opm = Owl::OParamManager::Instance();
     auto GS = GlobalSettings::Instance();
+    /**std::ofstream outFile;
+    bool first_time[PARAM::ROBOTMAXID];
+    float selfAxesX[PARAM::ROBOTMAXID];
+    float selfAxesY[PARAM::ROBOTMAXID];
+    float selfAxesW[PARAM::ROBOTMAXID];
+
+    CVector convertToSelfAxes(ZSS::Protocol::Robot4Rec robot) {
+        if (first_time[robot.id()]) {
+            selfAxesX[robot.id()] = robot.posx();
+            selfAxesY[robot.id()] = robot.posy();
+            selfAxesW[robot.id()] = robot.angle();
+            first_time[robot.id()] = false;
+        }
+        CVector convert_pos = CVector(robot.posx(), robot.posy());
+        convert_pos = convert_pos - CVector(selfAxesX[robot.id()], selfAxesY[robot.id()]);
+        convert_pos = convert_pos.rotate(-selfAxesW[robot.id()]);
+        return convert_pos;
+    }**/
 }
 CRecPlayer::CRecPlayer() {
     udpSendSocket = nullptr;
 }
 
 CRecPlayer::~CRecPlayer() {
+    //outFile.close();
     stop();
     //delete replayFile;
     //replayFile = nullptr;
@@ -39,6 +60,12 @@ bool CRecPlayer::loadRec(QString &filename, int &maxframe) {
         maxframe = recMsgs.recmsgs_size() - 2;
         delete replayFile;
         replayFile = nullptr;
+        /**
+        outFile.open((filename.split('.')[0] + ".csv").toStdString(), std::ios::out | std::ios::trunc);
+        // 写入标题行
+        outFile << "team" << "," << "id" << "," << "x" << "," << "y" << std::endl;
+        std::fill_n(first_time, PARAM::ROBOTMAXID, true);
+        **/
         return true;
     }
     qDebug() << "open filed";
@@ -167,6 +194,10 @@ void CRecPlayer::sendMessage(const ZSS::Protocol::RecMessage& recMsg) {
                             recMsg.maintainvision().processmsg(color).robot(j).posx(),
                             recMsg.maintainvision().processmsg(color).robot(j).posy(),
                             recMsg.maintainvision().processmsg(color).robot(j).angle());
+            //std::string team = color == 0 ? "BLUE" : "YELLOW";
+            //CVector convert_pos = convertToSelfAxes(recMsg.maintainvision().processmsg(color).robot(j));
+            //outFile << team << "," << std::to_string(recMsg.maintainvision().processmsg(color).robot(j).id()) << ","
+            //    << std::to_string(convert_pos.x()) << "," << std::to_string(convert_pos.y()) << std::endl;
         }
     }
     GlobalData::Instance()->processRobot.push(result);
@@ -191,6 +222,7 @@ void CRecPlayer::sendMessage(const ZSS::Protocol::RecMessage& recMsg) {
     ZSS::Protocol::Debug_Msgs debugMsgs;
     for (int team = PARAM::BLUE; team <= PARAM::YELLOW; team++) {
         debugMsgs = recMsg.debugmsgs(team);
+        debugMsgs.set_login_name(opm->LoginName); // 重要，不然画不出来
         int size = debugMsgs.ByteSize();
         if (team == 0) {
             GlobalData::Instance()->debugBlueMessages.resize(size);
@@ -301,4 +333,5 @@ void CRecPlayer::run() {
         playLogVision();
         QThread::currentThread()->msleep(12/playerRate);
     }
+    //outFile.close();
 }

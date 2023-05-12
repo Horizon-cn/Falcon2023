@@ -51,11 +51,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
       loadParam(type_points, "DebugMessages/type_points", true);
       loadParam(type_text, "DebugMessages/type_text", true);
       loadParam(type_robot, "DebugMessages/type_robot", true);
-      //HeatMap
-      loadParam(HeatMap, "HeatMap/HeatMap", false);
-      loadParam(drawStep, "HeatMap/drawStep", 100);
-      loadParam(startPosX, "HeatMap/startPosX", -6000);
-      loadParam(startPosY, "HeatMap/startPosY", -4500);
+      loadParam(heatMap, "DebugMessages/heatMap", false);
       //Size
       loadParam(ballDiameter, "Size/ballDiameter", 100);
       loadParam(shadowDiameter, "Size/shadowDiameter", 30);
@@ -114,12 +110,7 @@ class ParamManagerOwl: public Falcon::ParamManager {
     int canvasWidth, canvasHeight;
     int param_canvasWidth, param_canvasHeight;
     //DebugMessages
-    bool debug, type_arc, type_line, type_points, type_text, type_robot;
-     //HeatMap
-    bool HeatMap;
-    int drawStep;
-    int startPosX;
-    int startPosY;
+    bool debug, type_arc, type_line, type_points, type_text, type_robot, heatMap;    
     //Size
     int ballDiameter, shadowDiameter, carDiameter, carFaceWidth, numberSize, debugPointSize;
     //Field
@@ -294,13 +285,13 @@ public:
         loadParam(convertPower, "General/convertPower", true);
         for (int i = 0; i < PARAM::ROBOTMAXID; i++) {
             loadParam(flat_a[i], QString("Robot%1/flat_a").arg(i), 0);
-            loadParam(flat_b[i], QString("Robot%1/flat_b").arg(i), 18.14);
-            loadParam(flat_c[i], QString("Robot%1/flat_c").arg(i), 100);
+            loadParam(flat_b[i], QString("Robot%1/flat_b").arg(i), 0.1814);
+            loadParam(flat_c[i], QString("Robot%1/flat_c").arg(i), 0);
             loadParam(chip_a[i], QString("Robot%1/chip_a").arg(i), 0);
-            loadParam(chip_b[i], QString("Robot%1/chip_b").arg(i), 32);
+            loadParam(chip_b[i], QString("Robot%1/chip_b").arg(i), 0.32);
             loadParam(chip_c[i], QString("Robot%1/chip_c").arg(i), 0);
             loadParam(flat_max[i], QString("Robot%1/flat_max").arg(i), 127);
-            loadParam(flat_min[i], QString("Robot%1/flat_min").arg(i), 60);
+            loadParam(flat_min[i], QString("Robot%1/flat_min").arg(i), 0);
             loadParam(chip_max[i], QString("Robot%1/chip_max").arg(i), 127);
             loadParam(chip_min[i], QString("Robot%1/chip_min").arg(i), 30);
         }
@@ -335,19 +326,23 @@ public:
         loadParam(Gravity, "World/Gravity", 9.8);
         BallRadius = value("Ball/BallRadius", 0.0215).toDouble() * 1000;
         loadParam(DesiredFPS, "World/DesiredFPS", 75);
+        loadParam(wheelSpeedCallBack, "Communication/wheelSpeedCallBack", false);
         team = value("Team", "blueTeam", "SRC").toString();
         robot_settings = new QSettings(qApp->applicationDirPath()+ QString("/../data/config/") + QString("%1.ini").arg(team), QSettings::IniFormat);
         CenterFromKicker = robot_settings->value("Geometery/CenterFromKicker", 0.073).toDouble() * 1000;
         RobotRadius = robot_settings->value("Geometery/Radius", 0.09).toDouble() * 1000;
+        WheelRadius = robot_settings->value("Geometery/WheelRadius", 0.0325).toDouble() * 1000;
     }
 public:
     double Gravity;
     double BallRadius;
     double DesiredFPS;
+    bool wheelSpeedCallBack;
     QString team;
     QSettings* robot_settings;
     double CenterFromKicker;
     double RobotRadius;
+    double WheelRadius;
 };
 class ParamManagerSkill : public Falcon::ParamManager {
 public:
@@ -365,9 +360,15 @@ public:
     void loadParamFromFile() {
         qDebug() << "load" + filename;
         MAX_BALL_SPEED = value("Rule/MAX_BALL_SPEED", 630).toDouble() / 100.0;
+        drawStep = value("GpuBestAlg/step", 10).toInt() * 10;
+        startPosX = value("GpuBestAlg/startPosX", -600).toInt() * 10;
+        startPosY = value("GpuBestAlg/startPosY", -450).toInt() * 10;
     }
 public:
     double MAX_BALL_SPEED;
+    int drawStep;
+    int startPosX;
+    int startPosY;
 };
 typedef Falcon::MeyersSingleton<ParamManagerOwl> OParamManager;
 typedef Falcon::MeyersSingleton<ParamManagerCfg> CParamManager;

@@ -1,7 +1,7 @@
 #include "PointCalculation/SupportPos.h"
 
 #include "BallSpeedModel.h"
-#include "BestPlayer.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include "PointCalculation/ChipBallJudge.h"
 #include "GDebugEngine.h"
 #include "TaskMediator.h"
@@ -114,7 +114,7 @@ void CSupportPos::generatePos(const CVisionModule* pVision,int num){
 	const CGeoPoint ballRawPos = ball.Pos();
 	const double BallVelDir = Utils::Normalize(ball.Vel().dir());
 	const double antiBallVelDir = Utils::Normalize(ball.Vel().dir() + PI);
-	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(BestPlayer::Instance()->theirFastestPlayerToBallList().at(0).num);
+	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	const int enemyDefenderAmount = calcEnemyDefenderAmount(pVision);
 	double reflectPower;
 	CGeoPoint defaultPos = CGeoPoint(ourLeader.Pos().x(), -ourLeader.Pos().y());  //对方无防守车时，默认助攻点与Leader对称
@@ -207,7 +207,7 @@ bool CSupportPos::isBallInOurControl(const CVisionModule* pVision){
 	const CGeoPoint ballRawPos = ball.Pos();
 	const double BallVelDir = Utils::Normalize(ball.Vel().dir());
 	const double antiBallVelDir = Utils::Normalize(ball.Vel().dir() + PI);
-	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(BestPlayer::Instance()->theirFastestPlayerToBallList().at(0).num);
+	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	const bool isSensored = RobotSensor::Instance()->IsInfoValid(ourLeaderNum) && RobotSensor::Instance()->IsInfraredOn(ourLeaderNum);	//If Infrared on 
 	const bool isHasBallInVision = (ball.Pos() - ourLeader.Pos()).mod() < PLAYER_SIZE + 3 && fabs((ball.Pos() - ourLeader.Pos()).dir() - ourLeader.Dir()) < PI * 6 / 180;
 	const bool isUnderControlled = (ourLeader.Pos() - ball.Pos()).mod() < (enemyLeader.Pos() - ball.Pos()).mod();
@@ -226,7 +226,7 @@ int CSupportPos::calcEnemyDefenderAmount(const CVisionModule* pVision){
 	const CGeoPoint ballRawPos = ball.Pos();
 	const double BallVelDir = Utils::Normalize(ball.Vel().dir());
 	const double antiBallVelDir = Utils::Normalize(ball.Vel().dir() + PI);
-	const int enemyAmount =VisionModule::Instance()->getTheirValidNum(); //Size存疑 与列表的对应关系需要校对
+	const int enemyAmount = DefenceInfoNew::Instance()->getSteadyBallChaserNum();
 	if (enemyAmount == 0){
 		return 0;
 	}
@@ -236,10 +236,10 @@ int CSupportPos::calcEnemyDefenderAmount(const CVisionModule* pVision){
 		enemyDefenderAmount++;
 	}
 	for (int _i = 0; _i < enemyAmount; _i++){
-		if (enemyDefendArea.HasPoint(pVision->TheirPlayer(BestPlayer::Instance()->theirFastestPlayerToBallList().at(_i).num).Pos()) 
-			&& BestPlayer::Instance()->theirFastestPlayerToBallList().at(_i).num != pVision->TheirGoalie()){
+		if (enemyDefendArea.HasPoint(pVision->TheirPlayer(DefenceInfoNew::Instance()->getSteadyBallChaserList().at(_i)).Pos())
+			&& DefenceInfoNew::Instance()->getSteadyBallChaserList().at(_i) != pVision->TheirGoalie()){
 			enemyDefenderAmount++;
-			_defenderList[enemyCount] = BestPlayer::Instance()->theirFastestPlayerToBallList().at(_i).num;
+			_defenderList[enemyCount] = DefenceInfoNew::Instance()->getSteadyBallChaserList().at(_i);
 			enemyCount++;
 		}
 	}
@@ -257,7 +257,7 @@ double CSupportPos::calcBallReflectDirAndPos(const CVisionModule* pVision, const
 	const CGeoPoint ballRawPos = ball.Pos();
 	const double BallVelDir = Utils::Normalize(ball.Vel().dir());
 	const double antiBallVelDir = Utils::Normalize(ball.Vel().dir() + PI);
-	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(BestPlayer::Instance()->theirFastestPlayerToBallList().at(0).num);
+	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	int currentDefender=0;//当前索引防守者
 	int effectDefender = 0;//实际生效防守者(一般实际比赛中，一次射门仅由一辆防守车实际完成阻挡）
 	bool isAnyDefenderEffect = false;
@@ -380,8 +380,8 @@ CGeoPoint CSupportPos::calcTheBestPoint(const CVisionModule *pVision,const CGeoC
 	const CGeoPoint ballRawPos = ball.Pos();
 	const double BallVelDir = Utils::Normalize(ball.Vel().dir());
 	const double antiBallVelDir = Utils::Normalize(ball.Vel().dir() + PI);
-	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(BestPlayer::Instance()->theirFastestPlayerToBallList().at(0).num);
-	const bool isEnemyExist = BestPlayer::Instance()->theirFastestPlayerToBallList().size();
+	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
+	const bool isEnemyExist = DefenceInfoNew::Instance()->getSteadyBallChaserNum();
 	CGeoPoint targetPos = bestZone.Center();
 	double projDist = 0;
 	double targetDir = (CGeoPoint(PITCH_LENGTH / 2, 0) - targetPos).dir();
@@ -389,8 +389,8 @@ CGeoPoint CSupportPos::calcTheBestPoint(const CVisionModule *pVision,const CGeoC
 	CGeoLine targetLine = CGeoLine(CGeoPoint(PITCH_LENGTH / 2, 0), targetPos);
 	int currentDefender = 0;
 	if (isEnemyExist){
-		for (int _i = 0; _i < BestPlayer::Instance()->theirFastestPlayerToBallList().size(); _i++){
-			currentDefender=BestPlayer::Instance()->theirFastestPlayerToBallList().at(_i).num;
+		for (int _i = 0; _i < DefenceInfoNew::Instance()->getSteadyBallChaserNum(); _i++){
+			currentDefender= DefenceInfoNew::Instance()->getSteadyBallChaserList().at(_i);
 			if ((pVision->TheirPlayer(currentDefender).Pos() - bestZone.Center()).mod() < bestZone.Radius()&&
 				targetSeg.IsPointOnLineOnSegment(targetLine.projection(pVision->TheirPlayer(currentDefender).Pos()))){
 				projDist= (targetLine.projection(pVision->TheirPlayer(currentDefender).Pos())-targetPos).mod();
@@ -418,7 +418,7 @@ void CSupportPos::checkAvoidShootLine(const CVisionModule *pVision){
 	const CGeoPoint ballRawPos = ball.Pos();
 	const double BallVelDir = Utils::Normalize(ball.Vel().dir());
 	const double antiBallVelDir = Utils::Normalize(ball.Vel().dir() + PI);
-	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(BestPlayer::Instance()->theirFastestPlayerToBallList().at(0).num);
+	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(DefenceInfoNew::Instance()->getSteadyBallChaserNum());
 	double finalDir = 0;
 	double changeDir = 0;
 	bool needDetourToAvoid = false;
@@ -477,7 +477,7 @@ void CSupportPos::keepLeastDistanceFromLeader(const CVisionModule *pVision,doubl
 	const CGeoPoint ballRawPos = ball.Pos();
 	const double BallVelDir = Utils::Normalize(ball.Vel().dir());
 	const double antiBallVelDir = Utils::Normalize(ball.Vel().dir() + PI);
-	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(BestPlayer::Instance()->theirFastestPlayerToBallList().at(0).num);
+	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(DefenceInfoNew::Instance()->getSteadyBallChaserNum());
 	//double changeDir = (ourSupporter.Pos()-ourLeader.Pos()).dir();
 	double changeDir = (_supportPos - ball.Pos()).dir();
 	if ((_supportPos - ball.Pos()).mod() < leastDist){
@@ -495,7 +495,7 @@ void CSupportPos::checkAvoidCenterLine(const CVisionModule *pVision, double radi
 	const CGeoPoint ballRawPos = ball.Pos();
 	const double BallVelDir = Utils::Normalize(ball.Vel().dir());
 	const double antiBallVelDir = Utils::Normalize(ball.Vel().dir() + PI);
-	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(BestPlayer::Instance()->theirFastestPlayerToBallList().at(0).num);
+	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(DefenceInfoNew::Instance()->getSteadyBallChaserNum());
 	static int ourLeaderInLeftOrRight = ourLeader.Pos().y() < 0 ? Left : Right;
 	if (ourLeader.Pos().y()>buffer){
 		ourLeaderInLeftOrRight = Right;

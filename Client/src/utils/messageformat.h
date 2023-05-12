@@ -5,6 +5,7 @@
 #include "ballstate.h"
 #include <list>
 #include "staticparams.h"
+#include <QDateTime>
 
 /************************************************************************/
 /*                 Basic Vision Classes                                 */
@@ -17,7 +18,14 @@ struct RobotInformation {
     bool chip;
     double battery;
     double capacitance;
-    RobotInformation(): infrared(false), flat(false), chip(false), battery(0), capacitance(0) {}
+    double wheelSpeed[4];
+    QTime wheelSpeedTimestamp;
+    bool wheelSpeedUpdate;
+    RobotInformation(): infrared(false), flat(false), chip(false), battery(0), capacitance(0) {
+        std::fill_n(wheelSpeed, 4, 0);
+        wheelSpeedTimestamp = QTime::currentTime();
+        wheelSpeedUpdate = false;
+    }
     bool fill(bool infrared, bool flat, bool chip, double battery, double capacitance){
         this->infrared = infrared;
         this->flat = flat;

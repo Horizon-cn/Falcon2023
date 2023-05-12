@@ -40,6 +40,18 @@ function goCmuRush(p, d, a, f)
 	return {mexe, mpos}
 end
 
+function goBezierRush(p, d, a, f)
+	local idir
+	if d ~= nil then
+		idir = d
+	else
+		idir = dir.shoot()
+	end
+
+	local mexe, mpos = BezierRush{pos = p, dir = idir, acc = a, flag = f}
+	return {mexe, mpos}
+end
+
 ------------------------------------- 射门相关的skill ---------------------------------------
 
 function testBreak()
@@ -112,6 +124,8 @@ function passToPos(p, c)
 	local ipower
 	if type(c)== "number" and c ~= nil then
 		ipower=kp.specified(c)
+	elseif type(c) == "function" then -- 自定义力度
+		ipower = c
 	else
 		ipower=kp.toTargetNormalPlay(p)
 	end
@@ -311,6 +325,31 @@ function shootV2Pass(p, c)
 	return {mexe, mpos, kick.flat, idir, pre.middle, ipower, cp.full, flag.nothing}
 end
 
+function justKick(mode, power, flag)
+	local imode,ipower,iflag
+	if mode ~= "chip" then
+		imode="kick"
+	else
+		imode="chip"
+	end
+	if power==nil then
+		if imode=="kick" then
+			ipower=kp.full()()
+		else
+			ipower=cp.full()()
+		end
+	else
+		ipower=power
+	end
+	if flag==nil then
+		iflag=0
+	else
+		iflag=flag
+	end
+	local mexe, mpos = JustKick{ mode=imode, power=ipower, flag=iflag }
+	return {mexe, mpos}
+end
+
 ---------------------------------------- WaitKick ------------------------------------------
 
 function waitTouch(p1,p2,style)
@@ -346,6 +385,36 @@ end
 
 function dribbleTurnShoot()
 	local mexe, mpos = DribbleTurnKick{fDir = dir.shoot(),rotV=3.5,kPower=kp.full()}
+	return {mexe, mpos}
+end
+
+function dribbleTurnShootV2(d,precision,mode,power)
+	local idir,ipre,imode,ipower
+	if d==nil then
+		idir=dir.shoot()
+	else
+		idir=d
+	end
+	if precision==nil then
+		ipre=pre.middle()
+	else
+		ipre=precision
+	end
+	if mode ~= "chip" then
+		imode="kick"
+	else
+		imode="chip"
+	end
+	if power==nil then
+		if imode=="kick" then
+			ipower=kp.full()
+		else
+			ipower=cp.full()
+		end
+	else
+		ipower=power
+	end
+	local mexe, mpos = DribbleTurnKickV2{dir=idir,precision=ipre,mode=imode,power=ipower}
 	return {mexe, mpos}
 end
 
@@ -690,6 +759,11 @@ function goSecondPassPos(role)
 	return {mexe, mpos}
 end
 
+function support(role, num)
+	local mexe, mpos = GoCmuRush{ pos = ball.supportPassPos(num), dir = player.toShootOrRobot(role),sender=role,flag=bit:_or(flag.allow_dss, flag.dodge_ball)}
+	return {mexe, mpos}
+end
+	
 function goLWPassPos(role)
 	local mexe, mpos = GoCmuRush{ pos = ball.LWPassPos(), dir = player.toShootOrRobot(role),sender=role,flag=flag.allow_dss}
 	return {mexe, mpos}
@@ -837,7 +911,7 @@ function defendFront(p)
 end
 
 function defendHead()
-	local mexe, mpos = GotoMatchPos{ pos = pos.defendHeadPos, dir = player.toBallDir, acc = 800,flag = flag.not_avoid_their_vehicle}
+	local mexe, mpos = GotoMatchPos{ pos = pos.defendHeadPos, dir = player.toBallDir, acc = 800,flag = flag.not_avoid_their_vehicle, srole = "defendHead"}
 	return {mexe, mpos}
 end
 
@@ -1009,7 +1083,7 @@ end
 
 -- 强行绕前盯人
 function markingFront(p)
-	local mexe, mpos = Marking{pri = p, front = true, dir = dir.shoot(),flag=flag.allow_dss}
+	local mexe, mpos = Marking{pri = p, front = true, flag=flag.allow_dss}
 	return {mexe, mpos}
 end
 
@@ -1076,7 +1150,8 @@ end
 
 function getBall(p)
 	-- local mexe, mpos = GetBall{ pos = pos.backBall(p), dir = dir.backBall(p)}
-	local mexe, mpos = GetBall{ pos = ball.backPos(p), dir = ball.backDir(p)}
+	-- local mexe, mpos = GetBall{ pos = ball.backPos(p), dir = ball.backDir(p)}
+	local mexe, mpos = GetBall{ pos = ball.backPos(p), dir = player.toPointDir(p)}
 	return {mexe, mpos}
 end
 
@@ -1183,6 +1258,13 @@ end
 function continue()
 	return {["name"] = "continue"}
 end
+
+function goPIDCircle(p, r, o)
+	local mexe, mpos = GoPIDCircle{ pos = p, rad = r, opt = o }
+	return {mexe, mpos}
+end
+
+
 ----------------------------------------------------------------------------------------------
 
 ------------------------------------ 测试相关的skill ------------------------------------------

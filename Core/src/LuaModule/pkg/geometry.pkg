@@ -1,0 +1,136 @@
+$#include "geometry.h"
+
+class CVector {
+    CVector();
+    CVector(double x, double y);
+    CVector(const CVector& v);
+    bool setVector(double x, double y);
+    double mod() const;
+    double mod2() const;
+    double dir() const;
+    double theta(const CVector& v);
+    CVector rotate(double angle) const;
+    CVector unit() const;
+    double x() const;
+    double y() const;
+    double value(double angle) const;
+    CVector operator +(const CVector& v) const;
+    CVector operator -(const CVector& v) const;
+    CVector operator *(double a) const;
+    double operator *(CVector b) const;
+    CVector operator /(double a) const;
+    CVector operator -() const;
+};
+
+class CGeoPoint {
+    CGeoPoint();
+    ~CGeoPoint();
+    CGeoPoint(double x, double y);
+    CGeoPoint(const CGeoPoint& p);
+    bool operator==(const CGeoPoint& rhs);
+    double x() const;
+    double y() const;
+    void setX(double x);
+    void setY(double y);
+    bool fill(double x, double y);
+    double dist(const CGeoPoint& p) const;
+    double dist2(const CGeoPoint& p) const;
+    CGeoPoint operator+(const CVector& v) const;
+    CGeoPoint operator*(const double& a) const;
+    CVector operator-(const CGeoPoint& p) const;
+    CGeoPoint midPoint(const CGeoPoint& p) const;
+};
+
+class CGeoLine {
+    CGeoLine();
+    CGeoLine(const CGeoPoint& p1, const CGeoPoint& p2);
+    CGeoLine(const CGeoPoint& p, double angle);
+    void calABC();
+    CGeoPoint projection(const CGeoPoint& p) const;
+    CGeoPoint point1() const;
+    CGeoPoint point2() const;
+    bool operator==(const CGeoLine& rhs);
+    const double& a() const;
+    const double& b() const;
+    const double& c() const;
+};
+
+class CGeoLineLineIntersection {
+    CGeoLineLineIntersection(const CGeoLine& line_1, const CGeoLine& line_2);
+    bool Intersectant() const;
+    const CGeoPoint& IntersectPoint() const;
+};
+
+class CGeoSegment: public CGeoLine {
+    CGeoSegment();
+    CGeoSegment(const CGeoPoint& p1, const CGeoPoint& p2);
+    bool IsPointOnLineOnSegment(const CGeoPoint& p) const;
+    bool IsSegmentsIntersect(const CGeoSegment& p) const;
+    CGeoPoint segmentsIntersectPoint(const CGeoSegment& p) const;
+    double dist2Point(const CGeoPoint& p);
+    double dist2Segment(const CGeoSegment& s);
+    const CGeoPoint& start() const;
+    const CGeoPoint& end() const;
+    const CGeoPoint& center();
+};
+
+class CGeoShape {
+    virtual ~CGeoShape();
+    virtual bool HasPoint( const CGeoPoint& p) const = 0;
+};
+
+class CGeoRectangle : public CGeoShape {
+    CGeoRectangle();
+    CGeoRectangle( const CGeoPoint& leftTop, const CGeoPoint& rightDown);
+    CGeoRectangle( double x1, double y1, double x2, double y2);
+    void calPoint(double x1, double y1, double x2, double y2);
+    double dist2Point(const CGeoPoint& p);
+    virtual bool HasPoint(const CGeoPoint& p) const;
+};
+
+class CGeoLineRectangleIntersection {
+    CGeoLineRectangleIntersection(const CGeoLine& line, const CGeoRectangle& rect);
+    bool intersectant() const;
+    const CGeoPoint& point1() const;
+    const CGeoPoint& point2() const;
+};
+
+class CGeoCirlce : public CGeoShape {
+    CGeoCirlce();
+    CGeoCirlce(const CGeoPoint& c, double r);
+    virtual bool HasPoint(const CGeoPoint& p) const ;
+    CGeoPoint Center() const;
+    double Radius() const;
+    double Radius2() const;
+};
+
+class CGeoLineCircleIntersection {
+    CGeoLineCircleIntersection(const CGeoLine& line, const CGeoCirlce& circle);
+    bool intersectant() const;
+    const CGeoPoint& point1() const;
+    const CGeoPoint& point2() const;
+};
+
+class CGeoEllipse: CGeoShape {
+    CGeoEllipse();
+    CGeoEllipse(CGeoPoint c, double m, double n);
+    CGeoPoint Center() const;
+    virtual bool HasPoint(const CGeoPoint& p) const ;
+    double Xaxis()const;
+    double Yaxis()const;
+};
+
+class CGeoLineEllipseIntersection {
+    CGeoLineEllipseIntersection(const CGeoLine& line, const CGeoEllipse& circle);
+    bool intersectant() const;
+    const CGeoPoint& point1() const;
+    const CGeoPoint& point2() const;
+};
+
+class CGeoSegmentCircleIntersection {
+    CGeoSegmentCircleIntersection(const CGeoSegment& line, const CGeoCirlce& circle);
+    bool intersectant() const;
+    const CGeoPoint& point1() const;
+    const CGeoPoint& point2() const;
+    int size();
+};

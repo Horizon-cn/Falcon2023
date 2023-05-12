@@ -41,19 +41,21 @@ const static QColor DEBUG_COLOR[10] = {
     Qt::black
 };
 const static QColor DEBUG_BRUSH_COLOR = QColor(255, 255, 255, 20);
-const static QColor COLOR_ORANGE(255, 0, 255);
+const static QColor COLOR_VIOLET(255, 0, 255);
 const static QColor COLOR_ORANGE_SHADOW(255, 0, 255, 60);
 const static QColor COLOR_TRANSORANGE(255, 170, 85, 100);
 const static QColor COLOR_DARKGREEN(48, 48, 48);
 const static QColor COLOR_RED(220, 53, 47);
 const static QColor COLOR_LIGHTWHITE(255, 255, 255, 20);
 const static qreal zoomStep = 0.05;
+const static qreal zoomMax = 2;
 const static qreal zoomMin = 0.35; //0.1;
 const int ballRatio = 3;
 
 auto opm = Owl::OParamManager::Instance();
 auto cpm = Owl::CParamManager::Instance();
 auto sipm = Owl::SIParamManager::Instance();
+auto skpm = Owl::SKParamManager::Instance();
 qreal zoomRatio = 1;
 QPoint zoomStart = QPoint(0, 0);
 QRect area;
@@ -318,7 +320,7 @@ void Field::leftAltModifierPressEvent(QMouseEvent *e) {}
 void Field::leftAltModifierMoveEvent(QMouseEvent *e) {}
 void Field::leftAltModifierReleaseEvent(QMouseEvent *e) {}
 void Field::leftCtrlModifierPressEvent(QMouseEvent *e) {
-    checkClosestBall(rx(e->x()), ry(e->y()));
+    checkClosestBall(rx(e->x()), ry(e->y()), 500); // 太难点了，点到Focus里面就行
 }
 void Field::leftCtrlModifierMoveEvent(QMouseEvent *e) {
     QLineF line(start, end);
@@ -329,12 +331,14 @@ void Field::leftCtrlModifierMoveEvent(QMouseEvent *e) {
 void Field::leftCtrlModifierReleaseEvent(QMouseEvent *e) {
     QLineF line(start, end);
     if(pressedBall) {
-        Simulator::Instance()->setBall(start.x()/1000.0, start.y()/1000.0, ballRatio*line.dx()/1000.0, ballRatio*line.dy()/1000.0);
+        const Owl::Ball& ball = GlobalData::Instance()->maintain[0].ball[0];
+        Simulator::Instance()->setBall(ball.pos.x()/1000.0, ball.pos.y()/1000.0, ballRatio*line.dx()/1000.0, ballRatio*line.dy()/1000.0);
         pressedBall = false;
     }
 }
 void Field::leftDoubleClickEvent(QMouseEvent * e){
-    checkClosestBall(rx(e->x()), ry(e->y()));
+    double limit = sipm->BallRadius; //opm->ballDiameter;
+    checkClosestBall(rx(e->x()), ry(e->y()), limit);
     if (pressedBall) {
         QDialog dialog;
         QFormLayout form(&dialog);
@@ -361,12 +365,11 @@ void Field::leftDoubleClickEvent(QMouseEvent * e){
         pressedBall = false;
     }
 }
-void Field::checkClosestBall(double x, double y) {
-    double limit = pow(sipm->BallRadius*2, 2) / 4; //pow(opm->ballDiameter, 2) / 4;
+void Field::checkClosestBall(double x, double y, double limit) {
     auto& vision = GlobalData::Instance()->maintain[0];
     if (vision.ball[0].valid) {
         const Owl::Ball& ball = vision.ball[0];
-        if(distance2(ball.pos.x() - x, ball.pos.y() - y) < limit) {
+        if(distance2(ball.pos.x() - x, ball.pos.y() - y) < pow(limit, 2)) {
             pressedBall = true;
             return;
         }
@@ -575,8 +578,8 @@ void Field::middleNoModifierPressEvent(QMouseEvent *e) {
 }
 void Field::middleNoModifierMoveEvent(QMouseEvent *e) {
     auto t = MiddleEvent::zoomStart + zoomRatio * (MiddleEvent::start - QPoint(e->x(), e->y()));
-    zoomStart.setX(limitRange(t.x(), 0, int(area.width() * (1 - zoomRatio))));
-    zoomStart.setY(limitRange(t.y(), 0, int(area.height() * (1 - zoomRatio))));
+    zoomStart.setX(limitRange(t.x(), 0, int(area.width() * (zoomMax - zoomRatio))));
+    zoomStart.setY(limitRange(t.y(), 0, int(area.height() * (zoomMax - zoomRatio))));
     triggerDraw();
 }
 void Field::middleNoModifierReleaseEvent(QMouseEvent *e) {}
@@ -613,11 +616,11 @@ void Field::middleCtrlModifierReleaseEvent(QMouseEvent *e) {
 void Field::wheelEvent (QWheelEvent *e) {
     qreal oldRatio = zoomRatio;
     zoomRatio += (e->delta() < 0 ? zoomStep : -zoomStep);
-    zoomRatio = limitRange(zoomRatio, zoomMin, 1.0);
+    zoomRatio = limitRange(zoomRatio, zoomMin, zoomMax); //1.0
     qDebug()<<"zoomRatio"<<zoomRatio;
     zoomStart -= e->pos() * (zoomRatio - oldRatio);
-    zoomStart.setX(limitRange(zoomStart.x(), 0, int(area.width() * (1 - zoomRatio))));
-    zoomStart.setY(limitRange(zoomStart.y(), 0, int(area.height() * (1 - zoomRatio))));
+    zoomStart.setX(limitRange(zoomStart.x(), 0, int(area.width() * (zoomMax - zoomRatio))));
+    zoomStart.setY(limitRange(zoomStart.y(), 0, int(area.height() * (zoomMax - zoomRatio))));
     pixmapPainter.setRenderHint(QPainter::Antialiasing, zoomRatio>0.5);
     triggerDraw();
 }
@@ -654,7 +657,7 @@ void Field::repaint() {//change here!!!!!!! 每帧视觉都更新
         paintInit(); // 绘制场地线
         drawMaintainVision(0);
         drawDebugMessages(PARAM::BLUE); //BLUE
-        reportStatus();
+        //reportStatus();
         paintOffCar();
         break;
     case 3:
@@ -664,7 +667,7 @@ void Field::repaint() {//change here!!!!!!! 每帧视觉都更新
         paintInit(); // 绘制场地线
         drawMaintainVision(0);
         drawDebugMessages(PARAM::YELLOW); //YELLOW
-        reportStatus();
+        //reportStatus();
         paintOffCar();
         break;
     default:
@@ -823,17 +826,22 @@ void Field::drawMaintainVision(int index) {
 
     for(int i = -99; i < 0; i ++) {
 //        drawVision(GlobalData::Instance()->maintain[index + i],true);
+        auto& robot = GlobalData::Instance()->maintain[index + i].robot[PARAM::BLUE][0];
+        paintShadow(COLOR_LIGHTWHITE, robot.pos.x(), robot.pos.y());
         auto& ball = GlobalData::Instance()->maintain[index + i].ball[0];
         paintShadow(COLOR_TRANSORANGE, ball.pos.x(), ball.pos.y());
     }
     for(int j = 0; j < maintain.ballSize; j++) {
         auto& ball = maintain.ball[j];
         QColor ballColor;
-        if (ball.valid == 2) ballColor = Qt::blue;
-        else if(ball.valid) ballColor = COLOR_ORANGE;
-        else ballColor = COLOR_ORANGE_SHADOW;
+        if (ball.valid == 1)
+            ballColor = COLOR_RED;
+        else if (ball.valid == 2)
+            ballColor = COLOR_VIOLET;
+        else
+            ballColor = COLOR_ORANGE_SHADOW;
         paintBall(ballColor, ball.pos.x(), ball.pos.y());
-        paintFocus(COLOR_RED, ball.pos.x(), ball.pos.y(), 500, ballFocusCount++);
+        paintFocus(ballColor, ball.pos.x(), ball.pos.y(), 500, ballFocusCount++);
     }
 }
 void Field::paintCar(const QColor& color, quint8 num, qreal x, qreal y, qreal radian, bool ifDrawNum, const QColor& textColor, bool needCircle) {
@@ -917,7 +925,7 @@ void Field::drawVision(const Owl::OriginMessage &vision, bool shadow) {
     for(int j = 0; j < vision.ballSize; j++) {
         auto& ball = vision.ball[j];
         if(!shadow) {
-            paintBall(COLOR_ORANGE, ball.pos.x(), ball.pos.y());
+            paintBall(COLOR_RED, ball.pos.x(), ball.pos.y());
         } else {
             paintShadow(COLOR_TRANSORANGE, ball.pos.x(), ball.pos.y());
         }
@@ -1069,7 +1077,7 @@ void Field::receiveBlue(){
     static OWL::Protocol::Heat_Map_New blueHeatMap;
     while(true) {
         std::this_thread::sleep_for(std::chrono::microseconds(500)); //微秒
-        if (!opm->HeatMap || _type != 2) continue;
+        if (!opm->heatMap || _type != 2) continue;
         while (receiverBlue->state() == QUdpSocket::BoundState && receiverBlue->hasPendingDatagrams()) {
             datagram.resize(receiverBlue->pendingDatagramSize());
             receiverBlue->readDatagram(datagram.data(),datagram.size());
@@ -1094,10 +1102,10 @@ void Field::receiveBlue(){
                     auto pos = heatPoints.pos(k); // 以传入的点为端点画方框，减少复杂度
                     GlobalData::Instance()->blueHeatMutex.lock();
                     //heatPainter.drawRect(QRectF(::x(pos.x()*10), ::y(-pos.y()*10), ::w(RECT_SIZE), ::h(-RECT_SIZE)));
-                    int point_num_width = opm->field_width / opm->drawStep; //宽边可以绘制的点数
-                    float pos_x = opm->startPosX + int(pos / point_num_width) * opm->drawStep; //mm，默认从左上角开始，纵向给点编号
-                    float pos_y = opm->startPosY + pos % point_num_width * opm->drawStep;
-                    heatPainter.drawRect(QRectF(::x(pos_x), ::y(-pos_y), ::w(opm->drawStep), ::h(-opm->drawStep)));
+                    int point_num_width = opm->field_width / skpm->drawStep; //宽边可以绘制的点数
+                    float pos_x = skpm->startPosX + int(pos / point_num_width) * skpm->drawStep; //mm，默认从左上角开始，纵向给点编号
+                    float pos_y = skpm->startPosY + pos % point_num_width * skpm->drawStep;
+                    heatPainter.drawRect(QRectF(::x(pos_x), ::y(-pos_y), ::w(skpm->drawStep), ::h(-skpm->drawStep)));
                     GlobalData::Instance()->blueHeatMutex.unlock();
                 }
             }
@@ -1114,7 +1122,7 @@ void Field::receiveYellow(){
     static OWL::Protocol::Heat_Map_New yellowHeatMap;
     while(true) {
         std::this_thread::sleep_for(std::chrono::microseconds(500));
-        if (!opm->HeatMap || _type != 3) continue;
+        if (!opm->heatMap || _type != 3) continue;
         while (receiverYellow->state() == QUdpSocket::BoundState && receiverYellow->hasPendingDatagrams()) {
             datagram.resize(receiverYellow->pendingDatagramSize());
             receiverYellow->readDatagram(datagram.data(),datagram.size());
@@ -1138,10 +1146,10 @@ void Field::receiveYellow(){
                 for(int k = 0; k < size; k++) {
                     auto pos = heatPoints.pos(k); // 以传入的点为端点画方框，减少复杂度
                     GlobalData::Instance()->yellowHeatMutex.lock();
-                    int point_num_width = opm->field_width / opm->drawStep; //宽边可以绘制的点数
-                    float pos_x = opm->startPosX + int(pos / point_num_width) * opm->drawStep; //mm，默认从左上角开始，纵向给点编号
-                    float pos_y = opm->startPosY + pos % point_num_width * opm->drawStep;
-                    heatPainter.drawRect(QRectF(::x(pos_x), ::y(-pos_y), ::w(opm->drawStep), ::h(-opm->drawStep)));
+                    int point_num_width = opm->field_width / skpm->drawStep; //宽边可以绘制的点数
+                    float pos_x = skpm->startPosX + int(pos / point_num_width) * skpm->drawStep; //mm，默认从左上角开始，纵向给点编号
+                    float pos_y = skpm->startPosY + pos % point_num_width * skpm->drawStep;
+                    heatPainter.drawRect(QRectF(::x(-pos_x), ::y(pos_y), ::w(skpm->drawStep), ::h(-skpm->drawStep)));
                     //heatPainter.drawRect(QRectF(::x(pos.x()*10), ::y(-pos.y()*10), ::w(RECT_SIZE), ::h(-RECT_SIZE)));
                     GlobalData::Instance()->yellowHeatMutex.unlock();
                 }
@@ -1150,7 +1158,7 @@ void Field::receiveYellow(){
     }
 }
 void Field::drawHeatMap(int team) {
-    if(!opm->HeatMap) return;
+    if(!opm->heatMap) return;
     auto& heat_mutex = team == PARAM::BLUE? GlobalData::Instance()->blueHeatMutex : GlobalData::Instance()->yellowHeatMutex;
     heat_mutex.lock();
     pixmapPainter.drawPixmap(0, 0, *heat_pixmap);

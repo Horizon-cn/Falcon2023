@@ -1,0 +1,36 @@
+$#include "utils.h"
+
+class CVisionModule;
+namespace Utils{
+	double Normalize(double angle);
+	CVector Polar2Vector(double m,double angle);
+	double VectorDot(const CVector& v1, const CVector& v2);
+	double dirDiff(const CVector& v1, const CVector& v2);
+	bool InBetween(const CGeoPoint& p,const CGeoPoint& p1,const CGeoPoint& p2);
+	bool InBetween(double v,double v1,double v2);
+	bool AngleBetween(double d, double d1, double d2, double buffer = Param::Math::PI/30);
+	bool InBetween(const CVector& v, const CVector& v1, const CVector& v2, double buffer = Param::Math::PI/30);
+	CGeoPoint MakeInField(const CGeoPoint& p,const double buffer = 0);
+	bool OutOfField(const CGeoPoint& p,const double buffer = 0);
+	bool IsInField(const CGeoPoint p, double buffer);
+	CGeoPoint MakeOutOfOurPenaltyArea(const CGeoPoint& p,const double buffer);
+	CGeoPoint MakeOutOfTheirPenaltyArea(const CGeoPoint& p, const double buffer);
+	CGeoPoint MakeOutOfCircleAndInField(const CGeoPoint& center,const double radius,const CGeoPoint& p,const double buffer);
+	CGeoPoint MakeOutOfCircle(const CGeoPoint& center, const double radius, const CGeoPoint& target, const double buffer, const bool isBack = false, const CGeoPoint& mePos = CGeoPoint(1e8, 1e8), const CVector adjustVec = CVector(1e8, 1e8));
+	CGeoPoint MakeOutOfLongCircle(const CGeoPoint& seg_start, const CGeoPoint& seg_end, const double radius, const CGeoPoint& target, const double buffer, const CVector adjustVec = CVector(1e8, 1e8));
+	CGeoPoint MakeOutOfRectangle(const CGeoPoint& recP1, const CGeoPoint& recP2, const CGeoPoint& target, const double buffer);
+	bool InOurPenaltyArea(const CGeoPoint& p,const double buffer);
+	bool InTheirPenaltyArea(const CGeoPoint& p,const double buffer);
+	bool PlayerNumValid(int num);
+	CGeoPoint GetOutSidePenaltyPos(double dir, double delta, const CGeoPoint targetPoint = CGeoPoint(-(Param::Field::PITCH_LENGTH)/2, 0));
+	CGeoPoint GetOutTheirSidePenaltyPos(double dir, double delta, const CGeoPoint& targetPoint);
+	CGeoPoint GetInterPos(double dir, const CGeoPoint targetPoint = CGeoPoint(-(Param::Field::PITCH_LENGTH)/2, 0));
+	CGeoPoint GetTheirInterPos(double dir, const CGeoPoint& targetPoint);
+	float SquareRootFloat(float number); 
+	bool canGo(const CVisionModule* pVision, const int num, const CGeoPoint& target, const int flag, const double avoidBuffer);
+	double dist_SegToPoint(double segFirstX, double segFirstY, double segSecondX, double segSecondY, double pointX, double pointY);
+	CGeoPoint MakeOutOfLongCircle(double segFirstX, double segFirstY, double segSecondX, double segSecondY, const CGeoPoint &p);
+	bool point_OnLineOnSeg(const double segFirstX, const double segFirstY, const double segSecondX, const double segSecondY, const double pointX, const double pointY);
+	double min_Obs(double a, double b);
+	double max_Obs(double a, double b);
+}

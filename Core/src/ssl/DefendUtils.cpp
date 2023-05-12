@@ -7,6 +7,7 @@
 #include "TaskMediator.h"
 #include <GDebugEngine.h>
 #include "BestPlayer.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include "BallSpeedModel.h"
 #include "Global.h"
 #include "PointCalculation/CornerAreaPos.h"
@@ -155,7 +156,7 @@ namespace DefendUtils {
 		int shooter;
 		if (pVision->Ball().Vel().mod() < ENEMY_PASS_SPEED)
 		{
-			shooter = BestPlayer::Instance()->getTheirBestPlayer();
+			shooter = DefenceInfoNew::Instance()->getBestBallChaser();
 		}
 		else {
 			const BallVisionT Ball = pVision->Ball();
@@ -179,7 +180,7 @@ namespace DefendUtils {
 			}
 			if (min_player == 0)
 			{
-				shooter = BestPlayer::Instance()->getTheirBestPlayer();
+				shooter = DefenceInfoNew::Instance()->getBestBallChaser();
 			}
 			else
 			{
@@ -769,7 +770,7 @@ namespace DefendUtils {
 			Rbasepoint = Rtarget;
 			Rbasedir = Rdir;
 			if (Utils::InOurPenaltyArea(pVision->Ball().Pos(), PENALTY_BUFFER) && mode == 0) {
-				int oppnum = BestPlayer::Instance()->getTheirBestPlayer();
+				int oppnum = DefenceInfoNew::Instance()->getBestBallChaser();
 				if (/*pVision->TheirPlayer(oppnum).Pos().x()<0 && */oppnum != 0 && vision->TheirPlayer(oppnum).Valid()) {
 					if (pVision->TheirPlayer(oppnum).Pos().y() > 0 && (pVision->TheirPlayer(oppnum).Pos() - GOAL_CENTRE_POS).dir() > (RIGHTBACK_CRITICAL_POINT - GOAL_CENTRE_POS).dir()) {
 						defendbasepoint = RIGHTBACK_CRITICAL_POINT;
@@ -879,7 +880,7 @@ namespace DefendUtils {
 			}
 			if (mode == 3) {
 				if (Utils::InOurPenaltyArea(pVision->Ball().Pos(), PENALTY_BUFFER)) {
-					int oppnum = BestPlayer::Instance()->getTheirBestPlayer();
+					int oppnum = DefenceInfoNew::Instance()->getBestBallChaser();
 					if (oppnum != 0 && vision->TheirPlayer(oppnum).Valid()) {
 						if (pVision->TheirPlayer(oppnum).Pos().y() > 0 && (pVision->TheirPlayer(oppnum).Pos() - GOAL_CENTRE_POS).dir() > (RIGHTBACK_CRITICAL_POINT - GOAL_CENTRE_POS).dir()) {
 							defendbasepoint = RIGHTBACK_CRITICAL_POINT;
@@ -993,7 +994,7 @@ namespace DefendUtils {
 			break;
 		}
 		if (Utils::InOurPenaltyArea(pVision->Ball().Pos(), PENALTY_BUFFER) && mode == 0) {
-			int oppnum = BestPlayer::Instance()->getTheirBestPlayer();
+			int oppnum = DefenceInfoNew::Instance()->getBestBallChaser();
 			if (oppnum != 0 && vision->TheirPlayer(oppnum).Valid()) {
 				if ((pVision->TheirPlayer(oppnum).Pos() - GOAL_CENTRE_POS).dir() > (RIGHTBACK_CRITICAL_POINT - GOAL_CENTRE_POS).dir())
 					defendbasepoint = RIGHTBACK_CRITICAL_POINT;
@@ -1147,7 +1148,7 @@ namespace DefendUtils {
 		}
 		else if (mode == 3) {
 			if (Utils::InOurPenaltyArea(pVision->Ball().Pos(), PENALTY_BUFFER) == true) {
-				int oppnum = BestPlayer::Instance()->getTheirBestPlayer();
+				int oppnum = DefenceInfoNew::Instance()->getBestBallChaser();
 				if (oppnum != 0 && vision->TheirPlayer(oppnum).Valid() == true) {
 					if (pVision->TheirPlayer(oppnum).Pos().y() > 0
 						&& (pVision->TheirPlayer(oppnum).Pos() - GOAL_CENTRE_POS).dir() > (RIGHTBACK_CRITICAL_POINT - GOAL_CENTRE_POS).dir()) {
@@ -1653,7 +1654,7 @@ namespace DefendUtils {
 		}
 		else if (Utils::InOurPenaltyArea(pVision->Ball().Pos(), PENALTY_BUFFER) == true
 			|| pVision->Ball().Valid() == false) {
-			int normalDefendNum = BestPlayer::Instance()->getTheirBestPlayer();
+			int normalDefendNum = DefenceInfoNew::Instance()->getBestBallChaser();
 			if (normalDefendNum >= 0) {
 				double enemy2OurgoalDir = (pVision->TheirPlayer(normalDefendNum).Pos() - GOAL_CENTRE_POS).dir();
 				if (sideFactor == 1) {
@@ -1838,7 +1839,7 @@ namespace DefendUtils {
 	}
 
 	CGeoPoint getMiddleDefender(double bufferX) {
-		int enemyNum = BestPlayer::Instance()->getTheirBestPlayer();
+		int enemyNum = DefenceInfoNew::Instance()->getBestBallChaser();
 		const PlayerVisionT& enemy = vision->TheirPlayer(enemyNum);
 		double defendDir = 0;
 		CGeoPoint RenemyPos = reversePoint(enemy.Pos());

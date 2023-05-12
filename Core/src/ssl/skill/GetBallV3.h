@@ -15,7 +15,11 @@ public:
 	virtual CPlayerCommand* execute(const CVisionModule* pVision);
 protected:
 	virtual void toStream(std::ostream& os) const { os << "Skill: GetBallV3\n"; }
-
+	int PredictForRobot(CGeoPoint point, const CVisionModule* pVision);
+	CGeoPoint Ball_Predict_Pos(const CVisionModule* pVision);
+	CGeoPoint PredictForBall(int frame, const CVisionModule* pVision);
+	CGeoPoint GenerateLargeAnglePoint(const CVisionModule* pVision, const double finalDir, const bool debug);
+	bool JudgeLargeBack(const CVisionModule* pVision, CGeoPoint target);
 private:
 	int _lastCycle;
 };

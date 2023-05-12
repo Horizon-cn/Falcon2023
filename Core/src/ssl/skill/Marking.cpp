@@ -1,6 +1,6 @@
 #include "Marking.h"
 #include <skill/Factory.h>
-#include "BestPlayer.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include "Vision/VisionModule.h"
 #include "utils.h"
 #include "GDebugEngine.h"
@@ -98,7 +98,7 @@ void CMarking::plan(const CVisionModule* pVision)
 	*      ÅÐ¶ÏÊÇ·ñÒªÈÆÇ°½ØÇò      *
 	*	    By Soap 2015-4-27     *
 	*****************************/
-	const PlayerVisionT* theirKicker = &pVision->TheirPlayer(BestPlayer::Instance()->theirFastestPlayerToBallList().front().num);
+	const PlayerVisionT* theirKicker = &pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	double ballToEnemyDir = (enemy.Pos() - ball.Pos()).dir();
 	double meToBallDist = me.Pos().dist(ball.Pos());
 	double enemyToBallDist = enemy.Pos().dist(ball.Pos());
@@ -323,8 +323,8 @@ void CMarking::plan(const CVisionModule* pVision)
 		DefenceInfo::Instance()->setMarkMode(vecNumber,enemyNum,false);
 		setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(MarkingTask));
 	}
-    if (MarkingTask.player.flag & PlayerStatus::ALLOW_DSS)
-        cout << "This is DSS!" << endl;
+    // if (MarkingTask.player.flag & PlayerStatus::ALLOW_DSS)
+        // cout << "This is DSS!" << endl;
 	GDebugEngine::Instance()->gui_debug_msg(MarkingTask.player.pos,"M",COLOR_WHITE);
 	//cout<<enemyNum<<": "<<pVision->TheirPlayer(enemyNum).Vel().mod()<<" "<<vecNumber<<endl;
 	_lastCycle = pVision->Cycle();

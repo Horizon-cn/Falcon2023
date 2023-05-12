@@ -9,6 +9,7 @@
 #include "TaskMediator.h"
 #include "OppAttributesFactory.h"
 #include "GDebugEngine.h"
+#include "defenceNew/DefenceInfoNew.h"
 #include <cstring>
 
 namespace{
@@ -337,7 +338,7 @@ void CDefenceInfo::updateSteadyAttackArray()
 
 void CDefenceInfo::updateBallTaken(const CVisionModule* pVision)
 {
-	int keeperNum = BestPlayer::Instance()->theirFastestPlayerToBallList().at(0).num;	
+	int keeperNum = DefenceInfoNew::Instance()->getBestBallChaser();
 	const PlayerVisionT& keeper =pVision->TheirPlayer(keeperNum);
 	const CGeoPoint ballPos = pVision->Ball().Pos();
 	static int ballTakedCount = 0;

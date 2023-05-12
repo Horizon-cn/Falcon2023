@@ -11,7 +11,7 @@
 //};
 class ParamManagerOwl : public Falcon::ParamManager {
 public:
-    ParamManagerOwl() : ParamManager("../data/owl2.ini") {}
+    ParamManagerOwl() : ParamManager("../data/owl2.ini") { setFileName("./"); update(); }
     ~ParamManagerOwl() {}
     void update()
     {
@@ -34,7 +34,7 @@ public:
 typedef Falcon::MeyersSingleton<ParamManagerOwl> OParamManager;
 class ParamManagerCfg : public Falcon::ParamManager {
 public:
-    ParamManagerCfg() : ParamManager("../data/cfg.ini") {}
+    ParamManagerCfg() : ParamManager("../data/cfg.ini") { setFileName("./"); update(); }
     ~ParamManagerCfg() {}
     void update() {
         //IP address
@@ -63,19 +63,19 @@ public:
 typedef Falcon::MeyersSingleton<ParamManagerCfg> CParamManager;
 class ParamManagerVision : public Falcon::ParamManager {
 public:
-    ParamManagerVision() : ParamManager("../data/vision.ini") {}
+    ParamManagerVision() : ParamManager("../data/vision.ini") { setFileName("./"); }
     ~ParamManagerVision() {}
 };
 typedef Falcon::MeyersSingleton<ParamManagerVision> VParamManager;
 class ParamManagerSimulator : public Falcon::ParamManager {
 public:
-    ParamManagerSimulator() : ParamManager("../data/simulator.ini") {}
+    ParamManagerSimulator() : ParamManager("../data/simulator.ini") { setFileName("./"); }
     ~ParamManagerSimulator() {}
 };
 typedef Falcon::MeyersSingleton<ParamManagerSimulator> SParamManager;
 class CParamManagerSkill : public Falcon::ParamManager {
     public:
-        CParamManagerSkill() : ParamManager("../data/skill.ini") {}
+        CParamManagerSkill() : ParamManager("../data/skill.ini") { setFileName("./"); update(); }
         ~CParamManagerSkill() {}
         void update()
         {
@@ -89,6 +89,12 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(DRAW_BALLPLACE_AREA, "Debug/DRAW_BALLPLACE_AREA", 0);
             loadParam(DRAW_PENALTY_DEBUG_MSG, "Debug/DRAW_PENALTY_DEBUG_MSG", 1);
 
+            loadParam(BUFFER, "GotoPositionNew/BUFFER", 10);
+            loadParam(INFLAT_RATIO, "GotoPositionNew/INFLAT_RATIO", 1.0);
+            loadParam(LOWER_BND_UDOT, "GotoPositionNew/LOWER_BND_UDOT", 2.0);
+            loadParam(MAX_SEARCH_ITERATION, "GotoPositionNew/MAX_SEARCH_ITERATION", 2);
+            loadParam(COUNTPLAN_THRESHOLD, "GotoPositionNew/COUNTPLAN_THRESHOLD", 90);
+
             loadParam(TOUCH_SHIFT_DIST, "TOUCHKICK/TOUCH_SHIFT_DIST", 9.96);
             loadParam(TOUCH_Debug, "TOUCHKICK/TOUCH_Debug", 0);
 
@@ -101,6 +107,18 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(SPECIAL_AREA_BACK_LINE_MODE, "Defence/SPECIAL_AREA_BACK_LINE_MODE", 0);
             loadParam(SIDEBACK_MARKING_MODE, "Defence/SIDEBACK_MARKING_MODE", 1);
             loadParam(GOALIE_FILL_IN_MODE, "Defence/GOALIE_FILL_IN_MODE", 0);
+
+            loadParam(display_debug_info, "DefenceNew/display_debug_info", 1);
+            loadParam(factor_ballChaserTest, "DefenceNew/factor_ballChaserTest", 0);
+            loadParam(factor_Dist2BallNormalized, "DefenceNew/factor_Dist2BallNormalized", 0.7);
+            loadParam(factor_Dist2BallProjModified, "DefenceNew/factor_Dist2BallProjModified", 0.7);
+            loadParam(factor_BallMovingCost, "DefenceNew/factor_BallMovingCost", 0.35);
+            loadParam(factor_TooFar4Pass, "DefenceNew/factor_TooFar4Pass", 0.01);
+            loadParam(factor_TooClose4Pass, "DefenceNew/factor_TooClose4Pass", 1);
+            loadParam(factor_TooFar4Shoot, "DefenceNew/factor_TooFar4Shoot", 0.1);
+            loadParam(factor_EasyBlock, "DefenceNew/factor_EasyBlock", 100);
+            loadParam(factor_NearSideLine, "DefenceNew/factor_NearSideLine", 1);
+            loadParam(factor_EasyShoot, "DefenceNew/factor_EasyShoot", 50);
 
             loadParam(PERIOD_MOVE_X, "Motion/PERIOD_MOVE_X", 0.07692);
             loadParam(PERIOD_MOVE_Y, "Motion/PERIOD_MOVE_Y", 0.013);
@@ -126,6 +144,8 @@ class CParamManagerSkill : public Falcon::ParamManager {
 
             loadParam(SUPPORT_DIST, "Support/SUPPORT_DIST", 1);
 
+            loadParam(GOALIE_DEBUG, "Goalie/GOALIE_DEBUG", 1);
+            loadParam(AGGRESSIVE_GOALIE, "Goalie/AGGRESSIVE_GOALIE", 1);
             loadParam(SLOW_BALL_SPD, "Goalie/SLOW_BALL_SPD", 25.0);
             loadParam(KICKPOWER_GOALIE, "Goalie/KICKPOWER_GOALIE", 550);
             loadParam(HAVE_BALL_DIST, "Goalie/HAVE_BALL_DIST", 30);
@@ -133,12 +153,20 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(CHALLENGE_BALL_DIST, "Goalie/CHALLENGE_BALL_DIST", 60);
             loadParam(BLOCK_DIST, "Goalie/BLOCK_DIST", 60);
 
-            loadParam(BREAK_BACK_DRIBBLE_SPEED, "BREAK/BACK_DRIBBLE_SPEED", 10);
+           
             loadParam(BREAK_SHOOT_ACCURACY, "BREAK/SHOOT_ACCURACY", 10);
             loadParam(BREAK_DEBUG, "BREAK/DEBUG", 1);
             loadParam(COEF_BLOCKSCORE, "BREAK/COEF_BLOCKSCORE", 10);
             loadParam(COEF_NEARSCORE, "BREAK/COEF_NEARSCORE", 1);
             loadParam(COEF_DISTSCORE, "BREAK/COEF_DISTSCORE", 0.5);
+            loadParam(BREAK_ACC, "BREAK/ACC", 200);
+            loadParam(BREAK_VEL, "BREAK/VEL", 500);
+            loadParam(BREAK_ROT_ACC, "BREAK/ROT_ACC", 50);
+            loadParam(BREAK_ROT_VEL, "BREAK/ROT_VEL", 100);
+            loadParam(BREAK_OBSTACLE_RADIUS, "BREAK/OBSTACLE_RADIUS", 5);
+
+
+
 
             loadParam(KICK_DIST, "Advance/KICK_DIST", 400);
             loadParam(WantToLessShoot, "Advance/WantToLessShoot", 3);
@@ -194,6 +222,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(CheckBackPos, "MultiBack/CheckBackPos", true);
             loadParam(dangerVel, "MultiBack/dangerVel", 15);
             loadParam(dangerDist, "MultiBack/dangerDist", 50);
+            loadParam(defendBreak, "MultiBack/defendBreak", true);
 
             loadParam(BAYESLIST, "CMatchState/BAYESLIST", "BayesParams1");
             loadParam(BAYESPARAM, "CMatchState/BAYESPARAM", "Skuba_Attack");
@@ -217,8 +246,21 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(TRANSLATION_ACC_LIMIT, "Capability/TRANSLATION_ACC_LIMIT", 500);
             loadParam(TRANSLATION_SPEED_LIMIT, "Capability/TRANSLATION_SPEED_LIMIT", 300);
             loadParam(TRANSLATION_ROTATE_ACC_LIMIT, "Capability/TRANSLATION_ROTATE_ACC_LIMIT", 5);
+            loadParam(MAX_TRANSLATION_SPEED_X, "Capability/MAX_TRANSLATION_SPEED_X", 500);
+            loadParam(MAX_TRANSLATION_SPEED_Y, "Capability/MAX_TRANSLATION_SPEED_Y", 500);
 
             loadParam(PENALTY_FIGHT, "General/PENALTY_FIGHT", 1);
+
+            loadParam(maxFrame, "BallStatus/maxFrame", 10);
+            loadParam(ourVisionJudgeDist, "BallStatus/ourVisionJudgeDist", 11.3);
+            loadParam(ourVisionJudgeDir, "BallStatus/ourVisionJudgeDir", 30);
+            loadParam(theirVisionJudgeDist, "BallStatus/theirVisionJudgeDist", 20);
+            loadParam(theirVisionJudgeDir, "BallStatus/theirVisionJudgeDir", 30);
+
+            loadParam(boundaryVersion, "GpuBestAlg/boundaryVersion", 1);
+            loadParam(step, "GpuBestAlg/step", 10);
+            loadParam(startPosX, "GpuBestAlg/startPosX", -600);
+            loadParam(startPosY, "GpuBestAlg/startPosY", -450);
         }
     public:
         // GotoPosition 中的调试开关
@@ -232,6 +274,12 @@ class CParamManagerSkill : public Falcon::ParamManager {
         int DRAW_OBS;
         int DRAW_BALLPLACE_AREA;
         int DRAW_PENALTY_DEBUG_MSG;
+        // GotoPositionNew 中的调试变量
+        double BUFFER;
+        double INFLAT_RATIO;
+        double LOWER_BND_UDOT;
+        int MAX_SEARCH_ITERATION;
+        int COUNTPLAN_THRESHOLD;
         // TouchKick 中的调试开关
         int TOUCH_SHIFT_DIST;
         int TOUCH_Debug;
@@ -245,6 +293,18 @@ class CParamManagerSkill : public Falcon::ParamManager {
         int SPECIAL_AREA_BACK_LINE_MODE;
         int SIDEBACK_MARKING_MODE;
         int GOALIE_FILL_IN_MODE;
+        // DefenceNew
+        bool display_debug_info;
+        double factor_ballChaserTest;
+        double factor_Dist2BallNormalized;
+        double factor_Dist2BallProjModified;
+        double factor_BallMovingCost;
+        double factor_TooFar4Pass;
+        double factor_TooClose4Pass;
+        double factor_TooFar4Shoot;
+        double factor_EasyBlock;
+        double factor_NearSideLine;
+        double factor_EasyShoot;
         // 电机参数
         double PERIOD_MOVE_X;
         double PERIOD_MOVE_Y;
@@ -272,6 +332,8 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double SUPPORT_DIST;
         //GetBallParam GET_BALL_PARAM;
         // Goalie2022参数 by SYLG
+        bool GOALIE_DEBUG;
+        bool AGGRESSIVE_GOALIE;
         double SLOW_BALL_SPD;
         int KICKPOWER_GOALIE;
         double HAVE_BALL_DIST;
@@ -279,12 +341,17 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double CHALLENGE_BALL_DIST;
         double BLOCK_DIST;
         //break 参数
-        double BREAK_BACK_DRIBBLE_SPEED;
         double BREAK_SHOOT_ACCURACY;
         bool BREAK_DEBUG;
         double COEF_NEARSCORE;
         double COEF_BLOCKSCORE;
         double COEF_DISTSCORE;
+        double BREAK_ACC;
+        double BREAK_VEL;
+        double BREAK_ROT_VEL;
+        double BREAK_ROT_ACC;
+        double BREAK_OBSTACLE_RADIUS;
+
         //advance参数 byTYH  2022.10
         double KICK_DIST;  /*射门允许范围 越高越容易射门*/
         int WantToLessShoot ; /*射门倾向，越低越容易射门 最低为0 最高为5*/
@@ -342,6 +409,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
         bool CheckBackPos;
         int dangerVel;
         int dangerDist;
+        bool defendBreak;
         // MatchState
         QString BAYESLIST;
         QString BAYESPARAM;
@@ -365,8 +433,22 @@ class CParamManagerSkill : public Falcon::ParamManager {
         int TRANSLATION_ACC_LIMIT;
         int TRANSLATION_SPEED_LIMIT;
         int TRANSLATION_ROTATE_ACC_LIMIT;
+        int MAX_TRANSLATION_SPEED_X;
+        int MAX_TRANSLATION_SPEED_Y;
+
         // General
         bool PENALTY_FIGHT;
+        // BallStatus
+        int maxFrame;
+        double ourVisionJudgeDist;
+        double ourVisionJudgeDir;
+        double theirVisionJudgeDist;
+        double theirVisionJudgeDir;
+        // GpuBestAlg
+        int boundaryVersion;
+        int step;
+        int startPosX;
+        int startPosY;
 };
 typedef Falcon::NormalSingleton< CParamManagerSkill > ParamManager;
 

@@ -42,7 +42,7 @@ class CDealBall {
     double calculateWeight(int camID, CGeoPoint);
 //    void checkInfrared(ReceiveVisionMessage& result);
     bool ballInRobot(CGeoPoint);
-    void checkInfrared(Owl::Ball ball);
+    void checkInfrared(Owl::Ball& ball);
     Owl::Ball ballSequence[PARAM::BALLNUM][PARAM::CAMERA];
     Owl::Ball lastBall, currentBall, simBall;
     double lastPossible, currentPossible;
