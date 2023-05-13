@@ -36,9 +36,7 @@ firstState = "start",
 	Middle   = task.leftBack(),
 	Defender = task.rightBack(),
 	Goalie   = task.goalieNew(),
-	Engine	 = task.goCmuRush(FRONT_POS2, _, ACC, STOP_DSS),
-	Hawk 	 = task.goCmuRush(FRONT_POS3, _, ACC, STOP_DSS),
-	match    = "[AMLDSEH]"
+	match    = "[AMLDS]"
 },
 
 name = "Ref_Stop4CornerKick",

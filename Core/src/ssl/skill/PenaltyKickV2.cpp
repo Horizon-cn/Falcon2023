@@ -142,7 +142,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
                 }
             }
             else {
-                if (fabs(opp.VelX()) > 200 ) {
+                if (fabs(opp.VelX()) > 150 ) {
                     _state = CHIP; break;
                 }
                 else if (Me2OppTooclose(pVision, _executor)) {
@@ -250,7 +250,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -300), "LOSE and GETBALL", COLOR_ORANGE);
             //KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
             /*此处朝向可持久化即可 不需要进行改变*/
-            setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+            setSubTask(PlayerRole::makeItNoneTrajGetBallV3(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
         }
         break;
     case KICK:   // 射门
@@ -455,6 +455,7 @@ bool CPenaltyKickV2::isDirOK(const CVisionModule* pVision, int vecNumber, double
     return false;
 }
 
+
 /**********************************************************
     * Description: 状态切换判定类函数，用于状态转化之间的判断
     * Author: 谭宇宏
@@ -581,6 +582,7 @@ double CPenaltyKickV2::generateNormalPushDir(const CVisionModule* pVision, const
     const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
     const BallVisionT& ball = pVision->Ball();
     double faceDir = 0.0;
+    return faceDir;
     if (!opp.Valid()) {
         KickDirection::Instance()->GenerateShootDir(vecNumber, pVision->OurPlayer(vecNumber).Pos());
         faceDir = KickDirection::Instance()->getRealKickDir();

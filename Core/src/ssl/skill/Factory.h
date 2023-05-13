@@ -47,6 +47,7 @@ public:
 	//拿球的Skill. by HXY
 	CPlayerTask* SlowGetBall(const TaskT& task);
 	CPlayerTask* NoneTrajGetBall(const TaskT& task);
+	CPlayerTask* NoneTrajGetBallV3(const TaskT& task);
 
 	//转身的Skill. by HXY
 	CPlayerTask* DribbleTurn(const TaskT& task);
@@ -124,6 +125,7 @@ namespace PlayerRole {
 	CPlayerTask* makeItRunLocalVersion(const int num, const double speedX, const double speedY, const double rotSpeed);  // 发开环的小车坐标系速度
 	CPlayerTask* makeItCrazyPush(const int num, double faceDir);
 	CPlayerTask* makeItNoneTrajGetBall(const int num, const double dir, CVector finalVel = CVector(0.0, 0.0), int flags = 0, double StopDist = -2, CTRL_METHOD mode = CMU_TRAJ);
+	CPlayerTask* makeItNoneTrajGetBallV3(const int num, const double dir, CVector finalVel = CVector(0.0, 0.0), int flags = 0, double StopDist = -2, CTRL_METHOD mode = CMU_TRAJ);
 	CPlayerTask* makeItGoAndTurnKickV4(const int num, const double dir, CVector finalVel = CVector(0.0, 0.0), int flags = 0, double StopDist = -2, CTRL_METHOD mode = CMU_TRAJ);
 	CPlayerTask* makeItForceStartRush(const int num, double faceDir, int flags = 0);
 	CPlayerTask* makeItChaseKickV1(const int num, double faceDir, int flags = 0);

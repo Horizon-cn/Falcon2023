@@ -1,9 +1,13 @@
 
 local function def_chipPower()
-  if math.abs(ball.posY()) > 270 then 
-    return 180
+  if math.abs(ball.posY()) > 300 then 
+    return 280
+  elseif math.abs(ball.posY())> 285 then
+    return 210
+  elseif math.abs(ball.posY()) > 270 then 
+    return 190
   else 
-    return 100
+    return 180
   end
 end
 
@@ -38,9 +42,7 @@ gPlayTable.CreatePlay{
     Middle   = task.goCmuRush(SYNT_POS_1,_,_,flag.allow_dss),
     Defender = task.goCmuRush(ANTI_POS_1,_,_,flag.allow_dss),
     Goalie   = dangerous and task.goalieNew(),
-    Engine   = task.goLWPassPos("Assister"),
-    Hawk     = task.goCmuRush(ANTI_POS_3,_,_,flag.allow_dss),
-    match    = "{A}{LS}{M}{DEH}"
+    match    = "{A}{M}{D}{LS}"
   },
 
 
@@ -57,9 +59,7 @@ gPlayTable.CreatePlay{
     Middle   = task.goCmuRush(ANTI_POS_2,_,_,flag.allow_dss),
     Defender = task.goCmuRush(SYNT_POS_2,_,_,flag.allow_dss),
     Goalie   = task.goalieNew(),
-    Engine   = task.goLWPassPos("Assister"),
-    Hawk     = task.goCmuRush(SYNT_POS_3,_,_,flag.allow_dss),
-    match    = "{A}{LS}{M}{DEH}"
+    match    = "{A}{M}{D}{LS}"
   },
 
 
@@ -76,9 +76,7 @@ gPlayTable.CreatePlay{
     Middle   = task.goCmuRush(ANTI_POS_3,_,_,flag.allow_dss),
     Defender = task.continue(),
     Goalie   = task.goalieNew(),
-    Engine   = task.goLWPassPos("Assister"),
-    Hawk     = task.continue(),
-    match    = "{A}{LS}{M}{DEH}"
+    match    = "{A}{M}{D}{LS}"
   },
 
   ["shoot"] = {
@@ -92,12 +90,10 @@ gPlayTable.CreatePlay{
     Assister = task.stop(),
     Leader   = task.rightBack(),
     Special  = task.leftBack(),
-    Middle   = task.shootV2(),
+    Middle   = task.chaseNew(),
     Defender = task.goLeftSupport(),
     Goalie   = task.goalieNew(),
-    Engine   = task.goLWPassPos("Assister"),
-    Hawk     = task.goRightSupport(),
-    match    = "{A}{LS}{M}{DEH}"
+    match    = "{A}{M}{D}{LS}"
   },
 
   name = "Ref_CornerKickV8",
