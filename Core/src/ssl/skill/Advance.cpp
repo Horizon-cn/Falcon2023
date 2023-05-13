@@ -469,8 +469,10 @@ bool CAdvance::isPassBalltoMe(const CVisionModule* pVision, int vecNumber) {
     const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
     CVector opp2me = me.Pos() - opp.Pos();
 //    printf("%.3f %.3f\n",(opp.Pos() - me.Pos()).mod(), Utils::Normalize(ball2me.dir() - opp2me.dir()));
-    if((opp.Pos() - me.Pos()).mod() < 60 && Utils::Normalize(ball2me.dir() - opp2me.dir()) < Param::Math::PI / 7) return false;
-    if(ball.Vel().mod() < 175.0) return false;
+	bool nearBoundary = fabs(me.Pos().x()) > Param::Field::PITCH_LENGTH / 2 - Param::Vehicle::V2::PLAYER_SIZE * 4 ||
+		fabs(me.Pos().y()) > Param::Field::PITCH_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE * 4; // 靠近边界不能让开
+    if((opp.Pos() - me.Pos()).mod() < 60 && Utils::Normalize(ball2me.dir() - opp2me.dir()) < Param::Math::PI / 7 && !nearBoundary) return false;
+    if(ball.Vel().mod() < 175.0 && !nearBoundary) return false;
     if (ball.Valid() && abs(diff_ballMoving2Me) < Param::Math::PI / 7.5 && (ball2me.mod() / ball.Vel().mod() < BalltoMeVelTime)) {//
 		return true;
 	}
@@ -664,7 +666,7 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 int CAdvance::toChipOrToFlat(const CVisionModule* pVision, int vecNumber, CGeoPoint TargetPoint) {
     // 0chip 1flat
     const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-    if(isTheLineBlocked(pVision, me.Pos(), TargetPoint))return 0;
+    if(isTheLineBlocked(pVision, me.Pos(), TargetPoint) && me.Pos().dist(pVision->Ball().Pos()) <= ParamManager::Instance()->maxChipDist)return 0;
 
     return 1;
 }
@@ -849,7 +851,8 @@ double CAdvance::TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision,
 	while (n <= Param::Field::MAX_PLAYER) {
 		if (!pVision->TheirPlayer(n).Valid()) { n++; continue; }
 		projectionPoint = start2Target.projection(pVision->TheirPlayer(n).Pos());
-		if (opp2LineDist > (projectionPoint - pVision->TheirPlayer(n).Pos()).mod() && projectionPoint.x() < Param::Field::PITCH_LENGTH / 2.0 && projectionPoint.x() > startPoint.x()) {
+		double r = (projectionPoint - startPoint).x() * (projectionPoint - targetPoint).x() + (projectionPoint - startPoint).y() * (projectionPoint - targetPoint).y();
+		if (opp2LineDist > (projectionPoint - pVision->TheirPlayer(n).Pos()).mod() && r < 0) { // projectionPoint.x() < Param::Field::PITCH_LENGTH / 2.0 && projectionPoint.x() > startPoint.x()) {
 			opp2LineDist = (projectionPoint - pVision->TheirPlayer(n).Pos()).mod();
 		}
 		n++;

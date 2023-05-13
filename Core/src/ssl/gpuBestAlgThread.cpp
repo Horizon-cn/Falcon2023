@@ -24,6 +24,7 @@
 #include <thread>
 #include "Semaphore.h"
 #include <sstream>
+#include "TaskMediator.h"
 extern Semaphore vision_to_cuda;
 
 
@@ -359,6 +360,9 @@ void CGPUBestAlgThread::predictBallPos() {
 
 int CGPUBestAlgThread::getBallArea() {
 	CGeoPoint ballPos = _pVision->Ball().Pos();
+	int advancer = TaskMediator::Instance()->advancer();
+	if (advancer != 0)
+		ballPos = _pVision->OurPlayer(advancer).Pos();
 	int areaNum;
 	for (areaNum = 0; areaNum < AREANUM; areaNum++){
 		if (gpuCalcArea::processed_fieldRectangleArray[areaNum].check4inclusion(ballPos))

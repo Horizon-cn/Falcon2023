@@ -36,7 +36,8 @@ void CDribbleTurnKickV2::plan(const CVisionModule* pVision)
 
 	CPlayerTask* pTask;
 
-	if (abs(Utils::Normalize(me.Dir() - finalDir)) > 80.0 * Param::Math::PI / 180 || (BallStatus::Instance()->getBallPossession(true, runner) == 0 )) {
+	// if (abs(Utils::Normalize(me.Dir() - finalDir)) > 80.0 * Param::Math::PI / 180 || (BallStatus::Instance()->getBallPossession(true, runner) == 0 )) {
+	if (BallStatus::Instance()->getBallPossession(true, runner) == 0) {
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 100), "GET");
 		pTask = PlayerRole::makeItNoneTrajGetBall(runner, finalDir, CVector(0, 0), ShootNotNeedDribble, 0);
 	}
@@ -48,7 +49,8 @@ void CDribbleTurnKickV2::plan(const CVisionModule* pVision)
 			|| dribblePoint == CGeoPoint(9999, 9999)) {
 			dribblePoint = me.Pos();
 		}
-		if (me.Pos().dist(dribblePoint) < 100) {
+		if (me.Pos().dist(dribblePoint) < 100 && fabs(ball.Pos().x()) < Param::Field::PITCH_LENGTH / 2 - Param::Field::BALL_SIZE
+			&& fabs(ball.Pos().y()) < Param::Field::PITCH_WIDTH / 2 - Param::Field::BALL_SIZE) { // 防止dribble too far 或者 出界
 			CGeoPoint target = ball.Pos() + Utils::Polar2Vector(ball.Pos().dist(me.Pos()), Utils::Normalize(finalDir + Param::Math::PI));
 			pTask = PlayerRole::makeItGoto(runner, target, finalDir, PlayerStatus::DODGE_BALL); // 小Break
 		}
