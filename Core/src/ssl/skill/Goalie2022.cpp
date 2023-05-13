@@ -15,7 +15,7 @@
 #define DEBUG_EVALUATE(x) {if(goalie_debug) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,-300), x);}
 
 namespace {
-	bool goalie_debug,is_penalty;
+	bool goalie_debug, is_penalty;
 	const CGeoPoint goalCenter(-Param::Field::PITCH_LENGTH / 2, 0);
 	const CGeoPoint RLeftGoalPost(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
 	const CGeoPoint RRightGoalPost(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);

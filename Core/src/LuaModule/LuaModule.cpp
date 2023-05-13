@@ -797,6 +797,7 @@ extern "C" int Skill_Marking(lua_State * L)
 	//	}
 	//}
 	int enemy = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(pri - 1);
+	DefenceInfoNew::Instance()->addMarker();
 
 	CPlayerTask* pTask = PlayerRole::makeItMarkEnemy(runner, enemy, front, flag, CGeoPoint(x, y), dir);
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
