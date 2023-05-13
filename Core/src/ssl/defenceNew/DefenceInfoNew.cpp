@@ -16,7 +16,7 @@ namespace {
 	GDebugEngine::Instance()->gui_debug_msg(p, str_##arr.toLatin1(), COLOR_YELLOW);\
 }
 
-CDefenceInfoNew::CDefenceInfoNew() :isInTheirPass(false)
+CDefenceInfoNew::CDefenceInfoNew() :isInTheirPass(false), _ballChaserChanged(false), _ballReceiverChanged(false), _markerAmount(0), _lastMarkerAmount(0)
 {
 	display_debug_info = paramManager->display_debug_info;
 	_chaserPotientialList.resize(Param::Field::MAX_PLAYER, 0);
@@ -37,6 +37,8 @@ CDefenceInfoNew::~CDefenceInfoNew()
 
 void CDefenceInfoNew::updateDefenceInfoNew(const CVisionModule* pVision)
 {
+	_lastMarkerAmount = _markerAmount;
+	_markerAmount = 0;
 	updateBallChaserList(pVision);
 	updateBallReceiverList(pVision);
 	checkPass(pVision);
@@ -75,9 +77,6 @@ void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 		_ballChaserList.end());
 	sort(_ballChaserList.begin(), _ballChaserList.end(),
 		[&](int num1, int num2) {return _chaserPotientialList[num1] < _chaserPotientialList[num2]; });
-	//目前使用接口的地方不判断是否存在，故需要保底
-	if (_ballChaserList.empty())
-		_ballChaserList.push_back(0);
 }
 
 void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
@@ -103,8 +102,6 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 		_ballReceiverList.end());
 	sort(_ballReceiverList.begin(), _ballReceiverList.end(),
 		[&](int num1, int num2) {return _receiverPotientialList[num1] < _receiverPotientialList[num2]; });
-	if (_ballReceiverList.empty())
-		_ballReceiverList.push_back(0);
 }
 //传球时的特殊处理
 void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
@@ -126,23 +123,26 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 	{
 		if (BallStatus::Instance()->IsBallKickedOut())
 		{
-			if (display_debug_info) {
-				GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "ball kick!!!!!!!!!!!!!!!!!");
-				//qDebug() << "ball kick!!!!!!!!!";
-			}
+			if (display_debug_info)
+				GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "ball kick!");
 			for (_kicker = 0; _kicker < 2 * Param::Field::MAX_PLAYER; _kicker++)
 				if (BallStatus::Instance()->IsBallKickedOut(_kicker))
 					break;
-			if (_kicker >= Param::Field::MAX_PLAYER)//TheirKick
+			if (Param::Field::MAX_PLAYER <= _kicker && _kicker < 2 * Param::Field::MAX_PLAYER)//TheirKick
 			{
 				_kicker -= Param::Field::MAX_PLAYER;
 				matchReceiver(pVision);
 				if (_receiver != -1)
+				{
 					isInTheirPass = true;
+					//如果有对应marking车，使其成为我们的advance
+					if (DefenceInfo::Instance()->queryMarked(_receiver))
+						TaskMediator::Instance()->setAdvancerPassTo(pVision->OurPlayer(DefenceInfo::Instance()->getOurMarkDenfender(_receiver)).Pos());
+				}
 			}
 		}
 	}
-	//接球者作为新的BallChaser，同时从BallReceiver移除。同时如果有对应marking车，使其成为我们的advance
+	//接球者作为新的BallChaser，同时从BallReceiver移除
 	if (isInTheirPass)
 	{
 		if (display_debug_info)
@@ -155,9 +155,6 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 		auto tmp = find(_ballReceiverList.begin(), _ballReceiverList.end(), _receiver);
 		if (tmp != _ballReceiverList.end())
 			_ballReceiverList.erase(tmp);
-
-		if (DefenceInfo::Instance()->queryMarked(_receiver))
-			TaskMediator::Instance()->setAdvancerPassTo(pVision->OurPlayer(DefenceInfo::Instance()->getOurMarkDenfender(_receiver)).Pos());
 	}
 }
 
@@ -180,23 +177,38 @@ void CDefenceInfoNew::matchReceiver(const CVisionModule* pVision)
 
 void CDefenceInfoNew::updateSteady()
 {
-	//目前使用接口的地方不判断是否存在，故需要保底
+	//目前使用接口的地方不判断是否存在，故需要保底，而已保证steady不为空，故令其等于steady
+	//能不能直接等于steady（旧的？）想想
 	if (_ballChaserList.empty())
-		_ballChaserList.push_back(0);
+		_ballChaserList = _ballChaserSteadyList;
 	if (_ballReceiverList.empty())
-		_ballReceiverList.push_back(0);
-	//todo 原defenceinfo的设计考虑的是具体人员是否相同，以及考虑了接球车nomark，这个再想想
-	if (_ballChaserList[0] != _ballChaserSteadyList[0] ||
-		_ballChaserList.size() != _ballChaserSteadyList.size())
-		_ballChaserSteadyList = _ballChaserList;
-	bool updateReceiver = false;
+		_ballReceiverList = _ballReceiverSteadyList;
+
+	//chaser: 主要看最佳追球者
+	_ballChaserChanged = false;
 	if (_ballChaserList[0] != _ballChaserSteadyList[0])
-		updateReceiver = true;
-	if (!_ballReceiverSteadyList.empty()) {
-		auto newRank = find(_ballReceiverList.begin(), _ballReceiverList.end(), _ballReceiverSteadyList[0]);
-		if (newRank == _ballReceiverList.end() || newRank - _ballReceiverList.begin() >= 2)
-			updateReceiver = true;
+		_ballChaserChanged = true;
+	if (_ballChaserChanged)
+		_ballChaserSteadyList = _ballChaserList;
+
+	//receiver: 针对marking数量进行特殊处理
+	_ballReceiverChanged = false;
+	if (_ballReceiverList[0] != _ballReceiverSteadyList[0])
+		_ballReceiverChanged = true;
+	if (_ballReceiverList.size() < _lastMarkerAmount || _ballReceiverSteadyList.size() < _lastMarkerAmount)
+		_ballReceiverChanged = true;
+	else
+	{
+		vector<double> toMarkPotientialList(_lastMarkerAmount);
+		for (int i = 0; i < _lastMarkerAmount; i++)
+			toMarkPotientialList[i] = _receiverPotientialList[_ballReceiverSteadyList[i]];
+		sort(toMarkPotientialList.begin(), toMarkPotientialList.end());
+		for (int i = 0; i < _lastMarkerAmount; i++)
+			if (toMarkPotientialList[i] > 1.3 * _receiverPotientialList[_ballReceiverList[i]])
+			{
+				_ballReceiverChanged = true; //qDebug() << "big:" << toMarkPotientialList[i] << "small:" << _receiverPotientialList[_ballReceiverList[i]];
+			}
 	}
-	if (updateReceiver)
+	if (_ballReceiverChanged)
 		_ballReceiverSteadyList = _ballReceiverList;
 }

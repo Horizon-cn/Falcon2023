@@ -18,6 +18,7 @@ public:
 	~CDefenceInfoNew();
 	//每帧更新
 	void updateDefenceInfoNew(const CVisionModule* pVision);
+	void addMarker() { _markerAmount++; };
 	//防守信息接口
 	bool isBestBallChaserChanged() { return _ballChaserChanged; }
 	int getBestBallChaser() { return _ballChaserList[0]; }
@@ -42,7 +43,7 @@ private:
 	TenemyList _ballChaserList, _ballChaserSteadyList, _ballReceiverList, _ballReceiverSteadyList;
 	TpotientialList _chaserPotientialList, _lastChaserPotientialList, _receiverPotientialList, _lastReceiverPotientialList;
 	bool isInTheirPass, _ballChaserChanged, _ballReceiverChanged;
-	int _kicker, _receiver;
+	int _kicker, _receiver, _markerAmount, _lastMarkerAmount;
 };
 
 typedef Falcon::NormalSingleton<CDefenceInfoNew> DefenceInfoNew;

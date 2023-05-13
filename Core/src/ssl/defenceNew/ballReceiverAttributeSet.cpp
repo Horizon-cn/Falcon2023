@@ -1,4 +1,5 @@
 #include "ballReceiverAttributeSet.h"
+#include "defence/DefenceInfo.h"
 
 namespace {
 	CGeoPoint goalCentre(-Param::Field::PITCH_LENGTH / 2, 0);
@@ -49,6 +50,8 @@ EVALUATE_ATTRIBUTE_NEW(EasyBlock)
 		const PlayerVisionT& blocker = pVision->OurPlayer(i);
 		if (!blocker.Valid())
 			continue;
+		if (DefenceInfo::Instance()->queryMarked(num) && i == DefenceInfo::Instance()->getOurMarkDenfender(num))
+			continue;
 		CGeoPoint blockerProj = passLine.projection(blocker.Pos());
 		double blocker2projDist = blocker.Pos().dist(blockerProj);
 		double ball2projDist = ball.Pos().dist(blockerProj);
@@ -79,6 +82,8 @@ EVALUATE_ATTRIBUTE_NEW(EasyShoot)
 	{
 		const PlayerVisionT& blocker = pVision->OurPlayer(i);
 		if (!blocker.Valid()||i==0)//0:目前我方Goalie
+			continue;
+		if (DefenceInfo::Instance()->queryMarked(num) && i == DefenceInfo::Instance()->getOurMarkDenfender(num))
 			continue;
 		CGeoPoint blockerProj = shootLine.projection(blocker.Pos());
 		double blocker2projDist = blocker.Pos().dist(blockerProj);
