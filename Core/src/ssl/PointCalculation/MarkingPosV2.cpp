@@ -58,7 +58,7 @@ namespace NameSpaceMarkingPosV2 {
 	bool BACK_LINE_MODE = false;//回退防守
 	bool SPECIAL_AREA_BACK_LINE_MODE = false;//针对角球，特殊区域的盯人全部采用BACK_LINE模式
 
-	double RECEIVER_MARK_BUFFER = -3.0;//receiver 盯人距离
+	double RECEIVER_MARK_BUFFER = 5.0;//-3.0;//receiver 盯人距离
 
 	//调试开关
 	bool debug = false;
