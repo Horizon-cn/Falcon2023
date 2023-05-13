@@ -348,12 +348,14 @@ CPlayerTask* CTaskFactoryV2::DribbleTurnKickV2(const TaskT& task) {
 //////////////////////////////////////////////////////////////////////////
 // define the namespace used to provide interface for task calling
 namespace PlayerRole {
-	CPlayerTask* makeItBreak(const int num, const CGeoPoint& target, bool isPenalty, double shootaccuracy, bool isSpin)
+	CPlayerTask* makeItBreak(const int num, const CGeoPoint& target, bool isPenalty, double shootaccuracy, bool isSpin, bool isChipKick, double kickPower)
 	{
 		static TaskT playerTask;
 		playerTask.executor = num;
 		playerTask.player.pos = target;
 		playerTask.player.kickprecision = shootaccuracy;
+		playerTask.player.ischipkick = isChipKick;
+		playerTask.player.kickpower = kickPower;
 		if (isPenalty)playerTask.player.flag = playerTask.player.flag | PlayerStatus::PENALTY_KICK;
 		if (isSpin)playerTask.player.flag = playerTask.player.flag | PlayerStatus::SPIN;
 

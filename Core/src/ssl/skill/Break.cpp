@@ -168,8 +168,8 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     // 传球精度控制（默认为SHOOT_ACCURACY)
     double precision = task().player.kickprecision > 0 ? task().player.kickprecision : SHOOT_ACCURACY;
-    if(isPenalty)precision=3;
-    precision = 2;
+    //if(isPenalty)precision=3;
+    //precision = 2;
     //踢球相关向量和方向
     CVector me2Ball = ball.Pos() - me.Pos();
     CVector me2Enemy=enemy.Pos()-me.Pos();
@@ -185,10 +185,13 @@ void CBreak::plan(const CVisionModule* pVision) {
     bool needBreakThrough = false;
 
     //当定点设置在禁区内时判定为进行射门
-    double passpower = 100;
-    bool shootGoal = Utils::InTheirPenaltyArea(passTarget, 0);
+    bool isChipKick = task().player.ischipkick;
+    double passpower = task().player.kickpower; // 100;
+    //bool shootGoal = (passTarget.x() == Param::Field::PITCH_LENGTH / 2 && fabs(passTarget.y()) <= Param::Field::GOAL_WIDTH / 2); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
+    
+    bool shootGoal = Utils::InTheirPenaltyArea(passTarget, 0); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
 
-    double power = shootGoal ? 10000 : passpower;
+    double power = shootGoal ? 10000 : passpower; 
     
     //以下是运行逻辑
 
@@ -280,24 +283,31 @@ void CBreak::plan(const CVisionModule* pVision) {
         GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000 * 10, finalDir), COLOR_RED);
         GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000 * 10, me.Dir()), COLOR_BLUE);
     }
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("Canshoot:" + to_string(canShoot)).c_str(), COLOR_YELLOW);
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("Canshoot:" + to_string(canShoot)).c_str(), COLOR_YELLOW);
     auto vel_vertical_target = std::sin(me.Vel().dir() - me2target.dir()) * me.Vel().mod();
 
     //cout<<canShoot<<' '<<fabs(Utils::Normalize(me.Dir() - finalDir))<<' '<<precision * Param::Math::PI / 180.0 <<' '<< fabs(vel_vertical_target)<<endl;
 
     bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
     //if (canShoot && fabs(Utils::Normalize(me.Dir() - finalDir)) < precision * Param::Math::PI / 180.0 && fabs(vel_vertical_target) < 20) {
-    calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
-
-    cout << "canShoot____" << ' ' << canShoot << endl;
-    cout << "dirok____" << ' ' << dirok << endl;
-    if (canShoot && dirok ) {
-        cout << "shoot!!!" << endl;
-        DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
-        KickStatus::Instance()->setKick(vecNumber, power);//力度可调
-
-    }
     DribbleStatus::Instance()->setDribbleCommand(vecNumber, 3);
+    //cout << "canShoot____" << ' ' << canShoot << endl;
+    //cout << "dirok____" << ' ' << dirok << endl;
+
+    if (shootGoal  && dirok) {
+        //if (shootGoal && canShoot && dirok) {
+        cout << "shoot!!!" << endl;
+        // DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
+        KickStatus::Instance()->setKick(vecNumber, power);//力度可调
+    }
+    else if (!shootGoal && fabs(Utils::Normalize(me.Dir() - finalDir)) <= precision) {
+        cout << "pass!!!" << endl;
+        // DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
+        if (isChipKick)
+            KickStatus::Instance()->setChipKick(vecNumber, power);//力度可调
+        else
+            KickStatus::Instance()->setKick(vecNumber, power);//力度可调
+    }
     _lastCycle = pVision->Cycle();
     return CStatedTask::plan(pVision);
 }
@@ -343,6 +353,7 @@ CGeoPoint CBreak::makeInCircle(const CGeoPoint& point, const CGeoPoint& center, 
 //算点
 
     //解耦路径规划与射门判断
+
 
 CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, const CGeoPoint& target, const CGeoPoint& dribblePoint, const bool isChip, bool& canShoot, bool& needBreakThrough) {
 
@@ -408,6 +419,13 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             int pos_num = 2 + 1 + 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
             int pos_size = pos_num * sizeof(float);
             int target_point_num = 10;
+            float target_step = Param::Field::GOAL_WIDTH / (target_point_num - 1);
+            CGeoPoint target_point = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
+            if (!Utils::InTheirPenaltyArea(target, 0)) { // 不在门里，是传球
+                target_point_num = 1;
+                target_step = 0;
+                target_point = target;
+            }
             int target_size = 2 * target_point_num * sizeof(float);
             int results_size = 3 * target_point_num * sizeof(float);
 
@@ -472,10 +490,9 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             }
 
             // 生成目标点信息：
-            float target_step = Param::Field::GOAL_WIDTH / (target_point_num - 1);
             for (int i = 0; i < target_point_num; i++) {
-                target_info[2 * i] = Param::Field::PITCH_LENGTH / 2;
-                target_info[2 * i + 1] = -Param::Field::GOAL_WIDTH / 2 + i * target_step;
+                target_info[2 * i] = target_point.x();
+                target_info[2 * i + 1] = target_point.y() + i * target_step;
             }
 
             std::cout << "break start calc with gpu" << std::endl;
@@ -675,7 +692,7 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
     if (Param::Field::MAX_PLAYER == 0)
     {
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
-        if (fabs(projection) > Param::Field::GOAL_WIDTH / 2) {
+        if (fabs(projection) > (Param::Field::GOAL_WIDTH) / 2) {
             flag = false;
         }
     }
@@ -686,7 +703,7 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
         
-        if (r < radius || fabs(projection) + 5 > Param::Field::GOAL_WIDTH / 2 ) {
+        if (r < radius || fabs(projection) + 2 > (Param::Field::GOAL_WIDTH ) / 2 ) {
             flag = false;
             break;
         }
