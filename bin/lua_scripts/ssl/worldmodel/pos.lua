@@ -247,10 +247,11 @@ function advance()
 	local k_v_1=1.35
 	local k_v_2=0.00225
 	local advancePos
-	--local advancerPassTo = kickStatus:getAdvancerPassTo()
+	local nextAdvancer, x, y = CGetAdvancerPassTo()
+	local advancerPassTo = CGeoPoint:new_local(x, y)
+	--debugEngine:gui_debug_msg(CGeoPoint:new_local(500, 0), nextAdvancer)
 	--if advancerPassTo:x() > -9999 and ball.velMod() > 70 then -- 指定了接球车并已经踢出
 	--	advancePos = advancerPassTo
-	local nextAdvancer = kickStatus:getNextAdvancer()
 	local ball2NextAdvancerDir = (player.pos(nextAdvancer) - ball.pos()):dir()
 	local angleDiff = math.abs(ball2NextAdvancerDir - ball.velDir())
 	local ball2NextAdvancerDist = ball.pos():dist(player.pos(nextAdvancer))
@@ -261,12 +262,12 @@ function advance()
 			--return CGeoPoint(ball.posX()+k_v_1*ball.velX(),ball.posY()+k_v_2*ball.velY())
 			advancePos = CGeoPoint(ball.posX()+k_v_2*math.abs(ball.velX())*ball.velX(),ball.posY()+k_v_2*math.abs(ball.velY())*ball.velY())
 		else
-			local robotNum = bestPlayer:getOurBestPlayer()
-			if Utils.PlayerNumValid(robotNum) then
-				advancePos = player.pos(robotNum)
-			else
+		--	local robotNum = bestPlayer:getOurBestPlayer()
+		--	if Utils.PlayerNumValid(robotNum) then
+		--		advancePos = player.pos(robotNum)
+		--	else
 				advancePos = ball.pos()
-			end
+		--	end
 		end
 	end
 	debugEngine:gui_debug_x(advancePos, 0)  			

@@ -196,6 +196,9 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(TEND_TO_SHOOT_FLAG, "Advance/TEND_TO_SHOOT_FLAG", 23);
             loadParam(SHOOT_BLOCKED_RANGE, "Advance/SHOOT_BLOCKED_RANGE", 1.4);
             loadParam(PASS_BLOCKED_RANGE, "Advance/PASS_BLOCKED_RANGE", 5);
+            loadParam(BALL_DEC, "Advance/BALL_DEC", 98.0);
+            loadParam(FASTEST_RECEIVE_VEL, "Advance/FASTEST_RECEIVE_VEL", 80.0);
+            loadParam(maxChipDist, "Advance/maxChipDist", 460.0);
 
             loadParam(CHASEKICK_TOPENALTY_GAP, "ChaseKick/CHASEKICK_TOPENALTY_GAP", 10);
             loadParam(CHASEKICK_ENDVEL_STARTX, "ChaseKick/CHASEKICK_ENDVEL_STARTX", 0);
@@ -214,6 +217,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(roll_acc, "GetBall/roll_acc", 200);
             loadParam(slide_acc, "GetBall/slide_acc", 500);
             loadParam(transition_speed, "GetBall/transition_speed", 400);
+            loadParam(LARGE_ADJUST_ANGLE, "GetBall/LARGE_ADJUST_ANGLE", 20.0);
 
             loadParam(CATEGORY, "PENALTY_DEFENCE/CATEGORY", 3);
             loadParam(FRAME, "PENALTY_DEFENCE/FRAME", 0);
@@ -372,6 +376,9 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double TEND_TO_SHOOT_FLAG;
         double SHOOT_BLOCKED_RANGE;
         double PASS_BLOCKED_RANGE;
+        double BALL_DEC;
+        double FASTEST_RECEIVE_VEL;
+        double maxChipDist;
         /*射门力度参数*/
         int KICKPOWER;
         int CHIPPOWER;
@@ -401,6 +408,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double roll_acc;
         double slide_acc;
         double transition_speed;
+        double LARGE_ADJUST_ANGLE;
         // PENALTY_DEFENCE
         int CATEGORY;
         int FRAME;

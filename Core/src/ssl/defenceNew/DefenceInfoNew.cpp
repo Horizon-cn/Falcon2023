@@ -120,7 +120,7 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 		if (angleDiff > Param::Math::PI / 2.0 || ball2ReceiverDist > 450 || ball2ReceiverDist < 100 || ball.Vel().mod() < 70)
 		{
 			isInTheirPass = false;
-			KickStatus::Instance()->resetAdvancerPassTo();
+			TaskMediator::Instance()->resetAdvancerPassTo();
 		}
 	} else
 	{
@@ -157,7 +157,7 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 			_ballReceiverList.erase(tmp);
 
 		if (DefenceInfo::Instance()->queryMarked(_receiver))
-			KickStatus::Instance()->setAdvancerPassTo(pVision->OurPlayer(DefenceInfo::Instance()->getOurMarkDenfender(_receiver)).Pos());
+			TaskMediator::Instance()->setAdvancerPassTo(pVision->OurPlayer(DefenceInfo::Instance()->getOurMarkDenfender(_receiver)).Pos());
 	}
 }
 

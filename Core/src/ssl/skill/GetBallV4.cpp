@@ -60,6 +60,7 @@ namespace {
     double roll_acc = 200;
     double slide_acc = 500;
     double transition_speed = 400;
+    double LARGE_ADJUST_ANGLE = 20;
 
     double HEAD_LIMIT = 3;
 }
@@ -75,6 +76,7 @@ CGetBallV4::CGetBallV4()
     roll_acc = ParamManager::Instance()->roll_acc;
     slide_acc = ParamManager::Instance()->slide_acc;
     transition_speed = ParamManager::Instance()->transition_speed;
+    LARGE_ADJUST_ANGLE = ParamManager::Instance()->LARGE_ADJUST_ANGLE;
 
     _lastCycle = 0;
 }
@@ -285,7 +287,7 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
     case DIRECT:
-        getball_task.player.pos = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, reverse_finalDir); // 预测球的位置 + 5.85     
+        getball_task.player.pos = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, (me.Pos() - ball.Pos()).dir()); // 预测球的位置 + 5.85     
         getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
 
         getball_task.player.needdribble = IS_DRIBBLE;
@@ -556,7 +558,7 @@ bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double fi
 bool CGetBallV4::MustUseLargeToAdjust(const CVisionModule* pVision, const int _executor, const double finalDir){
     const BallVisionT& ball = pVision->Ball();
     const PlayerVisionT& me = pVision->OurPlayer(_executor);
-    if (fabs(Utils::Normalize(finalDir - me.Dir())) > Param::Math::PI * 20 / 180.0) return 1;
+    if (fabs(Utils::Normalize(finalDir - me.Dir())) > Param::Math::PI * LARGE_ADJUST_ANGLE / 180.0) return 1;
     else return 0;
 }
 

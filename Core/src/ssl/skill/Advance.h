@@ -72,6 +72,7 @@ private:
     int RELIEF_POWER ;
     int  BACK_POWER ;
     int Advance_DEBUG_ENGINE;
+    double LARGE_ADJUST_ANGLE;
     /**********************************************************
     * Description: ??¨°???
     * Author: ?????
@@ -85,7 +86,7 @@ private:
     CGeoPoint theirCenter = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
     CGeoPoint ourGoal = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
 
-    CGeoPoint SupportPoint[9];
+    CGeoPoint SupportPoint[6];
 
     int LastPassPoint = 0; /*????????????*/
     double last_dir_deviation = 100;
@@ -104,6 +105,7 @@ private:
     bool checkOppHasBall(const CVisionModule* pVision);
     int getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
     bool checkBallFront(const CVisionModule* pVision, double angle);
+    bool IsOurNearHere(const CVisionModule* pVision, const int supportIndex);
     bool IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber);
 
     bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);

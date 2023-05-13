@@ -166,12 +166,12 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	BallStatus::Instance()->UpdateBallStatus(this);
 
 	// 【#TODO】 更新敌我双方对于球的势能，越小越有利于拿球，贝叶斯滤波中有使用
-	BestPlayer::Instance()->update(this); 
+	// BestPlayer::Instance()->update(this); 
 	
 	// 【#TODO】 更新贝叶斯滤波器，评估目前比赛攻防形式
 	// MatchState::Instance()->update();
 
-	DefenceInfo::Instance()->updateDefenceInfo(this);
+	// DefenceInfo::Instance()->updateDefenceInfo(this);
 	DefenceInfoNew::Instance()->updateDefenceInfoNew(this);
 
 	/////////////////////////////////////////////////////////////////////////////
