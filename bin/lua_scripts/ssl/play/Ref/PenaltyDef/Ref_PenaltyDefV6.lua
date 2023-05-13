@@ -7,11 +7,11 @@ firstState = "init",
 			return "start"
 		end
 	end,
-	Leader  = task.goCmuRush(CGeoPoint:new_local(265, 0),_,_,flag.allow_dss),
-	Middle  = task.goCmuRush(CGeoPoint:new_local(265,50),_,_,flag.allow_dss),
-	Crosser = task.goCmuRush(CGeoPoint:new_local(265,-50),_,_,flag.allow_dss),
-	Defender = task.goCmuRush(CGeoPoint:new_local(265,-150),_,_,flag.allow_dss),
-	Assister = task.goCmuRush(CGeoPoint:new_local(265,100),_,_,flag.allow_dss),
+	Leader  = task.goCmuRush(CGeoPoint:new_local(265, 250),_,_,flag.allow_dss),
+	Middle  = task.goCmuRush(CGeoPoint:new_local(265,-250),_,_,flag.allow_dss),
+	Crosser = task.goCmuRush(CGeoPoint:new_local(265,-200),_,_,flag.allow_dss),
+	Defender = task.goCmuRush(CGeoPoint:new_local(265,200),_,_,flag.allow_dss),
+	Assister = task.goCmuRush(CGeoPoint:new_local(265,225),_,_,flag.allow_dss),
 	Goalie   = task.penaltyGoalie(),
 	match = "{LACDM}"
 },
@@ -23,11 +23,11 @@ firstState = "init",
 			return "kicklong"
 		end
 	end,
-	Leader  = task.goCmuRush(CGeoPoint:new_local(265, 0),_,_,flag.allow_dss),
-	Middle  = task.goCmuRush(CGeoPoint:new_local(265,50),_,_,flag.allow_dss),
-	Crosser = task.goCmuRush(CGeoPoint:new_local(265,-50),_,_,flag.allow_dss),
-	Defender = task.goCmuRush(CGeoPoint:new_local(265,-150),_,_,flag.allow_dss),
-	Assister = task.goCmuRush(CGeoPoint:new_local(265,100),_,_,flag.allow_dss),
+	Leader  = task.goCmuRush(CGeoPoint:new_local(265, 250),_,_,flag.allow_dss),
+	Middle  = task.goCmuRush(CGeoPoint:new_local(265,-250),_,_,flag.allow_dss),
+	Crosser = task.goCmuRush(CGeoPoint:new_local(265,-200),_,_,flag.allow_dss),
+	Defender = task.goCmuRush(CGeoPoint:new_local(265,200),_,_,flag.allow_dss),
+	Assister = task.goCmuRush(CGeoPoint:new_local(265,225),_,_,flag.allow_dss),
 	Goalie   = task.penaltyGoalie(),
 	match    = "{LACDM}"
 },
@@ -38,11 +38,16 @@ firstState = "init",
 			return "exit"
 		end
 	end,
-	Goalie  = task.penaltyGoalie(),
+	Leader  = task.goCmuRush(CGeoPoint:new_local(265, 250),_,_,flag.allow_dss),
+	Middle  = task.goCmuRush(CGeoPoint:new_local(265,-250),_,_,flag.allow_dss),
+	Crosser = task.goCmuRush(CGeoPoint:new_local(265,-200),_,_,flag.allow_dss),
+	Defender = task.goCmuRush(CGeoPoint:new_local(265,200),_,_,flag.allow_dss),
+	Assister = task.goCmuRush(CGeoPoint:new_local(265,225),_,_,flag.allow_dss),
+	Goalie  = task.advance(),
 	match = "{LACDM}"
 },
 
-name = "Ref_PenaltyDefV1",
+name = "Ref_PenaltyDefV6",
 applicable ={
 	exp = "a",
 	a = true

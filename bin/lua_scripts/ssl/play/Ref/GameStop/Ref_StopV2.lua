@@ -138,6 +138,9 @@ end
 
 local SIDE_POS, MIDDLE_POS, INTER_POS, SIDE2_POS, INTER2_POS = pos.refStopAroundBall()
 
+local KICKOF_POS_1 = CGeoPoint:new_local(-20, 80)
+local KICKOF_POS_2 = CGeoPoint:new_local(-70, 0)
+local KICKOF_POS_3 = CGeoPoint:new_local(-20, -80)
 
 local STOP_FLAG = flag.dodge_ball
 local STOP_DSS = bit:_or(STOP_FLAG, flag.allow_dss)
@@ -177,6 +180,8 @@ firstState = "start",
     gBallPosYInStop = ball.posY()
     if cond.isGameOn() then
       return "exit"
+    elseif ball.posX() > -8 and ball.posX() < 8 and ball.posY() > -8 and ball.posY() < 8 then
+      return "kickof"
     elseif ball.toOurGoalPostDistSum() < PENALTY_THRESHOLD_DIST then
     --elseif ball.toOurGoalDist() < PENALTY_THRESHOLD_DIST then
       return "standByPenalty"
@@ -200,11 +205,62 @@ firstState = "start",
   match    = "[AMDLS]"
 },
 
+['kickof'] = {
+  switch = function()
+    if cond.isGameOn() then
+      return "exit"
+    elseif ball.posX() > -8 and ball.posX() < 8 and ball.posY() > -8 and ball.posY() < 8 then
+      return nil
+    elseif ball.toOurGoalPostDistSum() < PENALTY_THRESHOLD_DIST then
+      gBallPosXInStop = ball.posX()
+      gBallPosYInStop = ball.posY()
+      return "standByPenalty"
+    elseif ball.posY() < MIDDLE_THRESHOLD_Y and ball.posY() > -MIDDLE_THRESHOLD_Y then
+      if (math.abs(gBallPosXInStop - ball.posX()) >= 8 or math.abs(gBallPosYInStop - ball.posY()) >= 8) then
+        gBallPosXInStop = ball.posX()
+        gBallPosYInStop = ball.posY()
+        return "standInMiddle"
+      end
+      if bufcnt( ((gRoleNum["Assister"] ~= 0) and (player.toTargetDist("Assister") > 8)) or
+                 ((gRoleNum["Special"] ~= 0) and (player.toTargetDist("Special") > 8)) or
+                 ((gRoleNum["Leader"] ~= 0) and (player.toTargetDist("Leader") > 8)) or
+                 ((gRoleNum["Defender"] ~= 0) and (player.toTargetDist("Defender") > 8)) or
+                 ((gRoleNum["Middle"] ~= 0) and (player.toTargetDist("Middle") > 8)), getBufTime()) then
+        return "reDoStop"
+      end
+      if bufcnt( ((gRoleNum["Assister"] ~= 0) and (player.toTargetDist("Assister") < 10)) and
+                 ((gRoleNum["Special"] ~= 0) and (player.toTargetDist("Special") < 10)) and
+                 ((gRoleNum["Leader"] ~= 0) and (player.toTargetDist("Leader") < 10)) and
+                 ((gRoleNum["Defender"] ~= 0) and (player.toTargetDist("Defender") < 10)) and
+                 ((gRoleNum["Middle"] ~= 0) and (player.toTargetDist("Middle") < 10)), 15) then
+        gBallPosXInStop = ball.posX()
+        gBallPosYInStop = ball.posY()
+        return nil
+      end
+    elseif ball.posY() > MIDDLE_THRESHOLD_Y + param.playerRadius or ball.posY() < -MIDDLE_THRESHOLD_Y - param.playerRadius then
+      gBallPosXInStop = ball.posX()
+      gBallPosYInStop = ball.posY()
+      return "standByLine"
+    else
+      return "exit"
+    end
+  end,
+  Assister = task.goCmuRush(KICKOF_POS_1, dir.playerToBall, ACC, STOP_DSS),
+  Special  = task.goCmuRush(KICKOF_POS_2, dir.playerToBall, ACC, STOP_DSS),
+  Leader   = task.goCmuRush(KICKOF_POS_3, dir.playerToBall, ACC, STOP_DSS),
+  Defender = task.rightBack(),--task.defendMiddle4Stop(),--TODO
+  Middle   = task.leftBack(),
+  Goalie   = task.goalieNew(),
+  match    = "[DM][ASL]"
+},
+
 ["standInMiddle"] = {
   switch = function()
     if cond.isGameOn() then
       return "exit"
     --elseif ball.toOurGoalDist() < PENALTY_THRESHOLD_DIST then
+    elseif ball.posX() > -8 and ball.posX() < 8 and ball.posY() > -8 and ball.posY() < 8 then
+      return "kickof"  
     elseif ball.toOurGoalPostDistSum() < PENALTY_THRESHOLD_DIST then
       gBallPosXInStop = ball.posX()
       gBallPosYInStop = ball.posY()
@@ -264,6 +320,8 @@ firstState = "start",
     if cond.isGameOn() then
       return "exit"
     --elseif ball.toOurGoalDist() < PENALTY_THRESHOLD_DIST then
+    elseif ball.posX() > -8 and ball.posX() < 8 and ball.posY() > -8 and ball.posY() < 8 then
+      return "kickof" 
     elseif ball.toOurGoalPostDistSum() < PENALTY_THRESHOLD_DIST then
       if (math.abs(gBallPosXInStop - ball.posX()) >= 8 or math.abs(gBallPosYInStop - ball.posY()) >= 8) then
         gBallPosXInStop = ball.posX()
@@ -315,6 +373,8 @@ firstState = "start",
     if cond.isGameOn() then
       return "exit"
     --elseif ball.toOurGoalDist() < PENALTY_THRESHOLD_DIST then
+    elseif ball.posX() > -8 and ball.posX() < 8 and ball.posY() > -8 and ball.posY() < 8 then
+      return "kickof" 
     elseif ball.toOurGoalPostDistSum() < PENALTY_THRESHOLD_DIST then
       gBallPosXInStop = ball.posX()
       gBallPosYInStop = ball.posY()

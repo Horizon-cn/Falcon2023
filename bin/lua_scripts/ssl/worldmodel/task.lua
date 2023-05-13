@@ -192,7 +192,7 @@ function flatPass(role, power)
 		ipower = kp.specified(power)
 	end
 	local mexe, mpos = ChaseKick{pos = ball.pos, dir = ball.toPlayerHeadDir(role)}
-	return {mexe, mpos, kick.flat, ball.toPlayerHeadDir(role), pre.low, ipower, cp.full(), flag.nothing}
+	return {mexe, mpos, kick.flat, ball.toPlayerHeadDir(role), pre.low, ipower, cp.full(), flag.force_kick}
 end
 
 function compensatePass(role,power)

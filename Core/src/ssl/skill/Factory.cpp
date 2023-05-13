@@ -138,6 +138,9 @@ CPlayerTask* CTaskFactoryV2::OpenSpeed(const TaskT& task) {
 CPlayerTask* CTaskFactoryV2::NoneTrajGetBall(const TaskT& task) {
 	return MakeTask< CGetBallV4 >(task);
 }
+CPlayerTask* CTaskFactoryV2::NoneTrajGetBallV3(const TaskT& task) {
+	return MakeTask< CGetBallV3 >(task);
+}
 CPlayerTask* CTaskFactoryV2::ForceStartRush(const TaskT& task) {
 	return MakeTask< CForceStartRush >(task);
 }
@@ -481,6 +484,18 @@ namespace PlayerRole {
 		playerTask.player.specified_ctrl_method = mode;
 		return TaskFactoryV2::Instance()->NoneTrajGetBall(playerTask);
 	}
+	CPlayerTask* makeItNoneTrajGetBallV3(const int num, const double dir, CVector finalVel, int flags, double StopDist, CTRL_METHOD mode)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		playerTask.player.vel = finalVel;
+		playerTask.player.flag = flags;
+		playerTask.player.rotvel = StopDist;
+		playerTask.player.specified_ctrl_method = mode;
+		return TaskFactoryV2::Instance()->NoneTrajGetBallV3(playerTask);
+	}
+
 	CPlayerTask* makeItGoAndTurnKickV4(const int num, const double dir, CVector finalVel, int flags, double StopDist, CTRL_METHOD mode)
 	{
 		static TaskT playerTask;

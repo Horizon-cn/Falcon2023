@@ -90,8 +90,10 @@ timeout = 99999
 }
 --]]
 local LEFT_POS = CGeoPoint:new_local(200, -165)
+local LEFT_POS_2 = CGeoPoint:new_local(300, -165)
 
 local START_POS = CGeoPoint:new_local(35, 0)
+local START_POS_1 = CGeoPoint:new_local(20, 0)
 local RECEIVE_POS = CGeoPoint:new_local(-110, -70)
 
 local RIGHT_POS_1  = CGeoPoint:new_local(-20, 80)
@@ -108,35 +110,35 @@ firstState = "start",
       return "temp"
     end
   end,
-  Leader   = task.goCmuRush(START_POS,-3.14,_,flag.allow_dss),
+  Leader   = task.goCmuRush(START_POS,-3,_,flag.allow_dss),
   Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss),
   Special  = task.goCmuRush(RIGHT_POS_1,_,_,flag.allow_dss),
   Middle   = task.leftBack(),
   Defender = task.rightBack(),
   Goalie   = task.goalieNew(),
-  match    = "[L][AD][MS]"
+  match    = "[L][AS][MD]"
 },
 
 ["temp"] = {
   switch = function ()
-    if bufcnt(player.toPointDist("Assister", RECEIVE_POS) < 10 and player.toPointDist("Special", RIGHT_POS_1) < 10 ,"fast",100) then
+    if bufcnt(player.toPointDist("Assister", RECEIVE_POS) < 10 and player.toPointDist("Special", RIGHT_POS_1) < 10 ,50,100) then
       return "kickof"
     end
   end,
-  Leader   = task.staticGetBall(-3),
+  Leader   = task.goCmuRush(START_POS_1,-3,_,flag.allow_dss),  --staticGetBall(player.toPlayerDir("Assister","Leader")),
   Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss),
   Special  = task.goCmuRush(RIGHT_POS_1,_,_,flag.allow_dss),
   Middle   = task.leftBack(),
   Defender = task.rightBack(),
   Goalie   = task.goalieNew(),
-  match    = "[L][AD][MS]"
+  match    = "[L][AS][MD]"
 },
 
 
 ["kickof"] = {
     switch = function ()
     --if bufcnt(player.kickBall("Leader"), "fast", 200) then
-      if bufcnt(player.kickBall("Leader"), "fast", 100) then
+      if bufcnt(player.toBallDist("Leader") > 30) then
       return "receive"
     end
   end,
@@ -146,12 +148,12 @@ firstState = "start",
   Middle   = task.leftBack(),
   Defender = task.rightBack(),
   Goalie   = task.goalieNew(),
-  match    = "[L][AD][MS]"
+  match    = "[L][AS][MD]"
 },
 
 ["receive"] = {
   switch = function ()
-    if bufcnt(player.toBallDist("Assister") < 20, 80, 150) then
+    if bufcnt(player.toBallDist("Assister") < 20, 20, 150) then
       return "exit"
     end
   end,
@@ -161,9 +163,8 @@ firstState = "start",
   Middle   = task.leftBack(),
   Defender = task.rightBack(),
   Goalie   = task.goalieNew(),
-  match    = "[A][DL][MS]"
+  match    = "[L][AS][MD]"
 },
-
 
 
 name = "Ref_KickOffV23",

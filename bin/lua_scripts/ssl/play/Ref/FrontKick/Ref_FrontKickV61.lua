@@ -1,12 +1,10 @@
-----------------------------------------------------------
------             SRC lua             ------
------   中场任意球，使用范围中线0~125   ------
------          SCJ 2020/11/10 改      ------
--- 用在中场靠中间位置的定位球，主要要考虑到球的y值会在正负之前跳动
----11/13改 平传 receiveShoot 
+--欺骗策略
 local halfPitchX = param.pitchLength/2    -- 半场长度
 local halfPitchY = param.pitchWidth/2   -- 半场宽度
 local halfGoalW = param.goalWidth/2
+
+local cheatshootpos = ball.refAntiYPos(CGeoPoint:new_local(170,-70))
+local CHEAT = pos.passForTouch(ball.refAntiYPos(CGeoPoint:new_local(170,-70)))
 
 local MAKE_POS_ORG    = CGeoPoint:new_local(100, -250)
 local RIGHT_POS   = ball.refSyntYPos(CGeoPoint:new_local(280, 220))
@@ -14,7 +12,7 @@ local INNER_POS   = ball.refSyntYPos(CGeoPoint:new_local(350, 220))
 local RIGHT_POS2  = ball.refSyntYPos(CGeoPoint:new_local(250, 250))
 local MAKE_POS    = ball.refAntiYPos(MAKE_POS_ORG)
 local READY_POS   = ball.refSyntYPos(CGeoPoint:new_local(80, -150))
-local SHOOT_POS   = ball.refSyntYPos(CGeoPoint:new_local(70, -150))
+local SHOOT_POS   = ball.refSyntYPos(CGeoPoint:new_local(340, -200))
 local MASK_POS    = ball.refSyntYPos(CGeoPoint:new_local(320, 100))
 local SHOOT_POS2  = ball.refSyntYPos(CGeoPoint:new_local(280, -130))
 local SHOOT_POS3  = ball.refSyntYPos(CGeoPoint:new_local(50, 100))
@@ -24,126 +22,164 @@ local GOALIE_POS = {
   ball.refSyntYPos(CGeoPoint:new_local(0.1*halfPitchX,0.3*halfPitchY)),
   FINAL_SHOOT_POS,
 }
+local function def_chipPower()
+  if math.abs(ball.posY()) > 270 then 
+    return 200
+  else 
+    return 160
+  end
+end
+local SPECIAL_POS = {
+  ball.refAntiYPos(CGeoPoint:new_local(270,240)),
+  ball.refAntiYPos(CGeoPoint:new_local(0.75*halfPitchX,0.75*halfPitchY)),
+  ball.refAntiYPos(CGeoPoint:new_local(0.8*halfPitchX,0.95*halfPitchY)),
+  ball.refAntiYPos(CGeoPoint:new_local(0.9*halfPitchX,0.95*halfPitchY)),
+}
+local LEADER_POS = {
+ball.refAntiYPos(CGeoPoint:new_local(-85,-50)),
+ball.refAntiYPos(CGeoPoint:new_local(-100,0)),
+ball.refAntiYPos(CGeoPoint:new_local(-85,50)),
+ball.refAntiYPos(CGeoPoint:new_local(-85,0)),
+}
+local MIDDLE_POS = {
+  ball.refAntiYPos(CGeoPoint:new_local(270,215)),
+  ball.refAntiYPos(CGeoPoint:new_local(340,215)),
+  ball.refAntiYPos(CGeoPoint:new_local(335,115)),
+  ball.refAntiYPos(CGeoPoint:new_local(380,220)),
+
+}
+local DEFENDER_POS = {
+  ball.refAntiYPos(CGeoPoint:new_local(0.45*halfPitchX,0.45*halfPitchY)),
+  ball.refAntiYPos(CGeoPoint:new_local(0.2*halfPitchX,0.95*halfPitchY)),
+  ball.refAntiYPos(CGeoPoint:new_local(0.7*halfPitchX,0.95*halfPitchY)),
+}
+local function projectX()
+    local x = 0
+    if(ball.posY()>0) then --170 -70
+         if(ball.posX()>=170) then
+            x = 16
+            return x
+         else
+           x = -16
+            return x 
+         end
+    else --170 70
+          if(ball.posX()>=170) then
+            x = 16
+            return x
+          else
+           x = -16
+            return x
+          end
+    end
+end
+
+local function projectY()
+    local y = 0
+    if(ball.posY()>0) then --170 -70
+         if(ball.posX()>=170) then
+            y = 16
+            return y
+         else
+           y = 16
+            return y
+         end
+    else --170 70
+          if(ball.posX()>=170) then
+            y = -16
+            return y
+          else
+           y = -16
+            return y
+          end
+    end
+end
 
 gPlayTable.CreatePlay{
 
-firstState = "getready",
 
+firstState = "getready",
+--各就各位，Middle去球门前干扰，special协同干扰，在chippass之后回防，Leader在中场待命，由Leader完成最终kick，
+--Assister负责传球，Defender始终作为诱饵
 ["getready"] = {
   switch = function ()
-    if bufcnt(player.toTargetDist("Special")<30 or
-      player.toTargetDist("Leader")<30, "normal") then
+    if bufcnt(player.toTargetDist("Defender")<30
+    , "normal") then
       return "startball"
     end
   end,
   --Assister = task.goCmuRush(ball.pos())
-  Assister = task.staticGetBall(MAKE_POS_ORG),
-  Leader   = task.goCmuRush(CGeoPoint:new_local(0,120)),
-  Special  = task.goCmuRush(CGeoPoint:new_local(0,-120)),
- Defender = task.goCmuRush(READY_POS),
-  Middle   = task.goCmuRush(RIGHT_POS2),
-  Goalie   = task.runMultiPos(GOALIE_POS, false, 30, _, 600),
-  match    = "{A}[LDSM]"
+  Assister = task.goCmuRush(pos.reflectPos(projectX(),-projectY()),_,_,flag.allow_dss),
+  Leader   = task.goCmuRush(LEADER_POS[1],_,_,flag.allow_dss),
+  Special  = task.goCmuRush(SPECIAL_POS[1],_,_,flag.allow_dss),
+ Defender = task.goCmuRush(READY_POS,_,_,flag.allow_dss),
+  Middle   = task.goCmuRush(MIDDLE_POS[3],_,_,flag.allow_dss),
+  Goalie   = task.goalie(),
+  match    = "{A}{M}{DLS}"
 },
 
 ["startball"] = {
   switch = function ()
-    if bufcnt(player.toTargetDist("Special")<30 and
-      player.toTargetDist("Leader")<30, 1, 180) then
+    if bufcnt(player.toTargetDist("Defender")<30 and
+      player.toTargetDist("Middle")<30 and 
+      player.toTargetDist("Assister")<10 , 10, 180)  then
       return "getball"
     end
   end,
-  Assister = task.staticGetBall(MAKE_POS_ORG),
-  Middle   = task.goCmuRush(RIGHT_POS2),
-  Special  = task.goCmuRush(RIGHT_POS),
-  Leader   = task.goCmuRush(MAKE_POS, player.toBallDir("Leader")),
-  Defender = task.goCmuRush(READY_POS),
-  Goalie   = task.runMultiPos(GOALIE_POS, false, 30, _, 600),
-  match    = "{A}[DLSM]"
+  Assister = task.staticGetBall(CHEAT),
+  Middle   = task.runMultiPos(MIDDLE_POS),
+  Special  = task.goCmuRush(SPECIAL_POS[1],_,_,flag.allow_dss),
+  Leader   = task.goCmuRush(LEADER_POS[1],_,_,flag.allow_dss),
+  Defender = task.goCmuRush(READY_POS,_,_,flag.allow_dss),
+  Goalie   = task.goalie(),
+  match    = "{A}{M}{D}{SL}"
 },
 
 ["getball"] = {
   switch = function ()
-    if bufcnt(true, 20) then
+    if bufcnt(player.toTargetDist("Assister")<20, "fast", 100) then
       return "chippass"
     end
   end,
-  Assister = task.staticGetBall(MAKE_POS_ORG),
-  Middle   = task.goCmuRush(RIGHT_POS2),
-  Special  = task.goCmuRush(RIGHT_POS),
-  Leader   = task.goCmuRush(MAKE_POS, player.toBallDir("Leader")),
-  Defender = task.goCmuRush(READY_POS, player.toBallDir("Defender")),
+  Assister = task.staticGetBall(CHEAT),
+  Middle   = task.runMultiPos(MIDDLE_POS),
+  Special  = task.goCmuRush(SPECIAL_POS[1]),
+  Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),
+  Defender = task.goCmuRush(READY_POS, player.toBallDir("Defender"),_, flag.allow_dss),
   Goalie   = task.goalie(),
   match    = "{ADLSM}"
 },
 
 ["chippass"] = {
   switch = function ()
-    if  player.kickBall("Assister") or
-      player.toBallDist("Assister") > 20 then
-      return "fixgoto"
+    if bufcnt( player.kickBall("Assister") or
+      player.toBallDist("Assister")>20,"fast", 100)  then
+      return "gokick"
     end
   end,
-  Assister = task.chipPass("Defender",200),
-  Middle   = task.goCmuRush(RIGHT_POS2),
-  Special  = task.goCmuRush(RIGHT_POS),
-  Leader   = task.goCmuRush(MAKE_POS, player.toBallDir("Leader")),
-  Defender = task.goCmuRush(READY_POS,player.toBallDir("Defender")),
+  Assister = task.chipPass(CHEAT(),def_chipPower()),
+  Middle   = task.runMultiPos(MIDDLE_POS),
+  Special  = task.singleBack(),
+  Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),
+  Defender = task.goCmuRush(READY_POS,player.toBallDir("Defender"),_, flag.allow_dss),
   Goalie   = task.goalie(),
   match    = "{ADLSM}"
 },
-
-["fixgoto"] = {
-  switch = function ()
-    if bufcnt(player.toTargetDist("Assister") < 30,"fast") or bufcnt(true,20) then
-      return "dfpassball"
-  -- elseif  bufcnt(true, 200) then
-   --   return "exit"
-    end
-  end,
-  Middle   = task.goCmuRush(MASK_POS),
-  Special  = task.goCmuRush(INNER_POS,player.toBallDir("Special")),
-  Leader   = task.goCmuRush(MAKE_POS, player.toBallDir("Leader")),
-  Defender = task.goCmuRush(READY_POS, player.toBallDir("Defender")),
-  Assister = task.goCmuRush(SHOOT_POS3, player.toBallDir("Assister")),
-  Goalie   = task.goalie(),
-  match    = "{ALDSM}"
-},
-
-["dfpassball"] = {
-  switch = function ()  
-    if  player.kickBall("Defender") or
-      (( math.abs(ball.velDir()-player.toBallDir("Defender")) < math.pi/18) and (ball.velMod() > 80)) then
-      return "gokick"
-   -- elseif  bufcnt(true, 120) then
-   --   return "exit"
-    end
-  end,
-  Middle   = task.rightBack(),
-  Special  = task.goCmuRush(INNER_POS,player.toBallDir),
-  Leader   = task.leftBack(),
-  --Leader   = task.goCmuRush(MAKE_POS, player.toBallDir),
-  Defender = task.receivePass("Assister",400),
-  Assister = task.goCmuRush(SHOOT_POS3, player.toBallDir),
-  Goalie   = task.goalie(),
-  match    = "{D}{AS}{LM}"
-},
-
 ["gokick"] = {
     switch = function ()
-    if player.kickBall("Assister") then
+    if player.kickBall("Leader") then
       return "exit"
     elseif  bufcnt(true, 480) then
       return "exit"
     end
   end,
-  Assister = task.receiveShoot(),
-  Middle   = task.rightBack(),
-  Defender  = task.defendMiddle(),
-  Special  = task.goCmuRush(MASK_POS,player.toBallDir("Special")),
-  Leader = task.leftBack(),
+  Assister = task.singleBack(),
+  Special   = task.rightBack(),
+  Defender = task.singleBack(),
+  Middle  = task.leftBack(),
+  Leader = task.chaseNew(),
   Goalie   = task.goalie(),
-  match    = "{A}{S}{DLM}"
+  match    = "{A}{L}{S}{DM}"
 },
 
 name = "Ref_FrontKickV61",
