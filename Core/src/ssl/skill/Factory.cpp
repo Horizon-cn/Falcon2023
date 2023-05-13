@@ -109,7 +109,7 @@ CPlayerTask* CTaskFactoryV2::Break(const TaskT& task)
 //////////////////////////////////////////////////////////////////////////
 // current now debugged skill for game
 CPlayerTask* CTaskFactoryV2::GoPIDCircle(const TaskT& task) {
-    return MakeTask< CGoPIDCircle >(task);
+	return MakeTask< CGoPIDCircle >(task);
 }
 CPlayerTask* CTaskFactoryV2::GotoPosition(const TaskT& task) {
 	return MakeTask< CGotoPosition >(task);
@@ -647,180 +647,180 @@ namespace PlayerRole {
 		playerTask.ball.receiver = tendemNum;
 		return TaskFactoryV2::Instance()->Advance(playerTask);
 
-    }
-    CPlayerTask* makeItPenaltyKickV2(const int num, const int flags, const int tendemNum)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        playerTask.ball.receiver = tendemNum;
-        return TaskFactoryV2::Instance()->PenaltyKickV2(playerTask);
-    }
-    CPlayerTask* makeItTandem(const int num, const int robber, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.ball.receiver = robber;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->Tandem(playerTask);
-    }
-    CPlayerTask* makeItGoAndTurnKick(const int num, const double targetdir, const int itype, const int power)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = targetdir;
-        playerTask.player.flag = itype;
-        playerTask.player.chipkickpower = power;
-        return TaskFactoryV2::Instance()->GoAndTurnKick(playerTask);
-    }
-    CPlayerTask* makeItCircleAndPass(const int num, const double targetdir, const int itype, const int power)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = targetdir;
-        playerTask.player.flag = itype;
-        playerTask.player.chipkickpower = power;
-        return TaskFactoryV2::Instance()->CircleAndPass(playerTask);
-    }
-    CPlayerTask* makeItTestCircleBall(const int num ,const double targetdir,const double kickprecision,const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = targetdir;
-        playerTask.player.flag = flags;
-        playerTask.player.kickprecision = kickprecision;
-        return TaskFactoryV2::Instance()->TestCircleBall(playerTask);
-    }
-    CPlayerTask* makeItGoAndTurnKickV3(const int num ,const double targetdir,int circleNum,const double fixAngle,const double maxAcc,const int radius,const int numPerCir,const double gotoPre,const double gotoDist,const double adjustPre,const double kickprecision,const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = targetdir;
-        playerTask.player.flag = flags;
-        playerTask.ball.angle = circleNum;
-        playerTask.player.kickprecision = kickprecision;
-        playerTask.player.rotate_speed = fixAngle;
-        playerTask.player.max_acceleration = maxAcc;
-        playerTask.player.rotvel = radius;
-        playerTask.player.chipkickpower = numPerCir;
-        playerTask.player.kickpower = gotoPre;
-        playerTask.player.max_deceleration = gotoDist;
-        playerTask.player.speed_x = adjustPre;
-        return TaskFactoryV2::Instance()->GoAndTurnKickV3(playerTask);
-    }
-    CPlayerTask* makeItGoAndTurn(const int num ,const double targetdir,const double kickprecision,const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = targetdir;
-        playerTask.player.flag = flags;
-        playerTask.player.kickprecision = kickprecision;
-        return TaskFactoryV2::Instance()->GoAndTurn(playerTask);
-    }
-    CPlayerTask* makeItGoAroundRobot(const int num,const double faceDir,const CGeoPoint circleCenter,int circleDir,double radius, int flag)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = faceDir;
-        playerTask.player.rotdir = circleDir;
-        playerTask.player.pos = circleCenter;
-        playerTask.player.rotvel = radius;
-        return TaskFactoryV2::Instance()->GoAroundRobot(playerTask);
-    }
-    CPlayerTask* makeItGoTechChalPos(const int num, const int flag)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flag;
-        return TaskFactoryV2::Instance()->GoTechChalPos(playerTask);
-    }
-    CPlayerTask* makeItSlowGetBall(const int num, const double dir, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = dir;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->SlowGetBall(playerTask);
-    }
-    CPlayerTask* makeItTimeDelayTest(const int num, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->timeDelayTest(playerTask);
-    }
-    CPlayerTask* makeItMarkEnemy(const int num,const int enemy,const bool front, const int flags,const CGeoPoint pos,const double dir)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.ball.Sender = enemy;
-        playerTask.ball.front = front;
-        playerTask.player.flag = flags;
-        playerTask.player.pos = pos;
-        playerTask.player.angle = dir;
-        return TaskFactoryV2::Instance()->Marking(playerTask);
-    }
-    CPlayerTask* makeItGoSupport(const int num, bool leftOrRight)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.left_or_right = leftOrRight;
-        return TaskFactoryV2::Instance()->GoSupport(playerTask);
-    }
-    CPlayerTask* makeItGoPIDCircle(const int runner, const CGeoPoint pos, const double r, const bool opt)
-    {
-        static TaskT playerTask;
-        playerTask.executor = runner;
-        playerTask.player.left_or_right = opt;
-        playerTask.player.pos = pos;
-        playerTask.player.GoRadius = r;
-        return TaskFactoryV2::Instance()->GoPIDCircle(playerTask);
-    }
-    CPlayerTask* makeItShootBall(const int num, const double dir, const bool ischipkick, const double precision, const double kp, const double cp, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.ischipkick = ischipkick;
-        playerTask.player.angle = dir;
-        playerTask.player.kickprecision = precision;
-        playerTask.player.kickpower = kp;
-        playerTask.player.chipkickpower = cp;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->ShootBall(playerTask);
-    }
-    CPlayerTask* makeItShootBallV2(const int num, const double dir, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = dir;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->ShootBallV2(playerTask);
-    }
-    CPlayerTask* makeItReceivePass(const int num, const double dir, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.angle = dir;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->ReceivePass(playerTask);
-    }
-    CPlayerTask* makeItFetchBall(const int num, const CGeoPoint target, double kickPower, const double angle)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.ball.pos = target;
-        playerTask.player.kickpower = kickPower;
-        playerTask.player.angle = angle;
-        return TaskFactoryV2::Instance()->FetchBall(playerTask);
-    }
-    CPlayerTask* makeItPenaltyGoalie(const int num, const int flags)
-    {
-        static TaskT playerTask;
-        playerTask.executor = num;
-        playerTask.player.flag = flags;
-        return TaskFactoryV2::Instance()->PenaltyDefV1(playerTask);
-        //    return TaskFactoryV2::Instance()->PenaltyGoalie(playerTask);
-    }
+	}
+	CPlayerTask* makeItPenaltyKickV2(const int num, const int flags, const int tendemNum)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		playerTask.ball.receiver = tendemNum;
+		return TaskFactoryV2::Instance()->PenaltyKickV2(playerTask);
+	}
+	CPlayerTask* makeItTandem(const int num, const int robber, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.ball.receiver = robber;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->Tandem(playerTask);
+	}
+	CPlayerTask* makeItGoAndTurnKick(const int num, const double targetdir, const int itype, const int power)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = targetdir;
+		playerTask.player.flag = itype;
+		playerTask.player.chipkickpower = power;
+		return TaskFactoryV2::Instance()->GoAndTurnKick(playerTask);
+	}
+	CPlayerTask* makeItCircleAndPass(const int num, const double targetdir, const int itype, const int power)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = targetdir;
+		playerTask.player.flag = itype;
+		playerTask.player.chipkickpower = power;
+		return TaskFactoryV2::Instance()->CircleAndPass(playerTask);
+	}
+	CPlayerTask* makeItTestCircleBall(const int num, const double targetdir, const double kickprecision, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = targetdir;
+		playerTask.player.flag = flags;
+		playerTask.player.kickprecision = kickprecision;
+		return TaskFactoryV2::Instance()->TestCircleBall(playerTask);
+	}
+	CPlayerTask* makeItGoAndTurnKickV3(const int num, const double targetdir, int circleNum, const double fixAngle, const double maxAcc, const int radius, const int numPerCir, const double gotoPre, const double gotoDist, const double adjustPre, const double kickprecision, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = targetdir;
+		playerTask.player.flag = flags;
+		playerTask.ball.angle = circleNum;
+		playerTask.player.kickprecision = kickprecision;
+		playerTask.player.rotate_speed = fixAngle;
+		playerTask.player.max_acceleration = maxAcc;
+		playerTask.player.rotvel = radius;
+		playerTask.player.chipkickpower = numPerCir;
+		playerTask.player.kickpower = gotoPre;
+		playerTask.player.max_deceleration = gotoDist;
+		playerTask.player.speed_x = adjustPre;
+		return TaskFactoryV2::Instance()->GoAndTurnKickV3(playerTask);
+	}
+	CPlayerTask* makeItGoAndTurn(const int num, const double targetdir, const double kickprecision, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = targetdir;
+		playerTask.player.flag = flags;
+		playerTask.player.kickprecision = kickprecision;
+		return TaskFactoryV2::Instance()->GoAndTurn(playerTask);
+	}
+	CPlayerTask* makeItGoAroundRobot(const int num, const double faceDir, const CGeoPoint circleCenter, int circleDir, double radius, int flag)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = faceDir;
+		playerTask.player.rotdir = circleDir;
+		playerTask.player.pos = circleCenter;
+		playerTask.player.rotvel = radius;
+		return TaskFactoryV2::Instance()->GoAroundRobot(playerTask);
+	}
+	CPlayerTask* makeItGoTechChalPos(const int num, const int flag)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flag;
+		return TaskFactoryV2::Instance()->GoTechChalPos(playerTask);
+	}
+	CPlayerTask* makeItSlowGetBall(const int num, const double dir, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->SlowGetBall(playerTask);
+	}
+	CPlayerTask* makeItTimeDelayTest(const int num, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->timeDelayTest(playerTask);
+	}
+	CPlayerTask* makeItMarkEnemy(const int num, const int enemy, const bool front, const int flags, const CGeoPoint pos, const double dir)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.ball.Sender = enemy;
+		playerTask.ball.front = front;
+		playerTask.player.flag = flags;
+		playerTask.player.pos = pos;
+		playerTask.player.angle = dir;
+		return TaskFactoryV2::Instance()->Marking(playerTask);
+	}
+	CPlayerTask* makeItGoSupport(const int num, bool leftOrRight)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.left_or_right = leftOrRight;
+		return TaskFactoryV2::Instance()->GoSupport(playerTask);
+	}
+	CPlayerTask* makeItGoPIDCircle(const int runner, const CGeoPoint pos, const double r, const bool opt)
+	{
+		static TaskT playerTask;
+		playerTask.executor = runner;
+		playerTask.player.left_or_right = opt;
+		playerTask.player.pos = pos;
+		playerTask.player.GoRadius = r;
+		return TaskFactoryV2::Instance()->GoPIDCircle(playerTask);
+	}
+	CPlayerTask* makeItShootBall(const int num, const double dir, const bool ischipkick, const double precision, const double kp, const double cp, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.ischipkick = ischipkick;
+		playerTask.player.angle = dir;
+		playerTask.player.kickprecision = precision;
+		playerTask.player.kickpower = kp;
+		playerTask.player.chipkickpower = cp;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->ShootBall(playerTask);
+	}
+	CPlayerTask* makeItShootBallV2(const int num, const double dir, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->ShootBallV2(playerTask);
+	}
+	CPlayerTask* makeItReceivePass(const int num, const double dir, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->ReceivePass(playerTask);
+	}
+	CPlayerTask* makeItFetchBall(const int num, const CGeoPoint target, double kickPower, const double angle)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.ball.pos = target;
+		playerTask.player.kickpower = kickPower;
+		playerTask.player.angle = angle;
+		return TaskFactoryV2::Instance()->FetchBall(playerTask);
+	}
+	CPlayerTask* makeItPenaltyGoalie(const int num, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->PenaltyDefV1(playerTask);
+		//    return TaskFactoryV2::Instance()->PenaltyGoalie(playerTask);
+	}
 
 	CPlayerTask* makeItGoalie2013(const int num, const int flags) {
 		static TaskT playerTask;
@@ -829,9 +829,10 @@ namespace PlayerRole {
 		return TaskFactoryV2::Instance()->Goalie2013(playerTask);
 	}
 
-	CPlayerTask* makeItGoalie2022(const int num, const int flags) {
+	CPlayerTask* makeItGoalie2022(const int num, const bool isPenalty, const int flags) {
 		static TaskT playerTask;
 		playerTask.executor = num;
+		playerTask.player.isPenalty = isPenalty;
 		playerTask.player.flag = flags;
 		return TaskFactoryV2::Instance()->Goalie2022(playerTask);
 	}

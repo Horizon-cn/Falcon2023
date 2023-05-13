@@ -10,11 +10,12 @@
 #include "WorldModel/WorldModel.h"
 #include <TaskMediator.h>
 #include "defenceNew/DefenceInfoNew.h"
+#include <random>
 
 #define DEBUG_EVALUATE(x) {if(goalie_debug) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,-300), x);}
 
 namespace {
-	bool goalie_debug;
+	bool goalie_debug, is_penalty;
 	const CGeoPoint goalCenter(-Param::Field::PITCH_LENGTH / 2, 0);
 	const CGeoPoint RLeftGoalPost(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
 	const CGeoPoint RRightGoalPost(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
@@ -44,13 +45,17 @@ CGoalie2022::CGoalie2022() :this_shoot_cycle(0), rescuePoint(goalCenter)
 
 void CGoalie2022::plan(const CVisionModule* pVision)
 {
+	is_penalty = task().player.isPenalty;
 	int purpose = evaluate(pVision);
 	CPlayerTask* pTask;
 	switch (purpose) {
 	case TEST:
 		break;
 	case NORMAL:
-		pTask = normalTask(pVision);
+		if (is_penalty)
+			pTask = penaltyTask(pVision);
+		else
+			pTask = normalTask(pVision);
 		break;
 	case RESCUE:
 		pTask = rescueTask(pVision);
@@ -141,6 +146,8 @@ bool CGoalie2022::ShouldAttack(const CVisionModule* pVision)
 	   同时，主动出击风险较大，因此用return false添加限制逻辑为主  by SYLG */
 	   /************************************************************************/
 	if (!AGGRESSIVE_GOALIE)
+		return false;
+	if (is_penalty)
 		return false;
 	int robotNum = task().executor;
 	const PlayerVisionT& enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
@@ -404,6 +411,68 @@ CPlayerTask* CGoalie2022::attackEnemyTask(const CVisionModule* pVision)
 	flag |= PlayerStatus::DRIBBLING;
 
 	return PlayerRole::makeItGoto(robotNum, pos, dir, flag);
+}
+
+CPlayerTask* CGoalie2022::penaltyTask(const CVisionModule* pVision)
+{
+	CGeoPoint defCenter;//防守中心，影响随机点的分布
+	const PlayerVisionT& enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
+	CGeoLine defLine(enemy.Pos(), enemy.Dir());
+	if (fabs(enemy.Dir()) <= Param::Math::PI / 2)
+		defLine = CGeoLine(enemy.Pos(), goalCenter);
+	CGeoLineLineIntersection intersect(defLine, BaseLine);
+	if (intersect.Intersectant())
+		defCenter = intersect.IntersectPoint();
+	else
+		defCenter = goalCenter;
+
+	int random_num = 5;
+	double random_start = -0.3;
+	double random_end = 0.3;
+	double random_step = (random_end - random_start) / double(random_num - 1);
+	double random_current = random_start - random_step;
+
+	vector<CGeoPoint> random_points(random_num);
+	generate(random_points.begin(), random_points.end(), //generate points between [begin,end]
+		[&]() {
+		random_current += random_step;
+		return CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH / 6, random_current * Param::Field::GOAL_WIDTH); });
+	if (goalie_debug)
+		for (auto& p : random_points)
+			GDebugEngine::Instance()->gui_debug_x(p, COLOR_GREEN);
+	default_random_engine generator{ (unsigned int)pVision->Cycle() };
+	vector<int> weight_vector;
+	weight_vector.reserve(random_num);
+	for (auto& p : random_points)
+		weight_vector.push_back(100000 / sqrt(defCenter.dist(p)) / std::log10(30 + p.dist(goalCenter)));
+	discrete_distribution<int> weight(weight_vector.begin(), weight_vector.end());
+	//固定间隔帧数进行随机生成
+	static int generate_index = weight(generator);
+	static int interval_cnt = 0;
+	const int generate_interval = 5;
+	interval_cnt++;
+	if (interval_cnt > generate_interval)
+	{
+		interval_cnt = 0;
+		generate_index = weight(generator);
+	}
+	int robotNum = task().executor;
+
+	double dir;
+	CGeoPoint finalPos = random_points[generate_index];
+	const PlayerVisionT& me = pVision->OurPlayer(robotNum);
+	const BallVisionT& ball = pVision->Ball();
+	//if (ball.Valid()) {
+	//	dir = CVector(ball.Pos() - me.Pos()).dir();
+	//} else {
+	//	dir = CVector(me.Pos() - goalCenter).dir();
+	//}
+	dir = 0;
+
+	int flag = task().player.flag;
+	flag |= PlayerStatus::QUICKLY;
+
+	return PlayerRole::makeItGoto(robotNum, finalPos, dir, flag);
 }
 
 void CGoalie2022::generateRescuePoint(const CVisionModule* pVision)

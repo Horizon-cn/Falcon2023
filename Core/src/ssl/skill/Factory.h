@@ -12,14 +12,14 @@ class CPlayerTask;
 class CTaskFactoryV2 {
 public:
 	CPlayerTask* GoPIDCircle(const TaskT& task);
-    CPlayerTask* Break(const TaskT& task);
-    //跑位的Skill. by HXY
-    CPlayerTask* GotoPosition(const TaskT& task);
-    CPlayerTask* SmartGotoPosition(const TaskT& task);
+	CPlayerTask* Break(const TaskT& task);
+	//跑位的Skill. by HXY
+	CPlayerTask* GotoPosition(const TaskT& task);
+	CPlayerTask* SmartGotoPosition(const TaskT& task);
 	CPlayerTask* GotoPositionNew(const TaskT& task);
 
 	CPlayerTask* GoAroundRobot(const TaskT& task);
-    CPlayerTask* GoTechChalPos(const TaskT& task);
+	CPlayerTask* GoTechChalPos(const TaskT& task);
 	//进攻的Skill. by HXY
 	CPlayerTask* ChaseKickV1(const TaskT& task);
 	CPlayerTask* ChaseKickV2(const TaskT& task);
@@ -73,8 +73,8 @@ public:
 	CPlayerTask* MarkingTouch(const TaskT& task);
 	CPlayerTask* MarkingFront(const TaskT& task);
 
-    //守门的Skill. by HXY
-    CPlayerTask* Goalie2013(const TaskT& task);
+	//守门的Skill. by HXY
+	CPlayerTask* Goalie2013(const TaskT& task);
 	CPlayerTask* Goalie2022(const TaskT& task);
 
 	//其他的Skill. by HXY
@@ -148,7 +148,7 @@ namespace PlayerRole {
 	CPlayerTask* makeItTestCircleBall(const int num, const double targetdir, const double kickprecision = Param::Math::PI * 5 / 180, const int flags = 0);
 	CPlayerTask* makeItGoAroundRobot(const int num, const double faceDir, const CGeoPoint circleCenter, int circleDir, double radius = 25, int flags = 0);
 
-    CPlayerTask* makeItGoTechChalPos(const int num, const int flag);
+	CPlayerTask* makeItGoTechChalPos(const int num, const int flag);
 
 	CPlayerTask* makeItSlowGetBall(const int num, const double dir, const int flags = 0);
 	CPlayerTask* makeItTimeDelayTest(const int num, const int flags = 0);
@@ -157,19 +157,19 @@ namespace PlayerRole {
 	CPlayerTask* makeItShootBallV2(const int num, const double dir, const int flags = 0);
 	CPlayerTask* makeItReceivePass(const int num, const double dir, const int flags = 0);
 	CPlayerTask* makeItFetchBall(const int num, const CGeoPoint target, double kickPower, const double angle);
-    CPlayerTask* makeItPenaltyGoalie(const int num, const int flags = 0);
-    CPlayerTask* makeItGoalie2013(const int num, const int flag = 0);
-	CPlayerTask* makeItGoalie2022(const int num, const int flag = 0);
+	CPlayerTask* makeItPenaltyGoalie(const int num, const int flags = 0);
+	CPlayerTask* makeItGoalie2013(const int num, const int flag = 0);
+	CPlayerTask* makeItGoalie2022(const int num, const bool isPenalty, const int flag = 0);
 	CPlayerTask* makeItShootoutGoalie(const int num, const int flag = 0);
 	CPlayerTask* makeItShootoutGoalieV2(const int num, const int flag = 0);
 	CPlayerTask* makeItInterceptBall(const int num, const double add_angle);
-	CPlayerTask* makeItJustKick(const int num, const int mode=0, const double power=550, const int flag=0);
+	CPlayerTask* makeItJustKick(const int num, const int mode = 0, const double power = 550, const int flag = 0);
 	CPlayerTask* makeItWaitTouch(const int num, const CGeoPoint& target, const double dir, const double angle, const int flag = 0);
 	CPlayerTask* makeItPenaltyKick2013(const int num, const int flag = 0);
 	CPlayerTask* makeItPenaltyKick2014(const int num, const int flag = 0);
 	CPlayerTask* makeItDribbleTurn(const int num, const double finalDir, const double pre = Param::Math::PI / 90);
 	CPlayerTask* makeItDribbleTurnKick(const int num, const double finalDir, const double turnRotVel, const double kickPower);
-	CPlayerTask* makeItDribbleTurnKickV2(const int num, const double finalDir=0, const double precision=5*Param::Math::PI/180, const int mode=0, const double power=550, const bool isAdvancer = false, const CGeoPoint Target = CGeoPoint(0, 0));
+	CPlayerTask* makeItDribbleTurnKickV2(const int num, const double finalDir = 0, const double precision = 5 * Param::Math::PI / 180, const int mode = 0, const double power = 550, const bool isAdvancer = false, const CGeoPoint Target = CGeoPoint(0, 0));
 	CPlayerTask* makeItGoSupport(const int num, const bool leftOrRight);
 	CPlayerTask* makeItGoPIDCircle(const int runner, const CGeoPoint pos, const double r, const bool opt);
 }
