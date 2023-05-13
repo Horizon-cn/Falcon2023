@@ -674,7 +674,7 @@ int CGetBallV3::PredictForRobot(CGeoPoint point, const CVisionModule* pVision)//
         capability.maxSpeed *= SLOW_FACTOR;
     }
     const double time_factor = 1.5;
-    double usedtime = expectedCMPathTime(Robot, point, 300, capability.maxSpeed, time_factor);
+    double usedtime = expectedCMPathTime(Robot, point, capability, CVector(0, 0), time_factor, 0);
     int frame = usedtime * 60;
     //double frame = point.dist(Robot.Pos()) / capability.maxSpeed ;
     return frame;

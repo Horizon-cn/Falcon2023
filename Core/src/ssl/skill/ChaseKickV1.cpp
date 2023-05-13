@@ -107,6 +107,12 @@ void CChaseKickV1::plan(const CVisionModule* pVision)
 	}else{
 		robot_ahead_time = -0.10;
 	}
+
+	PlayerCapabilityT capability;
+	capability.maxAccel = capability.maxDec = MaxAcceleration;
+	capability.maxSpeed = capability.maxSpeedX = capability.maxSpeedY = MaxSpeed;
+	
+
 	// 模拟迭代求预测点及时间: 1-小车先于球；2-球在界内;3-用时不超最大时间
 	long predict_cycle=0;
 	do{
@@ -114,8 +120,9 @@ void CChaseKickV1::plan(const CVisionModule* pVision)
 		predict_cycle+=increase_step;
 		ball_time += increase_step*STEP_TIME;
 		CGeoPoint tmpPoint = ball_predict_pos + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER,Utils::Normalize(task().player.angle+Param::Math::PI));
+		
 		if( CMU_TRAJ == TRAJECTORY_METHORD )	//CMU的零速到点轨迹生成
-			robot_time = expectedCMPathTime(me,tmpPoint,MaxAcceleration,MaxSpeed,CM_PREDICT_FACTOR) + STEP_TIME*Param::Latency::TOTAL_LATED_FRAME;
+			robot_time = expectedCMPathTime(me, tmpPoint, capability, CVector(0, 0), CM_PREDICT_FACTOR, 0) + STEP_TIME*Param::Latency::TOTAL_LATED_FRAME;
 		else
 			robot_time = expectedPathTime(me,tmpPoint, MaxAcceleration, MaxSpeed) + STEP_TIME*Param::Latency::TOTAL_LATED_FRAME;
 	}while ( robot_time + robot_ahead_time > ball_time  && !Utils::OutOfField(ball_predict_pos) 

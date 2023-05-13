@@ -122,13 +122,13 @@ void CAdvance::plan(const CVisionModule* pVision)
 	for(int i=0;i<9;++i)
 		SupportPoint[i] = GPUBestAlgThread::Instance()->getBestPointFromArea(i);/* Gpu算点 */
 	// 可视化球的预测位置
-	/*
+	
 	for (int i = 0; i < 6; i++) {
 		CGeoPoint ball_predict_pos = GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), i * 8);
 		GDebugEngine::Instance()->gui_debug_msg(ball_predict_pos, (to_string(i * 8)).c_str(), COLOR_YELLOW);
 		GDebugEngine::Instance()->gui_debug_x(ball_predict_pos, COLOR_BLUE);
 	}
-	*/
+	
 
 //	NormalPlayUtils::generatePassPoint(ball.Pos(), SupportPoint[0], SupportPoint[1], SupportPoint[2], SupportPoint[3]);
 	NumberOfSupport = 6;/*暂时只考虑对面半场六个*/

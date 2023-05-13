@@ -139,7 +139,7 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     }
     string time1 = stamp();
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), ("Dribble Status:" + time1).c_str(), COLOR_YELLOW);
+    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), ("Dribble Status:" + time1).c_str(), COLOR_YELLOW);
 
     //记录目前执行车号和最具威胁车号
     int vecNumber = task().executor;
@@ -195,7 +195,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     bool frared = (RobotSensor::Instance()->IsInfraredOn(vecNumber));// || isVisionHasBall(pVision, task().executor);
 
 
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("Frared Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
+    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("Frared Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
 
     //if (!frared)
     if (BallStatus::Instance()->getBallPossession(true, vecNumber) == 0)
@@ -205,7 +205,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     }
     GDebugEngine::Instance()->gui_debug_x(dribblePoint, COLOR_RED);
     GDebugEngine::Instance()->gui_debug_arc(dribblePoint, 100, 0, 360, COLOR_RED);
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), ("Dribble Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
+    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), ("Dribble Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
 
 
     TaskT grabTask(task());
@@ -214,7 +214,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     grabTask.player.angle = finalDir;
    
 
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
+    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
    /*if (pVision->Cycle() % 60 == 0) {
         move_point = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     }
@@ -226,7 +226,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     CGeoPoint target = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
     end = clock();
     
-    std::cout << "best break point calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
+    //std::cout << "best break point calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
     if (isSetPoint(pVision, point, me.Pos())) {
         move_point = target;
     }

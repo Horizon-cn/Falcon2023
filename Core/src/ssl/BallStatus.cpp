@@ -121,7 +121,7 @@ void CBallStatus::computeBallPossession(const CVisionModule* pVision, bool isOur
         if (isVisionPossession || isInfraredPossession)
             ballPossession[num]++;
         else
-            ballPossession[num]--;
+            ballPossession[num] --;
         ballPossession[num] = max(0, min(maxFrame, ballPossession[num]));
     }
 }

@@ -189,7 +189,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	//control.makeCmTrajectory(self, final, capability, mode);
 	float usedtime = target.dist(self.Pos()) / capability.maxSpeed / 1.414;		// 单位：秒
 	const double time_factor = 1.5;
-	usedtime = expectedCMPathTime(self, final.Pos(), capability.maxAccel, capability.maxSpeed, time_factor);
+	usedtime = expectedCMPathTime(self, final.Pos(), capability, task().player.vel, time_factor, IsGoMiddle);
 
 	/************************************************************************/
 	/* 调用动态避障模块（DSS），对轨迹生成模块运动指令进行避碰检查	*/

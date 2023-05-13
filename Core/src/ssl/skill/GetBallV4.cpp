@@ -291,13 +291,13 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
     case HAVE:
-        getball_task.player.pos = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, reverse_finalDir); // 预测球的位置 + 5.85     
-        // getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
+        getball_task.player.pos = me.Pos();
+        getball_task.player.angle = finalDir;
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
 
     case LEAVEBACK:
-        getball_task.player.pos = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(minGetBallDist, Utils::Normalize((ball.Pos() - me.Pos()).dir()) + Param::Math::PI); // 预测球的位置 + 5.85     
+        getball_task.player.pos = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(20, Utils::Normalize((ball.Pos() - me.Pos()).dir()) + Param::Math::PI); // 预测球的位置 + 5.85     
         getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
         getball_task.player.needdribble = 0;
         getball_task.player.flag = getball_task.player.flag & (~PlayerStatus::DRIBBLING);	//取消控球标签
@@ -335,12 +335,12 @@ CPlayerCommand* CGetBallV4::execute(const CVisionModule* pVision)
 CGeoPoint CGetBallV4::PredictForBall(int frame, const CVisionModule* pVision) //用GPUBestAlgThread获得球的位置
 {
     CGeoPoint Point;
-    /*
+    
     const BallVisionT& ball = pVision->Ball();
      Point = GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), frame);
-    */
+    
 
-    Point = BallSpeedModel::Instance()->posForTime(frame, pVision);
+    //Point = BallSpeedModel::Instance()->posForTime(frame, pVision);
     return Point;
 }
 
@@ -411,7 +411,7 @@ int CGetBallV4::PredictForRobot(CGeoPoint point, const CVisionModule* pVision)//
         capability.maxSpeed *= SLOW_FACTOR;
     }
     const double time_factor = 1.5;
-    double usedtime = expectedCMPathTime(Robot, point, 300, capability.maxSpeed, time_factor);
+    double usedtime = expectedCMPathTime(Robot, point, capability, CVector(0, 0), time_factor, 0);
     double frame = usedtime * 60;
     char msg[100];
     sprintf(msg, "%f", frame);
@@ -461,7 +461,9 @@ CGeoPoint CGetBallV4::GenerateLargeAnglePoint(const CVisionModule* pVision, cons
         }
     }
     else {
-        CGeoPoint target = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(getBallDist, Utils::Normalize(ball.Vel().dir() + Param::Math::PI));
+        if((ball.Pos() - me.Pos()).theta(ball.Vel()) < Param::Math::PI * 60 / 180.0)
+            target = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(getBallDist, Utils::Normalize(finalDir + Param::Math::PI));
+        else target = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(getBallDist, ball.Vel().dir());
     }
     //cout << "GETBALLDIST:   " << getBallDist << "MOD:   " << (target - me.Pos()).mod() << endl;
 

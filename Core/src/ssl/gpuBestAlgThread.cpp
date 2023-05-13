@@ -946,6 +946,7 @@ void CGPUBestAlgThread::sendFieldRectangle() {
 		CGeoPoint leftDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftDownPos;
 		CGeoPoint rightDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightDownPos;
 		CGeoPoint centerPos = gpuCalcArea::processed_fieldRectangleArray[i].getCenter();
+		/*
 		GDebugEngine::Instance()->gui_debug_line(leftUpPos, rightUpPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(rightUpPos, rightDownPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(rightDownPos, leftDownPos, COLOR_BLACK);
@@ -953,9 +954,10 @@ void CGPUBestAlgThread::sendFieldRectangle() {
 		GDebugEngine::Instance()->gui_debug_x(_bestSupport[i], COLOR_WHITE);
 		GDebugEngine::Instance()->gui_debug_msg(_bestSupport[i], QString::number(i).toStdString().c_str(), COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(_pointPotential[i]).toStdString().c_str(), COLOR_BLACK);
+		*/
 	}
 	//支撑点顺序debug信息
-
+	/*
 	//GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], QString::number(cum).toStdString().c_str(), COLOR_BLACK);
 	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], "000", COLOR_YELLOW);
 	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[1], "111", COLOR_YELLOW);
@@ -963,4 +965,5 @@ void CGPUBestAlgThread::sendFieldRectangle() {
 	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[3], "333", COLOR_YELLOW);
 	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[4], "444", COLOR_YELLOW);
 	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[5], "555", COLOR_YELLOW);
+	*/
 }

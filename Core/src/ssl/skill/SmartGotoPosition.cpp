@@ -145,11 +145,6 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
     // 运动参数设置
     _capability = setCapability(pVision);
-    if (task().player.max_acceleration)_capability.maxAccel = task().player.max_acceleration;
-    if (task().player.max_deceleration)_capability.maxDec = task().player.max_deceleration;
-    if (task().player.max_rot_acceleration)_capability.maxAngularDec = task().player.max_rot_acceleration;
-    if (task().player.max_rot_acceleration)_capability.maxAngularAccel = task().player.max_rot_acceleration;
-    if (task().player.max_rot_speed)_capability.maxAngularSpeed = task().player.max_rot_speed;
 
     /*
     grabTask.player.max_acceleration = MAX_ACC;
@@ -185,11 +180,15 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
     // 生成避障区域
     ObstaclesNew obsNew(avoidLength);
-    obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
-//    if (isAdvancer || isBack || isGoalie)
-//        obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
-//    else
-//        obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
+    if (isAdvancer || isBack || isGoalie)
+        obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
+    if (isAdvancer || isBack || isGoalie)
+        obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 2, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
+
+    //if (isAdvancer || isBack || isGoalie)
+    //    obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 2, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
+    //else
+    //    obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
     
 
     /************************************************************************/
@@ -406,6 +405,13 @@ PlayerCapabilityT CSmartGotoPosition::setCapability(const CVisionModule* pVision
         capability.maxAccel = 200;
         capability.maxDec = 200;
     }
+
+    if (task().player.max_acceleration)_capability.maxAccel = task().player.max_acceleration;
+    if (task().player.max_deceleration)_capability.maxDec = task().player.max_deceleration;
+    if (task().player.max_rot_acceleration)_capability.maxAngularDec = task().player.max_rot_acceleration;
+    if (task().player.max_rot_acceleration)_capability.maxAngularAccel = task().player.max_rot_acceleration;
+    if (task().player.max_rot_speed)_capability.maxAngularSpeed = task().player.max_rot_speed;
+
 
     return capability;
 }

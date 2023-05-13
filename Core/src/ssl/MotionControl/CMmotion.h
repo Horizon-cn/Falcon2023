@@ -52,7 +52,7 @@ void goto_point_omni_test(const PlayerVisionT& start,
 	PlayerVisionT& nextStep,
 	nonZeroMode mode = FAST, bool IsGoMiddle = false);
 
-double expectedCMPathTime(const PlayerVisionT& start, const CGeoPoint& final, double maxAccel, double maxVelocity, double accel_factor);
+double expectedCMPathTime(const PlayerVisionT& start, const CGeoPoint& final, PlayerCapabilityT capability, CVector target_vel, double accel_factor, bool IsGoMiddle);
 double predictedTime(const PlayerVisionT& start, const CGeoPoint& Target, const CVector& targetVel = CVector(0, 0));
 double predictedTimeWithRawVel(const PlayerVisionT& start, const CGeoPoint & Target, const CVector& targetVel = CVector(0, 0));
 double predictedTheirTime(const PlayerVisionT& start, const CGeoPoint& Target, const CVector& targetVel = CVector(0, 0));

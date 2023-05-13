@@ -377,7 +377,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     bool DEBUG_ENGINE = 0;
     sprintf(v0debugmsg, "%f", v0);
     sprintf(v1debugmsg, "%f", v1);
-    // 这个时间很关键，设得较大则定位精度将大大降低 by qxz
+    // 这个时间很关键，设得较大则定位精度将大大降低 
     double period = 1 / 60.0; // 一段很小的时间，处理运动到目标点附近时加速度，稳定到点，防止超调
     if (pT == MOVE_Y) {
         traj_accel = -copysign(min(d_max, v0/ period), v0);
@@ -395,11 +395,6 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     a_max /= a_factor;
     d_max /= a_factor;
     // X = 13, Y = 77, ROT = 16
-    /*
-    double decFactor = (pT == ROTATE ? 1.0 : DEC_FACTOR);
-    a_max /= a_factor;
-    d_max /= ((paramManager->D_MAX_FACTOR) * a_factor);
-    */
 
     double accel_time_to_v1 = fabs(v1 - v0) / a_max;                                                  // 最大加速度加速到末速度的时间
     double accel_dist_to_v1 = fabs((v1 + v0) / 2.0) * accel_time_to_v1;                               // 单一加速到末速度时的位移
@@ -415,31 +410,8 @@ void compute_motion_1d_test(double x0, double v0, double v1,
         period = PERIOD_MOVE_Y;
     else
         period = PERIOD_MOVE_ROT;
-    /*
-    double A_MAX_1 = paramManager->A_MAX_1;
-    double V_LIMIT_1 = paramManager->V_LIMIT_1;
-    double PERIOD_V_LIMIT_1 = paramManager->PERIOD_V_LIMIT_1;
-    double V_LIMIT_2 = paramManager->V_LIMIT_2;
-    double PERIOD_V_LIMIT_2 = paramManager->PERIOD_V_LIMIT_2;
-    double A_MAX_2 = paramManager->A_MAX_2;
-    double V_LIMIT_3 = paramManager->V_LIMIT_3;
-    double PERIOD_V_LIMIT_3 = paramManager->PERIOD_V_LIMIT_3;
-    double V_LIMIT_4 = paramManager->V_LIMIT_4;
-    double PERIOD_V_LIMIT_4 = paramManager->PERIOD_V_LIMIT_4;
-    if (a_max > A_MAX_1 && pT != MOVE_Y) {
-        if (fabs(v0) > V_LIMIT_1)
-            period = PERIOD_V_LIMIT_1;
-        else if (fabs(v0) > V_LIMIT_2)
-            period = PERIOD_V_LIMIT_2;
-    }
-    else if (a_max > A_MAX_2 && pT != MOVE_Y) {
-        if (fabs(v0) > V_LIMIT_3)
-            period = PERIOD_V_LIMIT_3;
-        else if (fabs(v0) > V_LIMIT_4)
-            period = PERIOD_V_LIMIT_4;
-    }
-    */
     double v_max_dist = (v_max * v_max - v0 * v0) / (2 * a_max) + (v_max * v_max - v1 * v1) / (2 * d_max);
+    // The Dist of Get the Max Vel
     if (v_max_dist > fabs(x0)) {
         double v_m = sqrt((2 * a_max * d_max * fabs(x0) + d_max * v0 * v0 + a_max * v1 * v1) / (a_max + d_max));
         traj_time_acc = (v_m - fabs(v0)) / a_max;
@@ -985,20 +957,29 @@ void goto_point_omni_test(const PlayerVisionT& start,
 /// @return .
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double expectedCMPathTime(const PlayerVisionT& start, const CGeoPoint& final, double maxAccel, double maxVelocity, double accel_factor) {
+double expectedCMPathTime(const PlayerVisionT& start, const CGeoPoint& final, PlayerCapabilityT capability, CVector target_vel, double accel_factor, bool IsGoMiddle) {
     CGeoPoint target_pos = final;
     CVector x = start.Pos() - target_pos;
     CVector v = start.Vel();
-    CVector target_vel = CVector(0, 0);
+    double max_accel = capability.maxAccel;
+    double max_decel = capability.maxDec;
+    double max_speed = capability.maxSpeed;
+
+    double max_angle_speed = capability.maxAngularSpeed;
+    double max_angle_accel = capability.maxAngularAccel;
+    double max_angle_decel = capability.maxAngularDec;
+
+    double max_speed_X = capability.maxSpeedX;
+    double max_speed_Y = capability.maxSpeedY;
+
     CVector a;
-    double time;
+    double ang_a;
+    double time_a, time_a_acc, time_a_dec, time_a_flat, time;
     double time_acc, time_dec, time_flat;
-    compute_motion_2d(x, v, target_vel,
-                      maxAccel,
-                      maxAccel,
-                      maxVelocity,
-                      accel_factor,
-                      a, time, time_acc, time_dec, time_flat);
+
+    compute_motion_2d_test(x, v, target_vel, 
+        max_accel, max_decel, max_speed, start.Dir(), max_speed_X, max_speed_Y, accel_factor, a, time, time_acc, time_dec, time_flat, FAST, IsGoMiddle);
+
     return time;
 }
 
