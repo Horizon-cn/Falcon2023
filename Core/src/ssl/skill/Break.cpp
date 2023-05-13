@@ -151,8 +151,12 @@ void CBreak::plan(const CVisionModule* pVision) {
     const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
     const PlayerVisionT& enemy = pVision->TheirPlayer(oppNum);
     const PlayerVisionT& goalie =pVision->TheirPlayer(goalieNum);
-    const CGeoPoint passTarget = task().player.pos;
+    CGeoPoint passTarget = task().player.pos;
+    bool shootGoal = Utils::InTheirPenaltyArea(passTarget, 0); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
 
+    if (shootGoal) {
+        passTarget = CGeoPoint(Param::Field::PITCH_LENGTH/2, 0);
+    }
     double penaltyX=0.0;
     double penaltyY=0.0;
 
@@ -189,8 +193,6 @@ void CBreak::plan(const CVisionModule* pVision) {
     double passpower = task().player.kickpower; // 100;
     //bool shootGoal = (passTarget.x() == Param::Field::PITCH_LENGTH / 2 && fabs(passTarget.y()) <= Param::Field::GOAL_WIDTH / 2); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
     
-    bool shootGoal = Utils::InTheirPenaltyArea(passTarget, 0); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
-
     double power = shootGoal ? 10000 : passpower; 
     
     //以下是运行逻辑
@@ -206,7 +208,7 @@ void CBreak::plan(const CVisionModule* pVision) {
         dribblePoint = me.Pos();
 
     }
-    GDebugEngine::Instance()->gui_debug_x(dribblePoint, COLOR_RED);
+    GDebugEngine::Instance()->gui_debug_x(dribblePoint, COLOR_RED);  // 不是这个
     GDebugEngine::Instance()->gui_debug_arc(dribblePoint, 100, 0, 360, COLOR_RED);
     //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), ("Dribble Status:" + to_string(frared)).c_str(), COLOR_YELLOW);
 
@@ -269,8 +271,8 @@ void CBreak::plan(const CVisionModule* pVision) {
     }
 
 
-    GDebugEngine::Instance()->gui_debug_x(move_point, COLOR_RED);
-    GDebugEngine::Instance()->gui_debug_x(passTarget, COLOR_RED);
+    GDebugEngine::Instance()->gui_debug_x(move_point, COLOR_RED); // 不是这个
+    GDebugEngine::Instance()->gui_debug_x(passTarget, COLOR_RED); // 是这个
     grabTask.player.flag |= PlayerStatus::ALLOW_DSS;
 
     auto breakvector = move_point - me.Pos();
@@ -500,13 +502,19 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             break_calc_with_gpu(target_info, target_point_num, pos_info, pos_num, ANGEL_MOD, MOD_NUM, results, vis_points);
 
             std::cout << "break start find best point" << std::endl;
-            float best_score = 10000;
+            float best_score = 2147483647;
             float best_idx = -1;
             CGeoPoint best_point(-100, -100);
             for (int i = 0; i < target_point_num; i++) {
                 CGeoPoint target_point(target_info[2 * i], target_info[2 * i + 1]);
                 float current_score = results[3 * i];
                 CGeoPoint move_point(results[3 * i + 1], results[3 * i + 2]);
+
+                if (move_point.x() > 425 ) {
+                    continue;
+                }
+                // 换成大场之后这个参数要改！！！！！！！！！！！！！！！！！！！！！！！！！
+                // 
                 //std::cout << "i: " << i << " | current score: " << current_score << " | move_point: " << move_point << std::endl;
                 if (best_score > current_score) {
                     best_score = current_score;
@@ -703,7 +711,7 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
         
-        if (r < radius || fabs(projection) + 2 > (Param::Field::GOAL_WIDTH ) / 2 ) {
+        if (r < radius || fabs(projection) + 5 > (Param::Field::GOAL_WIDTH ) / 2 ) {
             flag = false;
             break;
         }
