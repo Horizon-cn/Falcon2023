@@ -412,7 +412,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
         period = PERIOD_MOVE_ROT;
     double v_max_dist = (v_max * v_max - v0 * v0) / (2 * a_max) + (v_max * v_max - v1 * v1) / (2 * d_max);
     // The Dist of Get the Max Vel
-    cout << a_max << ' ' << d_max << ' ' << v_max << endl;
+
     if (v_max_dist > fabs(x0)) {
         double v_m = sqrt((2 * a_max * d_max * fabs(x0) + d_max * v0 * v0 + a_max * v1 * v1) / (a_max + d_max));
         traj_time_acc = (v_m - fabs(v0)) / a_max;

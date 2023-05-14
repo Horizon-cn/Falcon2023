@@ -11,6 +11,7 @@
 #include "WorldModel/WorldModel.h"
 #include "TaskMediator.h"
 #include "defenceNew/DefenceInfoNew.h"
+#include "gpuBestAlgThread.h"
 
 #define DEBUG_EVALUATE(x) {if(goalie_debug) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,-300), x);}
 
@@ -64,7 +65,7 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 		pTask = rescueTask(pVision);
 		break;
 	case SUPPORT:
-			pTask = supportTask(pVision);
+		pTask = supportTask(pVision);
 		break;
 	case CLEAR_BALL:
 		if (is_penalty)
@@ -104,7 +105,7 @@ CGoalie2022::Tevaluate CGoalie2022::evaluate(const CVisionModule* pVision)
 	} else if (IsFarFromBack(ball.Pos())) {
 		DEBUG_EVALUATE("evaluate: far ball");
 		return NORMAL;
-	} else if (!is_penalty&&ShouldAttack(pVision)) {
+	} else if (!is_penalty && ShouldAttack(pVision)) {
 		DEBUG_EVALUATE("evaluate: danger, attack enemy");
 		return ATTACK_ENEMY;
 	} else if (ball.Vel().mod() > SLOW_BALL_SPD) {
@@ -263,110 +264,85 @@ CPlayerTask* CGoalie2022::rescueTask(const CVisionModule* pVision)
 
 	return PlayerRole::makeItGoto(robotNum, rescuePoint, me.Dir(), flag);
 }
-//struct PassDirOrPos {
-//	double dir;
-//	CGeoPoint pos;
-//};
-//PassDirOrPos PassDirInside(const CVisionModule* pVision, int vecNumber) {
-//	PassDirOrPos ReturnValue;
-//	/*判断SupportPoint点位是否可以使用*/
-//	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-//	bool isOurNearPoint[9] = { 0 }/*, isBlockPoint[9] = { 0 }*/, isCanUse[9] = { 0 }, OneOfUsCanShoot = 0;
-//	int TheNumberOfCanShootPoint = 0, NowShootNumber = 0, TheidxOfCanShootPoint[9] = { 0 };
-//	double ShootDir[9] = { 0 }, ChangeDir[9] = { 0 }, DistToPoint[9] = { 0 }, DistOppToTheLine[9] = { 0 };
-//	double FinalDir = 0;
-//	/*依次为：我是否有人在传球点附近，敌人是否阻挡该传球路径，该点能否使用，我们有没有点满足要求，能够shoot的点的idx*/
-//	/*依次为：满足要求的点的数量TheNumberOfCanShootPoint，持久化点的number，shootdir，需要转变方向的Dir，最终角度Dir*/
-//	for (int i = 0; i < NumberOfSupport; ++i) {
-//		isOurNearPoint[i] = IsOurNearHere(pVision, SupportPoint[i], vecNumber);
-//		//isBlockPoint[i] = isTheLineBlocked(pVision, me.Pos(), SupportPoint[i]);
-//		DistOppToTheLine[i] = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), SupportPoint[i]);
-//		ShootDir[i] = KickDirection::Instance()->getPointShootDir(pVision, SupportPoint[i]);
-//		DistToPoint[i] = (SupportPoint[i] - me.Pos()).mod();
-//		ChangeDir[i] = me.Dir() - (SupportPoint[i] - me.Pos()).dir();
-//		isCanUse[i] = isOurNearPoint[i] && /*(!isBlockPoint[i]) &&*/ (ShootDir[i] != 1000) && (SupportPoint[i].x() > me.X());
-//		/*当前点可以射门的条件：我方有人在旁边，没有阻挡，射门可以*/
-//		if (isCanUse[i])OneOfUsCanShoot = 1;
-//	}
-//	ReturnValue.dir = (SupportPoint[LastPassPoint] - me.Pos()).dir();
-//	ReturnValue.pos = SupportPoint[LastPassPoint];
-//	if (SupportPoint[LastPassPoint].x() > me.X() && isOurNearPoint[LastPassPoint] && (abs(me.Dir() - (SupportPoint[LastPassPoint] - me.Pos()).dir()) < 0.5 * Param::Math::PI / SHOOT_PRECISION)) {
-//		return ReturnValue;
-//	}
-//	/*保持系统稳定性 */
-//
-//	if (OneOfUsCanShoot) {
-//		/*如果其中有一个满足大前提，就只考虑这些可以满足要求的点*/
-//		IsMeSupport = JudgeIsMeSupport(pVision, vecNumber);
-//		if (IsMeSupport) {
-//			if (isCanUse[1]) {
-//				ReturnValue.dir = (SupportPoint[1] - me.Pos()).dir();
-//				ReturnValue.pos = SupportPoint[1];
-//				return ReturnValue;
-//			}
-//			if (isCanUse[4]) {
-//				ReturnValue.dir = (SupportPoint[4] - me.Pos()).dir();
-//				ReturnValue.pos = SupportPoint[4];
-//				return ReturnValue;
-//			}
-//		}
-//		for (int i = 0; i < NumberOfSupport; ++i)
-//			if (isCanUse[i] && SupportPoint[i].x() > -330)TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
-//	} else {
-//		/*否则就有人的地方全都可以传 因为现在已经在决定传球方向了*/
-//		IsMeSupport = JudgeIsMeSupport(pVision, vecNumber);
-//		if (IsMeSupport) {
-//			if (isOurNearPoint[1]) {
-//				ReturnValue.dir = (SupportPoint[1] - me.Pos()).dir();
-//				ReturnValue.pos = SupportPoint[1];
-//				return ReturnValue;
-//			}
-//			if (isOurNearPoint[4]) {
-//				ReturnValue.dir = (SupportPoint[4] - me.Pos()).dir();
-//				ReturnValue.pos = SupportPoint[4];
-//				return ReturnValue;
-//			}
-//		}
-//		for (int i = 0; i < NumberOfSupport; ++i)
-//			if (isOurNearPoint[i] && SupportPoint[i].x() > -330)TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
-//	}
-//	double NowValue = -1, MinValue = 1e9; int Maxidx = -1;
-//	for (int i = 0; i < TheNumberOfCanShootPoint; ++i) {
-//		int NowIdx = TheidxOfCanShootPoint[i];
-//		NowValue = ChangeDir[NowIdx];
-//		if (NowValue < MinValue)Maxidx = NowIdx, MinValue = NowValue;
-//	}
-//	if (Maxidx < 0)Maxidx = 1;
-//	NowShootNumber = Maxidx;
-//	ReturnValue.dir = (SupportPoint[NowShootNumber] - me.Pos()).dir();
-//	ReturnValue.pos = SupportPoint[NowShootNumber];
-//	LastPassPoint = NowShootNumber;
-//	return ReturnValue;
-//}
+
+
+CGoalie2022::supportStruct::supportStruct(const CVisionModule* pVision, int i, int robotNum)
+{
+	const PlayerVisionT& me = pVision->OurPlayer(robotNum);
+	const BallVisionT& ball = pVision->Ball();
+	supporterNum = TaskMediator::Instance()->supporter(i);
+	supportPoint = GPUBestAlgThread::Instance()->getBestPointFromArea(i);
+	CVector ball2supporter(supportPoint - ball.Pos());
+	angleDiff = fabs(me.Dir() - ball2supporter.dir());
+}
 CPlayerTask* CGoalie2022::supportTask(const CVisionModule* pVision)
 {
-	int robotNum = task().executor;
-	int leaderNum = BestPlayer::Instance()->getOurBestPlayer();
-
-	if (robotNum == leaderNum) {//实际情况下不太可能出现
-		return clearBallTask(pVision);
+	//由于实车效果不理想 暂缓 by SYLG 5.15
+	//临时解决方案开始
+	{
+		int robotNum = task().executor;
+		const PlayerVisionT& me = pVision->OurPlayer(robotNum);
+		double dir = CVector(CGeoPoint(400, 0) - me.Pos()).dir();
+		int flag = task().player.flag;
+		flag |= PlayerStatus::QUICKLY;
+		flag |= PlayerStatus::DRIBBLING;
+		return PlayerRole::makeItNoneTrajGetBall(robotNum, dir, CVector(0, 0), flag);
 	}
+	//临时解决方案结束
 
-	const PlayerVisionT& me = pVision->OurPlayer(robotNum);
-	const PlayerVisionT& leader = pVision->OurPlayer(leaderNum);
+	int robotNum = task().executor;
+	const BallVisionT& ball = pVision->Ball();
 
-	double dir = CVector(leader.Pos() - me.Pos()).dir();
+	vector<supportStruct> supportStructs;
+	supportStructs.reserve(AREANUM);
+	for (int i = 0; i < AREANUM; i++)
+		supportStructs[i] = supportStruct(pVision, i, robotNum);
+	//支援点筛选：支援者到位，转动角度差不大（不然太慢），一定要安全
+	supportStructs.erase(remove_if(supportStructs.begin(), supportStructs.end(),
+		[&](const auto& item) {
+		int supporterNum = item.supporterNum;
+		const PlayerVisionT& supporter = pVision->OurPlayer(supporterNum);
+		CGeoPoint supportPoint = item.supportPoint;
+		double angleDiff = item.angleDiff;
+		if (supporterNum == 0 || supporter.Pos().dist(supportPoint) > 100 || angleDiff > Param::Math::PI / 2)
+			return true;
 
-	//中国赛临时支援策略
-	dir = CVector(CGeoPoint(400, 0) - me.Pos()).dir();
+		CGeoLine passLine(ball.Pos(), supporter.Pos());
+		for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
+		{
+			const PlayerVisionT& blocker = pVision->TheirPlayer(i);
+			if (!blocker.Valid())
+				continue;
+			CGeoPoint blockerProj = passLine.projection(blocker.Pos());
+			double blocker2projDist = blocker.Pos().dist(blockerProj);
+			double ball2projDist = ball.Pos().dist(blockerProj);
+			if (blocker2projDist > 300 || ball2projDist < 10)
+				continue;
+			double ratio_dist = blocker2projDist / ball2projDist;
+			if (ratio_dist < 1.2)
+				return true;
+		}
+		return false;
+	}), supportStructs.end());
+	sort(supportStructs.begin(), supportStructs.end(), [&](const auto& a, const auto& b) {return a.angleDiff < b.angleDiff;	});
+
+	if (supportStructs.empty())
+		return clearBallTask(pVision);
+
+	double finalDir = supportStructs[0].angleDiff;
 
 	int flag = task().player.flag;
 	flag |= PlayerStatus::QUICKLY;
 	flag |= PlayerStatus::DRIBBLING;
 
-	double power = 500;
-	KickStatus::Instance()->setChipKick(robotNum, power);
-	return PlayerRole::makeItNoneTrajGetBall(robotNum, dir, CVector(0, 0), flag);
+	double dist = (ball.Pos() - supportStructs[0].supportPoint).mod() - Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER;
+	double power = sqrt(powf(ParamManager::Instance()->FASTEST_RECEIVE_VEL, 2) + 2 * ParamManager::Instance()->BALL_DEC * dist);
+	power = min(power, (double)Param::Rule::MAX_BALL_SPEED);
+
+	return PlayerRole::makeItDribbleTurnKickV2(robotNum, finalDir, 7.0 * Param::Math::PI / 180.0, 0, power);
+	//todo1 isAdvance和target有啥用 问zyj
+	//todo2 改变flag，不然守门员用不了
+	//todo3 怎么告诉supporter我要传给他
 }
 
 CPlayerTask* CGoalie2022::clearBallTask(const CVisionModule* pVision)

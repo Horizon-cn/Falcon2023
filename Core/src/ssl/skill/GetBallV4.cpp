@@ -503,6 +503,9 @@ bool CGetBallV4::JudgeLargeBack(const CVisionModule* pVision, CGeoPoint target) 
 }
 CGeoPoint CGetBallV4::Ball_Predict_Pos(const CVisionModule* pVision)//返回最佳的点
 {
+    const BallVisionT& ball = pVision->Ball();
+    if (ball.Vel().mod() < 20)
+        return ball.Pos();
     CGeoPoint point;
     int FrameMin = 1, FrameMax = 200, FramePerfect = 200;
     while (FrameMin <= FrameMax)
@@ -520,10 +523,7 @@ CGeoPoint CGetBallV4::Ball_Predict_Pos(const CVisionModule* pVision)//返回最�
             FrameMin = mid + 1;
         }
     }
-    const BallVisionT& ball = pVision->Ball();
-    if(ball.Vel().mod() > 20) 
-        point = PredictForBall(FramePerfect + 3, pVision);
-    else  point = PredictForBall(FramePerfect, pVision);
+    point = PredictForBall(FramePerfect, pVision);
     return point;
 }
 
@@ -542,7 +542,7 @@ bool CGetBallV4::ROTATECanToDIRECT(const CVisionModule* pVision, const double fi
     const int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
     const CVector self2ball = ball.Pos() - me.Pos();
-    if (fabs(Utils::Normalize(finalDir - me.Dir())) < Param::Math::PI * 8 / 180.0) return 1;
+    if (fabs(Utils::Normalize(finalDir - me.Dir())) < Param::Math::PI * 5 / 180.0) return 1;
     return 0;
 }
 bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir)
