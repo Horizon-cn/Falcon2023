@@ -1,7 +1,12 @@
 function Break(task)
+    local targetPos
   
     execute = function(runner)
-      return CBreak(runner)
+      if type(targetPos) == "function" then
+        targetPos = task.pos()
+      else
+        targetPos = task.pos
+      return CBreak(runner, targetPos:x(), targetPos:y())
     end
   
     matchPos = function()

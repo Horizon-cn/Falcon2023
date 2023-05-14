@@ -23,8 +23,8 @@
 #include <iomanip>
 #include <iostream>
 
-#define OURPLAYER_NUM	8
-#define THEIRPLAYER_NUM 8
+#define OURPLAYER_NUM	6
+#define THEIRPLAYER_NUM 6
 #define BALL_NUM		1
 
 #ifdef ENABLE_CUDA
@@ -152,7 +152,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     const PlayerVisionT& enemy = pVision->TheirPlayer(oppNum);
     const PlayerVisionT& goalie =pVision->TheirPlayer(goalieNum);
     CGeoPoint passTarget = task().player.pos;
-    bool shootGoal = Utils::InTheirPenaltyArea(passTarget, 0); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
+    bool shootGoal = !task().player.ispass; // Utils::InTheirPenaltyArea(passTarget, 0); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
 
     if (shootGoal) {
         passTarget = CGeoPoint(Param::Field::PITCH_LENGTH/2, 0);
@@ -193,7 +193,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     double passpower = task().player.kickpower; // 100;
     //bool shootGoal = (passTarget.x() == Param::Field::PITCH_LENGTH / 2 && fabs(passTarget.y()) <= Param::Field::GOAL_WIDTH / 2); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
     
-    double power = shootGoal ? 10000 : passpower; 
+    double power = shootGoal ? Param::Rule::MAX_BALL_SPEED : passpower; 
     
     //以下是运行逻辑
 
@@ -371,7 +371,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
 
         //将在参与防守的敌方车入队
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
             auto test_enemy = pVision->TheirPlayer(i);
             //if (test_enemy.Valid() && !Utils::InTheirPenaltyArea(test_enemy.Pos(), 0))
                 //enemy_points.push_back(test_enemy.Pos());
@@ -393,7 +393,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         needBreakThrough = false;
         for (auto test_enemy : enemy_points) {
             auto projection = test_seg.projection(test_enemy);
-            float projection_dist = (projection - test_enemy).mod();
+            float projection_dist = max((projection - test_enemy).mod() - Param::Vehicle::V2::PLAYER_SIZE, 0.0);
             auto to_projection_dist = (projection - test_point).mod();
             auto straight_dist = (test_enemy - test_point).mod();
             /*cout << "test_seg.IsPointOnLineOnSegment(projection)__" << ' ' << test_seg.IsPointOnLineOnSegment(projection) << endl;
@@ -423,7 +423,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             int target_point_num = 10;
             float target_step = Param::Field::GOAL_WIDTH / (target_point_num - 1);
             CGeoPoint target_point = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
-            if (!Utils::InTheirPenaltyArea(target, 0)) { // 不在门里，是传球
+            if (task().player.ispass) { // !Utils::InTheirPenaltyArea(target, 0)) { // 不在门里，是传球
                 target_point_num = 1;
                 target_step = 0;
                 target_point = target;

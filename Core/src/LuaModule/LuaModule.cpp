@@ -688,7 +688,7 @@ extern "C" int Skill_DribbleTurnKickV2(lua_State * L)
 	double precision = LuaModule::Instance()->GetNumberArgument(3, NULL);
 	int mode = LuaModule::Instance()->GetNumberArgument(4, NULL);
 	double power = LuaModule::Instance()->GetNumberArgument(5, NULL);
-	CPlayerTask* pTask = PlayerRole::makeItDribbleTurnKickV2(runner, finalDir, precision, mode, power, 0, CGeoPoint(0, 0));
+	CPlayerTask* pTask = PlayerRole::makeItDribbleTurnKickV2(runner, finalDir, precision, mode, power, CGeoPoint(0, 0));
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
