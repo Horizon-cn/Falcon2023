@@ -112,7 +112,7 @@ typedef Falcon::NormalSingleton<CTaskFactoryV2> TaskFactoryV2;
 //! 调用skill的接口
 namespace PlayerRole {
 
-    CPlayerTask* makeItBreak(const int num, const CGeoPoint& target,bool isPenalty=false, double shootaccuracy=0,bool isSpin=false, bool isChipKick=false, double kickPower=0);
+	CPlayerTask* makeItBreak(const int num, const bool isPass = false, const CGeoPoint& target = CGeoPoint(0, 0), const bool isPenalty = false, const double shootaccuracy = 0, const bool isSpin = false, const bool isChipKick = false, const double kickPower = 0);
 	CPlayerTask* makeItStop(const int num, const int flags = 0);
 	CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const int flags = 0, const int sender = 0);
 	CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotvel, const int flags = 0, const int sender = 0);
@@ -171,7 +171,7 @@ namespace PlayerRole {
 	CPlayerTask* makeItPenaltyKick2014(const int num, const int flag = 0);
 	CPlayerTask* makeItDribbleTurn(const int num, const double finalDir, const double pre = Param::Math::PI / 90);
 	CPlayerTask* makeItDribbleTurnKick(const int num, const double finalDir, const double turnRotVel, const double kickPower);
-	CPlayerTask* makeItDribbleTurnKickV2(const int num, const double finalDir = 0, const double precision = 5 * Param::Math::PI / 180, const int mode = 0, const double power = 550, const bool isAdvancer = false, const CGeoPoint Target = CGeoPoint(0, 0));
+	CPlayerTask* makeItDribbleTurnKickV2(const int num, const double finalDir = 0, const double precision = 5 * Param::Math::PI / 180, const int mode = 0, const double power = 550, const CGeoPoint Target = CGeoPoint(0, 0));
 	CPlayerTask* makeItGoSupport(const int num, const bool leftOrRight);
 	CPlayerTask* makeItGoPIDCircle(const int runner, const CGeoPoint pos, const double r, const bool opt);
 }

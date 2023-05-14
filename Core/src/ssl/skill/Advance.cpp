@@ -300,7 +300,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			/*正常KICK阶段  需要区分是否方向已经转向成功  此处尚未完备可能存在BUG*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Kick", COLOR_ORANGE);
 			
-			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, GetFPassPower(me.Pos(), PassPos), 0, PassPos));
+			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, GetFPassPower(me.Pos(), PassPos), PassPos));
 			/*
 			if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick isDirOK", COLOR_ORANGE);
@@ -324,12 +324,12 @@ void CAdvance::plan(const CVisionModule* pVision)
         if (toChipOrToFlat(pVision, _executor, PassPos) == 1) {
             /*鉴定为可以平传球 则平传球*/
             if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "FLATPASS", COLOR_ORANGE);
-			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, GetFPassPower(me.Pos(), PassPos), 1, PassPos));
+			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, GetFPassPower(me.Pos(), PassPos), PassPos));
         }
         else {
             /*鉴定为不能平传球 则选择挑传 考虑函数同样为flatPassDir*/
             if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHIPPASS", COLOR_CYAN);
-			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, GetCPassPower(me.Pos(), PassPos), 1, PassPos));
+			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, GetCPassPower(me.Pos(), PassPos), PassPos));
         }
 		TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);
 		break;
@@ -340,7 +340,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         TMP = PassDirInside(pVision, _executor);
         KickorPassDir = TMP.dir;
         PassPos = TMP.pos;
-		setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, GetCPassPower(me.Pos(), PassPos), 1, PassPos));
+		setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, GetCPassPower(me.Pos(), PassPos), PassPos));
 		TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);
 		break;
 
@@ -348,7 +348,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKSHOOT", COLOR_YELLOW);
         KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		ShootPoint = (pVision->Cycle() % 60 == 0)? GenerateBreakShootPoint(pVision, _executor):ShootPoint;
-        if(AdJudgeBreakCanDo(pVision, _executor, ShootPoint)||true)setSubTask(PlayerRole::makeItBreak(_executor, ShootPoint));
+        if(AdJudgeBreakCanDo(pVision, _executor, ShootPoint)||true)setSubTask(PlayerRole::makeItBreak(_executor, false, ShootPoint));
         else setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, generateGetballDir(pVision, _executor), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		break;
 
@@ -364,7 +364,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			kickPower = GetCPassPower(me.Pos(), PassPoint);
 		else
 			kickPower = GetFPassPower(me.Pos(), PassPoint);
-        setSubTask(PlayerRole::makeItBreak(_executor, PassPoint, false, 5 * Param::Math::PI / 180, false, isChipKick, kickPower));
+        setSubTask(PlayerRole::makeItBreak(_executor, true, PassPoint, false, 5 * Param::Math::PI / 180, false, isChipKick, kickPower));
         break;
 	}       
 

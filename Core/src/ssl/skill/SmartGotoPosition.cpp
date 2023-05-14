@@ -135,7 +135,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
 
 
-    const bool isAdvancer = (vecNumber == TaskMediator::Instance()->advancer());
+    const bool isAdvancer = (vecNumber != 0 && vecNumber == TaskMediator::Instance()->advancer());
 
     // 判断为，判断需要躲避的指定区域，包括圆圈和放球椭圆
     bool avoidBallCircle = (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") || (playerFlag & PlayerStatus::AVOID_STOP_BALL_CIRCLE);
@@ -429,9 +429,15 @@ void CSmartGotoPosition::validateFinalTarget(CGeoPoint& finalTarget, const CVisi
     // 同时满足不是放球而且不带 NOT_DODGE_PENALTY 标志位的情况下才会更正目标点
     if  (WorldModel::Instance()->CurrentRefereeMsg() != "ourBallPlacement" && !(playerFlag & PlayerStatus::NOT_DODGE_PENALTY)) {
         finalTarget = Utils::MakeInField(finalTarget, -1*Param::Field::FIELD_WALL_DIST);
-        if (!isGoalie && Utils::InOurPenaltyArea(finalTarget, avoidLength))
+        CGeoPoint mePos = pVision->OurPlayer(task().executor).Pos();
+        // 如果球员现在就在禁区里，优先退出
+        if (!isGoalie && Utils::InOurPenaltyArea(mePos, avoidLength))
+            finalTarget = Utils::MakeOutOfOurPenaltyArea(mePos, avoidLength);
+        else if (Utils::InTheirPenaltyArea(mePos, theirPenaltyAvoidLength))
+            finalTarget = Utils::MakeOutOfTheirPenaltyArea(mePos, theirPenaltyAvoidLength);
+        else if (!isGoalie && Utils::InOurPenaltyArea(finalTarget, avoidLength))
             finalTarget = Utils::MakeOutOfOurPenaltyArea(finalTarget, avoidLength);
-        if (Utils::InTheirPenaltyArea(finalTarget, theirPenaltyAvoidLength))
+        else if (Utils::InTheirPenaltyArea(finalTarget, theirPenaltyAvoidLength))
             finalTarget = Utils::MakeOutOfTheirPenaltyArea(finalTarget, theirPenaltyAvoidLength);
     }
 }

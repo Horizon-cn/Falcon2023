@@ -54,8 +54,8 @@ end
 
 ------------------------------------- 射门相关的skill ---------------------------------------
 
-function testBreak()
-	local mexe, mpos = Break{}
+function testBreak(p)
+	local mexe, mpos = Break{pos = p}
 	return {mexe, mpos}
 end
 

@@ -17,7 +17,7 @@ firstState = "chase",
 		end
 	end,
     
-	Kicker = task.getBall(ball.pos()),
+	Kicker = task.staticGetBall(ball.pos()),
     match = ""
 },
 ["break"] = {
@@ -28,7 +28,7 @@ firstState = "chase",
 			return "chase";
 		end
 	end,
-    Kicker = task.testBreak(),
+    Kicker = task.testBreak(CGeoPoint:new_local(param.pitchLength / 2, 0)),
     match = ""
 },
 
