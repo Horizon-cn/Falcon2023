@@ -44,10 +44,10 @@ void CDefenceInfoNew::updateDefenceInfoNew(const CVisionModule* pVision)
 	checkPass(pVision);
 	updateSteady();
 	//debugÊä³ö
-	debug_arr(_ballChaserList, CGeoPoint(100, -350));
-	debug_arr(_ballChaserSteadyList, CGeoPoint(-400, -350));
-	debug_arr(_ballReceiverList, CGeoPoint(100, -250));
-	debug_arr(_ballReceiverSteadyList, CGeoPoint(-400, -250));
+	//debug_arr(_ballChaserList, CGeoPoint(100, -350));
+	//debug_arr(_ballChaserSteadyList, CGeoPoint(-400, -350));
+	//debug_arr(_ballReceiverList, CGeoPoint(100, -250));
+	//debug_arr(_ballReceiverSteadyList, CGeoPoint(-400, -250));
 
 }
 

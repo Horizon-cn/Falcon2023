@@ -412,8 +412,10 @@ int CGetBallV4::PredictForRobot(CGeoPoint point, const CVisionModule* pVision)//
     {
         capability.maxSpeed *= SLOW_FACTOR;
     }
+    capability.maxAccel = capability.maxDec = 200;
     const double time_factor = 1.5;
     double usedtime = expectedCMPathTime(Robot, point, capability, CVector(0, 0), time_factor, 0);
+    //cout << usedtime << endl;
     double frame = usedtime * 60;
     char msg[100];
     sprintf(msg, "%f", frame);
@@ -520,7 +522,7 @@ CGeoPoint CGetBallV4::Ball_Predict_Pos(const CVisionModule* pVision)//返回最�
     }
     const BallVisionT& ball = pVision->Ball();
     if(ball.Vel().mod() > 20) 
-        point = PredictForBall(FramePerfect + 10, pVision);
+        point = PredictForBall(FramePerfect + 3, pVision);
     else  point = PredictForBall(FramePerfect, pVision);
     return point;
 }

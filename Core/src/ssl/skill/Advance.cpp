@@ -185,6 +185,17 @@ void CAdvance::plan(const CVisionModule* pVision)
             }
             if (me.X() > 0) {
 				/*人在前场*/
+
+				if (!Me2OppTooclose(pVision, _executor)) {
+					_state = PUSHOUT; break; // PASS; break;
+
+				}
+				else if (CanSupportKick(pVision, _executor)) {
+					_state = BREAKPASS; break;
+				}
+				else { _state = PUSHOUT; break; }
+
+				/*
                 if (CanSupportKick(pVision, _executor)){
 					_state = BREAKPASS; break; // PASS; break;
 
@@ -193,17 +204,18 @@ void CAdvance::plan(const CVisionModule* pVision)
                     _state = BREAKPASS; break;
 				}
                 else { _state = PUSHOUT; break; }
+				*/
 			}
 			else {
 				/*人在后场  此处作为一个框架的TODO*/
-                if (CanSupportKick(pVision, _executor)) {
-					_state = BREAKPASS; break; // PASS; break;
+				if (!Me2OppTooclose(pVision, _executor)) {
+					_state = PUSHOUT; break; // PASS; break;
 
 				}
-                else if (Me2OppTooclose(pVision, _executor)) {
-                    _state = BREAKPASS; break;
+				else if (CanSupportKick(pVision, _executor)) {
+					_state = BREAKPASS; break;
 				}
-                else { _state = PUSHOUT; break; }
+				else { _state = PUSHOUT; break; }
 			}
 		}
 		else { _state = GET; break; }
@@ -376,8 +388,9 @@ void CAdvance::plan(const CVisionModule* pVision)
     case PUSHOUT:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "PUSHOUT", COLOR_YELLOW);
         KickStatus::Instance()->setBothKick(_executor, 0, 0);
-        KickorPassDir = generateNormalPushDir(pVision, _executor);
-		setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, 50, 1, PassPos));
+		PassPoint = generateNormalPushPoint(pVision, _executor);
+		setSubTask(PlayerRole::makeItBreak(_executor, PassPoint, false, 5 * Param::Math::PI / 180, false, 0, GetFPassPower(me.Pos(), PassPoint)));
+		KickorPassDir = (PassPoint - me.Pos()).dir();
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "PUSHOUT isDirOK", COLOR_ORANGE);
 		break;
 	}
@@ -412,14 +425,7 @@ bool CAdvance::checkOppHasBall(const CVisionModule* pVision) {
 	const BallVisionT& ball = pVision->Ball();
 	const PlayerVisionT& me = pVision->OurPlayer(_executor);
 	const CVector self2ball = ball.Pos() - me.Pos();
-	opponentID = 0;
-
-	const CBestPlayer::PlayerList& oppList = BestPlayer::Instance()->theirFastestPlayerToBallList();
-	if (oppList.size() < 1)return false;
-	else opponentID = oppList[0].num;
-	if (!pVision->TheirPlayer(opponentID).Valid()) {
-		opponentID = getTheirMostClosetoPosPlayerNum(pVision, pVision->Ball().Pos());
-	}
+	opponentID = getTheirMostClosetoPosPlayerNum(pVision, pVision->Ball().Pos());
 	const PlayerVisionT& opponent = pVision->TheirPlayer(opponentID);
 	if (Advance_DEBUG_ENGINE)GDebugEngine::Instance()->gui_debug_msg(opponent.Pos(), "Best Opp!", COLOR_WHITE);
 	CVector opponent2ball = ball.Pos() - opponent.Pos();
@@ -511,7 +517,20 @@ bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber)
 	const BallVisionT& ball = pVision->Ball();
 	CVector me2Ball = ball.Pos() - me.Pos();
 	CVector me2Opp = opp.Pos() - me.Pos();
-    if ((abs(me2Ball.mod()) < 40 && abs(me2Opp.mod()) < 40) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI /  3)) {
+
+	const double threshold = 70;
+
+	char me2Ball1[100];
+	char me2Opp1[100];
+	char dir1[100];
+	sprintf(me2Ball1, "%f", abs(me2Ball.mod()));
+	sprintf(me2Opp1, "%f", abs(me2Opp.mod()));
+	sprintf(dir1, "%f", (me2Ball.dir() - me2Opp.dir()) / Param::Math::PI * 180);
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), me2Ball1, COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), me2Opp1, COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), dir1, COLOR_YELLOW);
+
+    if ((abs(me2Ball.mod()) < threshold && abs(me2Opp.mod()) < threshold * 1.5) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI /  3)) {
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(450, 450), "TOO CLOSE with ball", COLOR_ORANGE);
 		return true;
 	}
@@ -913,40 +932,36 @@ double CAdvance::generateNormalPushDir(const CVisionModule* pVision, const int v
         return faceDir;
     }
 }*/
-double CAdvance::generateNormalPushDir(const CVisionModule* pVision, const int vecNumber) {
+CGeoPoint CAdvance::generateNormalPushPoint(const CVisionModule* pVision, const int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
 	const BallVisionT& ball = pVision->Ball();
 	double faceDir = 0.0;
-	if (!opp.Valid()) {
-		KickDirection::Instance()->GenerateShootDir(vecNumber, pVision->OurPlayer(vecNumber).Pos());
-		faceDir = KickDirection::Instance()->getRealKickDir();
-		return faceDir;
+
+	const double DirEpsilon = Param::Math::PI / 180 * 5;
+	const double VectorDist = 60;
+	const double ThresholdForOpp = 60;
+
+	CGeoPoint FinalTarget = CGeoPoint(-999, -999);
+	double Dist = -1e9;
+	for (int step = -7; step <= 7; ++step) {
+		const CGeoPoint target = me.Pos() + Utils::Polar2Vector(VectorDist, Param::Math::PI / 180 * 5 * step);
+		const double SingleDist = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), target);
+		if (SingleDist > Dist) FinalTarget = target, Dist = SingleDist;
+		//GDebugEngine::Instance()->gui_debug_x(target, COLOR_BLUE);
 	}
-	if (abs(ball.Pos().y()) < Param::Field::PITCH_WIDTH / 2 * 0.4 || me.Pos().x() < -50 /* || !checkBallFront(pVision, Param::Math::PI / 4.0)*/) {
-		//cout << "there there there" << endl;
-		KickDirection::Instance()->GenerateShootDir(vecNumber, pVision->OurPlayer(vecNumber).Pos());
-		faceDir = KickDirection::Instance()->getRealKickDir();
-		return faceDir;
-	}
-	else if (abs(ball.Pos().y()) > Param::Field::PITCH_WIDTH / 2 * 0.70) {
-		//cout << "here here here" << endl;
-		faceDir = opp.Dir() + Param::Math::PI;
-		return faceDir;
-	}
-	else {
-		KickDirection::Instance()->GenerateShootDir(vecNumber, pVision->OurPlayer(vecNumber).Pos());
-		double kickDir = KickDirection::Instance()->getRealKickDir();
-		double maxDir = Utils::Normalize(opp.Dir() + Param::Math::PI);
-		double diffDir = Utils::Normalize(kickDir - maxDir);
-		if (abs(diffDir) < Param::Math::PI / 15 || (kickDir > 0 && maxDir > kickDir) || (kickDir < 0 && maxDir < kickDir)) {
-			return kickDir;
-		}
-		else {
-			faceDir = Utils::Normalize(kickDir - diffDir * (3.33 * (abs(ball.Pos().y()) / (Param::Field::PITCH_WIDTH / 2)) - 1.33));
-			return faceDir;
+	if (Dist > ThresholdForOpp) {
+		Dist = 1e9;
+		for (int step = -7; step <= 7; ++step) {
+			const CGeoPoint target = me.Pos() + Utils::Polar2Vector(VectorDist, Param::Math::PI / 180 * 5 * step);
+			if (TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), target) < 60)continue;
+			const double SingleDist = (target - theirCenter).mod();
+			if (SingleDist < Dist) FinalTarget = target, Dist = SingleDist;
+			//GDebugEngine::Instance()->gui_debug_x(target, COLOR_BLUE);
 		}
 	}
+	GDebugEngine::Instance()->gui_debug_x(FinalTarget, COLOR_BLUE);
+	return FinalTarget;
 }
 double CAdvance::generateGetballDir(const CVisionModule* pVision, const int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
