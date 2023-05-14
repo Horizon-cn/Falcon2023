@@ -209,7 +209,7 @@ function RunPlay(name)
 					roleNum = gRoleNum[rolename]
 					--print("Here in string : "..roleNum)
 				elseif type(rolename)=="function" then
-					roleNum = rolename()
+					roleNum = gRoleNum[rolename()]
 					--print("Here in function : "..roleNum)
 				end
 

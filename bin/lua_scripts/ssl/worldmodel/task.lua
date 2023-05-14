@@ -129,8 +129,8 @@ function passToPos(p, c)
 	else
 		ipower=kp.toTargetNormalPlay(p)
 	end
-	local mexe, mpos = ChaseKickV2{pos = ball.pos, dir = idir}
-	return {mexe, mpos, kick.flat, idir, pre.high, ipower, cp.full(), flag.nothing}
+	local mexe, mpos = StaticGetBall{pos = ball.pos, dir = idir}
+	return {mexe, mpos, kick.flat, idir, pre.middle, ipower, cp.full(), flag.nothing}
 end
 
 

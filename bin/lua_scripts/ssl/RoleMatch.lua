@@ -242,17 +242,6 @@ function UpdateRole(matchTactic, isPlaySwitched, isStateSwitched)
 			end
 		end
 	end
-
-	for existname, _ in pairs(gRolePos) do
-		if type(existname) == "number" then
-			if existname >= 0 and existname < param.maxPlayer and gOurExistNum[existname] == existname then
-				gOurExistNum[existname] = -1
-				gRoleNum[existname] = existname
-			else
-				gRoleNum[existname] = -1
-			end
-		end
-	end
 	
 	local matchList = {}
 	matchTactic = DecodeMatchStr(matchTactic)
