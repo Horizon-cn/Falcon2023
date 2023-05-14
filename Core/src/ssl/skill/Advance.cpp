@@ -374,9 +374,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 		PassPoint = generateNormalPushPoint(pVision, _executor);
 		KickorPassDir = (PassPoint - me.Pos()).dir();
 		if(Me2OppTooclose(pVision, _executor)) 
-			setSubTask(PlayerRole::makeItBreak(_executor, PassPoint, false, 5 * Param::Math::PI / 180, false, 0, 110));
+			setSubTask(PlayerRole::makeItBreak(_executor, true, PassPoint, false, 5 * Param::Math::PI / 180, false, 0, 110));
 		else 	
-			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, 110, 1, PassPos));
+			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, 110, PassPos));
 
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "PUSHOUT isDirOK", COLOR_ORANGE);
 		break;

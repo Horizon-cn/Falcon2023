@@ -140,7 +140,7 @@ CGPUBestAlgThread::CGPUBestAlgThread() {
 
 #ifdef ENABLE_CUDA
 		// 需要查找的区域
-		_length = Param::Field::PITCH_LENGTH;
+		_length = Param::Field::PITCH_LENGTH / 2 - gpuCalcArea::middleBackBorderX;
 		_width = Param::Field::PITCH_WIDTH;
 		_step = ParamManager::Instance()->step; // 搜索的步长
 		// 起始点使得所有点都距离边线有半个步长的距离
