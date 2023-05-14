@@ -5,6 +5,8 @@
 
 class CGoalie2022 :public CStatedTask {
 public:
+	enum Tevaluate { NORMAL, RESCUE, SUPPORT, CLEAR_BALL, ATTACK_ENEMY, TEST };
+	enum Tpenalty { PENALTY_WAIT, PENALTY_TRICK_START, PENALTY_TRICK_FINISH };
 	CGoalie2022();
 	virtual void plan(const CVisionModule* pVision);
 	virtual bool isEmpty()const { return false; }
@@ -12,8 +14,7 @@ public:
 protected:
 	virtual void toStream(std::ostream& os) const { os << "Skill: CGoalie2022\n"; }
 private:
-	enum { NORMAL, RESCUE, SUPPORT, CLEAR_BALL, ATTACK_ENEMY, TEST };
-	int evaluate(const CVisionModule* pVision);
+	Tevaluate evaluate(const CVisionModule* pVision);
 	inline bool IsFarFromBack(const CGeoPoint& pos, int x = -Param::Field::PITCH_LENGTH * 0.1);
 	bool ShouldAttack(const CVisionModule* pVision);
 	bool isBallShot2Goal(const CVisionModule* pVision);
@@ -26,8 +27,7 @@ private:
 	void generateRescuePoint(const CVisionModule* pVision);
 	double CalClearBallDir(const CVisionModule* pVision);
 
-	int this_shoot_cycle;
-	CGeoPoint rescuePoint;
+	Tpenalty last_penalty_status;
 };
 
 #endif //__GOALIE_2022_H__
