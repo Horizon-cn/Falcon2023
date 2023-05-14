@@ -412,6 +412,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
         period = PERIOD_MOVE_ROT;
     double v_max_dist = (v_max * v_max - v0 * v0) / (2 * a_max) + (v_max * v_max - v1 * v1) / (2 * d_max);
     // The Dist of Get the Max Vel
+    cout << a_max << ' ' << d_max << ' ' << v_max << endl;
     if (v_max_dist > fabs(x0)) {
         double v_m = sqrt((2 * a_max * d_max * fabs(x0) + d_max * v0 * v0 + a_max * v1 * v1) / (a_max + d_max));
         traj_time_acc = (v_m - fabs(v0)) / a_max;
@@ -639,6 +640,7 @@ void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
     traj_accel = CVector(traj_accel_x, traj_accel_y);
     if (traj_accel.mod())
         traj_accel = traj_accel.rotate(rotangle);
+
     if (time_x < 1e-5 || time_x > 50) time_x = 0;
     if (time_y < 1e-5 || time_y > 50) time_y = 0;
     if (time_x < time_y) {
@@ -969,12 +971,12 @@ double expectedCMPathTime(const PlayerVisionT& start, const CGeoPoint& final, Pl
     double max_angle_accel = capability.maxAngularAccel;
     double max_angle_decel = capability.maxAngularDec;
 
-    double max_speed_X = capability.maxSpeedX;
-    double max_speed_Y = capability.maxSpeedY;
+    double max_speed_X = capability.maxSpeedX > 0 ? capability.maxSpeedX : max_speed;
+    double max_speed_Y = capability.maxSpeedY > 0 ? capability.maxSpeedY : max_speed;
 
     CVector a;
     double ang_a;
-    double time_a, time_a_acc, time_a_dec, time_a_flat, time;
+    double time_a, time_a_acc, time_a_dec, time_a_flat, time = 0;
     double time_acc, time_dec, time_flat;
 
     compute_motion_2d_test(x, v, target_vel, 

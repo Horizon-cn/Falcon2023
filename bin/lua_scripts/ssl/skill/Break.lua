@@ -6,6 +6,7 @@ function Break(task)
         targetPos = task.pos()
       else
         targetPos = task.pos
+      end
       return CBreak(runner, targetPos:x(), targetPos:y())
     end
   

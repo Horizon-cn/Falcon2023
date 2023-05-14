@@ -414,6 +414,7 @@ void ObstaclesNew::addObs(const CVisionModule * pVision, const TaskT & task, boo
                     ),
                     0);
             }
+
 		}
         // 球门下边框
 		CGeoPoint p11(

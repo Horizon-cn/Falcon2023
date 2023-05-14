@@ -171,21 +171,21 @@ end,
 
 ["beginning"] = {
 	Kicker   = task.defendKick(),
-	Special  = task.goSupportPos("Middle"),
+	Special  = task.support("Middle",0),
 	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
 	Defender = task.leftBack(),
 	Leader   = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[DLSM]"
 },
 
 ["attacker1"] = {
 	Kicker   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
-	Special  = task.goSupportPos("Middle"),
+	Special  = task.support("Middle",0),
 	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
 	Defender = task.leftBack(),
 	Leader   = task.rightBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[DLSM]"
 },
 
@@ -195,7 +195,7 @@ end,
 	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
 	Defender = task.defendHead(),
 	Leader   = task.singleBack(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[DLSM]"
 },
 
@@ -205,7 +205,7 @@ end,
 	Middle   = task.marking("Second"),
 	Defender = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
 	Leader   = task.defendHead(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[LSMD]"
 },
 
@@ -215,7 +215,7 @@ end,
 	Middle   = task.marking("Second"),
 	Defender = task.marking("Third"),
 	Leader   = task.defendHead(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[LSMD]"
 },
 
@@ -225,7 +225,7 @@ end,
 	Middle   = task.marking("Second"),
 	Defender = task.marking("Third"),
 	Leader   = task.defendHead(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[LSMD]"
 },
 
@@ -235,7 +235,7 @@ end,
 	Middle   = task.marking("Second"),
 	Defender = task.marking("Third"),
 	Leader   = task.defendHead(),
-	Goalie   = task.goalie(),
+	Goalie   = task.goalieNew(),
 	match    = "[LSMD]"
 },
 

@@ -172,8 +172,8 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     // 传球精度控制（默认为SHOOT_ACCURACY)
     double precision = task().player.kickprecision > 0 ? task().player.kickprecision : SHOOT_ACCURACY;
-    //if(isPenalty)precision=3;
-    //precision = 2;
+
+
     //踢球相关向量和方向
     CVector me2Ball = ball.Pos() - me.Pos();
     CVector me2Enemy=enemy.Pos()-me.Pos();
@@ -415,7 +415,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         }
         else
         {
-            std::cout << "============break calc with gpu===============" << std::endl;
+            //std::cout << "============break calc with gpu===============" << std::endl;
             // 使用GPU
             int _palyer_pos_num = 6;
             int pos_num = 2 + 1 + 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
@@ -438,7 +438,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             float* vis_points = (float*)malloc(3 * (ANGEL_MOD * 2 - 1) * (MOD_NUM - 1) * sizeof(float));
 
             if (pos_info == nullptr || target_info == nullptr || results == nullptr) {
-                std::cout << "break malloc fail" << std::endl;
+                //std::cout << "break malloc fail" << std::endl;
                 return test_point;
             }
 
@@ -497,11 +497,11 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                 target_info[2 * i + 1] = target_point.y() + i * target_step;
             }
 
-            std::cout << "break start calc with gpu" << std::endl;
+            //std::cout << "break start calc with gpu" << std::endl;
             // 这里会返回值，如果是0则可能GPU计算出现问题，建议切换为CPU去计算
             break_calc_with_gpu(target_info, target_point_num, pos_info, pos_num, ANGEL_MOD, MOD_NUM, results, vis_points);
 
-            std::cout << "break start find best point" << std::endl;
+            //std::cout << "break start find best point" << std::endl;
             float best_score = 2147483647;
             float best_idx = -1;
             CGeoPoint best_point(-100, -100);
@@ -522,7 +522,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                     best_idx = i;
                 }
             }
-            std::cout << "best point: " << best_point << " | best idx: " << best_idx << " | best score: " << best_score << std::endl;
+            //std::cout << "best point: " << best_point << " | best idx: " << best_idx << " | best score: " << best_score << std::endl;
             if (DEBUG) {
                 for (int i = 0; i < target_point_num; i++) {
                     CGeoPoint target_point(target_info[2 * i], target_info[2 * i + 1]);
