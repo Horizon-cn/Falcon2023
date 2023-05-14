@@ -7,6 +7,10 @@ class CGoalie2022 :public CStatedTask {
 public:
 	enum Tevaluate { NORMAL, RESCUE, SUPPORT, CLEAR_BALL, ATTACK_ENEMY, TEST };
 	enum Tpenalty { PENALTY_WAIT, PENALTY_TRICK_START, PENALTY_TRICK_FINISH };
+	struct supportStruct {
+		supportStruct(const CVisionModule* pVision, int i, int robotNum);
+		int supporterNum; CGeoPoint supportPoint; double angleDiff;
+	};
 	CGoalie2022();
 	virtual void plan(const CVisionModule* pVision);
 	virtual bool isEmpty()const { return false; }
