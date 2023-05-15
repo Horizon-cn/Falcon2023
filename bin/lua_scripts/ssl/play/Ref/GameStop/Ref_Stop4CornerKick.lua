@@ -36,7 +36,7 @@ firstState = "start",
 	Middle   = task.leftBack(),
 	Defender = task.rightBack(),
 	Goalie   = task.goalieNew(),
-	match    = "[AMLDS]"
+	match    = "[ALMDS]"
 },
 
 name = "Ref_Stop4CornerKick",

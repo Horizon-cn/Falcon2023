@@ -120,6 +120,7 @@ private:
     ***********************************************************/
     //bool isMePassedOpp(const CVisionModule* pVision, const int vecNumber);
     double generateNormalPushDir(const CVisionModule* pVision, const int vecNumber);
+    CGeoPoint generateNormalPushPoint(const CVisionModule* pVision, const int vecNumber);
 
 protected:
 

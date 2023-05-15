@@ -1,13 +1,13 @@
 
 local function def_chipPower()
   if math.abs(ball.posY()) > 300 then 
-    return 180
+    return 140
   elseif math.abs(ball.posY())> 285 then
-    return 160
-  elseif math.abs(ball.posY()) > 270 then 
     return 130
+  elseif math.abs(ball.posY()) > 270 then 
+    return 120
   else 
-    return 100
+    return 110
   end
 end
 
@@ -21,7 +21,7 @@ local SYNT_POS_2 = ball.refSyntYPos(CGeoPoint:new_local(300, 40))
 local SYNT_POS_3 = ball.refSyntYPos(CGeoPoint:new_local(225,120))
 
 
-local SHOOT_POS = pos.passForTouch(ball.refAntiYPos(CGeoPoint:new_local(300, 86)))
+local SHOOT_POS = pos.passForTouch(ball.refAntiYPos(CGeoPoint:new_local(290, 86)))
 
 local dangerous = true
 

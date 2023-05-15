@@ -287,13 +287,13 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
     case DIRECT:
-        getball_task.player.pos = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, (me.Pos() - ball.Pos()).dir()); // 预测球的位置 + 5.85     
+        getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS + 2, (me.Pos() - ball.Pos()).dir()); // 预测球的位置 + 5.85     这个长度越大离球越远
         getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
 
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
     case HAVE:
-        getball_task.player.pos = me.Pos();
+        getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, (me.Pos() - ball.Pos()).dir());
         getball_task.player.angle = finalDir;
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
@@ -451,8 +451,8 @@ CGeoPoint CGetBallV4::GenerateLargeAnglePoint(const CVisionModule* pVision, cons
     {
         getBallDist = maxGetBallDist;
     }
-    CGeoPoint target = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(getBallDist, theta_Dir);
-    if (ball.Vel().mod() < 15) {
+    CGeoPoint target = ball.Pos() + Utils::Polar2Vector(getBallDist, theta_Dir);
+    if (ball.Vel().mod() < 25) {
         CGeoLine JudgeLine1 = CGeoLine(ball.Pos(), finalDir);
         CGeoLine JudgeLine2 = CGeoLine(me.Pos(), target);
         CGeoLineLineIntersection LineIntersection = CGeoLineLineIntersection(JudgeLine1, JudgeLine2);
@@ -460,7 +460,7 @@ CGeoPoint CGetBallV4::GenerateLargeAnglePoint(const CVisionModule* pVision, cons
             CGeoPoint Intersection = LineIntersection.IntersectPoint();
             CGeoSegment JudgeSegment = CGeoSegment(me.Pos(), target);
             if (JudgeSegment.IsPointOnLineOnSegment(Intersection)) {
-                target = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(getBallDist, Utils::Normalize(finalDir + Param::Math::PI));
+                target = ball.Pos() + Utils::Polar2Vector(getBallDist, Utils::Normalize(finalDir + Param::Math::PI));
             }
         }
     }
@@ -542,7 +542,8 @@ bool CGetBallV4::ROTATECanToDIRECT(const CVisionModule* pVision, const double fi
     const int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
     const CVector self2ball = ball.Pos() - me.Pos();
-    if (fabs(Utils::Normalize(finalDir - me.Dir())) < Param::Math::PI * 5 / 180.0) return 1;
+    // 这里有改变
+    if (fabs(Utils::Normalize((ball.Pos() - me.Pos()).dir() - me.Dir())) < Param::Math::PI * 1 / 180.0) return 1;
     return 0;
 }
 bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir)
@@ -553,7 +554,7 @@ bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double fi
     const CVector self2ball = ball.Pos() - me.Pos();
     double ball2meDist = self2ball.mod();
     // cout << ball2meDist << endl;
-    if (ball.Vel().mod() > 30 || ball2meDist > 30)
+    if (ball.Vel().mod() > 70 || ball2meDist > 30)
         return 1;
     return 0;
 }

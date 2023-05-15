@@ -73,6 +73,7 @@ private:
     int  BACK_POWER ;
     int Advance_DEBUG_ENGINE;
     double LARGE_ADJUST_ANGLE;
+    int PUSHPOWER;
     /**********************************************************
     * Description: ??¨°???
     * Author: ?????

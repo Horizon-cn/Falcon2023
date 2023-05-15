@@ -43,6 +43,7 @@ CAdvance::CAdvance()
 	Advance_DEBUG_ENGINE = paramManager->Advance_DEBUG_ENGINE;
 	// GetBallV4
 	LARGE_ADJUST_ANGLE = paramManager->LARGE_ADJUST_ANGLE;
+	PUSHPOWER = 35;
 }
 
 
@@ -168,7 +169,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
 
 		//if (meHasBall>3) {
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.8) {
 			TaskMediator::Instance()->resetAdvancerPassTo();
             /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
             if ((NowIsShoot == 1) && fabs(me.Y() < 250) && me.X() < 400) { _state = BREAKSHOOT; break; }
@@ -185,7 +186,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 				}
 				else if (CanSupportKick(pVision, _executor)) {
-					_state = BREAKPASS; break;
+					_state = PUSHOUT; break;
 				}
 				else { _state = PUSHOUT; break; }
 			}
@@ -196,7 +197,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 				}
 				else if (CanSupportKick(pVision, _executor)) {
-					_state = BREAKPASS; break;
+					_state = PUSHOUT; break;
 				}
 				else { _state = PUSHOUT; break; }
 			}
@@ -228,7 +229,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
     case BREAKPASS:
-        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push OUT", COLOR_YELLOW);
+        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push BreakPass", COLOR_YELLOW);
 		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
 		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
         break;
@@ -373,10 +374,11 @@ void CAdvance::plan(const CVisionModule* pVision)
         KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		PassPoint = generateNormalPushPoint(pVision, _executor);
 		KickorPassDir = (PassPoint - me.Pos()).dir();
+
 		if(Me2OppTooclose(pVision, _executor)) 
-			setSubTask(PlayerRole::makeItBreak(_executor, true, PassPoint, false, 5 * Param::Math::PI / 180, false, 0, 110));
+			setSubTask(PlayerRole::makeItBreak(_executor, true, PassPoint, false, 5 * Param::Math::PI / 180, false, 0, PUSHPOWER));
 		else 	
-			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, 110, PassPos));
+			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, PUSHPOWER, PassPos));
 
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "PUSHOUT isDirOK", COLOR_ORANGE);
 		break;

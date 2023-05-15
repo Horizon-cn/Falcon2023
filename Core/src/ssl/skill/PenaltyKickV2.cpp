@@ -146,7 +146,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
                     _state = CHIP; break;
                 }
                 else if (Me2OppTooclose(pVision, _executor)) {
-                    _state = CHIP; break;
+                    _state = BREAKSHOOT; break;
                 }
                 else if (me2goal.mod() > KICK_DIST + 30){
                     _state = NORMAL_PUSH; break;
@@ -316,23 +316,19 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         break;
     case NORMAL_PUSH:
         KickDirection::Instance()->GenerateShootDir(_executor, pVision->OurPlayer(_executor).Pos());
-        if (pVision->Ball().X() <= 0) { //our half-field - 50(radius of the middle circle)
-            KickorPassDir = KickDirection::Instance()->getRealKickDir();
-        }
-        else {
-            KickorPassDir = generateNormalPushDir(pVision, _executor);
-        }
+        PassPoint = generateNormalPushPoint(pVision, _executor);
+        KickorPassDir = (PassPoint - me.Pos()).dir();
         setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -350), "finish in NorPush", COLOR_ORANGE);
         break;
     case LIGHT_KICK:
         KickStatus::Instance()->clearAll();
         if(pVision->Ball().X() <= -80)
-            KickStatus::Instance()->setKick(_executor, 100);
+            KickStatus::Instance()->setKick(_executor, 30);
         else if(pVision->Ball().X() <= 50)
-            KickStatus::Instance()->setKick(_executor, 80); // kick lightly
+            KickStatus::Instance()->setKick(_executor, 20); // kick lightly
         else
-            KickStatus::Instance()->setKick(_executor, 50);
+            KickStatus::Instance()->setKick(_executor, 10);
         break;
     }
 
@@ -612,6 +608,64 @@ double CPenaltyKickV2::generateNormalPushDir(const CVisionModule* pVision, const
         }
     }
 }
+
+CGeoPoint CPenaltyKickV2::generateNormalPushPoint(const CVisionModule* pVision, const int vecNumber) {
+    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+    const BallVisionT& ball = pVision->Ball();
+    double faceDir = 0.0;
+
+    const double DirEpsilon = Param::Math::PI / 180 * 5;
+    const double VectorDist = 60;
+    const double ThresholdForOpp = 60;
+
+    
+
+    CGeoPoint FinalTarget = CGeoPoint(-999, -999);
+    double Dist = -1e9;
+    for (int step = -7; step <= 7; ++step) {
+        const CGeoPoint target = me.Pos() + Utils::Polar2Vector(VectorDist, Param::Math::PI / 180 * 5 * step);
+
+        double passDir = (target - me.Pos()).dir();
+        CGeoLine start2Target = CGeoLine(me.Pos(), passDir);
+        CGeoPoint projectionPoint = start2Target.projection(pVision->TheirPlayer(opponentID).Pos());
+        double opp2LineDist = 1000;
+
+        double r = (projectionPoint - me.Pos()).x() * (projectionPoint - target).x() + (projectionPoint - me.Pos()).y() * (projectionPoint - target).y();
+        if (opp2LineDist > (projectionPoint - pVision->TheirPlayer(opponentID).Pos()).mod() && r < 0) { // projectionPoint.x() < Param::Field::PITCH_LENGTH / 2.0 && projectionPoint.x() > startPoint.x()) {
+            opp2LineDist = (projectionPoint - pVision->TheirPlayer(opponentID).Pos()).mod();
+        }
+
+        if (opp2LineDist > Dist) FinalTarget = target, Dist = opp2LineDist;
+        //GDebugEngine::Instance()->gui_debug_x(target, COLOR_BLUE);
+    }
+    if (Dist > ThresholdForOpp) {
+        Dist = 1e9;
+        for (int step = -10; step <= 10; ++step) {
+            const CGeoPoint target = me.Pos() + Utils::Polar2Vector(VectorDist, Param::Math::PI / 180 * 5 * step);
+
+            double passDir = (target - me.Pos()).dir();
+            CGeoLine start2Target = CGeoLine(me.Pos(), passDir);
+            CGeoPoint projectionPoint = start2Target.projection(pVision->TheirPlayer(opponentID).Pos());
+            double opp2LineDist = 1000;
+
+            double r = (projectionPoint - me.Pos()).x() * (projectionPoint - target).x() + (projectionPoint - me.Pos()).y() * (projectionPoint - target).y();
+            if (opp2LineDist > (projectionPoint - pVision->TheirPlayer(opponentID).Pos()).mod() && r < 0) { // projectionPoint.x() < Param::Field::PITCH_LENGTH / 2.0 && projectionPoint.x() > startPoint.x()) {
+                opp2LineDist = (projectionPoint - pVision->TheirPlayer(opponentID).Pos()).mod();
+            }
+            if (opp2LineDist > Dist) FinalTarget = target, Dist = opp2LineDist;
+
+            if (Dist < 60) continue;
+
+            const double SingleDist = (target - theirCenter).mod();
+            if (SingleDist < Dist) FinalTarget = target, Dist = SingleDist;
+            //GDebugEngine::Instance()->gui_debug_x(target, COLOR_BLUE);
+        }
+    }
+    //GDebugEngine::Instance()->gui_debug_x(FinalTarget, COLOR_BLUE);
+    return FinalTarget;
+}
+
 /*bool CPenaltyKickV2::isMePassedOpp(const CVisionModule* pVision, const int vecNumber) {
     const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
     const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);

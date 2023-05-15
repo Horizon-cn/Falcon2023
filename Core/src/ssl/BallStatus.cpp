@@ -128,6 +128,11 @@ void CBallStatus::computeBallPossession(const CVisionModule* pVision, bool isOur
 // 返回值的意义类似一个可信度
 double CBallStatus::getBallPossession(bool isOurPlayer, int id) {
     int num = id + Param::Field::MAX_PLAYER * (1 - (int)isOurPlayer);
+    if (id == 1) {
+        char msg[100];
+        sprintf(msg, "%f", (ballPossession[num] * 1.0 / pm->maxFrame));
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(270, -250), msg, COLOR_YELLOW);
+    }
     return (ballPossession[num] * 1.0 / pm->maxFrame);
 }
 
