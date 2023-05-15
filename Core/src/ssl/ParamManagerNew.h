@@ -153,6 +153,11 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(CHALLENGE_BALL_DIST, "Goalie/CHALLENGE_BALL_DIST", 60);
             loadParam(BLOCK_DIST, "Goalie/BLOCK_DIST", 60);
 
+            loadParam(RANDOM_NUM, "PenaltyGoalie/RANDOM_NUM", 5);
+            loadParam(RANDOM_MIN, "PenaltyGoalie/RANDOM_MIN", -0.3);
+            loadParam(RANDOM_MAX, "PenaltyGoalie/RANDOM_MAX", 0.3);
+            loadParam(STABLE_FRAME_INTERVAL, "PenaltyGoalie/STABLE_FRAME_INTERVAL", 5);
+            loadParam(TRICKPOS_DIV_PENALTY, "PenaltyGoalie/TRICKPOS_DIV_PENALTY", 1);
            
             loadParam(BREAK_SHOOT_ACCURACY, "BREAK/SHOOT_ACCURACY", 10);
             loadParam(BREAK_DEBUG, "BREAK/DEBUG", 1);
@@ -344,6 +349,12 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double CLOSE_DIST;
         double CHALLENGE_BALL_DIST;
         double BLOCK_DIST;
+        // Goalie2022点球参数 by SYLG
+        int RANDOM_NUM;
+        double RANDOM_MIN;
+        double RANDOM_MAX;
+        int STABLE_FRAME_INTERVAL;
+        double TRICKPOS_DIV_PENALTY;
         //break 参数
         double BREAK_SHOOT_ACCURACY;
         bool BREAK_DEBUG;
