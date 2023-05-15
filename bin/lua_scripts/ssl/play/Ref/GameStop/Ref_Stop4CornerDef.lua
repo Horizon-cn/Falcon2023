@@ -170,73 +170,73 @@ switch = function()
 end,
 
 ["beginning"] = {
-	Kicker   = task.defendKick(),
+	Assister   = task.defendKick(),
 	Special  = task.support("Middle",0),
 	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
 	Defender = task.leftBack(),
 	Leader   = task.rightBack(),
 	Goalie   = task.goalieNew(),
-	match    = "[DLSM]"
+	match    = "[ADLSM]"
 },
 
 ["attacker1"] = {
-	Kicker   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
 	Special  = task.support("Middle",0),
 	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
 	Defender = task.leftBack(),
 	Leader   = task.rightBack(),
 	Goalie   = task.goalieNew(),
-	match    = "[DLSM]"
+	match    = "[ADLSM]"
 },
 
 ["attacker2"] = {
-	Kicker   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
 	Special  = task.marking("First"),
 	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
 	Defender = task.defendHead(),
 	Leader   = task.singleBack(),
 	Goalie   = task.goalieNew(),
-	match    = "[DLSM]"
+	match    = "[ADLSM]"
 },
 
 ["attacker3"] = {
-	Kicker   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
 	Special  = task.marking("First"),
 	Middle   = task.marking("Second"),
 	Defender = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
 	Leader   = task.defendHead(),
 	Goalie   = task.goalieNew(),
-	match    = "[LSMD]"
+	match    = "[ALSMD]"
 },
 
 ["attacker4"] = {
-	Kicker   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
 	Special  = task.marking("First"),
 	Middle   = task.marking("Second"),
 	Defender = task.marking("Third"),
 	Leader   = task.defendHead(),
 	Goalie   = task.goalieNew(),
-	match    = "[LSMD]"
+	match    = "[ALSMD]"
 },
 
 ["attacker5"] = {
-	Kicker   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
 	Special  = task.marking("First"),
 	Middle   = task.marking("Second"),
 	Defender = task.marking("Third"),
 	Leader   = task.defendHead(),
 	Goalie   = task.goalieNew(),
-	match    = "[LSMD]"
+	match    = "[ALSMD]"
 },
 
 ["attacker6"] = {
-	Kicker   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
 	Special  = task.marking("First"),
 	Middle   = task.marking("Second"),
 	Defender = task.marking("Third"),
 	Leader   = task.defendHead(),
 	Goalie   = task.goalieNew(),
-	match    = "[LSMD]"
+	match    = "[ALSMD]"
 },
 
 name = "Ref_Stop4CornerDef",

@@ -103,7 +103,7 @@ firstState = "getready",
 --Assister负责传球，Defender始终作为诱饵
 ["getready"] = {
   switch = function ()
-    if bufcnt(player.toTargetDist("Defender")<30
+    if bufcnt(player.toTargetDist("Leader")<30
     , "normal") then
       return "startball"
     end
@@ -115,12 +115,12 @@ firstState = "getready",
  Defender = task.goCmuRush(READY_POS,_,_,flag.allow_dss),
   Middle   = task.goCmuRush(MIDDLE_POS[3],_,_,flag.allow_dss),
   Goalie   = task.goalie(),
-  match    = "{A}{M}{DLS}"
+  match    = "{A}{L}{D}{MS}"
 },
 
 ["startball"] = {
   switch = function ()
-    if bufcnt(player.toTargetDist("Defender")<30 and
+    if bufcnt(player.toTargetDist("Leader")<30 and
       player.toTargetDist("Middle")<30 and 
       player.toTargetDist("Assister")<10 , 10, 180)  then
       return "getball"
@@ -132,7 +132,7 @@ firstState = "getready",
   Leader   = task.goCmuRush(LEADER_POS[1],_,_,flag.allow_dss),
   Defender = task.goCmuRush(READY_POS,_,_,flag.allow_dss),
   Goalie   = task.goalie(),
-  match    = "{A}{M}{D}{SL}"
+  match    = "{A}{L}{D}{SM}"
 },
 
 ["getball"] = {
@@ -147,7 +147,7 @@ firstState = "getready",
   Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),
   Defender = task.goCmuRush(READY_POS, player.toBallDir("Defender"),_, flag.allow_dss),
   Goalie   = task.goalie(),
-  match    = "{ADLSM}"
+  match    = "{A}{L}{D}{SM}"
 },
 
 ["chippass"] = {
@@ -163,7 +163,7 @@ firstState = "getready",
   Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),
   Defender = task.goCmuRush(READY_POS,player.toBallDir("Defender"),_, flag.allow_dss),
   Goalie   = task.goalie(),
-  match    = "{ADLSM}"
+  match    = "{A}{L}{D}{SM}"
 },
 ["gokick"] = {
     switch = function ()
@@ -179,7 +179,7 @@ firstState = "getready",
   Middle  = task.leftBack(),
   Leader = task.chaseNew(),
   Goalie   = task.goalie(),
-  match    = "{A}{L}{S}{DM}"
+  match    = "{A}{L}{D}{SM}"
 },
 
 name = "Ref_FrontKickV61",

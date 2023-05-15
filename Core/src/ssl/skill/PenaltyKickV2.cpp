@@ -582,7 +582,6 @@ double CPenaltyKickV2::generateNormalPushDir(const CVisionModule* pVision, const
     const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
     const BallVisionT& ball = pVision->Ball();
     double faceDir = 0.0;
-    return faceDir;
     if (!opp.Valid()) {
         KickDirection::Instance()->GenerateShootDir(vecNumber, pVision->OurPlayer(vecNumber).Pos());
         faceDir = KickDirection::Instance()->getRealKickDir();
