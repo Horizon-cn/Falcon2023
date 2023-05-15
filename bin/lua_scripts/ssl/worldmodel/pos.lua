@@ -262,12 +262,12 @@ function advance()
 			--return CGeoPoint(ball.posX()+k_v_1*ball.velX(),ball.posY()+k_v_2*ball.velY())
 			advancePos = CGeoPoint(ball.posX()+k_v_2*math.abs(ball.velX())*ball.velX(),ball.posY()+k_v_2*math.abs(ball.velY())*ball.velY())
 		else
-		--	local robotNum = bestPlayer:getOurBestPlayer()
-		--	if Utils.PlayerNumValid(robotNum) then
-		--		advancePos = player.pos(robotNum)
-		--	else
+			local robotNum = bestPlayer:getOurBestPlayer()
+			if Utils.PlayerNumValid(robotNum) then
+				advancePos = player.pos(robotNum)
+			else
 				advancePos = ball.pos()
-		--	end
+			end
 		end
 	end
 	debugEngine:gui_debug_x(advancePos, 0)  			

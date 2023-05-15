@@ -388,19 +388,20 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
         //测试当前点,若当前点可直接射门，则直接返回
         CGeoPoint test_point = me.Pos();
-        auto test_seg = CGeoSegment(test_point, target);
+        auto test_seg = CGeoSegment(pVision->Ball().Pos(), target);
         canShoot = true;
         needBreakThrough = false;
         for (auto test_enemy : enemy_points) {
             auto projection = test_seg.projection(test_enemy);
-            float projection_dist = max((projection - test_enemy).mod() - Param::Vehicle::V2::PLAYER_SIZE, 0.0);
+            float projection_dist = max((projection - pVision->Ball().Pos()).mod() - Param::Vehicle::V2::PLAYER_SIZE, 0.0);
             auto to_projection_dist = (projection - test_point).mod();
             auto straight_dist = (test_enemy - test_point).mod();
+            float nearEnemyThreshold = task().player.ispass ? 2 : 15 * Param::Math::PI / 180.0;
             /*cout << "test_seg.IsPointOnLineOnSegment(projection)__" << ' ' << test_seg.IsPointOnLineOnSegment(projection) << endl;
             cout << "projection_dist__" << ' ' << projection_dist << endl;
             cout << "to_projection_dist__" << ' ' << to_projection_dist << endl;*/
             //if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist/to_projection_dist) < (15*Param::Math::PI/180.0))||(to_projection_dist<15&&projection_dist<15))) {
-            if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / to_projection_dist) < (15 * Param::Math::PI / 180.0))  )) {
+            if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / to_projection_dist) < (nearEnemyThreshold))  )) {
             /*if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {*/
                 canShoot = false;
                 needBreakThrough = true;

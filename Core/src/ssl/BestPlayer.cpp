@@ -528,7 +528,7 @@ void CBestPlayer::updateOurBestPlayer(const CVisionModule* pVision)
 	int cur_our_best_player = _ourFastestPlayerToBallList[0].num;
 	bool cur_our_best_player_changed = false;
 	//cout<<cur_our_best_player<<" "<<TaskMediator::Instance()->leftCenterBack()<<" "<<TaskMediator::Instance()->rightCenterBack()<<" "<<TaskMediator::Instance()->defendMiddle()<<endl;
-	if (cur_our_best_player==TaskMediator::Instance()->leftCenterBack() || cur_our_best_player==TaskMediator::Instance()->rightCenterBack()){
+	if (cur_our_best_player == TaskMediator::Instance()->goalie() || cur_our_best_player==TaskMediator::Instance()->leftBack() || cur_our_best_player==TaskMediator::Instance()->rightBack()){
 		if (TaskMediator::Instance()->defendMiddle()!=0){
 			double defendMiddleValue=getOurPotential(TaskMediator::Instance()->defendMiddle());
 			if (defendMiddleValue-_ourFastestPlayerToBallList[0].potential<0.1){
