@@ -13,13 +13,13 @@
 #include "defenceNew/DefenceInfoNew.h"
 #include "gpuBestAlgThread.h"
 
-#define DEBUG_EVALUATE(x) {if(goalie_debug) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,-300), x);}
+#define DEBUG_EVALUATE(x) {if(goalie_debug) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-Param::Field::PITCH_LENGTH*0.7,0), x);}
 
 namespace {
 	bool goalie_debug, is_penalty;
 	int this_shoot_cycle = 0;
 	const CGeoPoint goalCenter(-Param::Field::PITCH_LENGTH / 2, 0);
-	CGeoPoint trickPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH, 0);
+	CGeoPoint trickPoint;
 	CGeoPoint rescuePoint(goalCenter);
 	CGeoLine BaseLine(goalCenter, Param::Math::PI / 2);
 	CGeoLine moveLine(goalCenter + CVector(Param::Field::PENALTY_AREA_DEPTH / 4.0, 0), Param::Math::PI / 2);
@@ -36,6 +36,7 @@ namespace {
 CGoalie2022::CGoalie2022() :last_penalty_status(PENALTY_WAIT)
 {
 	goalie_debug = paramManager->GOALIE_DEBUG;
+	trickPoint = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH * paramManager->TRICKPOS_DIV_PENALTY, 0);
 	SLOW_BALL_SPD = paramManager->SLOW_BALL_SPD;
 	KICKPOWER = paramManager->KICKPOWER_GOALIE;
 	HAVE_BALL_DIST = paramManager->HAVE_BALL_DIST;
@@ -250,10 +251,11 @@ CPlayerTask* CGoalie2022::rescueTask(const CVisionModule* pVision)
 	const BallVisionT& ball = pVision->Ball();
 	CGeoLine ballVelLine(ball.Pos(), ball.Vel().dir());
 	CGeoPoint projection = ballVelLine.projection(rescuePoint);
-	if (projection.dist(rescuePoint) > 10 || pVision->Cycle() - this_shoot_cycle > 100)
+	if (projection.dist(rescuePoint) > Param::Vehicle::V2::PLAYER_SIZE || pVision->Cycle() - this_shoot_cycle > 100)
 		generateRescuePoint(pVision);
 	this_shoot_cycle = pVision->Cycle();
-	GDebugEngine::Instance()->gui_debug_msg(rescuePoint, "r", COLOR_BLUE);
+	if (goalie_debug)
+		GDebugEngine::Instance()->gui_debug_msg(rescuePoint, "r", COLOR_BLUE);
 
 	int robotNum = task().executor;
 	const PlayerVisionT& me = pVision->OurPlayer(robotNum);
@@ -386,6 +388,8 @@ CPlayerTask* CGoalie2022::attackEnemyTask(const CVisionModule* pVision)
 	}
 
 	int flag = task().player.flag;
+	flag |= PlayerStatus::NOT_AVOID_OUR_VEHICLE;
+	flag |= PlayerStatus::NOT_AVOID_THEIR_VEHICLE;
 	flag |= PlayerStatus::QUICKLY;
 	flag |= PlayerStatus::DRIBBLING;
 
@@ -405,9 +409,9 @@ CPlayerTask* CGoalie2022::penaltyTask(const CVisionModule* pVision)
 	else
 		defCenter = goalCenter;
 
-	int random_num = 5;
-	double random_start = -0.3;
-	double random_end = 0.3;
+	static int random_num = paramManager->RANDOM_NUM;
+	static double random_start = paramManager->RANDOM_MIN;
+	static double random_end = paramManager->RANDOM_MAX;
 	double random_step = (random_end - random_start) / double(random_num - 1);
 	double random_current = random_start - random_step;
 
@@ -415,7 +419,7 @@ CPlayerTask* CGoalie2022::penaltyTask(const CVisionModule* pVision)
 	generate(random_points.begin(), random_points.end(), //generate points between [begin,end]
 		[&]() {
 		random_current += random_step;
-		return CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH / 6, random_current * Param::Field::GOAL_WIDTH); });
+		return CGeoPoint(-Param::Field::PITCH_LENGTH / 2, random_current * Param::Field::GOAL_WIDTH); });
 	if (goalie_debug)
 		for (auto& p : random_points)
 			GDebugEngine::Instance()->gui_debug_x(p, COLOR_GREEN);
@@ -428,7 +432,7 @@ CPlayerTask* CGoalie2022::penaltyTask(const CVisionModule* pVision)
 	//固定间隔帧数进行随机生成
 	static int generate_index = weight(generator);
 	static int interval_cnt = 0;
-	const int generate_interval = 5;
+	static const int generate_interval = paramManager->STABLE_FRAME_INTERVAL;
 	interval_cnt++;
 	if (interval_cnt > generate_interval)
 	{
