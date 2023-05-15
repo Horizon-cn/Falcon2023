@@ -166,7 +166,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	BallStatus::Instance()->UpdateBallStatus(this);
 
 	// 【#TODO】 更新敌我双方对于球的势能，越小越有利于拿球，贝叶斯滤波中有使用
-	// BestPlayer::Instance()->update(this); 
+	BestPlayer::Instance()->update(this); // 暂时去不掉，缺少OurBestPalyer的替换
 	
 	// 【#TODO】 更新贝叶斯滤波器，评估目前比赛攻防形式
 	// MatchState::Instance()->update();

@@ -180,8 +180,8 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
     // 生成避障区域
     ObstaclesNew obsNew(avoidLength);
-    if (isAdvancer || isBack || isGoalie)
-        obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
+    //if (isAdvancer || isBack || isGoalie)
+    //    obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
     if (isAdvancer || isBack || isGoalie)
         obsNew.addObs(pVision, task(), DRAW_OBS, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 2, Param::Vehicle::V2::PLAYER_SIZE + Param::Field::BALL_SIZE + 0.5, Param::Field::BALL_SIZE + avoidBallFix);
 
@@ -260,11 +260,15 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         self.Pos().dist(finalTargetPos) < Param::Vehicle::V2::PLAYER_SIZE * 2) {
         middlePoint = finalTargetPos;
     }
-    // 第二种情况：上次规划的中间点仍然可以用，且还没有到达中间点
-    else if (obsNew.check(startNew.pos, lastPoint[vecNumber]) && (lastPoint[vecNumber] - self.Pos()).mod() > arrivedDist) {
+    // 第二种情况，在禁区附近特殊处理
+    else if (!(playerFlag & PlayerStatus::NOT_DODGE_PENALTY) && (Utils::InTheirPenaltyArea(self.Pos(), 40) || (!isGoalie && Utils::InOurPenaltyArea(self.Pos(), 40)))) {
+        middlePoint = dealPlanFail(self.Pos(), targetNew.pos, avoidLength, shrinkTheirPenalty);
+    }
+    // 第三种情况：上次规划的中间点仍然可以用，且还没有到达中间点
+    else if (obsNew.check(startNew.pos, lastPoint[vecNumber]) && obsNew.check(targetNew.pos, lastPoint[vecNumber]) && (lastPoint[vecNumber] - self.Pos()).mod() > arrivedDist) {
         middlePoint = lastPoint[vecNumber];
     }
-    // 第三种情况：其它，则重新规划
+    // 第四种情况：其它，则重新规划
     else {
         planner[vecNumber].initPlanner(250, 15, 20, 0.05, 0.55, Param::Vehicle::V2::PLAYER_SIZE);
         planner[vecNumber].planPath(&obsNew, startNew, targetNew);
@@ -274,14 +278,15 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         if (viaPoint[vecNumber].size() > 2) middlePoint = viaPoint[vecNumber][1].pos;
     }
 
-    //GDebugEngine::Instance()->gui_debug_x(middlePoint, 0);
+    GDebugEngine::Instance()->gui_debug_x(middlePoint, 0);
     //GDebugEngine::Instance()->gui_debug_x(lastPoint[vecNumber], 1);
 
     // 记录中间点，作为下一次规划基础
     lastPoint[vecNumber] = middlePoint;
+    
     bool needRush2Ball = Utils::InTheirPenaltyArea(ballPos, 10) && !Utils::InTheirPenaltyArea(ballPos, 0); // 球在禁区外且很靠近禁区，直接冲击
     if (!isGoalie && !(playerFlag & PlayerStatus::NOT_DODGE_PENALTY) && !needRush2Ball) {
-        //middlePoint = dealPlanFail(self.Pos(), middlePoint, avoidLength, shrinkTheirPenalty);
+        // middlePoint = dealPlanFail(myPos, middlePoint, avoidLength, shrinkTheirPenalty);
         while (Utils::InTheirPenaltyArea(middlePoint, 10)) { // 规划的点会闯入禁区，修正
             middlePoint = middlePoint + Utils::Polar2Vector(1, (middlePoint - CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0)).dir());
         }
@@ -290,7 +295,6 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
         }
         lastPoint[vecNumber] = middlePoint;
     }
-
 
     newTask.player.pos = middlePoint;
     //GDebugEngine::Instance()->gui_debug_x(middlePoint, 1);
@@ -310,7 +314,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     if (DRAW_TRAJ) {
         GDebugEngine::Instance()->gui_debug_x(myPos, COLOR_PURPLE);
         GDebugEngine::Instance()->gui_debug_arc(self.Pos(), avoidLength, 0, 360, 1);
-        GDebugEngine::Instance()->gui_debug_x(task().player.pos, COLOR_RED);
+        //GDebugEngine::Instance()->gui_debug_x(task().player.pos, COLOR_RED);
         GDebugEngine::Instance()->gui_debug_x(finalTargetPos, COLOR_YELLOW);
     }
 
@@ -429,13 +433,8 @@ void CSmartGotoPosition::validateFinalTarget(CGeoPoint& finalTarget, const CVisi
     // 同时满足不是放球而且不带 NOT_DODGE_PENALTY 标志位的情况下才会更正目标点
     if  (WorldModel::Instance()->CurrentRefereeMsg() != "ourBallPlacement" && !(playerFlag & PlayerStatus::NOT_DODGE_PENALTY)) {
         finalTarget = Utils::MakeInField(finalTarget, -1*Param::Field::FIELD_WALL_DIST);
-        CGeoPoint mePos = pVision->OurPlayer(task().executor).Pos();
         // 如果球员现在就在禁区里，优先退出
-        if (!isGoalie && Utils::InOurPenaltyArea(mePos, avoidLength))
-            finalTarget = Utils::MakeOutOfOurPenaltyArea(mePos, avoidLength);
-        else if (Utils::InTheirPenaltyArea(mePos, theirPenaltyAvoidLength))
-            finalTarget = Utils::MakeOutOfTheirPenaltyArea(mePos, theirPenaltyAvoidLength);
-        else if (!isGoalie && Utils::InOurPenaltyArea(finalTarget, avoidLength))
+        if (!isGoalie && Utils::InOurPenaltyArea(finalTarget, avoidLength))
             finalTarget = Utils::MakeOutOfOurPenaltyArea(finalTarget, avoidLength);
         else if (Utils::InTheirPenaltyArea(finalTarget, theirPenaltyAvoidLength))
             finalTarget = Utils::MakeOutOfTheirPenaltyArea(finalTarget, theirPenaltyAvoidLength);
@@ -543,33 +542,66 @@ CGeoPoint CSmartGotoPosition::dealPlanFail(CGeoPoint startPoint, CGeoPoint nextP
     CGeoRectangle theirPenalty(CGeoPoint(Param::Field::PITCH_LENGTH / 2 -Param::Field::PENALTY_AREA_DEPTH, -Param::Field::PENALTY_AREA_WIDTH / 2), CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2));
     CGeoRectangle ourPenalty(CGeoPoint(-Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2), CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH, Param::Field::PENALTY_AREA_WIDTH / 2));
     CGeoLine pathLine(startPoint, nextPoint);
-    if (!shrinkTheirPenalty) {
-        theirPenalty = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE, -Param::Field::PENALTY_AREA_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE), CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2 + Param::Vehicle::V2::PLAYER_SIZE));
-    }
+    // if (!shrinkTheirPenalty) {
+    //     theirPenalty = CGeoRectangle(CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE, -Param::Field::PENALTY_AREA_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE), CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2 + Param::Vehicle::V2::PLAYER_SIZE));
+    // }
     CGeoLineRectangleIntersection theirInter(pathLine, theirPenalty);
     CGeoLineRectangleIntersection ourInter(pathLine, ourPenalty);
     CGeoPoint nextPointNew = nextPoint;
     CGeoPoint candidate11 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST),
-        candidate12 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
+        // candidate12 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
         candidate21 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
-        candidate22 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST),
+        // candidate22 = CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - avoidLength - OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST),
         candidate31 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST),
-        candidate32 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
-        candidate41 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
-        candidate42 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST);
+        // candidate32 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST),
+        candidate41 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 - avoidLength - OPP_AVOID_DIST); // ,
+        // candidate42 = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + avoidLength + OPP_AVOID_DIST, -Param::Field::PENALTY_AREA_WIDTH / 2 + avoidLength + OPP_AVOID_DIST);
     if (DRAW_PENALTY_DEBUG_MSG) {
         GDebugEngine::Instance()->gui_debug_x(candidate11);
         GDebugEngine::Instance()->gui_debug_x(candidate21);
         GDebugEngine::Instance()->gui_debug_x(candidate31);
         GDebugEngine::Instance()->gui_debug_x(candidate41);
-        GDebugEngine::Instance()->gui_debug_x(candidate12);
-        GDebugEngine::Instance()->gui_debug_x(candidate22);
-        GDebugEngine::Instance()->gui_debug_x(candidate32);
-        GDebugEngine::Instance()->gui_debug_x(candidate42);
+        // GDebugEngine::Instance()->gui_debug_x(candidate12);
+        // GDebugEngine::Instance()->gui_debug_x(candidate22);
+        // GDebugEngine::Instance()->gui_debug_x(candidate32);
+        // GDebugEngine::Instance()->gui_debug_x(candidate42);
     }
 
-
-    if (theirInter.intersectant() || ourInter.intersectant()) {
+    double isTheirMiddle = 0, isOurMiddle = 0;
+    if (theirInter.intersectant()) {
+        CGeoPoint theirInterPoint = theirInter.point1().midPoint(theirInter.point2());
+        isTheirMiddle = (theirInterPoint.x() - startPoint.x()) * (theirInterPoint.x() - nextPoint.x()) + (theirInterPoint.y() - startPoint.y()) * (theirInterPoint.y() - nextPoint.y());
+    }
+    if (ourInter.intersectant()) {
+        CGeoPoint ourInterPoint = ourInter.point1().midPoint(ourInter.point2());
+        isOurMiddle = (ourInterPoint.x() - startPoint.x()) * (ourInterPoint.x() - nextPoint.x()) + (ourInterPoint.y() - startPoint.y()) * (ourInterPoint.y() - nextPoint.y());
+    }
+    if (isTheirMiddle < 0) {
+        double next2StartDir = Utils::Normalize((nextPoint - startPoint).dir());
+        if ((next2StartDir > -Param::Math::PI / 2 && next2StartDir < 0) || (next2StartDir > Param::Math::PI / 2 && next2StartDir < Param::Math::PI))
+            nextPointNew = candidate21;
+        else if ((next2StartDir > 0 && next2StartDir < Param::Math::PI / 2) || (next2StartDir > -Param::Math::PI && next2StartDir < -Param::Math::PI / 2))
+            nextPointNew = candidate11;
+        if (nextPoint.y() < -Param::Field::PENALTY_AREA_WIDTH / 2 && startPoint.y() > Param::Field::PENALTY_AREA_WIDTH / 2 
+            && nextPoint.x() >= startPoint.x() && startPoint.x() > Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE)
+            nextPointNew = candidate11;
+        else if (nextPoint.y() > Param::Field::PENALTY_AREA_WIDTH / 2 && startPoint.y() < -Param::Field::PENALTY_AREA_WIDTH / 2 
+            && nextPoint.x() >= startPoint.x() && startPoint.x() > Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE)
+            nextPointNew = candidate21;
+    }
+    else if (isOurMiddle < 0) {
+        double next2StartDir = Utils::Normalize((nextPoint - startPoint).dir());
+        if ((next2StartDir > -Param::Math::PI / 2 && next2StartDir < 0) || (next2StartDir > Param::Math::PI / 2 && next2StartDir < Param::Math::PI))
+            nextPointNew = candidate31;
+        else if ((next2StartDir > 0 && next2StartDir < Param::Math::PI / 2) || (next2StartDir > -Param::Math::PI && next2StartDir < -Param::Math::PI / 2))
+            nextPointNew = candidate41;
+        if (nextPoint.y() < -Param::Field::PENALTY_AREA_WIDTH / 2 && startPoint.y() > Param::Field::PENALTY_AREA_WIDTH / 2
+            && nextPoint.x() <= startPoint.x() && startPoint.x() < -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + Param::Vehicle::V2::PLAYER_SIZE)
+            nextPointNew = candidate31;
+        else if (nextPoint.y() > Param::Field::PENALTY_AREA_WIDTH / 2 && startPoint.y() < -Param::Field::PENALTY_AREA_WIDTH / 2
+            && nextPoint.x() <= startPoint.x() && startPoint.x() < -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + Param::Vehicle::V2::PLAYER_SIZE)
+            nextPointNew = candidate41;
+        /**
         if (!((startPoint.y() > Param::Field::PENALTY_AREA_WIDTH / 2 && nextPoint.y() > Param::Field::PENALTY_AREA_WIDTH / 2) ||
             (startPoint.y() < -Param::Field::PENALTY_AREA_WIDTH / 2 && nextPoint.y() < -Param::Field::PENALTY_AREA_WIDTH / 2) ||
             (startPoint.y() < Param::Field::PENALTY_AREA_WIDTH / 2 && startPoint.y() > -Param::Field::PENALTY_AREA_WIDTH / 2 && nextPoint.y() < Param::Field::PENALTY_AREA_WIDTH / 2 && nextPoint.y() > -Param::Field::PENALTY_AREA_WIDTH / 2))) {
@@ -623,8 +655,9 @@ CGeoPoint CSmartGotoPosition::dealPlanFail(CGeoPoint startPoint, CGeoPoint nextP
                 }
             }
         }
+        **/
     }
-
+    
     return nextPointNew;
 }
 
