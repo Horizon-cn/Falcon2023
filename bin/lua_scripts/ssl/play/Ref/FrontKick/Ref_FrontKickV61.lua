@@ -109,51 +109,35 @@ firstState = "getready",
     end
   end,
   --Assister = task.goCmuRush(ball.pos())
-  Assister = task.goCmuRush(pos.reflectPos(projectX(),-projectY()),_,_,flag.allow_dss),
+  Assister = task.goCmuRush(pos.reflectPos(projectX(),-projectY()),player.toPointDir(CHEAT,"Assister"),_,flag.allow_dss),
   Leader   = task.goCmuRush(LEADER_POS[1],_,_,flag.allow_dss),
   Special  = task.goCmuRush(SPECIAL_POS[1],_,_,flag.allow_dss),
  Defender = task.goCmuRush(READY_POS,_,_,flag.allow_dss),
   Middle   = task.goCmuRush(MIDDLE_POS[3],_,_,flag.allow_dss),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "{A}{L}{D}{MS}"
 },
 
 ["startball"] = {
   switch = function ()
     if bufcnt(player.toTargetDist("Leader")<30 and
-      player.toTargetDist("Middle")<30 and 
-      player.toTargetDist("Assister")<10 , 10, 180)  then
-      return "getball"
-    end
-  end,
-  Assister = task.staticGetBall(CHEAT),
-  Middle   = task.runMultiPos(MIDDLE_POS),
-  Special  = task.goCmuRush(SPECIAL_POS[1],_,_,flag.allow_dss),
-  Leader   = task.goCmuRush(LEADER_POS[1],_,_,flag.allow_dss),
-  Defender = task.goCmuRush(READY_POS,_,_,flag.allow_dss),
-  Goalie   = task.goalie(),
-  match    = "{A}{L}{D}{SM}"
-},
-
-["getball"] = {
-  switch = function ()
-    if bufcnt(player.toTargetDist("Assister")<20, "fast", 100) then
+      player.toTargetDist("Assister")<10 , "fast", 180)  then
       return "chippass"
     end
   end,
-  Assister = task.staticGetBall(CHEAT),
+  Assister = task.staticGetBall(CHEAT()),
   Middle   = task.runMultiPos(MIDDLE_POS),
-  Special  = task.goCmuRush(SPECIAL_POS[1]),
+  Special  = task.goCmuRush(SPECIAL_POS[1],_,_,flag.allow_dss),
   Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),
-  Defender = task.goCmuRush(READY_POS, player.toBallDir("Defender"),_, flag.allow_dss),
-  Goalie   = task.goalie(),
+  Defender = task.goCmuRush(READY_POS,_,_,flag.allow_dss),
+  Goalie   = task.goalieNew(),
   match    = "{A}{L}{D}{SM}"
 },
 
 ["chippass"] = {
   switch = function ()
     if bufcnt( player.kickBall("Assister") or
-      player.toBallDist("Assister")>20,"fast", 100)  then
+      player.toBallDist("Assister")>20, 10, 100)  then
       return "gokick"
     end
   end,
@@ -162,7 +146,7 @@ firstState = "getready",
   Special  = task.singleBack(),
   Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),
   Defender = task.goCmuRush(READY_POS,player.toBallDir("Defender"),_, flag.allow_dss),
-  Goalie   = task.goalie(),
+  Goalie   = task.goalieNew(),
   match    = "{A}{L}{D}{SM}"
 },
 ["gokick"] = {
@@ -173,13 +157,13 @@ firstState = "getready",
       return "exit"
     end
   end,
-  Assister = task.singleBack(),
+  Assister = task.goCmuRush(ball.refSyntYPos(CGeoPoint:new_local(270,240))),
   Special   = task.rightBack(),
-  Defender = task.singleBack(),
+  Defender = task.goCmuRush(READY_POS,player.toBallDir("Defender"),_, flag.allow_dss),
   Middle  = task.leftBack(),
   Leader = task.chaseNew(),
-  Goalie   = task.goalie(),
-  match    = "{A}{L}{D}{SM}"
+  Goalie   = task.goalieNew(),
+  match    = "{L}{A}{D}{SM}"
 },
 
 name = "Ref_FrontKickV61",

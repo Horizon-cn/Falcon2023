@@ -16,7 +16,6 @@
 #include <algorithm>
 #include <math.h>
 
-#include <ctime>
 #include <string>
 #include <chrono>
 #include <sstream>
@@ -155,7 +154,12 @@ void CBreak::plan(const CVisionModule* pVision) {
     bool shootGoal = !task().player.ispass; // Utils::InTheirPenaltyArea(passTarget, 0); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
 
     if (shootGoal) {
-        passTarget = CGeoPoint(Param::Field::PITCH_LENGTH/2, 0);
+        CGeoPoint TargetUp = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + 5);
+        CGeoPoint TargetDown = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 - 5);
+        double thetaUp = (TargetUp - ball.Pos()).dir();
+        double thetaDown = (TargetDown - ball.Pos()).dir();
+        if (me.Dir() < thetaUp) passTarget = TargetDown;
+        else if (me.Dir() > thetaDown)passTarget = TargetUp;
     }
     double penaltyX=0.0;
     double penaltyY=0.0;
@@ -297,14 +301,10 @@ void CBreak::plan(const CVisionModule* pVision) {
     //cout << "dirok____" << ' ' << dirok << endl;
 
     if (shootGoal  && dirok) {
-        //if (shootGoal && canShoot && dirok) {
-        cout << "shoot!!!" << endl;
         // DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
         KickStatus::Instance()->setKick(vecNumber, power);//力度可调
     }
     else if (!shootGoal && fabs(Utils::Normalize(me.Dir() - finalDir)) <= precision) {
-        cout << "pass!!!" << endl;
-        // DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
         if (isChipKick)
             KickStatus::Instance()->setChipKick(vecNumber, power);//力度可调
         else
@@ -388,27 +388,39 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
         //测试当前点,若当前点可直接射门，则直接返回
         CGeoPoint test_point = me.Pos();
-        auto test_seg = CGeoSegment(pVision->Ball().Pos(), target);
+        auto test_seg = CGeoSegment(pVision->Ball().Pos(), target); // 球门终点到我的距离
         canShoot = true;
         needBreakThrough = false;
-        for (auto test_enemy : enemy_points) {
-            auto projection = test_seg.projection(test_enemy);
-            float projection_dist = max((projection - pVision->Ball().Pos()).mod() - Param::Vehicle::V2::PLAYER_SIZE, 0.0);
-            auto to_projection_dist = (projection - test_point).mod();
-            auto straight_dist = (test_enemy - test_point).mod();
-            float nearEnemyThreshold = task().player.ispass ? 2 : 15 * Param::Math::PI / 180.0;
+        for (auto test_enemy : enemy_points) { //枚举一个敌人
+            auto projection = test_seg.projection(test_enemy);  //算敌人到线段投影
+            float projection_dist = max((projection - pVision->Ball().Pos()).mod() - Param::Vehicle::V2::PLAYER_SIZE, 0.0);  //球到投影点的距离
+            auto to_projection_dist = (projection - test_point).mod();  //另一半距离
+            auto straight_dist = (test_enemy - test_point).mod(); //敌人到我的距离
+            auto Opp2Projection = (projection - test_enemy).mod();
+            //float nearEnemyThreshold = task().player.ispass ? 2 : 15 * Param::Math::PI / 180.0;
+
+            //float nearEnemyThreshold = task().player.ispass ? 2 : 15 * Param::Math::PI / 180.0;
+            float nearEnemyThreshold = task().player.ispass ? 3.5 : 5.5;
+
             /*cout << "test_seg.IsPointOnLineOnSegment(projection)__" << ' ' << test_seg.IsPointOnLineOnSegment(projection) << endl;
             cout << "projection_dist__" << ' ' << projection_dist << endl;
             cout << "to_projection_dist__" << ' ' << to_projection_dist << endl;*/
             //if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist/to_projection_dist) < (15*Param::Math::PI/180.0))||(to_projection_dist<15&&projection_dist<15))) {
-            if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / to_projection_dist) < (nearEnemyThreshold))  )) {
+            //if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / to_projection_dist) < (nearEnemyThreshold))  )) {
             /*if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {*/
+            
+
+            if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / fabs((Opp2Projection - Param::Vehicle::V2::PLAYER_SIZE))) > (nearEnemyThreshold)))) {
+
+                
                 canShoot = false;
                 needBreakThrough = true;
                 break;
             }
         }
-        if (canShoot)
+        bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
+        //if (canShoot)
+        if(dirok)
         {
             //cout << "don't need dribble here";
 
@@ -669,10 +681,6 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         //    return move_point;
         //    }
         }
-
-
-
-
 }
 
 bool CBreak::isSetPoint(const CVisionModule* pVision, const CGeoPoint* point, const CGeoPoint& target) {
@@ -717,7 +725,21 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
             break;
         }
     }
+    /*
+    char projection[100];
+    sprintf(projection, "%f", projection);
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(160, 230), projection, COLOR_YELLOW);
+    */
+    CGeoLine ShootLine = CGeoLine(me.Pos(), me.Dir());
+    CGeoLine GoalLine = CGeoLine(theirLeft, theirRight);
+    CGeoSegment Goal = CGeoSegment(theirLeft, theirRight);
+    CGeoLineLineIntersection LineIntersection = CGeoLineLineIntersection(GoalLine, ShootLine);
+    if (LineIntersection.Intersectant() == 0)return false;
+    CGeoPoint Intersection = LineIntersection.IntersectPoint();
+    if (Goal.IsPointOnLineOnSegment(Intersection) == 0) flag = false;
+    /*
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("CanScore:" + to_string(flag)).c_str(), COLOR_YELLOW);
+    */
     return flag;
 
 }

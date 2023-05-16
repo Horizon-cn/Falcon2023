@@ -1,4 +1,3 @@
-
 /********************************************************************/
 /* GetBallV4
 
@@ -50,10 +49,6 @@ namespace {
     const bool USE_BALL_SPEED_MODEL = false;            // 应用球速模型
 
     //用到的静态变量
-    bool trueNeedAvoidBall = false;
-    int avoidBallCount = 0;
-    int fraredOn = 0;
-    int fraredOff = 0;
     double GETBALL_BIAS = -2.5; // 原来是2.5
     double BALL_NEAR_ROBOT = 20;
 
@@ -63,6 +58,8 @@ namespace {
     double LARGE_ADJUST_ANGLE = 20;
 
     double HEAD_LIMIT = 3;
+
+    CGeoPoint theirCenter = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
 }
 
 CGetBallV4::CGetBallV4()
@@ -87,8 +84,6 @@ void CGetBallV4::plan(const CVisionModule* pVision)
     // 内部状态进行重置
     if (pVision->Cycle() - _lastCycle > Param::Vision::FRAME_RATE * 0.1) {
         setState(BEGINNING);
-        trueNeedAvoidBall = false;
-        avoidBallCount = 0;
     }
 
     const BallVisionT& ball = pVision->Ball();
@@ -97,11 +92,11 @@ void CGetBallV4::plan(const CVisionModule* pVision)
     const CGeoPoint myhead = me.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer, me.Dir());
     const CVector self2ball = ball.Pos() - me.Pos();
     const CVector ball2self = me.Pos() - ball.Pos();
-    const CVector head2ball = ball.Pos() - myhead;
 
     const double StopDist = task().player.rotvel;
     //	cout << "StopDist:\t" << StopDist << endl;
 
+    opponentID = getTheirMostClosetoPosPlayerNum(pVision, pVision->Ball().Pos());
 
     double finalDir = task().player.angle;
     double reverse_finalDir = Utils::Normalize(finalDir + Param::Math::PI);
@@ -111,84 +106,8 @@ void CGetBallV4::plan(const CVisionModule* pVision)
     if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000, finalDir), COLOR_RED);
     if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000, self2ball.dir()), COLOR_PURPLE);
 
-    double BallPosWithVelFactorTmp = ballPredictBaseTime;
-
-    double dAngle_ball2myhead_ballvel = Utils::Normalize(Utils::Normalize(head2ball.dir() + Param::Math::PI) - ball.Vel().dir());
-    double dAngle_self2ball_medir = Utils::Normalize(self2ball.dir() - me.Dir());
-    double dAngle_finalDir2ballVel = Utils::Normalize(finalDir - ball.Vel().dir());
-
-    // 球在车正前方对球预测时间的影响，考虑红外
-    bool frared = RobotSensor::Instance()->IsInfraredOn(robotNum);
-
-    // 带有小缓存功能的红外
-    if (frared) {
-        fraredOn = fraredOn >= maxFrared ? maxFrared : fraredOn + 1;
-        fraredOff = 0;
-    }
-    else {
-        fraredOn = 0;
-        fraredOff = fraredOff >= maxFrared ? maxFrared : fraredOff + 1;
-    }
 
     CVector ballVel = ball.Vel();
-    /********************************************************************/
-    /* 预测BallPosWithVelFactorTmp时间之后的球位置  by lsp */
-    /********************************************************************/
-    CGeoPoint ballPosWithVel = CGeoPoint(0, 0);
-    if (me.Pos().dist(ball.Pos()) < BALL_NEAR_ROBOT || ballVel.mod() < 70) {
-        ballPosWithVel = ball.Pos();
-        GDebugEngine::Instance()->gui_debug_msg(ballPosWithVel, "too slow ball");
-    }
-    else {
-        // 粗略计算预测球的位置
-        // 修改了拿球的预测时间，从三个角度考虑，车到球运动轨迹的距离，车的朝向，车的运动速度
-        CGeoLine ball_line(ball.Pos(), ball.Pos() + ballVel);
-        CGeoPoint projection_point = ball_line.projection(me.Pos());
-        double projection2me_dist = projection_point.dist(me.Pos());
-        double angle_diff = Param::Math::PI - abs(abs(me.Dir()) - abs(ballVel.dir()));
-        if (me.Vel().mod() > 20) {
-            double vel_dir = me.Vel().dir();
-            double vel_dir_diff = abs(vel_dir - (projection_point - me.Pos()).dir());
-            BallPosWithVelFactorTmp += (vel_dir_diff - Param::Math::PI / 2) / 8;
-            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), QString("vel dir diff time:%5").arg((vel_dir_diff - Param::Math::PI / 2) / 5).toStdString().c_str());
-        }
-
-        BallPosWithVelFactorTmp += projection2me_dist / 400;
-        BallPosWithVelFactorTmp += angle_diff / 15;
-
-        // 粗略计算预测球的位置
-        if (ballVel.mod() < transition_speed) {
-            if (ballVel.mod() / roll_acc < BallPosWithVelFactorTmp) {
-                ballPosWithVel = ball.Pos() + ballVel.unit() * (ballVel.mod() * BallPosWithVelFactorTmp - 0.5 * roll_acc * BallPosWithVelFactorTmp * BallPosWithVelFactorTmp);
-                GDebugEngine::Instance()->gui_debug_msg(ballPosWithVel, QString("short roll ball, time:%5").arg(BallPosWithVelFactorTmp).toStdString().c_str());
-            }
-            else {
-                ballPosWithVel = ball.Pos() + ballVel.unit() * (ballVel.mod2() / roll_acc * 0.5);
-                GDebugEngine::Instance()->gui_debug_msg(ballPosWithVel, QString("long roll ball, time:%5").arg(BallPosWithVelFactorTmp).toStdString().c_str());
-            }
-        }
-        else {
-            float time2roll = (ballVel.mod() - transition_speed) / slide_acc;
-            float timeslide = transition_speed / roll_acc;
-            if (BallPosWithVelFactorTmp < time2roll) {
-                ballPosWithVel = ball.Pos() + ballVel.unit() * (ballVel.mod() * BallPosWithVelFactorTmp - 0.5 * slide_acc * BallPosWithVelFactorTmp * BallPosWithVelFactorTmp);
-            }
-            else if (BallPosWithVelFactorTmp < time2roll + timeslide) {
-                float slide_dist = (ballVel.mod2() - transition_speed * transition_speed) / slide_acc * 0.5;
-                float roll_time = BallPosWithVelFactorTmp - time2roll;
-                float roll_dist = transition_speed * roll_time - 0.5 * roll_acc * roll_time * roll_time;
-                ballPosWithVel = ball.Pos() + ballVel.unit() * (roll_dist + slide_dist);
-            }
-            else {
-                float slide_dist = (ballVel.mod2() - transition_speed * transition_speed) / slide_acc * 0.5;
-                float roll_dist = transition_speed * transition_speed / roll_acc * 2;
-                ballPosWithVel = ball.Pos() + ballVel.unit() * (roll_dist + slide_dist);
-            }
-            GDebugEngine::Instance()->gui_debug_msg(ballPosWithVel, "slide ball");
-        }
-    }
-    if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_arc(ballPosWithVel, 20, 0, 360, COLOR_YELLOW);
-
 
     TaskT getball_task(task());
     getball_task.player.rotvel = 0.0;
@@ -207,36 +126,7 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         getball_task.player.flag = getball_task.player.flag & (~PlayerStatus::DRIBBLING);	//取消控球标签
     getball_task.player.flag |= PlayerStatus::ALLOW_DSS;
 
-    const CGeoLine myheadLine = CGeoLine(myhead, Utils::Normalize(me.Dir() + Param::Math::PI / 2.0));
-    const CGeoPoint ball2myheadLine_ProjPoint = myheadLine.projection(ballPosWithVel);
-    double dAngDiff_self2ball_finaldir = fabs(Utils::Normalize(self2ball.dir() - finalDir));
-    bool isBallFrontOfMyhead = myhead.dist(ball2myheadLine_ProjPoint) < ball2myheadLimit ? true : false;  //球到嘴巴线的投影点在可以拿球的范围内
-    bool isInDirectGetBallCircle = me.Pos().dist(ballPosWithVel) < directGetBallDist ? true : false;     //是否在直接冲上去拿球距离之内
-    bool isGetBallDirReached = fabs(dAngDiff_self2ball_finaldir) < directGetBballDirLimit;
-    bool isCanDirectGetBall = isBallFrontOfMyhead && isInDirectGetBallCircle && isGetBallDirReached;      //重要布尔量:是否能直接上前拿球
-    bool dirOut = fabs(dAngDiff_self2ball_finaldir) > Param::Math::PI / 18.0;
-    bool canNOTDirectGetBall = !isBallFrontOfMyhead || !isInDirectGetBallCircle || dirOut;
-    bool isInNearBallCircle = me.Pos().dist(ball.Pos()) < nearBallRadius ? true : false;                 //是否在AVOIDBALL小圈之内
-    bool isBallBesideMe = false;
-    bool isBallBehindMe = false;
-    if (isInNearBallCircle)
-    {
-        if (canNOTDirectGetBall)
-        {
-            if (fabs(dAngDiff_self2ball_finaldir) > Param::Math::PI / 2.0)
-            {
-                isBallBehindMe = true;
-            }
-            else isBallBesideMe = true;
-        }
-    }
-    /*
-    double diffAngleVel2Final = fabs(dAngDiff_self2ball_finaldir);
-    int sign = diffAngleVel2Final > Param::Math::PI / 2.0 ? 1 : 0;
-    if (ball.Pos().dist(me.Pos()) > AllowFaceToFinalDist)
-        getball_task.player.angle = Utils::Normalize(self2ball.dir() + sign * Param::Math::PI);
-    else getball_task.player.angle = finalDir;
-    */
+
     getball_task.player.angle = finalDir;
     int _executor = robotNum;
     double ball2meDist = ball2self.mod();
@@ -268,7 +158,7 @@ void CGetBallV4::plan(const CVisionModule* pVision)
     }
 
     char state[100];
-    sprintf(state, "%f", (double)_state);
+    sprintf(state, "%f", (double)_RotateCnt);
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), state, COLOR_YELLOW);
     if (_state != ROTATE) _RotateCnt = 0;
     else _RotateCnt++;
@@ -293,7 +183,8 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
     case HAVE:
-        getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, (me.Pos() - ball.Pos()).dir());
+        //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, (me.Pos() - ball.Pos()).dir());
+        getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS + 2, (me.Pos() - ball.Pos()).dir()); // 预测球的位置 + 5.85     这个长度越大离球越远
         getball_task.player.angle = finalDir;
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
@@ -536,16 +427,6 @@ bool CGetBallV4::LARGECanToROTATE(const CVisionModule* pVision, const double fin
     if (ball.Vel().mod() < 20 && (LargeTarget - me.Pos()).mod() < 5) return 1;
     return 0;
 }
-bool CGetBallV4::ROTATECanToDIRECT(const CVisionModule* pVision, const double finalDir)
-{
-    const BallVisionT& ball = pVision->Ball();
-    const int robotNum = task().executor;
-    const PlayerVisionT& me = pVision->OurPlayer(robotNum);
-    const CVector self2ball = ball.Pos() - me.Pos();
-    // 这里有改变
-    if (fabs(Utils::Normalize((ball.Pos() - me.Pos()).dir() - me.Dir())) < Param::Math::PI * 1 / 180.0) return 1;
-    return 0;
-}
 bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir)
 {
     const BallVisionT& ball = pVision->Ball();
@@ -565,5 +446,79 @@ bool CGetBallV4::MustUseLargeToAdjust(const CVisionModule* pVision, const int _e
     else return 0;
 }
 
+bool CGetBallV4::ROTATECanToDIRECT(const CVisionModule* pVision, double finalDir){
+
+    double Precision = Param::Math::PI * 3 / 180;
+    //double offset = 0.05;
+
+    const BallVisionT& ball = pVision->Ball();
+    const PlayerVisionT& me = pVision->OurPlayer(task().executor);
+    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+    double myDir = me.Dir();
+    CVector opp2ball = ball.Pos() - opp.Pos();
+    CVector ball2goal = theirCenter - ball.Pos();
+    //if (!ShootOrPass) ShootPrecision = ShootPrecision * 0.8;
+    /*if (myDir - targetDir > 0)targetDir -= offset;
+    else targetDir += offset;
+    */
+
+    finalDir = (ball.Pos() - me.Pos()).dir();
+
+    last_final_dir = finalDir;
+
+    if (abs(finalDir - last_final_dir) > 4.0 * Precision) {
+        last_dir_deviation = 100;
+    }
+    if (Me2OppTooclose(pVision, task().executor)) {
+        if (abs(myDir - finalDir) < 1.5 * Precision) {
+            last_dir_deviation = 100;
+            return true;
+        }
+    }
+    if (abs(myDir - finalDir) > 1.5 * Precision) {
+        last_dir_deviation = myDir - finalDir;
+        return false;
+    }
+    else if ((abs(myDir - finalDir) > abs(last_dir_deviation) || (myDir - finalDir) * last_dir_deviation <= 0)) {
+        if (abs(myDir - finalDir) < 1.25 * Precision) {
+            last_dir_deviation = 100;
+            return true;
+        }
+    }
+    else if (abs(myDir - finalDir) < Precision) {
+        last_dir_deviation = 100;
+        return true;
+    }
+    last_dir_deviation = myDir - finalDir;
+    return false;
+}
+
+int CGetBallV4::getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos) {
+    double dist = 1000;
+    int num = 0;
+    for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+        if (pVision->TheirPlayer(i).Valid()) {
+            if (pVision->TheirPlayer(i).Pos().dist(pos) < dist) {
+                dist = pVision->TheirPlayer(i).Pos().dist(pos);
+                num = i;
+            }
+        }
+    }
+    return num;
+}
+
+bool CGetBallV4::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber) {
+    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+    const BallVisionT& ball = pVision->Ball();
+    CVector me2Ball = ball.Pos() - me.Pos();
+    CVector me2Opp = opp.Pos() - me.Pos();
+
+    const double threshold = 70;
 
 
+    if ((abs(me2Ball.mod()) < threshold && abs(me2Opp.mod()) < threshold * 1.5) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 3)) {
+        return true;
+    }
+    return false;
+}

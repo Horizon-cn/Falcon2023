@@ -1,6 +1,7 @@
 #ifndef _BREAK_H_
 #define _BREAK_H_
 #include <skill/PlayerTask.h>
+#include "Param.h"
 
 /**********************************************************/
 /* Skill: ???????¨°
@@ -27,7 +28,8 @@ private:
 
     CGeoPoint point[20];
     int running_index;
-
+    CGeoPoint theirLeft = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
+    CGeoPoint theirRight = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
 
     bool isSetPoint(const CVisionModule* pVision, const CGeoPoint* point, const CGeoPoint& target);
 

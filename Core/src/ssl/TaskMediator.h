@@ -266,7 +266,6 @@ public:
 
     int getNextAdvancer() {
         if (BallStatus::Instance()->IsBallKickedOut(_advancer.num)) {
-            std::cout << "here___________________" << std::endl;
             nextAdvancer = nextAdvancer_store;
             std::cout << nextAdvancer << std::endl;
         }

@@ -34,5 +34,5 @@ elseif ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
 elseif ball.refPosX() < -(param.pitchLength/2 - param.penaltyDepth - 100) and -(param.pitchLength/2 - param.penaltyDepth)<= ball.refPosX() and math.abs(ball.refPosY()) < param.penaltyWidth/2 + 100 then
     gCurrentPlay = "Ref_StopV3"
 else
-    gCurrentPlay = "Ref_Stop4FrontKick"
+    gCurrentPlay = "Ref_StopV2"
 end

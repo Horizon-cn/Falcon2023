@@ -116,6 +116,7 @@ private:
     bool JudgeIsMeSupport(const CVisionModule* pVision, int vecNumber);
     bool JudgePassMeIsBeBlocked(const CVisionModule *pVision, int vecNumber);
     bool AdJudgeBreakCanDo(const CVisionModule *pVision, int vecNumber, CGeoPoint TargetPoint);
+    bool MeIsInTheSide(const CVisionModule *pVision, int vecNumber);
     /**********************************************************
     * Description: ???§Ý??§Ø??????????????????????§Ø?
     * Author: ?????
@@ -125,7 +126,7 @@ private:
     bool tendToShoot(const CVisionModule* pVision, int vecNumber);
     int CanSupportKick(const CVisionModule* pVision, int vecNumber);
     bool isTheLineBlocked(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint);
-
+    int TheirRobotInBreakArea(const CVisionModule* pVision, const int vecNumber);
     /**********************************************************
     * Description: ????????????????GET?????
     * Author: ?????

@@ -735,7 +735,7 @@ __global__ void gpu_calc(float startPos[], float map[])
     float* our_player_ptr = startPos + 7;
     float* their_player_ptr = startPos + (7 + POS_INFO_LENGTH * SELF_NUM);
     // 为了与颜色一一对应，最大值不要超过MAX_SCORE
-    if (is_in_penalty(me_x, me_y, ROBOT_RADIUS) || if_collide_theirPlayer(me_pos_ptr, their_player_ptr)) { // 不能进禁区，不能冲撞对方机器人
+    if (is_in_penalty(me_x, me_y, ROBOT_RADIUS * 1.3) || if_collide_theirPlayer(me_pos_ptr, their_player_ptr)) { // 不能进禁区，不能冲撞对方机器人
         map[i] = MAX_SCORE;
     }
     else {    

@@ -186,6 +186,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(CHIPPOWER, "Advance/CHIPPOWER", 240);
             loadParam(ADV_FPASSPOWER, "Advance/ADV_FPASSPOWER", 2);
             loadParam(ADV_CPASSPOWER, "Advance/ADV_CPASSPOWER", 1);
+            loadParam(ADV_PUSHPOWER, "Advance/ADV_PUSHPOWER", 35.0);
             loadParam(RELIEF_POWER, "Advance/RELIEF_POWER", 400);
             loadParam(BACK_POWER, "Advance/BACK_POWER", 300);
             loadParam(BACK_POWER_V3, "Advance/BACK_POWER_V3", 160);
@@ -391,13 +392,14 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double FASTEST_RECEIVE_VEL;
         double maxChipDist;
         /*射门力度参数*/
-        int KICKPOWER;
-        int CHIPPOWER;
-        int ADV_FPASSPOWER;
+        double KICKPOWER;
+        double CHIPPOWER;
+        double ADV_FPASSPOWER;
         double ADV_CPASSPOWER;
-        int RELIEF_POWER;
-        int  BACK_POWER;
-        int BACK_POWER_V3;
+        double ADV_PUSHPOWER;
+        double RELIEF_POWER;
+        double  BACK_POWER;
+        double BACK_POWER_V3;
         bool Advance_DEBUG_ENGINE ;
         /*ReceivePass add by tyh*/
         double PassBalltoMeVel;

@@ -21,9 +21,12 @@ protected:
 	CGeoPoint GenerateLargeAnglePoint(const CVisionModule* pVision, const double finalDir, const bool debug);
 	bool JudgeLargeBack(const CVisionModule* pVision, CGeoPoint target);
 	bool LARGECanToROTATE(const CVisionModule* pVision, const double finalDir);
-	bool ROTATECanToDIRECT(const CVisionModule* pVision, const double finalDir);
+	bool ROTATECanToDIRECT(const CVisionModule* pVision, double finalDir);
 	bool WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir);
 	bool MustUseLargeToAdjust(const CVisionModule* pVision, const int _executor, const double finalDir);
+	int getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
+
+	bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
 private:
 	enum {
 		BEGIN = 0,
@@ -36,6 +39,9 @@ private:
 	int _state;
 	int _lastCycle;
 	int _RotateCnt;
+	int opponentID;
+	double last_final_dir;
+	double last_dir_deviation = 100;
 };
 
 #endif //_GET_BALL_V4_H__

@@ -97,8 +97,14 @@ namespace Utils {
     // ?§Ø?¦Ë???????§Ù?????. Modified by HXY.
     bool InTheirPenaltyArea(const CGeoPoint& p, const double buffer) {
         // buffer??????????????
-        return (p.x() > Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - buffer
-            && std::fabs(p.y()) < Param::Field::PENALTY_AREA_WIDTH / 2 + buffer);
+
+        double finalBuffer = buffer;
+        if (WorldModel::Instance()->CurrentRefereeMsg() == "ourIndirectKick" || WorldModel::Instance()->CurrentRefereeMsg() == "theirIndirectKick"
+            || WorldModel::Instance()->CurrentRefereeMsg() == "gameStop")
+            finalBuffer += 20;
+
+        return (p.x() > Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - finalBuffer
+            && std::fabs(p.y()) < Param::Field::PENALTY_AREA_WIDTH / 2 + finalBuffer);
     }
 
 
@@ -162,22 +168,27 @@ namespace Utils {
         // ????????§Ù???????????
         if (WorldModel::Instance()->CurrentRefereeMsg() == "ourBallPlacement")
             return p;
+        
+        double finalBuffer = buffer;
+        if (WorldModel::Instance()->CurrentRefereeMsg() == "ourIndirectKick" || WorldModel::Instance()->CurrentRefereeMsg() == "theirIndirectKick"
+            || WorldModel::Instance()->CurrentRefereeMsg() == "gameStop")
+            finalBuffer += 20;
 
         if (p.y() > 0) {
             // ??????????????????????????????????
             if (p.x() - Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH < Param::Field::PENALTY_AREA_WIDTH / 2 - p.y())
             // ??????????????
-                return CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - buffer, p.y());
+                return CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - finalBuffer, p.y());
             // ?????????????
-            else return CGeoPoint(p.x(), Param::Field::PENALTY_AREA_WIDTH / 2 + buffer);
+            else return CGeoPoint(p.x(), Param::Field::PENALTY_AREA_WIDTH / 2 + finalBuffer);
         }
         else {
             // ?????????????????????????¡¤????????
             if (p.x() - Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH < Param::Field::PENALTY_AREA_WIDTH / 2 + p.y())
             // ??????????????
-                return CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - buffer, p.y());
+                return CGeoPoint(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - finalBuffer, p.y());
             // ???????????¡¤?
-            else return CGeoPoint(p.x(), -Param::Field::PENALTY_AREA_WIDTH / 2 - buffer);
+            else return CGeoPoint(p.x(), -Param::Field::PENALTY_AREA_WIDTH / 2 - finalBuffer);
         }
         /**
         CGeoPoint fixPoint = p;

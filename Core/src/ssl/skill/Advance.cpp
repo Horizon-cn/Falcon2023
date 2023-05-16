@@ -23,6 +23,7 @@
 CAdvance::CAdvance()
 {
 	NowIsShoot = 0;
+	KickorPassDir = 0;
 	KICK_DIST = paramManager->KICK_DIST;  /*射门允许范围 越高越容易射门*/
 	WantToLessShoot = paramManager->WantToLessShoot; /*射门倾向，越低越容易射门 最低为0 最高为5*/
 	RELIEF_DIST = paramManager->RELIEF_DIST;  /*GET中紧急状况下的RELIEF判断距离*/
@@ -32,18 +33,21 @@ CAdvance::CAdvance()
 	SHOOT_PRECISION = paramManager->SHOOT_PRECISION;	/*允许射门最小精度角分母，越大越慢越精确 最低为7最高17*/
 	GetBallBias = paramManager->AdGetBallBias;	/*AdvanceGetball的偏差*/
 	BalltoMeVelTime = paramManager->BalltoMeVelTime; /*Advance传球给我主动去接的临界时间*/
+
 	/*射门力度参数*/
 	KICKPOWER = paramManager->KICKPOWER;
 	CHIPPOWER = paramManager->CHIPPOWER; // 暂时不用了
     ADV_FPASSPOWER_Alpha = paramManager->ADV_FPASSPOWER;
 	ADV_CPASSPOWER_Alpha = paramManager->ADV_CPASSPOWER;
+	PUSHPOWER = paramManager->ADV_PUSHPOWER;
     // max:600 350
 	RELIEF_POWER = paramManager->RELIEF_POWER;
     BACK_POWER = paramManager->BACK_POWER;
 	Advance_DEBUG_ENGINE = paramManager->Advance_DEBUG_ENGINE;
 	// GetBallV4
 	LARGE_ADJUST_ANGLE = paramManager->LARGE_ADJUST_ANGLE;
-	PUSHPOWER = 35;
+
+
 }
 
 
@@ -160,6 +164,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 	* Author: 谭宇宏
 	* Created Date: 2022/10/10
 	***********************************************************/
+
 	switch (_state) {
 	case BEGIN:
         _state = GET;
@@ -170,6 +175,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 		//if (meHasBall>3) {
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.8) {
+
 			TaskMediator::Instance()->resetAdvancerPassTo();
             /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
             if ((NowIsShoot == 1) && fabs(me.Y() < 250) && me.X() < 400) { _state = BREAKSHOOT; break; }
@@ -181,25 +187,28 @@ void CAdvance::plan(const CVisionModule* pVision)
             }
             if (me.X() > 0) {
 				/*人在前场*/
-				if ((!Me2OppTooclose(pVision, _executor)) && me.Pos().x() < 270) { // 周围没人
-					_state = PUSHOUT; break;
-
+				if (MeIsInTheSide(pVision, _executor) && CanSupportKick(pVision, _executor)) {
+					_state = PASS; break;
 				}
-				else if (CanSupportKick(pVision, _executor)) {
-					_state = PUSHOUT; break;
+				if (tendToShoot(pVision, _executor) && TheirRobotInBreakArea(pVision, _executor) < 3) {
+					NowIsShoot = 1;
+					_state = BREAKSHOOT; break;
+				}
+				else if (Me2OppTooclose(pVision, _executor) && CanSupportKick(pVision, _executor)) {
+					_state = BREAKPASS; break;
 				}
 				else { _state = PUSHOUT; break; }
 			}
 			else {
 				/*人在后场*/
 				if (!Me2OppTooclose(pVision, _executor)) {
-					_state = PUSHOUT; break; // 周围没人
+					_state = PASS; break; // 周围没人
 
 				}
 				else if (CanSupportKick(pVision, _executor)) {
-					_state = PUSHOUT; break;
+					_state = BREAKPASS; break;
 				}
-				else { _state = PUSHOUT; break; }
+				else { _state = JUSTCHIPPASS; break; }
 			}
 		}
 		else { _state = GET; break; }
@@ -349,6 +358,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKSHOOT", COLOR_YELLOW);
         KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		ShootPoint = (pVision->Cycle() % 60 == 0)? GenerateBreakShootPoint(pVision, _executor):ShootPoint;
+		KickorPassDir = (ShootPoint - me.Pos()).dir();
         if(AdJudgeBreakCanDo(pVision, _executor, ShootPoint)||true)setSubTask(PlayerRole::makeItBreak(_executor, false, ShootPoint));
         else setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, generateGetballDir(pVision, _executor), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		break;
@@ -361,6 +371,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);  //breakpass具有连续性 不适合采用setpass的技术
 		bool isChipKick = toChipOrToFlat(pVision, _executor, PassPos) == 0;
 		double kickPower = 0;
+		KickorPassDir = (PassPoint - me.Pos()).dir();
 		if (isChipKick)
 			kickPower = GetCPassPower(me.Pos(), PassPoint);
 		else
@@ -500,6 +511,18 @@ bool CAdvance::IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint,
 	}
 	return false;
 }
+int CAdvance::TheirRobotInBreakArea(const CVisionModule* pVision, const int vecNumber) {
+	int cnt = 0, n = 0;
+	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+	while (n <= Param::Field::MAX_PLAYER) {
+		if (!pVision->TheirPlayer(n).Valid()) { n++; continue; }
+		const PlayerVisionT& opp = pVision->TheirPlayer(n);
+		double x = opp.X(), y = opp.Y();
+		cnt += (abs(y) < 180 && (x > 250 || x > me.Pos().x()));
+		n++;
+	}
+	return cnt;
+}
 bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber) { //是否太近了
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
@@ -526,6 +549,10 @@ bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber)
 	return false;
 }
 
+bool CAdvance::MeIsInTheSide(const CVisionModule* pVision, int vecNumber) {
+	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+	return fabs(me.Y()) > 185;
+}
 bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int ShootOrPass) {
 	double ShootPrecision = SHOOT_PRECISION;
     //double offset = 0.05;
@@ -660,11 +687,10 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 	double SupportShootDir = 0, MeToSupportDist = 0 , SupportToGoal = 0 ;
     for (int i = 0; i < NumberOfSupport; ++i) {
         if (!IsOurNearHere(pVision, SupportPoint[i], vecNumber)) continue;
-		if (SupportPoint[i].x() < me.Pos().x()) continue;
-		SupportShootDir = KickDirection::Instance()->getPointShootDir(pVision, SupportPoint[i]);
+		if (SupportPoint[i].x() < me.Pos().x() && fabs(me.Y() < 250) && me.X() < 400) continue;
 		MeToSupportDist = (me.Pos() - SupportPoint[i]).mod();
 		SupportToGoal = (CGeoPoint(Param::Field::PITCH_LENGTH / 2.0, 0) - SupportPoint[i]).mod();
-        if (SupportShootDir != 1000 && MeToSupportDist < CanPassToWingDist && SupportToGoal < CanWingShootDist)
+        if (MeToSupportDist < CanPassToWingDist && SupportToGoal < CanWingShootDist)
 			return 1;
 	}
 	return 0;
@@ -736,10 +762,11 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 		//DistOppToTheLine[i] = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), SupportPoint[i]);//对手队员离传球线最短距离
 		ShootDir[i] = KickDirection::Instance()->getPointShootDir(pVision, SupportPoint[i]);		//射门角度
 		//DistToPoint[i] = (SupportPoint[i] - me.Pos()).mod();										//支撑点到“我”的距离
-		ChangeDir[i] = me.Dir() - (SupportPoint[i] - me.Pos()).dir();								//传球到点“我”需要改变的角度
+		ChangeDir[i] = fabs(me.Dir() - (SupportPoint[i] - me.Pos()).dir());								//传球到点“我”需要改变的角度
 
 		//最终的判定条件
-        isCanUse[i] = isOurNearPoint[i] && /*(!isBlockPoint[i]) &&*/ (ShootDir[i] != 1000) && (SupportPoint[i].x() > me.X());
+		if (fabs(me.Y()) > 100 && me.X() > 300)isCanUse[i] = isOurNearPoint[i] && (ShootDir[i] != 1000);
+		else isCanUse[i] = isOurNearPoint[i] &&  (ShootDir[i] != 1000) && (SupportPoint[i].x() > me.X());
 		//当前点可以射门的条件：我方有人在旁边，//没有阻挡//，射门可以，向前传球
 		if (isCanUse[i])
 		{
