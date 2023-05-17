@@ -178,8 +178,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 			TaskMediator::Instance()->resetAdvancerPassTo();
             /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
-            if ((NowIsShoot == 1) && fabs(me.Y() < 250) && me.X() < 400) { _state = BREAKSHOOT; break; }
-			if (me2goal.mod() < KICK_DIST && fabs(me.Y() < 250) && me.X() < 400) {
+            if ((NowIsShoot == 1) && fabs(me.Y() < 200) && me.X() < 370) { _state = BREAKSHOOT; break; }
+
+			if (me2goal.mod() < KICK_DIST && fabs(me.Y() < 200) && me.X() < 370) {
                 if (tendToShoot(pVision, _executor) || (Me2OppTooclose(pVision, _executor)) || isInBreakArea(pVision, _executor)) {
                     NowIsShoot = 1;
 					_state = BREAKSHOOT; break;
@@ -187,7 +188,8 @@ void CAdvance::plan(const CVisionModule* pVision)
             }
             if (me.X() > 0) {
 				/*人在前场*/
-				if (MeIsInTheSide(pVision, _executor) || CanSupportKick(pVision, _executor)) {
+
+				if (MeIsInTheSide(pVision, _executor) && CanSupportKick(pVision, _executor)) {
 					_state = PASS; break;
 				}
 				if (tendToShoot(pVision, _executor) && TheirRobotInBreakArea(pVision, _executor) < 3) {
@@ -202,7 +204,12 @@ void CAdvance::plan(const CVisionModule* pVision)
 			else {
 				/*人在后场*/
 				if (!Me2OppTooclose(pVision, _executor)) {
-					_state = PASS; break; // 周围没人
+					if (CanSupportKick(pVision, _executor)) {
+						_state = PASS; break; // 周围没人
+					}
+					else {
+						_state = PUSHOUT; break; // 周围没人
+					}
 
 				}
 				else if (CanSupportKick(pVision, _executor)) {
@@ -687,7 +694,7 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 	double SupportShootDir = 0, MeToSupportDist = 0 , SupportToGoal = 0 ;
     for (int i = 0; i < NumberOfSupport; ++i) {
         if (!IsOurNearHere(pVision, SupportPoint[i], vecNumber)) continue;
-		if (SupportPoint[i].x() < me.Pos().x() && fabs(me.Y() < 250) && me.X() < 400) continue;
+		if (SupportPoint[i].x() < me.Pos().x() && fabs(me.Y() < 200) && me.X() < 370) continue;
 		MeToSupportDist = (me.Pos() - SupportPoint[i]).mod();
 		SupportToGoal = (CGeoPoint(Param::Field::PITCH_LENGTH / 2.0, 0) - SupportPoint[i]).mod();
         if (MeToSupportDist < CanPassToWingDist && SupportToGoal < CanWingShootDist)

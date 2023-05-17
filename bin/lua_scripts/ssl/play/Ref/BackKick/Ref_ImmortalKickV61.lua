@@ -24,7 +24,11 @@ local GOALIE_POS = {
 }
 local function def_chipPower()
   if math.abs(ball.posX()) > 300 then 
-    return 180
+    return 370
+  elseif math.abs(ball.posX()) > 250 then 
+    return 290
+  elseif math.abs(ball.posX()) > 200 then
+    return 230
   else 
     return 150
   end
@@ -103,7 +107,7 @@ firstState = "getready",
 --Assister负责传球，Defender始终作为诱饵
 ["getready"] = {
   switch = function ()
-    if bufcnt(player.toTargetDist("Leader")<30
+    if bufcnt(player.toTargetDist("Leader")<10
     , "normal",100) then
       return "startball"
     end
@@ -120,12 +124,12 @@ firstState = "getready",
 
 ["startball"] = {
   switch = function ()
-    if bufcnt(player.toTargetDist("Leader")<30 and
-      player.toBallDist("Assister")<10 , 20, 180)  then
+    if bufcnt(--player.toBallDist("Assister")<10 and
+       player.toTargetDist("Leader")<50 , "fast", 180)  then
       return "chippass"
     end
   end,
-  Assister = task.staticGetBall(CHEAT),
+  Assister = task.staticGetBall(CHEAT()),
   Middle   = task.runMultiPos(MIDDLE_POS),
   Special  = task.goCmuRush(SPECIAL_POS[1],_,_,flag.allow_dss),
   Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),

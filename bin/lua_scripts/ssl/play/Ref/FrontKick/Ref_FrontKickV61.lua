@@ -23,10 +23,12 @@ local GOALIE_POS = {
   FINAL_SHOOT_POS,
 }
 local function def_chipPower()
-  if math.abs(ball.posY()) > 270 then 
-    return 120
-  else 
-    return 100
+  if math.abs(ball.posY()) > 250 then 
+    return 180
+  elseif math.abs(ball.posY()) > 200 then 
+    return 155
+  else
+    return 130
   end
 end
 local SPECIAL_POS = {
@@ -120,8 +122,8 @@ firstState = "getready",
 
 ["startball"] = {
   switch = function ()
-    if bufcnt(player.toTargetDist("Leader")<30 and
-      player.toBallDist("Assister")<10 , "fast", 180)  then
+    if bufcnt( --player.toBallDist("Assister")<10 and
+      player.toTargetDist("Leader")<20 , "fast", 180)  then
       return "chippass"
     end
   end,
