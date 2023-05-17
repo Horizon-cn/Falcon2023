@@ -121,7 +121,7 @@ firstState = "getready",
 ["startball"] = {
   switch = function ()
     if bufcnt(player.toTargetDist("Leader")<30 and
-      player.toTargetDist("Assister")<10 , "fast", 180)  then
+      player.toBallDist("Assister")<10 , "fast", 180)  then
       return "chippass"
     end
   end,

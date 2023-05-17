@@ -42,6 +42,7 @@ private:
 	int opponentID;
 	double last_final_dir;
 	double last_dir_deviation = 100;
+	double GetBall_Precision_alpha = 3.0;
 };
 
 #endif //_GET_BALL_V4_H__

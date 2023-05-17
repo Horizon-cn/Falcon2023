@@ -8,7 +8,7 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_play6" --"Test_play6ForTest" --"Test_ChaseKick" --"Test_play6" --"Test_Run"
+		return "Test_play6ForTest" --"Test_play6ForTest" --"Test_ChaseKick" --"Test_play6" --"Test_Run"
 	else
 		return "Test_play6" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
@@ -23,10 +23,10 @@ gSwitchNum = {
 -- 有0号在场门将就是0号，没有0号在场，看这里设置的号码
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
-	["Kicker"]   = {8},
+	["Kicker"]   = {11},
 	["Goalie"]   = {0},
-	["Tier"]	 = {3},
-	["Receiver"] = {7}
+	["Tier"]	 = {13},
+	["Receiver"] = {12}
 }
 
 -- 用来进行定位球的保持
@@ -216,5 +216,6 @@ gTestPlayTable = {
 	"Test_Circle",
 	"Test_play6",
 	"Test_defend6",
-	"Test_play6ForTest"
+	"Test_play6ForTest",
+	"Test_DSS"
 }

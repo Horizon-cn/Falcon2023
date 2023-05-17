@@ -187,7 +187,7 @@ void CAdvance::plan(const CVisionModule* pVision)
             }
             if (me.X() > 0) {
 				/*人在前场*/
-				if (MeIsInTheSide(pVision, _executor) && CanSupportKick(pVision, _executor)) {
+				if (MeIsInTheSide(pVision, _executor) || CanSupportKick(pVision, _executor)) {
 					_state = PASS; break;
 				}
 				if (tendToShoot(pVision, _executor) && TheirRobotInBreakArea(pVision, _executor) < 3) {
@@ -698,6 +698,7 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 int CAdvance::toChipOrToFlat(const CVisionModule* pVision, int vecNumber, CGeoPoint TargetPoint) {
     // 0chip 1flat
     const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+
     if(isTheLineBlocked(pVision, me.Pos(), TargetPoint) && me.Pos().dist(pVision->Ball().Pos()) <= ParamManager::Instance()->maxChipDist)return 0;
 
     return 1;
@@ -917,13 +918,13 @@ CGeoPoint CAdvance::GenerateBreakPassPoint(const CVisionModule* pVision, int vec
 
 double CAdvance::GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
 	double dist = (StartPoint - targetPoint).mod() -Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER;
-	double passPower = sqrt(powf(ParamManager::Instance()->FASTEST_RECEIVE_VEL, 2) + 2 * ParamManager::Instance()->BALL_DEC * dist);
+	double passPower = sqrt(powf(ParamManager::Instance()->FASTEST_RECEIVE_VEL, 2) + 2 * ParamManager::Instance()->BALL_DEC * dist) * ADV_FPASSPOWER_Alpha;
 	// std::cout << "passPower" << passPower << std::endl;
 	return min(passPower, (double)Param::Rule::MAX_BALL_SPEED);
     // return max(min(650.0, ADV_FPASSPOWER_Alpha* dist ), 200.0);
 }
 double CAdvance::GetCPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
-	double dist = (StartPoint - targetPoint).mod() - 9.0 * Param::Vehicle::V2::PLAYER_SIZE;
+	double dist = ((StartPoint - targetPoint).mod() - 9.0 * Param::Vehicle::V2::PLAYER_SIZE )* ADV_CPASSPOWER_Alpha;;
 	return min(ParamManager::Instance()->maxChipDist, dist);
 	// return min(460.0, ADV_CPASSPOWER_Alpha * dist);
 }

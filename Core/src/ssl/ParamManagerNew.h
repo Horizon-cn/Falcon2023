@@ -224,6 +224,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(slide_acc, "GetBall/slide_acc", 500);
             loadParam(transition_speed, "GetBall/transition_speed", 400);
             loadParam(LARGE_ADJUST_ANGLE, "GetBall/LARGE_ADJUST_ANGLE", 20.0);
+            loadParam(GetBall_Precision_alpha, "GetBall_Precision_alpha", 3.0);
 
             loadParam(CATEGORY, "PENALTY_DEFENCE/CATEGORY", 3);
             loadParam(FRAME, "PENALTY_DEFENCE/FRAME", 0);
@@ -422,6 +423,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double slide_acc;
         double transition_speed;
         double LARGE_ADJUST_ANGLE;
+        double GetBall_Precision_alpha;
         // PENALTY_DEFENCE
         int CATEGORY;
         int FRAME;

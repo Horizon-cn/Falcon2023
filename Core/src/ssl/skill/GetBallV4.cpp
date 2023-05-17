@@ -74,6 +74,7 @@ CGetBallV4::CGetBallV4()
     slide_acc = ParamManager::Instance()->slide_acc;
     transition_speed = ParamManager::Instance()->transition_speed;
     LARGE_ADJUST_ANGLE = ParamManager::Instance()->LARGE_ADJUST_ANGLE;
+    GetBall_Precision_alpha = ParamManager::Instance()->GetBall_Precision_alpha;
 
     _lastCycle = 0;
 }
@@ -448,7 +449,7 @@ bool CGetBallV4::MustUseLargeToAdjust(const CVisionModule* pVision, const int _e
 
 bool CGetBallV4::ROTATECanToDIRECT(const CVisionModule* pVision, double finalDir){
 
-    double Precision = Param::Math::PI * 3 / 180;
+    double Precision = Param::Math::PI * GetBall_Precision_alpha / 180;
     //double offset = 0.05;
 
     const BallVisionT& ball = pVision->Ball();
