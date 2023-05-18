@@ -2,7 +2,7 @@ IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 USE_SWITCH = false
-OPPONENT_NAME = "Avoidfoul" --"Avoidfoul"
+OPPONENT_NAME = "PureDefence" --"Avoidfoul"
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
@@ -107,6 +107,7 @@ gRefPlayTable = {
 	"Ref/CornerKick/Ref_CornerKickV1",
 	"Ref/CornerKick/Ref_CornerKickV6",
 	"Ref/CornerKick/Ref_CornerKickV8",
+	"Ref/CornerKick/Ref_CornerKickV80",
 	"Ref/CornerKick/Ref_CornerKickV30",
 	"Ref/CornerKick/Ref_CornerKickV201",
 	"Ref/CornerKick/Ref_CornerKickV202",
@@ -117,6 +118,7 @@ gRefPlayTable = {
 	"Ref/FrontKick/Ref_FrontKickV41",
 	"Ref/FrontKick/Ref_FrontKickV2",
 	"Ref/FrontKick/Ref_FrontKickV61",
+	"Ref/FrontKick/Ref_FrontKickV610",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
@@ -128,6 +130,7 @@ gRefPlayTable = {
 	"Ref/BackKick/Ref_ImmortalKickV1",
 	"Ref/BackKick/Ref_BackKickV2",
 	"Ref/BackKick/Ref_ImmortalKickV61",
+	"Ref/BackKick/Ref_ImmortalKickV610",
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
@@ -137,11 +140,15 @@ gRefPlayTable = {
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDefV5",
 	"Ref/CornerDef/Ref_CornerDefV2",
+	
+	"Ref/CornerDef/Ref_CornerDefV20",
 
 	--中场防守
 	"Ref/MiddleDef/Ref_MiddleDefV10",
 	"Ref/MiddleDef/Ref_MiddleDefV11",
 	"Ref/MiddleDef/Ref_MiddleDefV2",
+
+	"Ref/MiddleDef/Ref_MiddleDefV20",
 
 	--前场防守
 	"Ref/FrontDef/Ref_FrontDefV8",
@@ -154,6 +161,8 @@ gRefPlayTable = {
 	"Ref/BackDef/Ref_BackDefV11",
 	"Ref/BackDef/Ref_BackDefV12",
 	"Ref/BackDef/Ref_BackDefV2",
+
+	"Ref/BackDef/Ref_BackDefV20",
 
 	--己方放球
 	"Ref/BallPlace/Ref_OurBallPlaceV2",
