@@ -132,6 +132,7 @@ gRefPlayTable = {
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
 	"Ref/KickOffDef/Ref_KickOffDefV23",
+	"Ref/KickOffDef/Ref_KickOffDefV230",
 
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDefV5",
@@ -146,6 +147,7 @@ gRefPlayTable = {
 	"Ref/FrontDef/Ref_FrontDefV8",
 	"Ref/FrontDef/Ref_FrontDefV9",
 	"Ref/FrontDef/Ref_FrontDefV2",
+	"Ref/FrontDef/Ref_FrontDefV20",
 
 	--后场防守
 	"Ref/BackDef/Ref_BackDefV10",
@@ -162,10 +164,12 @@ gRefPlayTable = {
 	--点球进攻
 	"Ref/PenaltyKick/Ref_PenaltyKickV1",
 	"Ref/PenaltyKick/Ref_PenaltyKickV6",
+	"Ref/PenaltyKick/Ref_PenaltyKickV60",
 
 	--点球防守
 	"Ref/PenaltyDef/Ref_PenaltyDefV1",
 	"Ref/PenaltyDef/Ref_PenaltyDefV6",
+	"Ref/PenaltyDef/Ref_PenaltyDefV60",
 
 	--停止站位
 	"Ref/GameStop/Ref_Stop4BackKick",
