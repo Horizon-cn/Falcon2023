@@ -15,7 +15,7 @@ firstState = "init",
 			return "gotolong"
 		end
 	end,
-	Goalie  = task.goCmuRush(CGeoPoint:new_local(-50,0),_,_,flag.allow_dss),
+	Goalie  = task.goCmuRush(CGeoPoint:new_local(-185,0),_,_,flag.allow_dss),
 	Leader = task.goCmuRush(CGeoPoint:new_local(-300,0),_,_,flag.allow_dss),
 	Assister = task.goCmuRush(CGeoPoint:new_local(-300,100),_,_,flag.allow_dss),
 	Middle = task.goCmuRush(CGeoPoint:new_local(-300,-100),_,_,flag.allow_dss),
@@ -26,11 +26,11 @@ firstState = "init",
 
 ["gotolong"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Goalie") < 30 , 10 , 120) then
+		if bufcnt(player.toTargetDist("Goalie") < 15 , 10 , 120) then
 			return "templong"
 		end
 	end,
-	Goalie  = task.goCmuRush(CGeoPoint:new_local(-50,0),_,_,flag.allow_dss),
+	Goalie  = task.goCmuRush(CGeoPoint:new_local(-170,0),_,_,flag.allow_dss),
 	Leader = task.goCmuRush(CGeoPoint:new_local(-300,0),_,_,flag.allow_dss),
 	Assister = task.goCmuRush(CGeoPoint:new_local(-300,100),_,_,flag.allow_dss),
 	Middle = task.goCmuRush(CGeoPoint:new_local(-300,-100),_,_,flag.allow_dss),
@@ -45,7 +45,7 @@ firstState = "init",
 			return "kick"
 		end
 	end,
-	Goalie  = task.goCmuRush(CGeoPoint:new_local(-50,0),_,_,flag.allow_dss),
+	Goalie  = task.goCmuRush(CGeoPoint:new_local(-160,0),_,_,flag.allow_dss),
 	Leader = task.goCmuRush(CGeoPoint:new_local(-300,0),_,_,flag.allow_dss),
 	Assister = task.goCmuRush(CGeoPoint:new_local(-300,100),_,_,flag.allow_dss),
 	Middle = task.goCmuRush(CGeoPoint:new_local(-300,-100),_,_,flag.allow_dss),
