@@ -190,7 +190,6 @@ message Referee {
     //  * kickoff, penalty kick, force start
     //  * ball placement
     optional int32 current_action_time_remaining = 15;
-    optional string login_name = 16;
 }
 
 message ProposedGameEvent {

@@ -13,7 +13,7 @@ namespace Owl {
 		~CActionModule();
 		bool changeFrequency(int);
         int getFrequency() { return frequency; }
-        int getMaxFrequency() { return 9; }
+        int getMaxFrequency() { return 15; }
         QStringList& updatePortsList();
         bool changePorts(int);
         std::string getSerialPort() { return serial.portName().toStdString(); }

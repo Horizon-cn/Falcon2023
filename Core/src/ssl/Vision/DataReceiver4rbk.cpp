@@ -45,12 +45,17 @@ CDataReceiver4rbk::CDataReceiver4rbk():referee_socket(){
     delete pOption;
     int vision_port = (isYellow == TEAM_YELLOW) ? CParamManager::Instance()->yellow_vision : CParamManager::Instance()->blue_vision;
     int referee_port = isYellow == TEAM_YELLOW ? OParamManager::Instance()->refereePortToYellow : OParamManager::Instance()->refereePortToBlue;
+    qDebug() << referee_port;
     referee_socket.setProxy(QNetworkProxy::NoProxy);
     referee_socket.bind(QHostAddress::AnyIPv4, referee_port, QUdpSocket::ShareAddress);
     //referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address)); // receive Athena ref, need to change ZSS_ADDRESS
     foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces()) {
         referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address), iface);
     }
+    // 这是昨晚的表述 referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address)); // receive Athena ref, need to change ZSS_ADDRESS
+    //这是之前的表述 我已经恢复foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces()) {
+    //    referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address), iface);
+    //}
     referee_thread = new std::thread([=] {receiveRefMsgs();});
     referee_thread->detach();
     receive_vision_socket = new QUdpSocket();
@@ -199,12 +204,13 @@ void CDataReceiver4rbk::receiveRefMsgs() {
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         while (referee_socket.state() == QUdpSocket::BoundState && referee_socket.hasPendingDatagrams()) {
-            //qDebug()<<"receive";
+            qDebug()<<"receive";
             datagram.resize(referee_socket.pendingDatagramSize());
             referee_socket.readDatagram(datagram.data(), datagram.size());
             ssl_referee.ParseFromArray((void*)datagram.data(), datagram.size());
-            if (ssl_referee.has_login_name() && ssl_referee.login_name() != OParamManager::Instance()->LoginName)
-                break;
+            //if (ssl_referee.has_login_name() && ssl_referee.login_name() != OParamManager::Instance()->LoginName)
+            //    break;
+            qDebug() << "ok";
             PlayMode next_play_mode = PMNone; // avoid next command is none
             if (ssl_referee.has_next_command()) { // check next command first
                 Referee_Command next_command = ssl_referee.next_command();

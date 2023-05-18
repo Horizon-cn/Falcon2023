@@ -172,8 +172,8 @@ void CVisionModule::parse(void * ptr, int size) {
     static SSL_WrapperPacket packet;
     Owl::ReceiveVisionMessage message;
     packet.ParseFromArray(ptr, size);
-    if (packet.has_login_name() && opm->LoginName != packet.login_name())
-        return;
+    //if (packet.has_login_name() && opm->LoginName != packet.login_name())
+    //    return;
     if (packet.has_geometry() && opm->updateGeometry) {
         const SSL_GeometryFieldSize& field = packet.geometry().field();
         
