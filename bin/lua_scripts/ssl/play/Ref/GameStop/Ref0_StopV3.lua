@@ -8,7 +8,7 @@ local STOP_DSS   = bit:_or(STOP_FLAG, flag.allow_dss)
 local DEFX = -(param.pitchLength/2 - param.penaltyDepth -3 * param.playerRadius)
 local DEFY = param.penaltyWidth/2 + 2 * param.playerRadius 
 
-local DEF_POS1 = ball.syntYPos(CGeoPoint:new_local(DEFX, DEFY))
+local DEF_POS1 = ball.syntYPos(CGeoPoint:new_local(-293, 46))
 local DEF_POS2 = ball.syntYPos(CGeoPoint:new_local(DEFX, DEFY + 3 * param.playerRadius))
 local DEF_POS3 = ball.antiYPos(CGeoPoint:new_local(DEFX, DEFY))
 
@@ -26,7 +26,7 @@ firstState = "start",
   end,
   Defender = task.goCmuRush(DEF_POS1, _,  ACC, STOP_DSS),
   Middle  = task.goCmuRush(DEF_POS2, _,  ACC, STOP_DSS),
-  Special  = task.goCmuRush(DEF_POS3, _,  ACC, STOP_DSS),
+  Special  = task.defendHead(),
   Leader   = task.leftBack(),
   Assister = task.rightBack(),
   Goalie   = task.goalieNew(),
