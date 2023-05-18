@@ -48,6 +48,7 @@ private:
     int opponentID;
     int NumberOfSupport;/* Gpu??????????????? */
     int NowIsShoot;
+    int NumOfOurPlayer;
     /**********************************************************
     * Description: ?????§Ò? ???????ini??????????????
     *              ?????????????
@@ -112,11 +113,14 @@ private:
     bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
     bool isPassBalltoMe(const CVisionModule* pVision, int vecNumber);
     bool isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int ShootOrPass);
+    
     bool isInBreakArea(const CVisionModule* pVision, int vecNumber);
+    bool isInTheCornerArea(const CVisionModule* pVision, int vecNumber);
+    bool MeIsInTheSide(const CVisionModule* pVision, int vecNumber);
+    
     bool JudgeIsMeSupport(const CVisionModule* pVision, int vecNumber);
     bool JudgePassMeIsBeBlocked(const CVisionModule *pVision, int vecNumber);
     bool AdJudgeBreakCanDo(const CVisionModule *pVision, int vecNumber, CGeoPoint TargetPoint);
-    bool MeIsInTheSide(const CVisionModule *pVision, int vecNumber);
     /**********************************************************
     * Description: ???§Ý??§Ø??????????????????????§Ø?
     * Author: ?????
@@ -150,6 +154,8 @@ private:
 
     CGeoPoint generateNormalPushPoint(const CVisionModule* pVision, const int vecNumber);
     double generateGetballDir(const CVisionModule* pVision, const int vecNumber);
+
+    int GenerateStateOfFoulTrouble(const CVisionModule* pVision, const int vecNumber);
 
 protected:
 

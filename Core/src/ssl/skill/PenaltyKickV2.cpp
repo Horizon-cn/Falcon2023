@@ -149,10 +149,10 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
                     _state = BREAKSHOOT; break;
                 }
                 else if (me2goal.mod() > KICK_DIST + 30){
-                    _state = NORMAL_PUSH; break;
+                    _state = CHIP1; break;
                 }
                 else {
-                    _state = BREAKSHOOT; break;
+                    _state = CHIP1; break;
                 }
             }
         }
@@ -294,7 +294,9 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         }
         break;
     case CHIP1:
-        KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
+        if (ball.Y() >= 0)KickorPassDir = Param::Math::PI * 0.15;
+        else KickorPassDir = Param::Math::PI * 0.15;
+        //KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
         KickStatus::Instance()->clearAll();
             /*正常KICK阶段  需要区分是否方向已经转向成功  此处尚未完备可能存在BUG*/
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Chip", COLOR_ORANGE);
