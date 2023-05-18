@@ -9,7 +9,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-  Leader = task.defendKick()
+  Leader = task.defendKick(),
   Middle = task.leftBack(),
   Defender = task.rightBack(),
   Special = task.defendHead(),
