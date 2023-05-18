@@ -143,11 +143,11 @@
 
 local STOP_POS1 = function()
 	return ball.pos() + Utils.Polar2Vector(65, ball.toOurGoalDir())
-	if ball.toOurGoalDist() < 160*param.lengthRatio then
-		return CGeoPoint:new_local(-150*param.lengthRatio,0)
-	else
-		return ball.pos() + Utils.Polar2Vector(59, ball.toOurGoalDir())
-	end
+	-- if ball.toOurGoalDist() < 160*param.lengthRatio then
+	-- 	return CGeoPoint:new_local(-150*param.lengthRatio,0)
+	-- else
+	-- 	return ball.pos() + Utils.Polar2Vector(59, ball.toOurGoalDir())
+	-- end
 end
 
 local COR_DEF_POS1 = CGeoPoint:new_local(-50*param.lengthRatio,-50*param.widthRatio)
