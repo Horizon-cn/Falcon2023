@@ -9,14 +9,13 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-
-  Leader = task.defendKick(),
+  Leader = task.defendKick()
   Middle = task.leftBack(),
   Defender = task.rightBack(),
-  Special = task.marking("First"),
-  Assister = task.defendHead(),
+  Special = task.defendHead(),
+  Assister = task.marking("First"),
   Goalie = task.goalieNew(),
-  match    = "[L][DM][SA]"
+  match    = "[L][MD][A][S]"
 },
   name = "Ref_BackDefV2",
   applicable = {

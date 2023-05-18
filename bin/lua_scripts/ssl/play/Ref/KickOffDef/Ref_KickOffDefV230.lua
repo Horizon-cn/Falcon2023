@@ -15,9 +15,9 @@ firstState = "start",
 			return "exit"
 		end
 	end,
-	Leader   = task.goSpeciPos(CGeoPoint:new_local(-70, -60),_,flag.allow_dss), --task.goSpeciPos(KICKOFF_DEF_POS("left")),
-	Special  = task.goSpeciPos(CGeoPoint:new_local(-70, 60),_,flag.allow_dss), --task.goSpeciPos(KICKOFF_DEF_POS("right")),
-	Assister = task.goSpeciPos(CGeoPoint:new_local(-70, 0),_,flag.allow_dss),
+	Leader   = task.goCmuRush(CGeoPoint:new_local(-70, -60),_,flag.allow_dss), --task.goSpeciPos(KICKOFF_DEF_POS("left")),
+	Special  = task.goCmuRush(CGeoPoint:new_local(-70, 60),_,flag.allow_dss), --task.goSpeciPos(KICKOFF_DEF_POS("right")),
+	Assister = task.goCmuRush(CGeoPoint:new_local(-70, 0),_,flag.allow_dss),
 	Middle   = task.leftBack(),
 	Defender = task.rightBack(),
 	Goalie   = task.goalieNew(),
