@@ -135,10 +135,10 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
                     _state = KICK; break;
                 }
                 else if (Me2OppTooclose(pVision, _executor)) {
-                    _state = CHIP; break;
+                    _state = KICK; break;
                 }
                 else {
-                    _state = BREAKSHOOT; break;
+                    _state = KICK; break;
                 }
             }
             else {
@@ -152,7 +152,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
                     _state = CHIP1; break;
                 }
                 else {
-                    _state = CHIP1; break;
+                    _state = KICK; break;
                 }
             }
         }
@@ -294,21 +294,18 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         }
         break;
     case CHIP1:
-        if (ball.Y() >= 0)KickorPassDir = Param::Math::PI * 0.15;
-        else KickorPassDir = Param::Math::PI * 0.15;
+        if (ball.Y() >= 0)KickorPassDir = Param::Math::PI * 0.08;
+        else KickorPassDir = Param::Math::PI * 0.08;
         //KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
         KickStatus::Instance()->clearAll();
             /*正常KICK阶段  需要区分是否方向已经转向成功  此处尚未完备可能存在BUG*/
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Chip", COLOR_ORANGE);
-        if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
-            if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip isDirOK", COLOR_ORANGE);
-            KickStatus::Instance()->setChipKick(_executor, me2goal.mod() - 80);
-        }
-        else {
-            //setSubTask(PlayerRole::makeItGoAndTurnKickV4(_executor, kickDir));
-            setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
-            if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip is NOT DirOK ", COLOR_ORANGE);
-        }
+
+
+        setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, 120, CGeoPoint(0, 0))); //这里最后一个参数没解析 所以我偷懒了
+        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip", COLOR_ORANGE);
+
+
         break;
     case BREAKSHOOT:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKSHOOT", COLOR_YELLOW);
