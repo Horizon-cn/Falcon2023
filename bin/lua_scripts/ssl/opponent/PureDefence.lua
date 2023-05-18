@@ -16,7 +16,7 @@ gOppoConfig = {
 	PenaltyDef  = "Ref_PenaltyDefV60", --Ref_PenaltyDefV3
 	KickOff		= "Ref_KickOffV230",
 	KickOffDef  = "Ref_KickOffDefV230",
-	NorPlay     = "Test_play6"
+	NorPlay     = "NormalPlayPureDefence"
 }
 
 

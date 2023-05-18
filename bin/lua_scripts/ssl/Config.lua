@@ -194,6 +194,11 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_Stop4MiddleKick",
 	"Ref/GameStop/Ref_Stop4ChaKick",
 
+	"Ref/GameStop/Ref0_StopV2",
+	"Ref/GameStop/Ref0_StopV3",
+	"Ref/GameStop/Ref0_Stop4CornerDef",
+	"Ref/GameStop/Ref0_Stop4CornerKick",
+
 
 	--强制停止
 	"Ref/Ref_HaltV1",
@@ -230,6 +235,7 @@ gTestPlayTable = {
 	"Test_NormalMiddleDefend",
 	"Test_Circle",
 	"Test_play6",
+	"NormalPlayPureDefence",
 	"Test_defend6",
 	"Test_play6ForTest",
 	"Test_DSS"
