@@ -228,6 +228,7 @@ gTestPlayTable = {
 	"Test_NormalMiddleDefend",
 	"Test_Circle",
 	"Test_play6",
+	"NormalPlayPureDefence",
 	"Test_defend6",
 	"Test_play6ForTest",
 	"Test_DSS"
