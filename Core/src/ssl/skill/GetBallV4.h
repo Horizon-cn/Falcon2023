@@ -18,7 +18,7 @@ protected:
 	int PredictForRobot(CGeoPoint point, const CVisionModule* pVision);
 	CGeoPoint Ball_Predict_Pos(const CVisionModule* pVision);
 	CGeoPoint PredictForBall(int frame, const CVisionModule* pVision);
-	CGeoPoint GenerateLargeAnglePoint(const CVisionModule* pVision, const double finalDir, const bool debug);
+	CGeoPoint GenerateLargeAnglePoint(const CVisionModule* pVision, double finalDir, const bool debug);
 	bool JudgeLargeBack(const CVisionModule* pVision, CGeoPoint target);
 	bool LARGECanToROTATE(const CVisionModule* pVision, const double finalDir);
 	bool ROTATECanToDIRECT(const CVisionModule* pVision, double finalDir);
@@ -39,6 +39,7 @@ private:
 	int _state;
 	int _lastCycle;
 	int _RotateCnt;
+	int _LargeCnt;
 	int opponentID;
 	double last_final_dir;
 	double last_dir_deviation = 100;

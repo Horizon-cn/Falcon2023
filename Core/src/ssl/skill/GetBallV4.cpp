@@ -41,7 +41,8 @@ namespace {
     const double extremeAngle = Param::Math::PI/* * 176 / 180.0*/;
     const double directGetBballDirLimit = Param::Math::PI / 20.0;
     const int maxFrared = 125;	//红外极大值
-    const int MaxRotateCnt = 100;
+    const int MaxRotateCnt = 200;
+    const int MaxLargeCnt = 100;
 
     // 开关量
     bool DEBUG_ENGINE = false;                          // 调试模式
@@ -103,10 +104,6 @@ void CGetBallV4::plan(const CVisionModule* pVision)
     double reverse_finalDir = Utils::Normalize(finalDir + Param::Math::PI);
 
 
-    // 是否开启debug模式
-    if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000, finalDir), COLOR_RED);
-    if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000, self2ball.dir()), COLOR_PURPLE);
-
 
     CVector ballVel = ball.Vel();
 
@@ -138,7 +135,7 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         else _state = LARGE;
         break;
     case LARGE:
-        if (LARGECanToROTATE(pVision, finalDir)) _state = ROTATE;
+        if (LARGECanToROTATE(pVision, finalDir) || _LargeCnt > MaxLargeCnt) _state = ROTATE;
         break;
     case ROTATAE:
         if (ROTATECanToDIRECT(pVision, finalDir) || _RotateCnt > MaxRotateCnt) _state = DIRECT;
@@ -159,10 +156,16 @@ void CGetBallV4::plan(const CVisionModule* pVision)
     }
 
     char state[100];
-    sprintf(state, "%f", (double)_RotateCnt);
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), state, COLOR_YELLOW);
+    sprintf(state, "%f", (double)_state);
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500, 400), state, COLOR_YELLOW);
     if (_state != ROTATE) _RotateCnt = 0;
     else _RotateCnt++;
+    if (_state != LARGE)_LargeCnt = 0;
+    else {
+        CGeoPoint tmp = GenerateLargeAnglePoint(pVision, finalDir, 0);
+        if ((me.Pos() - tmp).mod() < 2) _LargeCnt++;
+        else _LargeCnt = 0;
+    }
 
     switch (_state)
     {
@@ -173,20 +176,21 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         break;
 
     case ROTATAE:
-        getball_task.player.pos = me.Pos();
+        // Utils::Normalize(theta_Dir + sign * Param::Math::PI * 65 / 180.0)
+        getball_task.player.pos = me.Pos(); // 预测球的位置 + 5.85     这个长度越大离球越远
         getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
     case DIRECT:
-        getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS + 2, (me.Pos() - ball.Pos()).dir()); // 预测球的位置 + 5.85     这个长度越大离球越远
+        getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS + 5, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
         getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
-
+        //getball_task.player.angle = finalDir;
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
     case HAVE:
         //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, (me.Pos() - ball.Pos()).dir());
-        getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS + 2, (me.Pos() - ball.Pos()).dir()); // 预测球的位置 + 5.85     这个长度越大离球越远
-        getball_task.player.angle = finalDir;
+        getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS + 5, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
+        getball_task.player.angle = (ball.Pos() - me.Pos()).dir();;
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
 
@@ -201,6 +205,12 @@ void CGetBallV4::plan(const CVisionModule* pVision)
     CTRL_METHOD mode = task().player.specified_ctrl_method;
     getball_task.player.is_specify_ctrl_method = true;
     getball_task.player.specified_ctrl_method = mode;
+
+    // 是否开启debug模式
+    finalDir = getball_task.player.angle;
+    if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000, finalDir), COLOR_RED);
+    if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000, me.Dir()), COLOR_PURPLE);
+
     setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(getball_task));
 
     _lastCycle = pVision->Cycle();
@@ -316,7 +326,7 @@ int CGetBallV4::PredictForRobot(CGeoPoint point, const CVisionModule* pVision)//
     return frame;
 }
 
-CGeoPoint CGetBallV4::GenerateLargeAnglePoint(const CVisionModule* pVision, const double finalDir, const bool debug) {
+CGeoPoint CGetBallV4::GenerateLargeAnglePoint(const CVisionModule* pVision, double finalDir, const bool debug) {
     const BallVisionT& ball = pVision->Ball();
     const int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
@@ -352,6 +362,9 @@ CGeoPoint CGetBallV4::GenerateLargeAnglePoint(const CVisionModule* pVision, cons
             CGeoPoint Intersection = LineIntersection.IntersectPoint();
             CGeoSegment JudgeSegment = CGeoSegment(me.Pos(), target);
             if (JudgeSegment.IsPointOnLineOnSegment(Intersection)) {
+                //double theta1 = (Intersection - me.Pos()).dir();
+                //CGeoPoint target1 = Intersection + Utils::Polar2Vector(2, Utils::Normalize(theta1));
+                //finalDir = (ball.Pos() - target1).dir();
                 target = ball.Pos() + Utils::Polar2Vector(getBallDist, Utils::Normalize(finalDir + Param::Math::PI));
             }
         }
@@ -425,7 +438,8 @@ bool CGetBallV4::LARGECanToROTATE(const CVisionModule* pVision, const double fin
     const BallVisionT& ball = pVision->Ball();
     const int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
-    if (ball.Vel().mod() < 20 && (LargeTarget - me.Pos()).mod() < 5) return 1;
+    
+    if ((ball.Vel().mod() < 15 && (LargeTarget - me.Pos()).mod() < 2)) return 1;
     return 0;
 }
 bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir)
@@ -462,31 +476,36 @@ bool CGetBallV4::ROTATECanToDIRECT(const CVisionModule* pVision, double finalDir
     /*if (myDir - targetDir > 0)targetDir -= offset;
     else targetDir += offset;
     */
-
     finalDir = (ball.Pos() - me.Pos()).dir();
 
-    last_final_dir = finalDir;
+    if (fabs(finalDir - last_final_dir) > 4.0 * Precision) {
 
-    if (abs(finalDir - last_final_dir) > 4.0 * Precision) {
-        last_dir_deviation = 100;
+        last_final_dir = finalDir;
     }
+    if (fabs(finalDir - me.Dir()) < Precision) {
+        return true;
+
+    }
+    else return false;
+
+
     if (Me2OppTooclose(pVision, task().executor)) {
-        if (abs(myDir - finalDir) < 1.5 * Precision) {
+        if (fabs(myDir - finalDir) < 1.5 * Precision) {
             last_dir_deviation = 100;
             return true;
         }
     }
-    if (abs(myDir - finalDir) > 1.5 * Precision) {
+    if (fabs(myDir - finalDir) > 1.5 * Precision) {
         last_dir_deviation = myDir - finalDir;
         return false;
     }
-    else if ((abs(myDir - finalDir) > abs(last_dir_deviation) || (myDir - finalDir) * last_dir_deviation <= 0)) {
-        if (abs(myDir - finalDir) < 1.25 * Precision) {
+    else if ((fabs(myDir - finalDir) > fabs(last_dir_deviation) || (myDir - finalDir) * last_dir_deviation <= 0)) {
+        if (fabs(myDir - finalDir) < 1.25 * Precision) {
             last_dir_deviation = 100;
             return true;
         }
     }
-    else if (abs(myDir - finalDir) < Precision) {
+    else if (fabs(myDir - finalDir) < Precision) {
         last_dir_deviation = 100;
         return true;
     }

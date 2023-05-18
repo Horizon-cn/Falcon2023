@@ -1,13 +1,13 @@
 
 local function def_chipPower()
   if math.abs(ball.posY()) > 300 then 
-    return 170
-  elseif math.abs(ball.posY())> 285 then
     return 160
-  elseif math.abs(ball.posY()) > 270 then 
+  elseif math.abs(ball.posY())> 285 then
     return 150
-  else 
+  elseif math.abs(ball.posY()) > 270 then 
     return 140
+  else 
+    return 130
   end
 end
 

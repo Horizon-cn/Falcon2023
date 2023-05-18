@@ -164,7 +164,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 	* Author: 谭宇宏
 	* Created Date: 2022/10/10
 	***********************************************************/
-
+	_state = GET;
 	switch (_state) {
 	case BEGIN:
         _state = GET;
@@ -174,7 +174,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
 
 		//if (meHasBall>3) {
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.8) {
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 
 			TaskMediator::Instance()->resetAdvancerPassTo();
             /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
@@ -199,6 +199,10 @@ void CAdvance::plan(const CVisionModule* pVision)
 				else if (Me2OppTooclose(pVision, _executor) && CanSupportKick(pVision, _executor)) {
 					_state = BREAKPASS; break;
 				}
+				else if (me.X() > 425) {
+					NowIsShoot = 1;
+					_state = BREAKSHOOT; break;
+				} 
 				else { _state = PUSHOUT; break; }
 			}
 			else {
@@ -253,7 +257,12 @@ void CAdvance::plan(const CVisionModule* pVision)
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 		KickStatus::Instance()->setKick(_executor, RELIEF_POWER);
 	}*/
-
+	/*
+	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.6) {
+		_state = PASS;
+	}
+	else _state = GET;
+	*/
 	/**********************************************************
 	* Description: 状态执行
 	* Author: 谭宇宏
