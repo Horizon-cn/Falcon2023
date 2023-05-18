@@ -7,11 +7,11 @@ firstState = "init",
 			return "exit"
 		end
 	end,
-	Leader  = task.goCmuRush(CGeoPoint:new_local(265, 250),_,_,flag.allow_dss),
-	Middle  = task.goCmuRush(CGeoPoint:new_local(265,-250),_,_,flag.allow_dss),
-	Crosser = task.goCmuRush(CGeoPoint:new_local(265,-200),_,_,flag.allow_dss),
-	Defender = task.goCmuRush(CGeoPoint:new_local(265,200),_,_,flag.allow_dss),
-	Assister = task.goCmuRush(CGeoPoint:new_local(265,225),_,_,flag.allow_dss),
+	Leader  = task.goCmuRush(CGeoPoint:new_local(300, 250),_,_,flag.allow_dss),
+	Middle  = task.goCmuRush(CGeoPoint:new_local(300,-250),_,_,flag.allow_dss),
+	Crosser = task.goCmuRush(CGeoPoint:new_local(300,-200),_,_,flag.allow_dss),
+	Defender = task.goCmuRush(CGeoPoint:new_local(300,200),_,_,flag.allow_dss),
+	Assister = task.goCmuRush(CGeoPoint:new_local(300,225),_,_,flag.allow_dss),
 	Goalie   = task.goalieNew("penalty"),
 	match = "{LACDM}"
 },
