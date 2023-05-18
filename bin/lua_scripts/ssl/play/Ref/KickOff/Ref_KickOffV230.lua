@@ -111,10 +111,10 @@ firstState = "start",
     end
   end,
   Leader   = task.goCmuRush(START_POS,-3,_,flag.allow_dss),
-  Assister = task.multiBack(4,1);
-  Special  = task.multiBack(4,2);
-  Middle   = task.multiBack(4,3);
-  Defender = task.multiBack(4,4);
+  Assister = task.multiBack(4,1),
+  Special  = task.multiBack(4,2),
+  Middle   = task.multiBack(4,3),
+  Defender = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
   match    = "[L][ASMD]"
 },
@@ -126,10 +126,10 @@ firstState = "start",
     end
   end,
   Leader   = task.goCmuRush(START_POS_1,-3,_,flag.allow_dss),  --staticGetBall(player.toPlayerDir("Assister","Leader")),
-  Assister = task.multiBack(4,1);
-  Special  = task.multiBack(4,2);
-  Middle   = task.multiBack(4,3);
-  Defender = task.multiBack(4,4);
+  Assister = task.multiBack(4,1),
+  Special  = task.multiBack(4,2),
+  Middle   = task.multiBack(4,3),
+  Defender = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
   match    = "[L][ASMD]"
 },
@@ -139,18 +139,32 @@ firstState = "start",
     switch = function ()
     --if bufcnt(player.kickBall("Leader"), "fast", 200) then
       if bufcnt(player.toBallDist("Leader") > 30) then
-      return "exit"
+      return "receive"
     end
   end,
-  Leader   = task.passToPos(outside,300)
-  Assister = task.multiBack(4,1);
-  Special  = task.multiBack(4,2);
-  Middle   = task.multiBack(4,3);
-  Defender = task.multiBack(4,4);
+  Leader   = task.flatPass("Assister"),
+  Assister = task.multiBack(4,1),
+  Special  = task.multiBack(4,2),
+  Middle   = task.multiBack(4,3),
+  Defender = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
   match    = "[L][ASMD]"
 },
 
+["receive"] = {
+  switch = function ()
+    if bufcnt(player.toBallDist("Assister") < 20, 20, 150) then
+      return "exit"
+    end
+  end,
+  Leader   = task.multiBack(2,1),
+  Assister = task.receive("Leader"),
+  Special  = task.multiBack(2,2),
+  Middle   = task.leftBack(),
+  Defender = task.rightBack(),
+  Goalie   = task.goalieNew(),
+  match    = "[L][AS][MD]"
+},
 
 
 name = "Ref_KickOffV230",

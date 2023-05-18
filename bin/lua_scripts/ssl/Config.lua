@@ -102,6 +102,8 @@ gRefPlayTable = {
 	--开球进攻
 	"Ref/KickOff/Ref_KickOffV6",
 	"Ref/KickOff/Ref_KickOffV23",
+	"Ref/KickOff/Ref_KickOffV230",
+
 
 	--角球进攻
 	"Ref/CornerKick/Ref_CornerKickV1",
