@@ -115,9 +115,9 @@ firstState = "getready",
   --Assister = task.goCmuRush(ball.pos())
   Assister = task.goCmuRush(pos.reflectPos(projectX(),-projectY()),player.toPointDir(CHEAT,"Assister"),_,flag.allow_dss),
   Leader   = task.goCmuRush(LEADER_POS[1],_,_,flag.allow_dss),
-  Special  = task.goCmuRush(SPECIAL_POS[1],_,_,flag.allow_dss),
+  Special   = task.leftBack(),
  Defender = task.goCmuRush(READY_POS,_,_,flag.allow_dss),
-  Middle   = task.goCmuRush(MIDDLE_POS[3],_,_,flag.allow_dss),
+  Middle   = task.rightBack(),
   Goalie   = task.goalieNew(),
   match    = "{A}{L}{D}{MS}"
 },
@@ -125,13 +125,13 @@ firstState = "getready",
 ["startball"] = {
   switch = function ()
     if bufcnt(--player.toBallDist("Assister")<10 and
-       player.toTargetDist("Leader")<50 , "fast", 180)  then
+       player.toTargetDist("Leader")<150 , "fast", 180)  then
       return "chippass"
     end
   end,
   Assister = task.staticGetBall(CHEAT()),
-  Middle   = task.runMultiPos(MIDDLE_POS),
-  Special  = task.goCmuRush(SPECIAL_POS[1],_,_,flag.allow_dss),
+  Middle   = task.rightBack(),
+  Special   = task.leftBack(),
   Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),
   Defender = task.goCmuRush(READY_POS,_,_,flag.allow_dss),
   Goalie   = task.goalieNew(),
@@ -146,8 +146,8 @@ firstState = "getready",
     end
   end,
   Assister = task.chipPass(CHEAT(),def_chipPower()),
-  Middle   = task.runMultiPos(MIDDLE_POS),
-  Special  = task.singleBack(),
+  Middle   = task.rightBack(),
+  Special   = task.leftBack(),
   Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),
   Defender = task.goCmuRush(READY_POS,player.toBallDir("Defender"),_, flag.allow_dss),
   Goalie   = task.goalieNew(),
@@ -162,9 +162,9 @@ firstState = "getready",
     end
   end,
   Assister = task.goCmuRush(ball.refSyntYPos(CGeoPoint:new_local(270,240))),
-  Special   = task.rightBack(),
+  Special   = task.leftBack(),
   Defender = task.goCmuRush(READY_POS,player.toBallDir("Defender"),_, flag.allow_dss),
-  Middle  = task.leftBack(),
+  Middle   = task.rightBack(),
   Leader = task.advance(),
   Goalie   = task.goalieNew(),
   match    = "{L}{A}{D}{SM}"
