@@ -41,7 +41,7 @@ gPlayTable.CreatePlay{
     Special  = task.leftBack(),
     Middle   = task.goCmuRush(SYNT_POS_1,_,_,flag.allow_dss),
     Defender = task.goCmuRush(ANTI_POS_1,_,_,flag.allow_dss),
-    Goalie   = dangerous and task.goalieNew(),
+    Goalie   = task.goalieNew(),
     match    = "{A}{M}{D}{LS}"
   },
 

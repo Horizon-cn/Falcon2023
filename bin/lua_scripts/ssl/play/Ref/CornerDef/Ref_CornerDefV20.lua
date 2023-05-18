@@ -1,4 +1,6 @@
-
+local STOP_POS = function()
+  return ball.pos() + Utils.Polar2Vector(65, ball.toOurGoalDir())
+end
 gPlayTable.CreatePlay{
 
   firstState = "start",
@@ -9,7 +11,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-  Leader = task.defendKick(),
+  Leader = task.goCmuRush(STOP_POS, player.toBallDir, _, flag.slowly),
   Assister = task.defendHead(),
   Special = task.marking("First"),
   Middle = task.leftBack(),

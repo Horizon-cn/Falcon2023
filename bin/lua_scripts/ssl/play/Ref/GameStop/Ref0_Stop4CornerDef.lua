@@ -142,6 +142,7 @@
 -- }
 
 local STOP_POS1 = function()
+	return ball.pos() + Utils.Polar2Vector(65, ball.toOurGoalDir())
 	if ball.toOurGoalDist() < 160*param.lengthRatio then
 		return CGeoPoint:new_local(-150*param.lengthRatio,0)
 	else
@@ -156,6 +157,9 @@ gPlayTable.CreatePlay{
 firstState = "beginning",
 
 switch = function()	
+	if gCurrentState == "beginning" then
+		return "beginning"
+	end
 	if gCurrentState == "beginning" and 
 		enemy.attackNum() <= 6 and enemy.attackNum() > 0 then
 		return "attacker"..enemy.attackNum()
@@ -170,7 +174,7 @@ switch = function()
 end,
 
 ["beginning"] = {
-	Assister   = task.defendKick(),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
 	Special  = task.marking("First"),
 	Middle   = task.defendHead(),
 	Defender = task.leftBack(),
