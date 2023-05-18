@@ -15,7 +15,7 @@ gPlayTable.CreatePlay{
   Special = task.marking("First"),
   Assister = task.marking("Second"),
   Goalie = task.goalieNew(),
-  match    = "[L][DM][AS]"
+  match    = "[L][MD][S][A]"
 },
   name = "Ref_FrontDefV20",
   applicable = {

@@ -15,7 +15,7 @@ gPlayTable.CreatePlay{
   Middle = task.leftBack(),
   Defender = task.rightBack(),
   Goalie = task.goalieNew(),
-  match    = "[L][MD][SA]"
+  match    = "[L][A][MD][S]"
 },
   name = "Ref_CornerDefV2",
   applicable = {
