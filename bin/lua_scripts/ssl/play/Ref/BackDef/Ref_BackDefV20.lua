@@ -17,7 +17,7 @@ gPlayTable.CreatePlay{
   Goalie = task.goalieNew(),
   match    = "[L][MD][A][S]"
 },
-  name = "Ref_BackDefV2",
+  name = "Ref_BackDefV20",
   applicable = {
     exp = "a",
     a = true
