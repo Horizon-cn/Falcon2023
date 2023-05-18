@@ -98,7 +98,7 @@ local RECEIVE_POS = CGeoPoint:new_local(-110, -70)
 
 local RIGHT_POS_1  = CGeoPoint:new_local(-20, 80)
 local RIGHT_POS_2  = CGeoPoint:new_local(155, 80)
-local outside = CGeoPoint:new_local(50,300)
+local outside = CGeoPoint:new_local(-50,300)
 
 
 gPlayTable.CreatePlay{
