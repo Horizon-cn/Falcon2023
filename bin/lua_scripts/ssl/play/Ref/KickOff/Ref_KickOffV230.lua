@@ -98,7 +98,7 @@ local RECEIVE_POS = CGeoPoint:new_local(-110, -70)
 
 local RIGHT_POS_1  = CGeoPoint:new_local(-20, 80)
 local RIGHT_POS_2  = CGeoPoint:new_local(155, 80)
-
+local outside = CGeoPoint:new_local(50,300)
 
 
 gPlayTable.CreatePlay{
@@ -111,27 +111,27 @@ firstState = "start",
     end
   end,
   Leader   = task.goCmuRush(START_POS,-3,_,flag.allow_dss),
-  Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss),
-  Special  = task.goCmuRush(RIGHT_POS_1,_,_,flag.allow_dss),
-  Middle   = task.leftBack(),
-  Defender = task.rightBack(),
+  Assister = task.multiBack(4,1);
+  Special  = task.multiBack(4,2);
+  Middle   = task.multiBack(4,3);
+  Defender = task.multiBack(4,4);
   Goalie   = task.goalieNew(),
-  match    = "[L][AS][MD]"
+  match    = "[L][ASMD]"
 },
 
 ["temp"] = {
   switch = function ()
-    if bufcnt(player.toPointDist("Assister", RECEIVE_POS) < 10 and player.toPointDist("Special", RIGHT_POS_1) < 10 ,50,100) then
+    if bufcnt(player.toTargetDist("Leader")<20 ,50,100) then
       return "kickof"
     end
   end,
   Leader   = task.goCmuRush(START_POS_1,-3,_,flag.allow_dss),  --staticGetBall(player.toPlayerDir("Assister","Leader")),
-  Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss),
-  Special  = task.goCmuRush(RIGHT_POS_1,_,_,flag.allow_dss),
-  Middle   = task.leftBack(),
-  Defender = task.rightBack(),
+  Assister = task.multiBack(4,1);
+  Special  = task.multiBack(4,2);
+  Middle   = task.multiBack(4,3);
+  Defender = task.multiBack(4,4);
   Goalie   = task.goalieNew(),
-  match    = "[L][AS][MD]"
+  match    = "[L][ASMD]"
 },
 
 
@@ -139,32 +139,18 @@ firstState = "start",
     switch = function ()
     --if bufcnt(player.kickBall("Leader"), "fast", 200) then
       if bufcnt(player.toBallDist("Leader") > 30) then
-      return "receive"
-    end
-  end,
-  Leader   = task.flatPass("Assister"), --goAndTurnKick("Assister", 500),
-  Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss),
-  Special  = task.goCmuRush(RIGHT_POS_2,_,_,flag.allow_dss),
-  Middle   = task.leftBack(),
-  Defender = task.rightBack(),
-  Goalie   = task.goalieNew(),
-  match    = "[L][AS][MD]"
-},
-
-["receive"] = {
-  switch = function ()
-    if bufcnt(player.toBallDist("Assister") < 20, 20, 150) then
       return "exit"
     end
   end,
-  Leader   = task.goCmuRush(LEFT_POS,_,_,flag.allow_dss),
-  Assister = task.receivePass("Leader"),
-  Special  = task.goCmuRush(RIGHT_POS_2,_,_,flag.allow_dss),
-  Middle   = task.leftBack(),
-  Defender = task.rightBack(),
+  Leader   = task.passToPos(outside,300)
+  Assister = task.multiBack(4,1);
+  Special  = task.multiBack(4,2);
+  Middle   = task.multiBack(4,3);
+  Defender = task.multiBack(4,4);
   Goalie   = task.goalieNew(),
-  match    = "[L][AS][MD]"
+  match    = "[L][ASMD]"
 },
+
 
 
 name = "Ref_KickOffV230",
