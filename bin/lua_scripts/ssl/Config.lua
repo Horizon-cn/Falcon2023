@@ -136,11 +136,15 @@ gRefPlayTable = {
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDefV5",
 	"Ref/CornerDef/Ref_CornerDefV2",
+	
+	"Ref/CornerDef/Ref_CornerDefV20",
 
 	--中场防守
 	"Ref/MiddleDef/Ref_MiddleDefV10",
 	"Ref/MiddleDef/Ref_MiddleDefV11",
 	"Ref/MiddleDef/Ref_MiddleDefV2",
+
+	"Ref/MiddleDef/Ref_MiddleDefV20",
 
 	--前场防守
 	"Ref/FrontDef/Ref_FrontDefV8",
@@ -152,6 +156,8 @@ gRefPlayTable = {
 	"Ref/BackDef/Ref_BackDefV11",
 	"Ref/BackDef/Ref_BackDefV12",
 	"Ref/BackDef/Ref_BackDefV2",
+
+	"Ref/BackDef/Ref_BackDefV20",
 
 	--己方放球
 	"Ref/BallPlace/Ref_OurBallPlaceV2",

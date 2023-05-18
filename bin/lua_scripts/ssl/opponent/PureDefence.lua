@@ -8,9 +8,9 @@ gOppoConfig = {
 	BackKick    = {"Ref_ImmortalKickV61"}, --{10, "Ref_ImmortalKickV1"}
 -------------------------------Def---------------------------------------------------
 
-	CornerDef   = "Ref_CornerDefV2", -- 可能要用v4，防头球
-	BackDef 	= "Ref_BackDefV2",
-	MiddleDef   = "Ref_MiddleDefV2",--横向marktouch用v5，四车markfront用v10,保守打法用V2
+	CornerDef   = "Ref_CornerDefV20", -- 可能要用v4，防头球
+	BackDef 	= "Ref_BackDefV20",
+	MiddleDef   = "Ref_MiddleDefV20",--横向marktouch用v5，四车markfront用v10,保守打法用V2
 	FrontDef    = "Ref_FrontDefV2", --四车markfront用v9,若挑就用V7，若他们四车全上就用V11,保守打法用Ref_FrontDefV2
 	PenaltyKick = "Ref_PenaltyKickV6", --Ref_PenaltyKick2017V5
 	PenaltyDef  = "Ref_PenaltyDefV6", --Ref_PenaltyDefV3
