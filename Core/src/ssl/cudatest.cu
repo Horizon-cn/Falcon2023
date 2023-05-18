@@ -113,7 +113,14 @@ inline __device__ bool is_in_penalty(float pos_x, float pos_y, float buffer) {
         return false;
     }
 }
-
+inline __device__ bool is_near_bound(float pos_x, float pos_y, float buffer) {
+    if (abs(abs(pos_y) - PITCH_WIDTH / 2) <= buffer || abs(abs(pos_x) - PITCH_LENGTH / 2) <= buffer) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 // 计算两点间的距离
 inline __device__ float dist(float* pos_ptr1, float* pos_ptr2) {
     return sqrt((pos_ptr1[0] - pos_ptr2[0]) * (pos_ptr1[0] - pos_ptr2[0]) + (pos_ptr1[1] - pos_ptr2[1]) * (pos_ptr1[1] - pos_ptr2[1]));
@@ -740,7 +747,9 @@ __global__ void gpu_calc(float startPos[], float map[])
     if (is_in_penalty(me_x, me_y, ROBOT_RADIUS * 2.0) || if_collide_theirPlayer(me_pos_ptr, their_player_ptr)) { // 不能进禁区，不能冲撞对方机器人
         map[i] = MAX_SCORE;
     }
-
+    else if (is_near_bound(me_x, me_y, ROBOT_RADIUS * 2.0)) {
+        map[i] = MAX_SCORE;
+    }
     else {    
         // 计算
         // 需要使用的一些变量
