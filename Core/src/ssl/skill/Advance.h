@@ -138,6 +138,11 @@ private:
 ***********************************************************/
     bool isOppFaceOurDoor(const CVisionModule* pVision, double angle);
     bool checkTheyCanShoot(const CVisionModule* pVision, int vecNumber);
+
+
+    bool OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber);
+
+    double generateOppIsNearThanMeDir(const CVisionModule* pVision, const int vecNumber);
 /**********************************************************
     * Description: ?????????????зр??????
     * Author: ?????

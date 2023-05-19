@@ -294,15 +294,15 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         }
         break;
     case CHIP1:
-        if (ball.Y() >= 0)KickorPassDir = Param::Math::PI * 0.08;
-        else KickorPassDir = Param::Math::PI * 0.08;
+        if (ball.Y() >= 0)KickorPassDir = Param::Math::PI * 0.04;
+        else KickorPassDir = Param::Math::PI * 0.04;
         //KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
         KickStatus::Instance()->clearAll();
             /*正常KICK阶段  需要区分是否方向已经转向成功  此处尚未完备可能存在BUG*/
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Chip", COLOR_ORANGE);
 
 
-        setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, 120, CGeoPoint(0, 0))); //这里最后一个参数没解析 所以我偷懒了
+        setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, 80, CGeoPoint(0, 0))); //这里最后一个参数没解析 所以我偷懒了
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip", COLOR_ORANGE);
 
 

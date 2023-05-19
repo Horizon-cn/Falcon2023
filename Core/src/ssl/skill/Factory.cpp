@@ -136,7 +136,7 @@ CPlayerTask* CTaskFactoryV2::OpenSpeed(const TaskT& task) {
 }
 
 CPlayerTask* CTaskFactoryV2::NoneTrajGetBall(const TaskT& task) {
-	return MakeTask< CGetBallV4 >(task);
+	return MakeTask< CGetBallV3 >(task);
 }
 CPlayerTask* CTaskFactoryV2::NoneTrajGetBallV3(const TaskT& task) {
 	return MakeTask< CGetBallV3 >(task);

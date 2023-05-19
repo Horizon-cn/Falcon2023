@@ -25,7 +25,7 @@ protected:
 	bool WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir);
 	bool MustUseLargeToAdjust(const CVisionModule* pVision, const int _executor, const double finalDir);
 	int getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
-
+	bool OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber);
 	bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
 private:
 	enum {

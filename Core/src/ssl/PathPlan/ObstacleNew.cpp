@@ -15,7 +15,7 @@ const double FRAME_PERIOD = 1.0 / Param::Vision::FRAME_RATE;
 const double MIN_AVOID_DIST = Param::Vehicle::V2::PLAYER_SIZE + 2.0;
 const double LOWER_BOUND_AVOID_SPEED = 50;
 const double UPPER_BOUND_AVOID_SPEED = 250;
-double FREE_KICK_BUF = 27;
+double FREE_KICK_BUF = 32;
 double stopBallAvoidDist = 60;
 
 inline float minObs(float a, float b) {
