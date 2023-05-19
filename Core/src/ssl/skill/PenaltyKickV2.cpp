@@ -149,7 +149,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
                     _state = BREAKSHOOT; break;
                 }
                 else if (me2goal.mod() > KICK_DIST + 30){
-                    _state = CHIP1; break;
+                    _state = LIGHT_KICK; break;
                 }
                 else {
                     _state = KICK; break;
@@ -323,11 +323,11 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
     case LIGHT_KICK:
         KickStatus::Instance()->clearAll();
         if(pVision->Ball().X() <= -80)
-            KickStatus::Instance()->setKick(_executor, 30);
-        else if(pVision->Ball().X() <= 50)
-            KickStatus::Instance()->setKick(_executor, 20); // kick lightly
-        else
-            KickStatus::Instance()->setKick(_executor, 10);
+            KickStatus::Instance()->setKick(_executor, 310);
+        else //if(pVision->Ball().X() <= 50)
+            KickStatus::Instance()->setKick(_executor, 280); // kick lightly
+        //else
+        //    KickStatus::Instance()->setKick(_executor, 10);
         break;
     }
 

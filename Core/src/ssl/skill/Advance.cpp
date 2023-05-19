@@ -1051,7 +1051,7 @@ bool CAdvance::OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber
 	CVector Ball2Opp = opp.Pos() - ball.Pos();
 
 	const double threshold = 70;
-	if (me2Ball.mod() < Ball2Opp.mod() + 20)return true;
+	if (me2Ball.mod() < Ball2Opp.mod() + 20 && me.X() < opp.X())return true;
 	return false;
 }
 
