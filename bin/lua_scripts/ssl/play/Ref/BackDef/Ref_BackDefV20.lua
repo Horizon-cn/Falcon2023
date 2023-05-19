@@ -13,7 +13,7 @@ gPlayTable.CreatePlay{
   Middle = task.leftBack(),
   Defender = task.rightBack(),
   Special = task.sideBack(),
-  Assister = task.marking("First"),
+  Assister = task.markingFront("First"),
   Goalie = task.goalieNew(),
   match    = "[L][MD][A][S]"
 },

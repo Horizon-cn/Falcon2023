@@ -117,12 +117,14 @@ gRefPlayTable = {
 	"Ref/CornerKick/Ref_CornerKickV202",
 	"Ref/CornerKick/Ref_CornerKickV300",
 	"Ref/CornerKick/Ref_CornerKickV2",
+	"Ref/CornerKick/Ref_CornerPush",
 	--前场进攻
 	"Ref/FrontKick/Ref_FrontKickV23",
 	"Ref/FrontKick/Ref_FrontKickV41",
 	"Ref/FrontKick/Ref_FrontKickV2",
 	"Ref/FrontKick/Ref_FrontKickV61",
 	"Ref/FrontKick/Ref_FrontKickV610",
+	"Ref/FrontKick/Ref_FrontPush",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
@@ -135,6 +137,7 @@ gRefPlayTable = {
 	"Ref/BackKick/Ref_BackKickV2",
 	"Ref/BackKick/Ref_ImmortalKickV61",
 	"Ref/BackKick/Ref_ImmortalKickV610",
+	"Ref/BackKick/Ref_BackPush",
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",

@@ -13,7 +13,7 @@ gPlayTable.CreatePlay{
     end,
   Leader = task.goCmuRush(STOP_POS, player.toBallDir, _, flag.slowly),
   Assister = task.defendHead(),
-  Special = task.marking("First"),
+  Special = task.markingFront("First"),
   Middle = task.leftBack(),
   Defender = task.rightBack(),
   Goalie = task.goalieNew(),
