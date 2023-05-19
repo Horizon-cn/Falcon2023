@@ -132,7 +132,8 @@ void CGetBallV4::plan(const CVisionModule* pVision)
     {
     case BEGIN:
         if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) _state = HAVE;
-        else _state = LARGE;
+        else if (!OppIsNearThanMe(pVision, _executor))_state = LARGE;
+        else _state = DIRECT;
         break;
     case LARGE:
         if (LARGECanToROTATE(pVision, finalDir) || _LargeCnt > MaxLargeCnt) _state = ROTATE;
@@ -540,5 +541,16 @@ bool CGetBallV4::Me2OppTooclose(const CVisionModule* pVision, const int vecNumbe
     if ((abs(me2Ball.mod()) < threshold && abs(me2Opp.mod()) < threshold * 1.5) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 3)) {
         return true;
     }
+    return false;
+}
+bool CGetBallV4::OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber) {
+    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+    const BallVisionT& ball = pVision->Ball();
+    CVector me2Ball = ball.Pos() - me.Pos();
+    CVector Ball2Opp = opp.Pos() - ball.Pos();
+    cout << me2Ball.mod() << ' ' << Ball2Opp.mod() << endl;
+    const double threshold = 70;
+    if (me2Ball.mod() > Ball2Opp.mod())return true;
     return false;
 }

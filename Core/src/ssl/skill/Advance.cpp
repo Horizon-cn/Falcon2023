@@ -177,7 +177,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
 
 		if (NumOfOurPlayer <= 2) {
-			if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
+			if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.2) {
 				TaskMediator::Instance()->resetAdvancerPassTo();
 				_state = GenerateStateOfFoulTrouble(pVision, _executor);
 				break;
@@ -189,7 +189,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		}
 
 		//if (meHasBall>3) {
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.2) {
 
 			TaskMediator::Instance()->resetAdvancerPassTo();
             /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
@@ -329,6 +329,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			//KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 			/*此处朝向可持久化即可 不需要进行改变*/
             LastPassDirToJudge = -999;
+			if (OppIsNearThanMe(pVision, _executor)) KickorPassDir = generateOppIsNearThanMeDir(pVision, _executor);
 			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		}
 		break;
@@ -1039,6 +1040,26 @@ double CAdvance::generateGetballDir(const CVisionModule* pVision, const int vecN
 int CAdvance::GenerateStateOfFoulTrouble(const CVisionModule* pVision, const int vecNumber) {
 	if (tendToShoot(pVision, vecNumber)) return KICK;
 	else return KICK;
+}
+
+
+bool CAdvance::OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber) {
+	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+	const BallVisionT& ball = pVision->Ball();
+	CVector me2Ball = ball.Pos() - me.Pos();
+	CVector Ball2Opp = opp.Pos() - ball.Pos();
+
+	const double threshold = 70;
+	if (me2Ball.mod() < Ball2Opp.mod() + 20 && me.X() < opp.X())return true;
+	return false;
+}
+
+double CAdvance::generateOppIsNearThanMeDir(const CVisionModule* pVision, const int vecNumber) {
+	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+	const BallVisionT& ball = pVision->Ball();
+	return (opp.Pos() - ball.Pos()).dir();
 }
 CPlayerCommand* CAdvance::execute(const CVisionModule* pVision)
 {

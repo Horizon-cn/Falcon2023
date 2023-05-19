@@ -8,11 +8,11 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "NormalPlayPureDefence" --"Test_play6"  --"Test_play6ForTest" --"Test_Run6" --"Test_play6" --"Test_Run"
+		return "Test_play6" --"Test_play6"  --"NormalPlayPureDefence" --"Test_Run6" --"Test_play6" --"Test_Run"
 		-- Test_Run6 测testrun
 		-- Test_play6ForTest测三车进攻
 	else
-		return "NormalPlayPureDefence" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "Test_play6" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
