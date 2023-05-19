@@ -298,11 +298,11 @@ firstState = "start",
 
   Assister = task.goCmuRush(SIDE_POS, dir.playerToBall, ACC, STOP_DSS),
   Special  = task.goCmuRush(INTER_POS, dir.playerToBall, ACC, STOP_DSS),
-  Leader   = task.goCmuRush(MIDDLE_POS, dir.playerToBall, ACC, STOP_DSS),
+  Leader   = task.sideBack(),
   Defender = task.rightBack(),--task.defendMiddle4Stop(),--TODO
   Middle   = task.leftBack(),
   Goalie   = task.goalieNew(),
-  match    = "[ASLDM]"
+  match    = "[DM][L][AS]"
 },
 
 ["standByPenalty"] = {
@@ -411,14 +411,14 @@ firstState = "start",
   end,
 
   Assister = task.goCmuRush(MIDDLE_POS, dir.playerToBall, ACC, STOP_DSS),
-  Special  = task.goCmuRush(INTER_POS, dir.playerToBall, ACC, STOP_DSS),
+  Special  = task.sideBack(),
   Leader   = task.goCmuRush(OTHER_SIDE_POS, dir.playerToBall, ACC, STOP_DSS),
   Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
   --Center   = task.stop(),
   --Fronter = task.stop(),
   Middle   = task.leftBack(),
   Goalie   = task.goalieNew(),
-  match    = "[AMDLS]"
+  match    = "[DM][L][AS]"
 },
 
 ["reDoStop"] = {

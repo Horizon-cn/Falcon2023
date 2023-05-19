@@ -29,7 +29,7 @@
 -- ["beginning"] = {
 -- 	Assister   = task.defendKick(),
 -- 	Special  = task.defendHead(),
--- 	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
+-- 	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.dodge_ball),
 -- 	Defender = task.leftBack(),
 -- 	Leader   = task.rightBack(),
 -- 	Goalie   = task.goalieNew(),
@@ -174,7 +174,7 @@ switch = function()
 end,
 
 ["beginning"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.dodge_ball),
 	Special  = task.marking("First"),
 	Middle   = task.defendHead(),
 	Defender = task.leftBack(),
@@ -184,9 +184,9 @@ end,
 },
 
 ["attacker1"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.dodge_ball),
 	Special  = task.marking("First"),
-	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
+	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.dodge_ball),
 	Defender = task.leftBack(),
 	Leader   = task.rightBack(),
 	Goalie   = task.goalieNew(),
@@ -194,9 +194,9 @@ end,
 },
 
 ["attacker2"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.dodge_ball),
 	Special  = task.marking("First"),
-	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
+	Middle   = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.dodge_ball),
 	Defender = task.defendHead(),
 	Leader   = task.singleBack(),
 	Goalie   = task.goalieNew(),
@@ -204,17 +204,17 @@ end,
 },
 
 ["attacker3"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.dodge_ball),
 	Special  = task.marking("First"),
 	Middle   = task.marking("Second"),
-	Defender = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.slowly),
+	Defender = task.goCmuRush(COR_DEF_POS1, player.toBallDir, _, flag.dodge_ball),
 	Leader   = task.defendHead(),
 	Goalie   = task.goalieNew(),
 	match    = "[ALSMD]"
 },
 
 ["attacker4"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.dodge_ball),
 	Special  = task.marking("First"),
 	Middle   = task.marking("Second"),
 	Defender = task.marking("Third"),
@@ -224,7 +224,7 @@ end,
 },
 
 ["attacker5"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.dodge_ball),
 	Special  = task.marking("First"),
 	Middle   = task.marking("Second"),
 	Defender = task.marking("Third"),
@@ -234,7 +234,7 @@ end,
 },
 
 ["attacker6"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.slowly),
+	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.dodge_ball),
 	Special  = task.marking("First"),
 	Middle   = task.marking("Second"),
 	Defender = task.marking("Third"),

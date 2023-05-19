@@ -3,7 +3,7 @@
 
 
 local STOP_FLAG  = bit:_or(flag.slowly, flag.dodge_ball)
-local STOP_DSS   = bit:_or(STOP_FLAG, flag.allow_dss)
+local STOP_DSS   = bit:_or(flag.dodge_ball, flag.allow_dss)
 
 local DEFX = -(param.pitchLength/2 - param.penaltyDepth -3 * param.playerRadius)
 local DEFY = param.penaltyWidth/2 + 2 * param.playerRadius 

@@ -247,7 +247,9 @@ void CDataReceiver4rbk::receiveRefMsgs() {
                 refereeInfo.refMsg.blueGoalie = (int)blue.goalkeeper();
                 refereeInfo.refMsg.yellowGoalie = (int)yellow.goalkeeper();
                 refereeInfo.refMsg.timeRemain = stage_time_left / 1000000;
-                std::cout << "Protobuf Protocol: RefereeBox Command : " << playModePair[m_play_mode].what << std::endl;
+                static int cnt = 0;
+                cnt++;
+                if(cnt%100 == 0)std::cout << "Protobuf Protocol: RefereeBox Command : " << playModePair[m_play_mode].what << std::endl;
                 //std::cout << "Stage_time_left : "<< msg.timeRemain << " Goals for blue : "<< (int)(pCmd_temp.goals_blue)
                 //	<< " Goals for yellow : "<< (int)(pCmd_temp.goals_yellow) << std::endl;
             }
@@ -281,7 +283,7 @@ PlayMode CDataReceiver4rbk::translateRefMsgs(Referee_Command command){
         std::cout << "refereebox is fucked !!!!! command : " << command << std::endl;
         cmd = 'H'; break;
     }
-    std::cout << cmd << endl;
+    //std::cout << cmd << endl;
     PlayMode play_mode = PMNone;
     for( int pm = PMStop; pm <= PMNone; ++pm ) {
         if( playModePair[pm].ch == cmd ) {

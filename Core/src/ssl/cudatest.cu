@@ -747,7 +747,7 @@ __global__ void gpu_calc(float startPos[], float map[])
     if (is_in_penalty(me_x, me_y, ROBOT_RADIUS * 2.0) || if_collide_theirPlayer(me_pos_ptr, their_player_ptr)) { // 不能进禁区，不能冲撞对方机器人
         map[i] = MAX_SCORE;
     }
-    else if (is_near_bound(me_x, me_y, ROBOT_RADIUS * 2.0)) {
+    else if (is_near_bound(me_x, me_y, ROBOT_RADIUS * 4.0)) {
         map[i] = MAX_SCORE;
     }
     else {    

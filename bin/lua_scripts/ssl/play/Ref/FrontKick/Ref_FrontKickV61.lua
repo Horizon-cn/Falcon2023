@@ -24,11 +24,11 @@ local GOALIE_POS = {
 }
 local function def_chipPower()
   if math.abs(ball.posY()) > 250 then 
-    return 155
+    return 100
   elseif math.abs(ball.posY()) > 200 then 
-    return 130
+    return 100
   else
-    return 110
+    return 85
   end
 end
 local SPECIAL_POS = {
@@ -71,7 +71,7 @@ local function projectX()
             return x
           else
            x = -16
-            return x
+            return x 
           end
     end
 end
@@ -127,7 +127,7 @@ firstState = "getready",
       return "chippass"
     end
   end,
-  Assister = task.staticGetBall(CHEAT()),
+  Assister = task.advance(),
   Middle   = task.runMultiPos(MIDDLE_POS),
   Special  = task.goCmuRush(SPECIAL_POS[1],_,_,flag.allow_dss),
   Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),
@@ -143,7 +143,8 @@ firstState = "getready",
       return "gokick"
     end
   end,
-  Assister = task.chipPass(CHEAT(),def_chipPower()),
+  --Assister = task.chipPass(CHEAT(),def_chipPower()),
+  Assister = task.advance(),
   Middle   = task.runMultiPos(MIDDLE_POS),
   Special  = task.singleBack(),
   Leader   = task.goCmuRush(cheatshootpos, dir.compensate(CHEAT), 300, flag.allow_dss),
@@ -160,10 +161,11 @@ firstState = "getready",
     end
   end,
   Assister = task.goCmuRush(ball.refSyntYPos(CGeoPoint:new_local(270,240))),
+  --Assister = task.advance(),
   Special   = task.rightBack(),
   Defender = task.goCmuRush(READY_POS,player.toBallDir("Defender"),_, flag.allow_dss),
   Middle  = task.leftBack(),
-  Leader = task.chaseNew(),
+  Leader = task.advance(),
   Goalie   = task.goalieNew(),
   match    = "{L}{A}{D}{SM}"
 },

@@ -18,7 +18,7 @@ firstState = "PureDefence",
 	Assister = task.leftBack(),
     Middle = task.rightBack(),
     Special = task.sideBack(),
-	Defender = task.marking("First"),
+	Defender = task.support("Leader",0),
 	Goalie = task.goalieNew(),
     match = "[L][MA][S][D]"
 },

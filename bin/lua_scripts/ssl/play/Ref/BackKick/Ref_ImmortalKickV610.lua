@@ -24,13 +24,13 @@ local GOALIE_POS = {
 }
 local function def_chipPower()
   if math.abs(ball.posX()) > 300 then 
-    return 370
+    return 190
   elseif math.abs(ball.posX()) > 250 then 
-    return 290
+    return 170
   elseif math.abs(ball.posX()) > 200 then
-    return 230
+    return 160
   else 
-    return 150
+    return 145
   end
 end
 local SPECIAL_POS = {

@@ -1,19 +1,19 @@
 
 local function def_chipPower()
   if math.abs(ball.posY()) > 300 then 
-    return 170
+    return 130
   elseif math.abs(ball.posY())> 285 then
-    return 160
+    return 110
   elseif math.abs(ball.posY()) > 270 then 
-    return 150
+    return 105
   else 
-    return 140
+    return 100
   end
 end
 
 local ANTI_POS_1 = ball.refAntiYPos(CGeoPoint:new_local(112, 33))
 local ANTI_POS_2 = ball.refAntiYPos(CGeoPoint:new_local(225, 66))
-local ANTI_POS_3 = ball.refAntiYPos(CGeoPoint:new_local(337, 86))
+local ANTI_POS_3 = ball.refAntiYPos(CGeoPoint:new_local(300, 86))
 
 
 local SYNT_POS_1 = ball.refSyntYPos(CGeoPoint:new_local(150, 33))
@@ -90,7 +90,7 @@ gPlayTable.CreatePlay{
     Assister = task.stop(),
     Leader   = task.rightBack(),
     Special  = task.leftBack(),
-    Middle   = task.chaseNew(),
+    Middle   = task.advance(),
     Defender = task.goLeftSupport(),
     Goalie   = task.goalieNew(),
     match    = "{A}{M}{D}{LS}"

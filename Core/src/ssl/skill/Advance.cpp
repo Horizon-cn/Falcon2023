@@ -194,11 +194,15 @@ void CAdvance::plan(const CVisionModule* pVision)
 			TaskMediator::Instance()->resetAdvancerPassTo();
             /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
             if ((NowIsShoot == 1) && (me.X() < 425) && fabs(me.Y()) < 260 ) { _state = BREAKSHOOT; break; }
-
+			if ((NowIsShoot == 2)) { _state = KICK; break; }
 			if (me2goal.mod() < KICK_DIST && (!isInTheCornerArea(pVision, _executor))) {
-                if (tendToShoot(pVision, _executor) || (Me2OppTooclose(pVision, _executor)) || isInBreakArea(pVision, _executor)) {
+                if ((Me2OppTooclose(pVision, _executor))) {
                     NowIsShoot = 1;
 					_state = BREAKSHOOT; break;
+				}
+				else {
+					NowIsShoot = 2;
+					_state = KICK; break;
 				}
             }
             if (me.X() > 0) {
@@ -207,17 +211,17 @@ void CAdvance::plan(const CVisionModule* pVision)
 					_state = PASS; break;
 				}
 				if (TheirRobotInBreakArea(pVision, _executor) < 3) {
-					NowIsShoot = 1;
-					_state = BREAKSHOOT; break;
+					NowIsShoot = 2;
+					_state = KICK; break;
 				}
 				else if (Me2OppTooclose(pVision, _executor) && CanSupportKick(pVision, _executor)) {
-					_state = BREAKPASS; break;
+					_state = PASS; break;
 				}
 				else if (me.X() > 425) {
 					NowIsShoot = 1;
-					_state = BREAKSHOOT; break;
+					_state = KICK; break;
 				} 
-				else { _state = KICK; break; }
+				else { NowIsShoot = 2;  _state = KICK; break; }
 			}
 			else {
 				/*人在后场*/
@@ -226,12 +230,12 @@ void CAdvance::plan(const CVisionModule* pVision)
 						_state = PASS; break; // 周围没人
 					}
 					else {
-						_state = KICK; break; // 周围没人
+						NowIsShoot = 2; _state = KICK; break; // 周围没人
 					}
 
 				}
 				else if (CanSupportKick(pVision, _executor)) {
-					_state = BREAKPASS; break;
+					_state = PASS; break;
 				}
 				else { _state = JUSTCHIPPASS; break; }
 			}
@@ -267,7 +271,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
 		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
         break;
-	}/*
+	}
+	if (_state != KICK && _state != BREAKSHOOT)NowIsShoot = 0;
+	/*
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 		KickStatus::Instance()->setKick(_executor, RELIEF_POWER);
 	}*/
@@ -1032,7 +1038,7 @@ double CAdvance::generateGetballDir(const CVisionModule* pVision, const int vecN
 }
 int CAdvance::GenerateStateOfFoulTrouble(const CVisionModule* pVision, const int vecNumber) {
 	if (tendToShoot(pVision, vecNumber)) return KICK;
-	else return BREAKSHOOT;
+	else return KICK;
 }
 CPlayerCommand* CAdvance::execute(const CVisionModule* pVision)
 {

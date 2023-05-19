@@ -3,7 +3,7 @@
 -- yys 2015-06-10
 
 local STOP_FLAG  = bit:_or(flag.slowly, flag.dodge_ball)
-local STOP_DSS   = bit:_or(STOP_FLAG, flag.allow_dss)
+local STOP_DSS   = bit:_or(flag.dodge_ball, flag.allow_dss)
 local KICK_POS   = function ()
 	return ball.syntYPos(CGeoPoint:new_local(ball.posX() - 59, param.pitchWidth/2-18))()
 end

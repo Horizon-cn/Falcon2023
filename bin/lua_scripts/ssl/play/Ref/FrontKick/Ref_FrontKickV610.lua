@@ -12,8 +12,8 @@ local INNER_POS   = ball.refSyntYPos(CGeoPoint:new_local(350, 220))
 local RIGHT_POS2  = ball.refSyntYPos(CGeoPoint:new_local(250, 250))
 local MAKE_POS    = ball.refAntiYPos(MAKE_POS_ORG)
 local READY_POS   = ball.refSyntYPos(CGeoPoint:new_local(80, -150))
-local SHOOT_POS   = ball.refSyntYPos(CGeoPoint:new_local(340, -200))
-local MASK_POS    = ball.refSyntYPos(CGeoPoint:new_local(320, 100))
+local SHOOT_POS   = ball.refSyntYPos(CGeoPoint:new_local(300, -200))
+local MASK_POS    = ball.refSyntYPos(CGeoPoint:new_local(300, 100))
 local SHOOT_POS2  = ball.refSyntYPos(CGeoPoint:new_local(280, -130))
 local SHOOT_POS3  = ball.refSyntYPos(CGeoPoint:new_local(50, 100))
 local GOALIE_POS = {
@@ -24,11 +24,11 @@ local GOALIE_POS = {
 }
 local function def_chipPower()
   if math.abs(ball.posY()) > 250 then 
-    return 180
+    return 150
   elseif math.abs(ball.posY()) > 200 then 
-    return 155
+    return 135
   else
-    return 130
+    return 105
   end
 end
 local SPECIAL_POS = {
@@ -45,8 +45,8 @@ ball.refAntiYPos(CGeoPoint:new_local(-85,0)),
 }
 local MIDDLE_POS = {
   ball.refAntiYPos(CGeoPoint:new_local(270,215)),
-  ball.refAntiYPos(CGeoPoint:new_local(340,215)),
-  ball.refAntiYPos(CGeoPoint:new_local(335,115)),
+  ball.refAntiYPos(CGeoPoint:new_local(300,215)),
+  ball.refAntiYPos(CGeoPoint:new_local(300,115)),
   ball.refAntiYPos(CGeoPoint:new_local(380,220)),
 
 }
@@ -163,7 +163,7 @@ firstState = "getready",
   Special   = task.rightBack(),
   Defender = task.goCmuRush(READY_POS,player.toBallDir("Defender"),_, flag.allow_dss),
   Middle  = task.leftBack(),
-  Leader = task.chaseNew(),
+  Leader = task.advance(),
   Goalie   = task.goalieNew(),
   match    = "{L}{A}{D}{SM}"
 },
