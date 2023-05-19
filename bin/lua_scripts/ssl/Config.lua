@@ -104,11 +104,14 @@ gRefPlayTable = {
 	--开球进攻
 	"Ref/KickOff/Ref_KickOffV6",
 	"Ref/KickOff/Ref_KickOffV23",
+	"Ref/KickOff/Ref_KickOffV230",
+
 
 	--角球进攻
 	"Ref/CornerKick/Ref_CornerKickV1",
 	"Ref/CornerKick/Ref_CornerKickV6",
 	"Ref/CornerKick/Ref_CornerKickV8",
+	"Ref/CornerKick/Ref_CornerKickV80",
 	"Ref/CornerKick/Ref_CornerKickV30",
 	"Ref/CornerKick/Ref_CornerKickV201",
 	"Ref/CornerKick/Ref_CornerKickV202",
@@ -119,6 +122,7 @@ gRefPlayTable = {
 	"Ref/FrontKick/Ref_FrontKickV41",
 	"Ref/FrontKick/Ref_FrontKickV2",
 	"Ref/FrontKick/Ref_FrontKickV61",
+	"Ref/FrontKick/Ref_FrontKickV610",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
@@ -130,30 +134,39 @@ gRefPlayTable = {
 	"Ref/BackKick/Ref_ImmortalKickV1",
 	"Ref/BackKick/Ref_BackKickV2",
 	"Ref/BackKick/Ref_ImmortalKickV61",
+	"Ref/BackKick/Ref_ImmortalKickV610",
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
 	"Ref/KickOffDef/Ref_KickOffDefV23",
+	"Ref/KickOffDef/Ref_KickOffDefV230",
 
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDefV5",
 	"Ref/CornerDef/Ref_CornerDefV2",
+	
+	"Ref/CornerDef/Ref_CornerDefV20",
 
 	--中场防守
 	"Ref/MiddleDef/Ref_MiddleDefV10",
 	"Ref/MiddleDef/Ref_MiddleDefV11",
 	"Ref/MiddleDef/Ref_MiddleDefV2",
 
+	"Ref/MiddleDef/Ref_MiddleDefV20",
+
 	--前场防守
 	"Ref/FrontDef/Ref_FrontDefV8",
 	"Ref/FrontDef/Ref_FrontDefV9",
 	"Ref/FrontDef/Ref_FrontDefV2",
+	"Ref/FrontDef/Ref_FrontDefV20",
 
 	--后场防守
 	"Ref/BackDef/Ref_BackDefV10",
 	"Ref/BackDef/Ref_BackDefV11",
 	"Ref/BackDef/Ref_BackDefV12",
 	"Ref/BackDef/Ref_BackDefV2",
+
+	"Ref/BackDef/Ref_BackDefV20",
 
 	--己方放球
 	"Ref/BallPlace/Ref_OurBallPlaceV2",
@@ -164,10 +177,12 @@ gRefPlayTable = {
 	--点球进攻
 	"Ref/PenaltyKick/Ref_PenaltyKickV1",
 	"Ref/PenaltyKick/Ref_PenaltyKickV6",
+	"Ref/PenaltyKick/Ref_PenaltyKickV60",
 
 	--点球防守
 	"Ref/PenaltyDef/Ref_PenaltyDefV1",
 	"Ref/PenaltyDef/Ref_PenaltyDefV6",
+	"Ref/PenaltyDef/Ref_PenaltyDefV60",
 
 	--停止站位
 	"Ref/GameStop/Ref_Stop4BackKick",
@@ -180,6 +195,11 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_Stop4FrontKick",
 	"Ref/GameStop/Ref_Stop4MiddleKick",
 	"Ref/GameStop/Ref_Stop4ChaKick",
+
+	"Ref/GameStop/Ref0_StopV2",
+	"Ref/GameStop/Ref0_StopV3",
+	"Ref/GameStop/Ref0_Stop4CornerDef",
+	"Ref/GameStop/Ref0_Stop4CornerKick",
 
 
 	--强制停止
@@ -217,6 +237,7 @@ gTestPlayTable = {
 	"Test_NormalMiddleDefend",
 	"Test_Circle",
 	"Test_play6",
+	"NormalPlayPureDefence",
 	"Test_defend6",
 	"Test_play6ForTest",
 	"Test_DSS",

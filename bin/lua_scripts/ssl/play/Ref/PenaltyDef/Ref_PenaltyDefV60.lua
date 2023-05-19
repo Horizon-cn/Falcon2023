@@ -16,7 +16,7 @@ firstState = "init",
 	match = "{LACDM}"
 },
 
-name = "Ref_PenaltyDefV6",
+name = "Ref_PenaltyDefV60",
 applicable ={
 	exp = "a",
 	a = true

@@ -69,7 +69,7 @@ firstState = "init",
 	match = "[L][DS][AM]"
 },
 
-name = "Ref_PenaltyKickV6",
+name = "Ref_PenaltyKickV60",
 applicable ={
 	exp = "a",
 	a = true

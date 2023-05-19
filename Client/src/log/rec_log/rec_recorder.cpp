@@ -21,7 +21,9 @@ bool isNewPacketRecv = false;
 QFile recordFile;
 QIODevice* recIO;
 QString filename;
+
 QTime startTime;
+
 //QTime timer;
 }
 RecRecorder::RecRecorder(QQuickItem *parent): QQuickItem(parent) {
@@ -117,6 +119,11 @@ void RecRecorder::store() {
         }
 
         GlobalData::Instance()->debugMutex.unlock();
+        if (fabs(startTime.secsTo(QTime::currentTime())) > 130) { // 130秒强制保存
+            stop();
+            start();
+        }
+
         if (fabs(startTime.secsTo(QTime::currentTime())) > 130) { // 130秒强制保存
             stop();
             start();
