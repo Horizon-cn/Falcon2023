@@ -48,10 +48,10 @@ CDataReceiver4rbk::CDataReceiver4rbk():referee_socket(){
     qDebug() << referee_port;
     referee_socket.setProxy(QNetworkProxy::NoProxy);
     referee_socket.bind(QHostAddress::AnyIPv4, referee_port, QUdpSocket::ShareAddress);
-    //referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address)); // receive Athena ref, need to change ZSS_ADDRESS
-    foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces()) {
-        referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address), iface);
-    }
+    referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address)); // receive Athena ref, need to change ZSS_ADDRESS
+    //foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces()) {
+    //    referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address), iface);
+    //}
     // 这是昨晚的表述 referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address)); // receive Athena ref, need to change ZSS_ADDRESS
     //这是之前的表述 我已经恢复foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces()) {
     //    referee_socket.joinMulticastGroup(QHostAddress(CParamManager::Instance()->referee_address), iface);
@@ -204,13 +204,11 @@ void CDataReceiver4rbk::receiveRefMsgs() {
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         while (referee_socket.state() == QUdpSocket::BoundState && referee_socket.hasPendingDatagrams()) {
-            qDebug()<<"receive";
             datagram.resize(referee_socket.pendingDatagramSize());
             referee_socket.readDatagram(datagram.data(), datagram.size());
             ssl_referee.ParseFromArray((void*)datagram.data(), datagram.size());
             //if (ssl_referee.has_login_name() && ssl_referee.login_name() != OParamManager::Instance()->LoginName)
             //    break;
-            qDebug() << "ok";
             PlayMode next_play_mode = PMNone; // avoid next command is none
             if (ssl_referee.has_next_command()) { // check next command first
                 Referee_Command next_command = ssl_referee.next_command();
@@ -234,6 +232,7 @@ void CDataReceiver4rbk::receiveRefMsgs() {
             Referee_TeamInfo blue = ssl_referee.blue();
             long long stage_time_left = ssl_referee.stage_time_left();
             m_play_mode = translateRefMsgs(command);
+            //qDebug() << command;
             referee_mutex.lock();
             // Get Ball Placement Position
             if (command == 16 || command == 17) {
@@ -282,6 +281,7 @@ PlayMode CDataReceiver4rbk::translateRefMsgs(Referee_Command command){
         std::cout << "refereebox is fucked !!!!! command : " << command << std::endl;
         cmd = 'H'; break;
     }
+    std::cout << cmd << endl;
     PlayMode play_mode = PMNone;
     for( int pm = PMStop; pm <= PMNone; ++pm ) {
         if( playModePair[pm].ch == cmd ) {
