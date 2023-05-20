@@ -379,6 +379,10 @@ void CGPUBestAlgThread::supportSort() {
 	//           3 0  
 	//  己方球门 4 1  敌方球门
 	//           5 2
+	/*
+	for (int i = 0; i < 5; ++i)
+		_bestSupport[i] = _bestPoint[i];
+	*/
 	switch (ball_area)
 	{ // 以下注释均为当前重要性排序，球所在区域均为最低优先级
 	case 0:
@@ -459,6 +463,7 @@ void CGPUBestAlgThread::supportSort() {
 		_bestSupport[5] = _bestPoint[1];
 		break;
 	}
+	
 }
 
 // 按照点的分值返回支撑点列表
@@ -488,12 +493,12 @@ CGeoPoint CGPUBestAlgThread::getBestPointFromArea(int support_idx) {
 	CGeoPoint temp_bestSupport;
 	_value_getter_mutex->lock();
 	if (support_idx > AREANUM) { // 处理越界情况，但是后三个点的位置并没有生成
-		temp_bestSupport = _bestSupport[0];
+		temp_bestSupport = _bestPoint[0];
 	}
 	else {
 		if (support_idx == 0)
 			sendFieldRectangle(); // 动态边界debug信息
-		temp_bestSupport =  _bestSupport[support_idx];
+		temp_bestSupport =  _bestPoint[support_idx];
 	}
 	_value_getter_mutex->unlock();
 	return temp_bestSupport;
@@ -774,14 +779,14 @@ void CGPUBestAlgThread::processPointValue() {
 	CGeoPoint bestPoint;
 	float minValue;
 	int area_idx;
-
+	/*
 	if (ParamManager::Instance()->boundaryVersion == 1) {
-		obscureBoundary(); //动态模糊边界
+		obscureBoundary(); //动态模糊边界s
 	}
 	else if (ParamManager::Instance()->boundaryVersion == 2) {
 		obscureBoundaryV2();
 	}
-
+	*/
 
 	// 搜索出所有区域的暂时最优点
 	for (int area_idx = 0; area_idx < AREANUM; area_idx++) {
@@ -827,7 +832,7 @@ void CGPUBestAlgThread::processPointValue() {
 	}
 
 	// if (ParamManager::Instance()->boundaryVersion == 1) {
-	 	supportSortV2(); // 按照重要性对支撑点进行排序	
+	// 	supportSortV2(); // 按照重要性对支撑点进行排序	
 	// }
 	// else if (ParamManager::Instance()->boundaryVersion == 2) {
 	// 	supportSortV2(); 
@@ -961,13 +966,13 @@ void CGPUBestAlgThread::sendFieldRectangle() {
 		*/
 	}
 	//支撑点顺序debug信息
-	/*
+	
 	//GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], QString::number(cum).toStdString().c_str(), COLOR_BLACK);
-	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], "000", COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[1], "111", COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[2], "222", COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[3], "333", COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[4], "444", COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(_bestSupport[5], "555", COLOR_YELLOW);
-	*/
+	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[0], "000", COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[1], "111", COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[2], "222", COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[3], "333", COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[4], "444", COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[5], "555", COLOR_YELLOW);
+	
 }

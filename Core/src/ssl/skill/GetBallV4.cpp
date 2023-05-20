@@ -139,7 +139,7 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         if (LARGECanToROTATE(pVision, finalDir) || _LargeCnt > MaxLargeCnt) _state = ROTATE;
         break;
     case ROTATAE:
-        if (ROTATECanToDIRECT(pVision, finalDir) || _RotateCnt > MaxRotateCnt) _state = DIRECT;
+        if (ROTATECanToDIRECT(pVision, finalDir) || _RotateCnt > MaxRotateCnt || OppIsNearThanMe(pVision, _executor)) _state = DIRECT;
         if (WeMustReturnLARGE(pVision, finalDir)) _state = LARGE;
         break;
     case DIRECT:
@@ -440,7 +440,7 @@ bool CGetBallV4::LARGECanToROTATE(const CVisionModule* pVision, const double fin
     const int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
     
-    if ((ball.Vel().mod() < 15 && (LargeTarget - me.Pos()).mod() < 2)) return 1;
+    if ((ball.Vel().mod() < 15 && (LargeTarget - me.Pos()).mod() < 4)) return 1;
     return 0;
 }
 bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir)
@@ -549,8 +549,8 @@ bool CGetBallV4::OppIsNearThanMe(const CVisionModule* pVision, const int vecNumb
     const BallVisionT& ball = pVision->Ball();
     CVector me2Ball = ball.Pos() - me.Pos();
     CVector Ball2Opp = opp.Pos() - ball.Pos();
-    cout << me2Ball.mod() << ' ' << Ball2Opp.mod() << endl;
+
     const double threshold = 70;
-    if (me2Ball.mod() > Ball2Opp.mod())return true;
+    if (me2Ball.mod() > Ball2Opp.mod() || Ball2Opp.mod() < 20)return true;
     return false;
 }

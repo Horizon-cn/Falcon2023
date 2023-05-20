@@ -142,7 +142,7 @@ firstState = "start",
       return "receive"
     end
   end,
-  Leader   = task.flatPass("Assister"), --goAndTurnKick("Assister", 500),
+  Leader   = task.chaseNew(), --goAndTurnKick("Assister", 500),
   Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss),
   Special  = task.goCmuRush(RIGHT_POS_2,_,_,flag.allow_dss),
   Middle   = task.leftBack(),
@@ -158,7 +158,7 @@ firstState = "start",
     end
   end,
   Leader   = task.goCmuRush(LEFT_POS,_,_,flag.allow_dss),
-  Assister = task.receivePass("Leader"),
+  Assister = task.chaseNew(),
   Special  = task.goCmuRush(RIGHT_POS_2,_,_,flag.allow_dss),
   Middle   = task.leftBack(),
   Defender = task.rightBack(),

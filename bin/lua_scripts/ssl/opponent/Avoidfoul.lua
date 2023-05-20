@@ -1,11 +1,11 @@
 gOppoConfig = {
   ----------------------play---------------------------------------------------------------
 
-	CornerKick  = {8}, -- kf
+	CornerKick  = {8}, -- kf 8
 	
-	FrontKick   = {61},
+	FrontKick   = {61},--61
 
-	BackKick    = {"Ref_ImmortalKickV61"}, --{10, "Ref_ImmortalKickV1"}
+	BackKick    = {"Ref_ImmortalKickV61"}, --{10, "Ref_ImmortalKickV1"}Ref_ImmortalKickV61
 -------------------------------Def---------------------------------------------------
 
 	CornerDef   = "Ref_CornerDefV2", -- 可能要用v4，防头球

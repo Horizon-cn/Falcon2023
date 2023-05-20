@@ -112,10 +112,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 	double me2BestOppDist = CVector(pVision->TheirPlayer(opponentID).Pos() - me.Pos()).mod();
 	
     if (fabs(KickorPassDir) < 1e-3) {
-            if (me2goal.mod() < KICK_DIST && (Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor))) {
-                KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, ball.Pos());
-            }
-            else KickorPassDir = PassDir(pVision, _executor);
+		PassDirOrPos TMP = PassDirInside(pVision, _executor);
+		KickorPassDir = TMP.dir;
+
         }
     //LastPassDirToJudge = -999;
     //bool JudgePassMeIsBeBlocked(const CVisionModule *pVision, int vecNumber);
@@ -175,69 +174,15 @@ void CAdvance::plan(const CVisionModule* pVision)
 		break;
 	case GET:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
-
-		if (NumOfOurPlayer <= 2) {
-			if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.2) {
-				TaskMediator::Instance()->resetAdvancerPassTo();
-				_state = GenerateStateOfFoulTrouble(pVision, _executor);
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.2) {
+			TaskMediator::Instance()->resetAdvancerPassTo();
+			if (Me2OppTooclose(pVision, _executor)) {
+				_state = BREAKPASS;
 				break;
 			}
 			else {
 				_state = GET;
 				break;
-			}
-		}
-
-		//if (meHasBall>3) {
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.2) {
-
-			TaskMediator::Instance()->resetAdvancerPassTo();
-            /*如果我和球门之间的距离小于KICK_DIST，考虑顺序为 shoot->break->pass */
-            if ((NowIsShoot == 1) && (me.X() < 425) && fabs(me.Y()) < 260 ) { _state = BREAKSHOOT; break; }
-			if ((NowIsShoot == 2)) { _state = KICK; break; }
-			if (me2goal.mod() < KICK_DIST && (!isInTheCornerArea(pVision, _executor))) {
-                if ((Me2OppTooclose(pVision, _executor))) {
-                    NowIsShoot = 1;
-					_state = BREAKSHOOT; break;
-				}
-				else {
-					NowIsShoot = 2;
-					_state = KICK; break;
-				}
-            }
-            if (me.X() > 0) {
-				/*人在前场*/
-				if ((MeIsInTheSide(pVision, _executor) || isInTheCornerArea(pVision, _executor)) && CanSupportKick(pVision, _executor)) {
-					_state = PASS; break;
-				}
-				if (TheirRobotInBreakArea(pVision, _executor) < 3) {
-					NowIsShoot = 2;
-					_state = KICK; break;
-				}
-				else if (Me2OppTooclose(pVision, _executor) && CanSupportKick(pVision, _executor)) {
-					_state = PASS; break;
-				}
-				else if (me.X() > 425) {
-					NowIsShoot = 1;
-					_state = KICK; break;
-				} 
-				else { NowIsShoot = 2;  _state = KICK; break; }
-			}
-			else {
-				/*人在后场*/
-				if (!Me2OppTooclose(pVision, _executor)) {
-					if (CanSupportKick(pVision, _executor)) {
-						_state = PASS; break; // 周围没人
-					}
-					else {
-						NowIsShoot = 2; _state = KICK; break; // 周围没人
-					}
-
-				}
-				else if (CanSupportKick(pVision, _executor)) {
-					_state = PASS; break;
-				}
-				else { _state = JUSTCHIPPASS; break; }
 			}
 		}
 		else { _state = GET; break; }

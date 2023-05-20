@@ -744,10 +744,10 @@ __global__ void gpu_calc(float startPos[], float map[])
     // 为了与颜色一一对应，最大值不要超过MAX_SCORE
     // 
     // attention 这里为了避免进入禁区 生成点更加往外放了 modified by tyh 5.18
-    if (is_in_penalty(me_x, me_y, ROBOT_RADIUS * 2.0) || if_collide_theirPlayer(me_pos_ptr, their_player_ptr)) { // 不能进禁区，不能冲撞对方机器人
+    if (is_in_penalty(me_x, me_y, ROBOT_RADIUS * 3.0) || if_collide_theirPlayer(me_pos_ptr, their_player_ptr)) { // 不能进禁区，不能冲撞对方机器人
         map[i] = MAX_SCORE;
     }
-    else if (is_near_bound(me_x, me_y, ROBOT_RADIUS * 4.0)) {
+    else if (is_near_bound(me_x, me_y, ROBOT_RADIUS * 5.0)) {
         map[i] = MAX_SCORE;
     }
     else {    
@@ -774,7 +774,9 @@ __global__ void gpu_calc(float startPos[], float map[])
         float receive_value = min(flat_pass_value, chip_pass_value); // evaluate_receive(me_pos_ptr, ball_pos_ptr, their_player_ptr);
         float goal_value = evaluate_goal_v2(me_pos_ptr, ball_pos_ptr, their_player_ptr, their_goalie); // evaluate_goal(me_pos_ptr, ball_pos_ptr, their_player_ptr);
         // 后场只考虑传球，角球区只考虑射门，中间区域线性比例渐变，与gpuBestAlgThread里面的边界对应
-        float goal_factor = min(max(ball_pos_ptr[0] + PITCH_LENGTH / 6, 0.0) / (PITCH_LENGTH / 2 - PENALTY_DEPTH + PITCH_LENGTH / 6), 1.0);
+        //技术挑战赛临时调整删去goal_value
+        //float goal_factor = min(max(ball_pos_ptr[0] + PITCH_LENGTH / 6, 0.0) / (PITCH_LENGTH / 2 - PENALTY_DEPTH + PITCH_LENGTH / 6), 1.0);
+        float goal_factor = 0;
         float receive_factor = 1 - goal_factor;
         float final_score = receive_factor * receive_value + goal_factor * goal_value;
         map[i] = min(max(final_score, 0.0), MAX_SCORE);

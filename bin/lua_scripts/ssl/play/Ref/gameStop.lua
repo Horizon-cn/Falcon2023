@@ -48,3 +48,5 @@ else
         gCurrentPlay = "Ref_StopV2"
     end
 end
+-- 避免犯规：过于接近球
+-- gCurrentPlay = "Ref_StopBack"

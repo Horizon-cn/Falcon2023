@@ -323,9 +323,9 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
     case LIGHT_KICK:
         KickStatus::Instance()->clearAll();
         if(pVision->Ball().X() <= -80)
-            KickStatus::Instance()->setKick(_executor, 310);
+            KickStatus::Instance()->setKick(_executor, 270);
         else //if(pVision->Ball().X() <= 50)
-            KickStatus::Instance()->setKick(_executor, 280); // kick lightly
+            KickStatus::Instance()->setKick(_executor, 250); // kick lightly
         //else
         //    KickStatus::Instance()->setKick(_executor, 10);
         break;

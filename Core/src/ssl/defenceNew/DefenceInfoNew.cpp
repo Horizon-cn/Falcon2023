@@ -63,8 +63,8 @@ void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 		if (BallStatus::Instance()->getBallPossession(false, i) > 0.5)
 			_chaserPotientialList[i] = 0;
 	//门将不应太容易成为最优
-	_chaserPotientialList[pVision->TheirGoalie()] *= 1.5;
-	_chaserPotientialList[pVision->TheirGoalie()] += 0.2;
+	//_chaserPotientialList[pVision->TheirGoalie()] *= 1.5;
+	//_chaserPotientialList[pVision->TheirGoalie()] += 0.2;
 	//与上一帧加权
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 		_chaserPotientialList[i] = _chaserPotientialList[i] * 0.75 + _lastChaserPotientialList[i] * 0.25;
@@ -73,7 +73,7 @@ void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 		_ballChaserList.push_back(i);
 	_ballChaserList.erase(remove_if(_ballChaserList.begin(), _ballChaserList.end(),
-		[&](int num) {return (!pVision->TheirPlayer(num).Valid()) || _chaserPotientialList[num] >= 0.75; }),
+		[&](int num) {return (!pVision->TheirPlayer(num).Valid()) || _chaserPotientialList[num] >= 100; }),
 		_ballChaserList.end());
 	sort(_ballChaserList.begin(), _ballChaserList.end(),
 		[&](int num1, int num2) {return _chaserPotientialList[num1] < _chaserPotientialList[num2]; });
@@ -87,9 +87,9 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 	for (int num = 0; num < Param::Field::MAX_PLAYER; num++)
 		_receiverPotientialList.push_back(ballReceiverAttributeSet::Instance()->evaluate(pVision, num));
 	//ballChaser不能是Receiver
-	_receiverPotientialList[_ballChaserList[0]] = 1000;
+	_receiverPotientialList[_ballChaserList[0]] = 10000;
 	//门将不应太容易成为最优
-	_receiverPotientialList[pVision->TheirGoalie()] *= 1.5;
+	//_receiverPotientialList[pVision->TheirGoalie()] *= 1.5;
 	//与上一帧加权
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 		_receiverPotientialList[i] = _receiverPotientialList[i] * 0.75 + _lastReceiverPotientialList[i] * 0.25;
@@ -98,7 +98,7 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 		_ballReceiverList.push_back(i);
 	_ballReceiverList.erase(remove_if(_ballReceiverList.begin(), _ballReceiverList.end(),
-		[&](int num) {return (!pVision->TheirPlayer(num).Valid()) || _receiverPotientialList[num] >= 1000; }),
+		[&](int num) {return (!pVision->TheirPlayer(num).Valid()) || _receiverPotientialList[num] >= 10000; }),
 		_ballReceiverList.end());
 	sort(_ballReceiverList.begin(), _ballReceiverList.end(),
 		[&](int num1, int num2) {return _receiverPotientialList[num1] < _receiverPotientialList[num2]; });
@@ -145,6 +145,7 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 	//接球者作为新的BallChaser，同时从BallReceiver移除
 	if (isInTheirPass)
 	{
+		int bestBallChaserNoPass = getBestBallChaser();
 		if (display_debug_info)
 			GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "new: in pass");
 		auto temp = find(_ballChaserList.begin(), _ballChaserList.end(), _receiver);
@@ -155,6 +156,7 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 		auto tmp = find(_ballReceiverList.begin(), _ballReceiverList.end(), _receiver);
 		if (tmp != _ballReceiverList.end())
 			_ballReceiverList.erase(tmp);
+		_ballReceiverList.push_back(bestBallChaserNoPass);
 	}
 }
 
@@ -177,6 +179,9 @@ void CDefenceInfoNew::matchReceiver(const CVisionModule* pVision)
 
 void CDefenceInfoNew::updateSteady()
 {
+	_ballChaserSteadyList = _ballChaserList;
+	_ballReceiverSteadyList = _ballReceiverList;
+
 	//目前使用接口的地方不判断是否存在，故需要保底，而已保证steady不为空，故令其等于steady
 	//能不能直接等于steady（旧的？）想想
 	if (_ballChaserList.empty())

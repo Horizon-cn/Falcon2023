@@ -86,7 +86,7 @@ namespace Param{
 	namespace Rule{
 		const int Version = ParamManager::Instance()->value("Rule/Version", 2019).toInt(); //2019; // 规则的版本
 		const double MaxDribbleDist = ParamManager::Instance()->value("Rule/MaxDribbleDist", 50).toDouble(); //50; // 最大带球距离
-		const int MAX_BALL_SPEED = ParamManager::Instance()->value("Rule/MAX_BALL_SPEED", 625).toInt(); //630;
+		const int MAX_BALL_SPEED = ParamManager::Instance()->value("Rule/MAX_BALL_SPEED", 675).toInt(); //630;
 	}
 }
 #endif

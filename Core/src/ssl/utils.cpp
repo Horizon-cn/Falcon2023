@@ -142,6 +142,7 @@ namespace Utils {
     // ????¦Ë???????????????????. Modified by HXY.
     CGeoPoint MakeOutOfOurPenaltyArea(const CGeoPoint& p, const double buffer) {
         // ????????§Ù???????????
+        const double NewBuffer = buffer + 5;
         if (WorldModel::Instance()->CurrentRefereeMsg() == "ourBallPlacement")
             return p;
 
@@ -149,17 +150,17 @@ namespace Utils {
             // ?????????????????????????????????
             if (-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH - p.x() < Param::Field::PENALTY_AREA_WIDTH / 2 - p.y())
             // ?????????????
-                return CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + buffer, p.y());
+                return CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + NewBuffer, p.y());
             // ?????????????
-            else return CGeoPoint(p.x(), Param::Field::PENALTY_AREA_WIDTH / 2 + buffer);
+            else return CGeoPoint(p.x(), Param::Field::PENALTY_AREA_WIDTH / 2 + NewBuffer);
         }
         else {
             // ????????????????????????¡¤????????
             if (-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH - p.x() < p.y() - (-Param::Field::PENALTY_AREA_WIDTH / 2))
             // ?????????????
-                return CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + buffer, p.y());
+                return CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + NewBuffer, p.y());
             // ???????????¡¤?
-            else return CGeoPoint(p.x(), -Param::Field::PENALTY_AREA_WIDTH / 2 - buffer);
+            else return CGeoPoint(p.x(), -Param::Field::PENALTY_AREA_WIDTH / 2 - NewBuffer);
         }
     }
 
@@ -169,10 +170,10 @@ namespace Utils {
         if (WorldModel::Instance()->CurrentRefereeMsg() == "ourBallPlacement")
             return p;
         
-        double finalBuffer = buffer;
+        double finalBuffer = buffer + 10;
         if (WorldModel::Instance()->CurrentRefereeMsg() == "ourIndirectKick" || WorldModel::Instance()->CurrentRefereeMsg() == "theirIndirectKick"
             || WorldModel::Instance()->CurrentRefereeMsg() == "gameStop")
-            finalBuffer += 35;
+            finalBuffer += 25;
 
         if (p.y() > 0) {
             // ??????????????????????????????????
