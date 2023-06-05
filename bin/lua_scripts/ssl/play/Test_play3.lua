@@ -107,54 +107,58 @@ end
 -- Goalie + Special + Defender
 gPlayTable.CreatePlay{
 
-firstState = "CM",
+firstState = "LW",
 
 --front
 ["LW"] = {
-	switch = SwitchBallArea,
+	switch = function ()
+		if true then
+			return "LW";
+		end
+	end,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.markingFront("First"),--task.markingFront("First"),
+    Middle = task.protectBall(),
     match = "[L][A][M]"
 },
 
 ["LWOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goLMPassPos("Leader"),
-    Middle = task.goMWPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),--task.markingFront("First"),
+    Middle = task.protectBall(), 
     match = "[L][A][M]"
 },
 
 ["CF"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.protectBall(),
+    Middle = task.advance(),--task.markingFront("First"),
     match = "[L][A][M]"
 },
 
 ["CFOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goRWPassPos("Leader"),
-    Middle = task.goLWPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),--task.markingFront("First"),
+    Middle = task.protectBall(), 
     match = "[L][A][M]"
 },
 
 ["RW"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.advance(),--task.markingFront("First"),
+    Middle = task.protectBall(),
     match = "[L][A][M]"
 },
 
 ["RWOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goMWPassPos("Leader"),
-    Middle = task.goRMPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),--task.markingFront("First"),
+    Middle = task.protectBall(), 
     match = "[L][A][M]"
 },
 
@@ -162,48 +166,48 @@ firstState = "CM",
 ["LM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.protectBall(),
+    Middle = task.advance(),--task.markingFront("First"),
     match = "[L][A][M]"
 },
 
 ["LMOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goLWPassPos("Leader"),
-    Middle = task.goMMPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),--task.markingFront("First"),
+    Middle = task.protectBall(), 
     match = "[L][A][M]"
 },
 
 ["CM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.protectBall(),
+    Middle = task.advance(),--task.markingFront("First"),
     match = "[L][A][M]"
 },
 
 ["CMOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goRWPassPos("Leader"),
-    Middle = task.goLWPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),--task.markingFront("First"),
+    Middle = task.protectBall(), 
     match = "[L][A][M]"
 },
 
 ["RM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.advance(),--task.markingFront("First"),
+    Middle = task.protectBall(),
     match = "[L][A][M]"
 },
 
 ["RMOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goRWPassPos("Leader"),
-    Middle = task.goMMPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),--task.markingFront("First"),
+    Middle = task.protectBall(),
     match = "[L][A][M]"
 },
 
@@ -212,48 +216,48 @@ firstState = "CM",
 ["LDM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.protectBall(),
+    Middle = task.advance(),--task.markingFront("First"),
     match = "[L][A][M]"
 },
 
 ["LDMOurBall"] = {
     switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goMMPassPos("Leader"),
-    Middle = task.goLMPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),--task.markingFront("First"),
+    Middle = task.protectBall(), 
     match = "[L][A][M]"
 },
 
 ["CDM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.advance(),--task.markingFront("First"),
+    Middle = task.protectBall(),--task.markingFront("Second"), --task.marking("First"),
     match = "[L][A][M]"
 },
 
 ["CDMOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goRMPassPos("Leader"),
-    Middle = task.goLMPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),--task.goRMPassPos("Leader"),
+    Middle = task.protectBall(), --task.marking("First"),
     match = "[L][A][M]"
 },
 
 ["RDM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.protectBall(),
+    Middle = task.advance(),--task.markingFront("Second"), --task.marking("First"),
     match = "[L][A][M]"
 },
 
 ["RDMOurBall"] = {
     switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goMMPassPos("Leader"),
-    Middle = task.goRMPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),
+    Middle = task.protectBall(), --task.marking("First"),
     match = "[L][A][M]"
 },
 
@@ -261,45 +265,45 @@ firstState = "CM",
 ["LB"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.advance(),
+    Middle = task.protectBall(), --task.marking("First"),
     match = "[L][A][M]"
 },
 ["LBOurBall"] = {
     switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goLMPassPos("Leader"),
-    Middle = task.goMMPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),
+    Middle = task.protectBall(), --task.marking("First"),
     match = "[L][A][M]"
 },
 
 ["CB"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.advance(),
+    Middle = task.protectBall(), --task.marking("First"),
     match = "[L][A][M]"
 },
 ["CBOurBall"] = {
     switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goLMPassPos("Leader"),
-    Middle = task.goRMPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),
+    Middle = task.protectBall(), --task.marking("First"),
     match = "[L][A][M]"
 },
 
 ["RB"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.markingFront("First"),
-    Middle = task.markingFront("Second"), --task.marking("First"),
+	Assister = task.advance(),
+    Middle = task.protectBall(), --task.marking("First"),
     match = "[L][A][M]"
 },
 ["RBOurBall"] = {
     switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.goRMPassPos("Leader"),
-    Middle = task.goMMPassPos("Leader"), --task.marking("First"),
+	Assister = task.advance(),
+    Middle = task.protectBall(), --task.marking("First"),
     match = "[L][A][M]"
 },
 

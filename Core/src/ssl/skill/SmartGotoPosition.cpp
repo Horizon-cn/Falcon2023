@@ -311,7 +311,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     else newTask.player.IsGoMiddle = false;
 
     // 控制吸球力度
-    if (isDribble || (playerFlag & PlayerStatus::DRIBBLING)) DribbleStatus::Instance()->setDribbleCommand(vecNumber, 2);
+    if (isDribble || (playerFlag & PlayerStatus::DRIBBLING)) DribbleStatus::Instance()->setDribbleCommand(vecNumber, 3);
 
     /************************************************************************/
     /* 调试信息显示                                                           */
@@ -411,9 +411,9 @@ PlayerCapabilityT CSmartGotoPosition::setCapability(const CVisionModule* pVision
 
     // GameStop状态不能超速
     if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") {
-        capability.maxSpeed = 140;
-        capability.maxAccel = 200;
-        capability.maxDec = 200;
+        capability.maxSpeed = 500;
+        capability.maxAccel = 400;
+        capability.maxDec = 400;
     }
 
     if (task().player.max_acceleration)_capability.maxAccel = task().player.max_acceleration;

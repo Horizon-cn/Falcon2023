@@ -56,7 +56,7 @@ namespace {
     double roll_acc = 200;
     double slide_acc = 500;
     double transition_speed = 400;
-    double LARGE_ADJUST_ANGLE = 20;
+    double LARGE_ADJUST_ANGLE = 179;
 
     double HEAD_LIMIT = 3;
 
@@ -147,8 +147,8 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         else if (WeMustReturnLARGE(pVision, finalDir)) _state = LARGE;
         break;
     case HAVE:
-        if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = LARGE;
-        if ((BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) && MustUseLargeToAdjust(pVision, _executor, finalDir) == 1) _state = LEAVEBACK;
+        if (BallStatus::Instance()->getBallPossession(true, _executor) == 0/* && ball2meDist > 11*/) _state = LARGE;
+        //if ((BallStatus::Instance()->getBallPossession(true, _executor) > 0.3)   && MustUseLargeToAdjust(pVision, _executor, finalDir) == 1) _state = LEAVEBACK;
         break;
     
     case LEAVEBACK:
@@ -190,8 +190,9 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         break;
     case HAVE:
         //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, (me.Pos() - ball.Pos()).dir());
-        getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS + 5, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
-        getball_task.player.angle = (ball.Pos() - me.Pos()).dir();;
+        getball_task.player.pos = me.Pos(); // 预测球的位置 + 5.85     这个长度越大离球越远
+        //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE, (me.Pos() - ball.Pos()).dir());
+        getball_task.player.angle = finalDir;// (ball.Pos() - me.Pos()).dir();;
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
 
@@ -308,7 +309,8 @@ int CGetBallV4::PredictForRobot(CGeoPoint point, const CVisionModule* pVision)//
     }
 
     if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") {
-        capability.maxSpeed = 140;
+        //capability.maxSpeed = 500;
+        //capability.maxSpeed = 140;
     }
 
     if (WorldModel::Instance()->CurrentRefereeMsg() == "ourBallPlacement")
@@ -440,7 +442,7 @@ bool CGetBallV4::LARGECanToROTATE(const CVisionModule* pVision, const double fin
     const int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
     
-    if ((ball.Vel().mod() < 15 && (LargeTarget - me.Pos()).mod() < 4)) return 1;
+    if ((ball.Vel().mod() < 15 && (LargeTarget - me.Pos()).mod() < 6)) return 1;
     return 0;
 }
 bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir)

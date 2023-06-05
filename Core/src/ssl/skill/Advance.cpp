@@ -177,7 +177,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.2) {
 			TaskMediator::Instance()->resetAdvancerPassTo();
 			if (Me2OppTooclose(pVision, _executor)) {
-				_state = BREAKPASS;
+				if (checkOppHasBall(pVision))_state = BREAKPASS;
+				else _state = GET;
 				break;
 			}
 			else {
@@ -274,7 +275,10 @@ void CAdvance::plan(const CVisionModule* pVision)
 			//KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 			/*此处朝向可持久化即可 不需要进行改变*/
             LastPassDirToJudge = -999;
+			//cout << OppIsNearThanMe(pVision, _executor) << ' ' << OppIsFarThanMe(pVision, _executor) << endl;
 			if (OppIsNearThanMe(pVision, _executor)) KickorPassDir = generateOppIsNearThanMeDir(pVision, _executor);
+			else if (OppIsFarThanMe(pVision, _executor)) KickorPassDir = generateOppIsFarThanMeDir(pVision, _executor);
+
 			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		}
 		break;
@@ -474,7 +478,7 @@ bool CAdvance::isTheLineBlocked(const CVisionModule* pVision, CGeoPoint startPoi
 
 bool CAdvance::IsOurNearHere(const CVisionModule* pVision, int supportIndex) {
 	int supporter = TaskMediator::Instance()->supporter(supportIndex);
-	if (supporter != 0 && pVision->OurPlayer(supporter).Pos().dist(SupportPoint[supportIndex]) < 100)
+	if (supporter != 0 && pVision->OurPlayer(supporter).Pos().dist(SupportPoint[supportIndex]) < 20)
 		return true;
 	return false;
 }
@@ -996,7 +1000,20 @@ bool CAdvance::OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber
 	CVector Ball2Opp = opp.Pos() - ball.Pos();
 
 	const double threshold = 70;
-	if (me2Ball.mod() < Ball2Opp.mod() + 20 && me.X() < opp.X())return true;
+	//cout << "ehreeeeeeee__"<<' '<<checkOppHasBall(pVision) << ' ' << (me2Ball.mod() > Ball2Opp.mod() + 10) << ' ' << (me2Ball.theta(Ball2Opp) > Utils::Normalize(Param::Math::PI / 180 * 90)) << endl;
+	if (checkOppHasBall(pVision))return true;
+	return false;
+}
+
+bool CAdvance::OppIsFarThanMe(const CVisionModule* pVision, const int vecNumber) {
+	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+	const BallVisionT& ball = pVision->Ball();
+	CVector me2Ball = ball.Pos() - me.Pos();
+	CVector Ball2Opp = opp.Pos() - ball.Pos();
+
+	const double threshold = 70;
+	if (me2Ball.mod() < Ball2Opp.mod())return true;
 	return false;
 }
 
@@ -1004,7 +1021,15 @@ double CAdvance::generateOppIsNearThanMeDir(const CVisionModule* pVision, const 
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
 	const BallVisionT& ball = pVision->Ball();
-	return (opp.Pos() - ball.Pos()).dir();
+	//return Utils::Normalize((opp.Pos() - ball.Pos()).dir() + 20 * Param::Math::PI / 180);
+	return Utils::Normalize((opp.Pos() - ball.Pos()).dir());// +20 * Param::Math::PI / 180);
+}
+double CAdvance::generateOppIsFarThanMeDir(const CVisionModule* pVision, const int vecNumber) {
+	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+	const BallVisionT& ball = pVision->Ball();
+	//return Utils::Normalize((opp.Pos() - ball.Pos()).dir() + 20 * Param::Math::PI / 180);
+	return Utils::Normalize((ball.Pos() - opp.Pos()).dir());// +20 * Param::Math::PI / 180);
 }
 CPlayerCommand* CAdvance::execute(const CVisionModule* pVision)
 {

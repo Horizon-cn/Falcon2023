@@ -302,13 +302,13 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     if (shootGoal  && dirok) {
         // DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);
-        KickStatus::Instance()->setKick(vecNumber, power);//力度可调
+        //KickStatus::Instance()->setKick(vecNumber, power);//力度可调
     }
     else if (!shootGoal && fabs(Utils::Normalize(me.Dir() - finalDir)) <= precision) {
-        if (isChipKick)
-            KickStatus::Instance()->setChipKick(vecNumber, power);//力度可调
-        else
-            KickStatus::Instance()->setKick(vecNumber, power);//力度可调
+        //if (isChipKick)
+        //    KickStatus::Instance()->setChipKick(vecNumber, power);//力度可调
+        //else
+        //    KickStatus::Instance()->setKick(vecNumber, power);//力度可调
     }
     _lastCycle = pVision->Cycle();
     return CStatedTask::plan(pVision);

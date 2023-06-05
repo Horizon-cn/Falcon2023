@@ -138,9 +138,9 @@ end
 
 local SIDE_POS, MIDDLE_POS, INTER_POS, SIDE2_POS, INTER2_POS = pos.refStopAroundBall()
 
-local KICKOF_POS_1 = CGeoPoint:new_local(-20, 80)
-local KICKOF_POS_2 = CGeoPoint:new_local(-70, 0)
-local KICKOF_POS_3 = CGeoPoint:new_local(-20, -80)
+local KICKOF_POS_1 = CGeoPoint:new_local(-20, 60)
+local KICKOF_POS_2 = CGeoPoint:new_local(-60, 0)
+local KICKOF_POS_3 = CGeoPoint:new_local(-20, -60)
 
 local STOP_FLAG = flag.dodge_ball
 local STOP_DSS = bit:_or(STOP_FLAG, flag.allow_dss)
@@ -168,7 +168,7 @@ local getBufTime = function()
   end
 end
 
-local ACC = 300
+local ACC = 500
 
 gPlayTable.CreatePlay {
 
@@ -251,7 +251,7 @@ firstState = "start",
   Defender = task.rightBack(),--task.defendMiddle4Stop(),--TODO
   Middle   = task.leftBack(),
   Goalie   = task.goalieNew(),
-  match    = "[DM][ASL]"
+  match    = "[ASL][DM]"
 },
 
 ["standInMiddle"] = {
