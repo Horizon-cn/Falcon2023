@@ -56,7 +56,7 @@ namespace {
     double roll_acc = 200;
     double slide_acc = 500;
     double transition_speed = 400;
-    double LARGE_ADJUST_ANGLE = 179;
+    double LARGE_ADJUST_ANGLE = 20;
 
     double HEAD_LIMIT = 3;
 
@@ -147,18 +147,19 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         else if (WeMustReturnLARGE(pVision, finalDir)) _state = LARGE;
         break;
     case HAVE:
-        if (BallStatus::Instance()->getBallPossession(true, _executor) == 0/* && ball2meDist > 11*/) _state = LARGE;
-        //if ((BallStatus::Instance()->getBallPossession(true, _executor) > 0.3)   && MustUseLargeToAdjust(pVision, _executor, finalDir) == 1) _state = LEAVEBACK;
+        if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = LARGE;
+        if ((BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) && MustUseLargeToAdjust(pVision, _executor, finalDir) == 1) _state = LEAVEBACK;
         break;
     
     case LEAVEBACK:
         if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > minGetBallDist) _state = LARGE;
         break;
     }
-
+    /*
     char state[100];
     sprintf(state, "%f", (double)_state);
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500, 400), state, COLOR_YELLOW);
+    */
     if (_state != ROTATE) _RotateCnt = 0;
     else _RotateCnt++;
     if (_state != LARGE)_LargeCnt = 0;
@@ -309,8 +310,7 @@ int CGetBallV4::PredictForRobot(CGeoPoint point, const CVisionModule* pVision)//
     }
 
     if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") {
-        //capability.maxSpeed = 500;
-        //capability.maxSpeed = 140;
+        capability.maxSpeed = 140;
     }
 
     if (WorldModel::Instance()->CurrentRefereeMsg() == "ourBallPlacement")
@@ -442,7 +442,7 @@ bool CGetBallV4::LARGECanToROTATE(const CVisionModule* pVision, const double fin
     const int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
     
-    if ((ball.Vel().mod() < 15 && (LargeTarget - me.Pos()).mod() < 6)) return 1;
+    if ((ball.Vel().mod() < 15 && (LargeTarget - me.Pos()).mod() < 4)) return 1;
     return 0;
 }
 bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir)

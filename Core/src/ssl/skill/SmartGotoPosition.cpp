@@ -411,9 +411,9 @@ PlayerCapabilityT CSmartGotoPosition::setCapability(const CVisionModule* pVision
 
     // GameStop×´Ì¬²»ÄÜ³¬ËÙ
     if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") {
-        capability.maxSpeed = 500;
-        capability.maxAccel = 400;
-        capability.maxDec = 400;
+        capability.maxSpeed = 140;
+        capability.maxAccel = 200;
+        capability.maxDec = 200;
     }
 
     if (task().player.max_acceleration)_capability.maxAccel = task().player.max_acceleration;
