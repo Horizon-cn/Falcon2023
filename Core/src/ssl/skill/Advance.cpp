@@ -218,7 +218,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
         break;
 	}
-	if (_state != KICK && _state != BREAKSHOOT)NowIsShoot = 0;
+	_state = GET;
 	/*
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 		KickStatus::Instance()->setKick(_executor, RELIEF_POWER);
