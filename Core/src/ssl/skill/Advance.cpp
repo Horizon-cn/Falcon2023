@@ -166,6 +166,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 	* Author: Ì·Óîºê
 	* Created Date: 2022/10/10
 	***********************************************************/
+	Advance_DEBUG_ENGINE = 0;
 	_state = GET;
 	switch (_state) {
 	case BEGIN:
@@ -517,7 +518,7 @@ bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber)
 	CVector me2Opp = opp.Pos() - me.Pos();
 
 	const double threshold = 70;
-
+	/*
 	char me2Ball1[100];
 	char me2Opp1[100];
 	char dir1[100];
@@ -527,7 +528,7 @@ bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber)
 	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), me2Ball1, COLOR_YELLOW);
 	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), me2Opp1, COLOR_YELLOW);
 	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), dir1, COLOR_YELLOW);
-
+	*/
     if ((abs(me2Ball.mod()) < threshold && abs(me2Opp.mod()) < threshold * 1.5) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI /  3)) {
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(450, 450), "TOO CLOSE with ball", COLOR_ORANGE);
 		return true;

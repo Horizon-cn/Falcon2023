@@ -24,7 +24,7 @@ firstState = "run1",
 			return "run2";
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos1, 1.57),
+	Kicker = task.goCmuRush(TargetPos1),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
@@ -33,10 +33,10 @@ firstState = "run1",
 ["run2"] = {
 	switch = function ()
 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 150, 1000) then
-			return "run1";
+			return "run3";
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos2, 1.57),
+	Kicker = task.goCmuRush(TargetPos2),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
@@ -44,11 +44,11 @@ firstState = "run1",
 
 ["run3"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Goalie") < distThreshold , 150, 1000) then
+		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 150, 1000) then
 			return "run1";
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos3, 1.57),
+	Kicker = task.goCmuRush(TargetPos3),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""

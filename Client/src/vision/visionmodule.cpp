@@ -62,7 +62,7 @@ void CVisionModule::udpSocketConnect() {
         vision_port = opm->VisionSim;
     }
     if (!opm->isSimulation || grsimInterface != 0 || !opm->useSimInside) {
-        //qDebug() << "VisionPort : " << vision_port;
+        qDebug() << "VisionPort : " << vision_port;
 
         udpReceiveSocket.bind(QHostAddress::AnyIPv4, vision_port, QUdpSocket::ShareAddress);
         //udpReceiveSocket.joinMulticastGroup(QHostAddress(cpm->ssl_address));
@@ -111,6 +111,7 @@ void CVisionModule::udpSocketDisconnect() {
 void CVisionModule::storeData() {
     static QByteArray datagram;
     while (udpReceiveSocket.hasPendingDatagrams()) {
+        qDebug() << "receive new vision";
         datagram.resize(udpReceiveSocket.pendingDatagramSize());
         udpReceiveSocket.readDatagram(datagram.data(), datagram.size());
         if(GlobalData::Instance()->refereeMode){
