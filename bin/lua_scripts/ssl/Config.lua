@@ -1,8 +1,8 @@
-IS_TEST_MODE = true
+IS_TEST_MODE = false
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 USE_SWITCH = false
-OPPONENT_NAME = "Avoidfoul"--"Avoidfoul" PureDefence
+OPPONENT_NAME = "PureDefence8"--"Avoidfoul" PureDefence6 PureDefence8
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
@@ -105,6 +105,7 @@ gRefPlayTable = {
 	"Ref/KickOff/Ref_KickOffV6",
 	"Ref/KickOff/Ref_KickOffV23",
 	"Ref/KickOff/Ref_KickOffV230",
+	"Ref/KickOff/Ref_KickOff8",
 
 
 	--角球进攻
@@ -118,6 +119,7 @@ gRefPlayTable = {
 	"Ref/CornerKick/Ref_CornerKickV300",
 	"Ref/CornerKick/Ref_CornerKickV2",
 	"Ref/CornerKick/Ref_CornerPush",
+	"Ref/CornerKick/Ref_CornerPush8",
 	--前场进攻
 	"Ref/FrontKick/Ref_FrontKickV23",
 	"Ref/FrontKick/Ref_FrontKickV41",
@@ -125,6 +127,7 @@ gRefPlayTable = {
 	"Ref/FrontKick/Ref_FrontKickV61",
 	"Ref/FrontKick/Ref_FrontKickV610",
 	"Ref/FrontKick/Ref_FrontPush",
+	"Ref/FrontKick/Ref_FrontPush8",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
@@ -138,38 +141,41 @@ gRefPlayTable = {
 	"Ref/BackKick/Ref_ImmortalKickV61",
 	"Ref/BackKick/Ref_ImmortalKickV610",
 	"Ref/BackKick/Ref_BackPush",
+	"Ref/BackKick/Ref_BackPush8",
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
 	"Ref/KickOffDef/Ref_KickOffDefV23",
 	"Ref/KickOffDef/Ref_KickOffDefV230",
+	"Ref/KickOffDef/Ref_KickOffDef8",
 
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDefV5",
 	"Ref/CornerDef/Ref_CornerDefV2",
-	
 	"Ref/CornerDef/Ref_CornerDefV20",
+	"Ref/CornerDef/Ref_CornerDef8",
 
 	--中场防守
 	"Ref/MiddleDef/Ref_MiddleDefV10",
 	"Ref/MiddleDef/Ref_MiddleDefV11",
 	"Ref/MiddleDef/Ref_MiddleDefV2",
-
 	"Ref/MiddleDef/Ref_MiddleDefV20",
+	"Ref/MiddleDef/Ref_MiddleDef8",
 
 	--前场防守
 	"Ref/FrontDef/Ref_FrontDefV8",
 	"Ref/FrontDef/Ref_FrontDefV9",
 	"Ref/FrontDef/Ref_FrontDefV2",
 	"Ref/FrontDef/Ref_FrontDefV20",
+	"Ref/FrontDef/Ref_FrontDef8",
 
 	--后场防守
 	"Ref/BackDef/Ref_BackDefV10",
 	"Ref/BackDef/Ref_BackDefV11",
 	"Ref/BackDef/Ref_BackDefV12",
 	"Ref/BackDef/Ref_BackDefV2",
-
 	"Ref/BackDef/Ref_BackDefV20",
+	"Ref/BackDef/Ref_BackDef8",
 
 	--己方放球
 	"Ref/BallPlace/Ref_OurBallPlaceV2",
@@ -181,11 +187,13 @@ gRefPlayTable = {
 	"Ref/PenaltyKick/Ref_PenaltyKickV1",
 	"Ref/PenaltyKick/Ref_PenaltyKickV6",
 	"Ref/PenaltyKick/Ref_PenaltyKickV60",
+	"Ref/PenaltyKick/Ref_PenaltyKick8",
 
 	--点球防守
 	"Ref/PenaltyDef/Ref_PenaltyDefV1",
 	"Ref/PenaltyDef/Ref_PenaltyDefV6",
 	"Ref/PenaltyDef/Ref_PenaltyDefV60",
+	"Ref/PenaltyDef/Ref_PenaltyDef8",
 
 	--停止站位
 	"Ref/GameStop/Ref_Stop4BackKick",
@@ -243,6 +251,7 @@ gTestPlayTable = {
 	"Test_Circle",
 	"Test_play6",
 	"NormalPlayPureDefence",
+	"NormalPlayPureDefence8",
 	"Test_defend6",
 	"Test_play6ForTest",
 	"Test_DSS",
