@@ -14,8 +14,8 @@ firstState = "advance",
 			return "advance";
 		end
 	end,
-	Kicker = task.advance(),
-    --Breaker = task.leftCenterBack(),
+	Goalie = task.advance(),
+    --Assister = task.support("Leader", 0),
     --Crosser = task.rightCenterBack(),
     --match = ""
 	match    = ""

@@ -192,10 +192,11 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
     case HAVE:
+        cout << "??" << endl;
         //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, (me.Pos() - ball.Pos()).dir());
         getball_task.player.pos = me.Pos(); // 预测球的位置 + 5.85     这个长度越大离球越远
         //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE, (me.Pos() - ball.Pos()).dir());
-        getball_task.player.angle = (ball.Pos() - me.Pos()).dir();;
+        getball_task.player.angle = me.Dir();
         getball_task.player.needdribble = IS_DRIBBLE;
         break;
     /*
@@ -222,7 +223,7 @@ void CGetBallV4::plan(const CVisionModule* pVision)
         getball_task.player.max_deceleration /= 2;
         getball_task.player.max_speed /= 2;
     }
-    getball_task.player.needdribble = 0;
+
     setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(getball_task));
 
     _lastCycle = pVision->Cycle();
@@ -338,7 +339,7 @@ bool CGetBallV4::LARGECanToROTATE(const CVisionModule* pVision, const double fin
     const int robotNum = task().executor;
     const PlayerVisionT& me = pVision->OurPlayer(robotNum);
     
-    if ((ball.Vel().mod() < 15 && (LargeTarget - me.Pos()).mod() < 2)) return 1;
+    if ((ball.Vel().mod() < 15 && (LargeTarget - me.Pos()).mod() < 1.7)) return 1;
     return 0;
 }
 bool CGetBallV4::WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir)
@@ -362,7 +363,7 @@ bool CGetBallV4::MustUseLargeToAdjust(const CVisionModule* pVision, const int _e
 
 bool CGetBallV4::ROTATECanToDIRECT(const CVisionModule* pVision, double finalDir){
 
-    double Precision = Param::Math::PI * GetBall_Precision_alpha / 180;
+    double Precision = GetBall_Precision_alpha;
     //double offset = 0.05;
 
     const BallVisionT& ball = pVision->Ball();

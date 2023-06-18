@@ -27,7 +27,7 @@ protected:
 	int getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
 	bool OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber);
 	bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
-
+	CGeoPoint GenerateLargeAnglePoint(const CVisionModule* pVision, double finalDir, const bool debug);
 
 	bool checkOppHasBall(const CVisionModule* pVision);
 private:
