@@ -27,6 +27,7 @@
 
 -- change to double size by yys
 -- 900*600 used
+--[[
 if OPPONENT_NAME == "PureDefence6" then
     if ball.refPosX() < -360 and math.abs(ball.refPosY()) > 200 then
         gCurrentPlay = "Ref0_Stop4CornerDef"
@@ -46,6 +47,31 @@ else
         gCurrentPlay = "Ref_StopV3"
     else
         gCurrentPlay = "Ref_StopV2"
+    end
+end
+--]]
+
+
+-- 1200*900 used
+if OPPONENT_NAME == "PureDefence8" then
+    if ball.refPosX() < -360 and math.abs(ball.refPosY()) > 200 then
+        gCurrentPlay = "Ref1_Stop4CornerDef"
+    elseif ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
+        gCurrentPlay = "Ref1_Stop4CornerKick"
+    elseif ball.refPosX() < -(param.pitchLength/2 - param.penaltyDepth - 100) and -(param.pitchLength/2 - param.penaltyDepth)<= ball.refPosX() and math.abs(ball.refPosY()) < param.penaltyWidth/2 + 100 then
+        gCurrentPlay = "Ref1_StopV3"
+    else
+        gCurrentPlay = "Ref1_StopV2"
+    end
+else
+    if ball.refPosX() < -360 and math.abs(ball.refPosY()) > 200 then
+        gCurrentPlay = "Ref_Stop4CornerDefV8"
+    elseif ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
+        gCurrentPlay = "Ref_Stop4CornerKickV8"
+    elseif ball.refPosX() < -(param.pitchLength/2 - param.penaltyDepth - 100) and -(param.pitchLength/2 - param.penaltyDepth)<= ball.refPosX() and math.abs(ball.refPosY()) < param.penaltyWidth/2 + 100 then
+        gCurrentPlay = "Ref_StopV3V8"
+    else
+        gCurrentPlay = "Ref_StopV2V8"
     end
 end
 -- 避免犯规：过于接近球

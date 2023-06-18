@@ -212,6 +212,19 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref0_Stop4CornerDef",
 	"Ref/GameStop/Ref0_Stop4CornerKick",
 
+	
+	"Ref/GameStop/Ref_StopV2V8",
+	"Ref/GameStop/Ref_StopV3V8",
+	"Ref/GameStop/Ref_Stop4CornerDefV8",
+	"Ref/GameStop/Ref_Stop4CornerKickV8",
+
+	
+	"Ref/GameStop/Ref1_StopV2",
+	"Ref/GameStop/Ref1_StopV3",
+	"Ref/GameStop/Ref1_Stop4CornerDef",
+	"Ref/GameStop/Ref1_Stop4CornerKick",
+
+
 	"Ref/GameStop/Ref_StopBack",
 
 
