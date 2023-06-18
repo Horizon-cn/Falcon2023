@@ -22,7 +22,7 @@ firstState = "PureDefence",
 	Breaker  = task.multiBack(4,3),
 	Crosser  = task.multiBack(4,4),
 	Goalie   = task.goalieNew(),
-    match = "[LMA][SDBC]"
+    match = "[SDBC][LMA]"
 },
 
 name = "NormalPlayPureDefence8",

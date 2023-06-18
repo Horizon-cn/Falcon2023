@@ -259,7 +259,7 @@ firstState = "start",
 	Breaker  = task.multiBack(3,1),
   Crosser  = task.multiBack(3,2),
   Goalie   = task.goalieNew(),
-  match    = "[DM][ASL][BC]"
+  match    = "[DM][BC][ASL]"
 },
 
 ["standInMiddle"] = {
@@ -316,7 +316,7 @@ firstState = "start",
 	Breaker  = task.multiBack(3,1),
   Crosser  = task.multiBack(3,2),
   Goalie   = task.goalieNew(),
-  match    = "[DM][L][AS][BC]"
+  match    = "[DM][BC][L][AS]"
 },
 
 ["standByPenalty"] = {
@@ -444,7 +444,7 @@ firstState = "start",
 	Breaker  = task.multiBack(3,1),
   Crosser  = task.multiBack(3,2),
   Goalie   = task.goalieNew(),
-  match    = "[DM][L][AS][BC]"
+  match    = "[DM][BC][LA][S]"
 },
 
 ["reDoStop"] = {
