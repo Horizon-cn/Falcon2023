@@ -27,7 +27,7 @@
 
 -- change to double size by yys
 -- 900*600 used
-if OPPONENT_NAME == "PureDefence" then
+if OPPONENT_NAME == "PureDefence6" then
     if ball.refPosX() < -360 and math.abs(ball.refPosY()) > 200 then
         gCurrentPlay = "Ref0_Stop4CornerDef"
     elseif ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then

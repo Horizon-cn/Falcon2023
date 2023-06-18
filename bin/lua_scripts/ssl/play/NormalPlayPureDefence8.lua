@@ -14,13 +14,15 @@ firstState = "PureDefence",
 			return "PureDefence";
 		end
 	end,
-	Leader = task.advance(),
-	Assister = task.leftBack(),
-    Middle = task.rightBack(),
-    Special = task.sideBack(),
-	Defender = task.goMWPassPos("Leader"),
-	Goalie = task.goalieNew(),
-    match = "[L][MA][S][D]"
+	Leader   = task.marking("First"),
+	Assister = task.marking("Second"),
+    Middle   = task.marking("Third"),
+    Special  = task.multiBack(4,1),
+	Defender = task.multiBack(4,2),
+	Breaker  = task.multiBack(4,3),
+	Crosser  = task.multiBack(4,4),
+	Goalie   = task.goalieNew(),
+    match = "[LMA][SDBC]"
 },
 
 name = "NormalPlayPureDefence8",

@@ -15,12 +15,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.goCmuRush(WAIT_BALL_POS(0),_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.rightBack(),
-    Special  = task.leftBack(),
-    Defender = task.sideBack(),
+    Middle   = task.marking("First"),
+    Leader   = task.marking("Second"),
+    Special  = task.marking("Third"),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "{LS}{A}{M}{D}"
+    match    = "{A}{LSM}{DBC}"
   },
 
   ["toBall"] = {
@@ -30,12 +32,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(ball.pos(),_,_,flag.allow_dss),
-    Middle   = task.goCmuRush(WAIT_BALL_POS(0),_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.rightBack(),
-    Special  = task.leftBack(),
-    Defender = task.sideBack(),
+    Middle   = task.marking("First"),
+    Leader   = task.marking("Second"),
+    Special  = task.marking("Third"),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "{LS}{A}{M}{D}"
+    match    = "{A}{LSM}{DBC}"
   },
 
   ["leaveBall"] = {
@@ -44,13 +48,16 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.rightBack(),
-    Special  = task.leftBack(),
-    Middle   = task.advance(),
-    Defender = task.sideBack(),
+    Assister = task.chaseNew(),
+    --Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
+    Middle   = task.marking("First"),
+    Leader   = task.marking("Second"),
+    Special  = task.marking("Third"),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "{LS}{A}{M}{D}"
+    match    = "{A}{LSM}{DBC}"
   },
 
   name = "Ref_FrontPush8",

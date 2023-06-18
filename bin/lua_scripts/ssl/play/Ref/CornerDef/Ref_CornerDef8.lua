@@ -11,10 +11,12 @@ gPlayTable.CreatePlay{
   Leader = task.defendMiddle(),
   Assister = task.defendHead(),
   Special = task.markingFront("First"),
+  Breaker = task.markingFront("Second"),
+  Crosser = task.markingFront("Third"),
   Middle = task.leftBack(),
   Defender = task.rightBack(),
   Goalie = task.goalieNew(),
-  match    = "[MD][AL][S]"
+  match    = "[MD][AL][SBC]"
 },
   name = "Ref_CornerDef8",
   applicable = {

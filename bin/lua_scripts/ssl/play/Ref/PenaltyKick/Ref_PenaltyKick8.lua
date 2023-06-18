@@ -21,7 +21,9 @@ firstState = "init",
 	Middle = task.goCmuRush(CGeoPoint:new_local(-300,-150),_,_,flag.allow_dss),
     Special = task.goCmuRush(CGeoPoint:new_local(-300,250),_,_,flag.allow_dss),
 	Defender = task.goCmuRush(CGeoPoint:new_local(-300,-250),_,_,flag.allow_dss),
-	match = "[L][DS][AM]"
+	Breaker = task.goCmuRush(CGeoPoint:new_local(-300,-200),_,_,flag.allow_dss),
+	Crosser = task.goCmuRush(CGeoPoint:new_local(-300,-100),_,_,flag.allow_dss),
+	match = "[C][LB][DS][AM]"
 },
 
 ["gotolong"] = {
@@ -36,7 +38,9 @@ firstState = "init",
 	Middle = task.goCmuRush(CGeoPoint:new_local(-300,-150),_,_,flag.allow_dss),
     Special = task.goCmuRush(CGeoPoint:new_local(-300,250),_,_,flag.allow_dss),
 	Defender = task.goCmuRush(CGeoPoint:new_local(-300,-250),_,_,flag.allow_dss),
-	match = "[L][DS][AM]"
+	Breaker = task.goCmuRush(CGeoPoint:new_local(-300,-200),_,_,flag.allow_dss),
+	Crosser = task.goCmuRush(CGeoPoint:new_local(-300,-100),_,_,flag.allow_dss),
+	match = "[C][LB][DS][AM]"
 },
 
 ["templong"] = {
@@ -51,7 +55,9 @@ firstState = "init",
 	Middle = task.goCmuRush(CGeoPoint:new_local(-300,-150),_,_,flag.allow_dss),
     Special = task.goCmuRush(CGeoPoint:new_local(-300,250),_,_,flag.allow_dss),
 	Defender = task.goCmuRush(CGeoPoint:new_local(-300,-250),_,_,flag.allow_dss),
-	match = "[L][DS][AM]"
+	Breaker = task.goCmuRush(CGeoPoint:new_local(-300,-200),_,_,flag.allow_dss),
+	Crosser = task.goCmuRush(CGeoPoint:new_local(-300,-100),_,_,flag.allow_dss),
+	match = "[C][LB][DS][AM]"
 },
 
 ["kick"] = {
@@ -66,7 +72,9 @@ firstState = "init",
 	Middle = task.goCmuRush(CGeoPoint:new_local(-300,-150),_,_,flag.allow_dss),
     Special = task.goCmuRush(CGeoPoint:new_local(-300,250),_,_,flag.allow_dss),
 	Defender = task.goCmuRush(CGeoPoint:new_local(-300,-250),_,_,flag.allow_dss),
-	match = "[L][DS][AM]"
+	Breaker = task.goCmuRush(CGeoPoint:new_local(-300,-200),_,_,flag.allow_dss),
+	Crosser = task.goCmuRush(CGeoPoint:new_local(-300,-100),_,_,flag.allow_dss),
+	match = "[C][LB][DS][AM]"
 },
 
 name = "Ref_PenaltyKick8",

@@ -12,8 +12,10 @@ firstState = "init",
 	Crosser = task.goCmuRush(CGeoPoint:new_local(300,-200),_,_,flag.allow_dss),
 	Defender = task.goCmuRush(CGeoPoint:new_local(300,200),_,_,flag.allow_dss),
 	Assister = task.goCmuRush(CGeoPoint:new_local(300,225),_,_,flag.allow_dss),
+	Breaker = task.goCmuRush(CGeoPoint:new_local(300,-225),_,_,flag.allow_dss),
+	Engine = task.goCmuRush(CGeoPoint:new_local(300,175),_,_,flag.allow_dss),
 	Goalie   = task.goalieNew("penalty"),
-	match = "{LACDM}"
+	match = "{LACDMBE}"
 },
 
 name = "Ref_PenaltyDef8",

@@ -17,12 +17,14 @@ firstState = "start",
 		end
 	end,
 	Leader   = task.goCmuRush(guardpoint), --task.goSpeciPos(KICKOFF_DEF_POS("left")),
-	Assister = task.multiBack(4,1),
-	Special  = task.multiBack(4,2),
-	Middle   = task.multiBack(4,3),
-	Defender = task.multiBack(4,4),
+	Assister = task.multiBack(6,1),
+	Special  = task.multiBack(6,2),
+	Middle   = task.multiBack(6,3),
+	Defender = task.multiBack(6,4),
+	Breaker  = task.multiBack(6,5),
+	Crosser  = task.multiBack(6,6),
 	Goalie   = task.goalieNew(),
-	match    = "[ADMLS]"
+	match    = "[L][ADMSBC]"
 },
 
 

@@ -94,7 +94,8 @@ local LEFT_POS_2 = CGeoPoint:new_local(300, -165)
 
 local START_POS = CGeoPoint:new_local(35, 0)
 local START_POS_1 = CGeoPoint:new_local(20, 0)
-local RECEIVE_POS = CGeoPoint:new_local(-110, -70)
+local RECEIVE_POS_1 = CGeoPoint:new_local(-110, -70)
+local RECEIVE_POS_2 = CGeoPoint:new_local(-110, 70)
 
 local RIGHT_POS_1  = CGeoPoint:new_local(-20, 80)
 local RIGHT_POS_2  = CGeoPoint:new_local(155, 80)
@@ -111,12 +112,14 @@ firstState = "start",
     end
   end,
   Leader   = task.goCmuRush(START_POS,-3,_,flag.allow_dss),
-  Assister = task.multiBack(4,1),
-  Special  = task.multiBack(4,2),
-  Middle   = task.multiBack(4,3),
-  Defender = task.multiBack(4,4),
+  Assister = task.goCmuRush(RECEIVE_POS_1,-3,_,flag.allow_dss),
+  Special  = task.goCmuRush(RECEIVE_POS_2,-3,_,flag.allow_dss),
+  Middle   = task.multiBack(4,1),
+  Defender = task.multiBack(4,2),
+  Breaker  = task.multiBack(4,3),
+  Crosser  = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
-  match    = "[L][ASMD]"
+  match    = "[L][AS][MDBC]"
 },
 
 ["temp"] = {
@@ -126,12 +129,14 @@ firstState = "start",
     end
   end,
   Leader   = task.goCmuRush(START_POS_1,-3,_,flag.allow_dss),  --staticGetBall(player.toPlayerDir("Assister","Leader")),
-  Assister = task.multiBack(4,1),
-  Special  = task.multiBack(4,2),
-  Middle   = task.multiBack(4,3),
-  Defender = task.multiBack(4,4),
+  Assister = task.goCmuRush(RECEIVE_POS_1,-3,_,flag.allow_dss),
+  Special  = task.goCmuRush(RECEIVE_POS_2,-3,_,flag.allow_dss),
+  Middle   = task.multiBack(4,1),
+  Defender = task.multiBack(4,2),
+  Breaker  = task.multiBack(4,3),
+  Crosser  = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
-  match    = "[L][ASMD]"
+  match    = "[L][AS][MDBC]"
 },
 
 
@@ -143,12 +148,14 @@ firstState = "start",
     end
   end,
   Leader   = task.flatPass("Assister"),
-  Assister = task.multiBack(4,1),
-  Special  = task.multiBack(4,2),
-  Middle   = task.multiBack(4,3),
-  Defender = task.multiBack(4,4),
+  Assister = task.goCmuRush(RECEIVE_POS_1,-3,_,flag.allow_dss),
+  Special  = task.goCmuRush(RECEIVE_POS_2,-3,_,flag.allow_dss),
+  Middle   = task.multiBack(4,1),
+  Defender = task.multiBack(4,2),
+  Breaker  = task.multiBack(4,3),
+  Crosser  = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
-  match    = "[L][ASMD]"
+  match    = "[L][AS][MDBC]"
 },
 
 ["receive"] = {
@@ -157,13 +164,15 @@ firstState = "start",
       return "exit"
     end
   end,
-  Leader   = task.multiBack(2,1),
+  Leader   = task.multiBack(4,1),
   Assister = task.receive("Leader"),
-  Special  = task.multiBack(2,2),
-  Middle   = task.leftBack(),
-  Defender = task.rightBack(),
+  Special  = task.leftBack(),
+  Middle   = task.rightBack(),
+  Defender = task.multiBack(4,2),
+  Breaker  = task.multiBack(4,3),
+  Crosser  = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
-  match    = "[L][AS][MD]"
+  match    = "[A][SM][LDBC]"
 },
 
 
