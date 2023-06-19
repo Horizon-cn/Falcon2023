@@ -111,24 +111,32 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 		}
 		break;
 	}
-	double dir = (pos1 - pos2).dir();
-	CGeoPoint target;
-	CPlayerTask* pTask;
+
+	static TaskT playerTask;
+	playerTask.executor = num;
+	playerTask.player.vel = CVector(0.0, 0.0);
+	playerTask.player.rotvel = 0;
+	playerTask.player.angle = (pos1 - pos2).dir();
+	playerTask.player.flag = 0;
+	playerTask.ball.Sender = 0;
+	playerTask.player.max_speed = _v;
+
 	GDebugEngine::Instance()->gui_debug_msg(debug_pos1, to_string(_v).c_str());//todo 目前只能显示，不能控制速度
+	CPlayerTask* pTask;
 	switch (_state)
 	{
 	case STATE_GET_READY:
-		target = pos1;
-		pTask = PlayerRole::makeItGoto(num, target, dir);
+		playerTask.player.pos = pos1;
+		pTask = TaskFactoryV2::Instance()->SmartGotoPosition(playerTask);
 		break;
 	case STATE_GOTO_1:
-		target = pos2;
-		pTask = PlayerRole::makeItGoto(num, target, dir);
+		playerTask.player.pos = pos2;
+		pTask = TaskFactoryV2::Instance()->SmartGotoPosition(playerTask);
 		(*_out1) << _v << " " << pVision->Cycle() << " " << me.Pos().x() << " " << me.Pos().y() << endl;
 		break;
 	case STATE_GOTO_2:
-		target = pos1;
-		pTask = PlayerRole::makeItGoto(num, target, dir);
+		playerTask.player.pos = pos1;
+		pTask = TaskFactoryV2::Instance()->SmartGotoPosition(playerTask);
 		(*_out1) << _v << " " << pVision->Cycle() << " " << me.Pos().x() << " " << me.Pos().y() << endl;
 		break;
 	case STATE_STOP:
@@ -138,7 +146,6 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 		pTask = PlayerRole::makeItStop(num);
 		GDebugEngine::Instance()->gui_debug_msg(debug_pos2, "file IO error!");
 	}
-
 	setSubTask(pTask);
 	CStatedTask::plan(pVision);
 }
