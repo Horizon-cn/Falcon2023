@@ -45,6 +45,7 @@ gSkill = {
 	"DribbleTurn",
 	"GoSupport",
 	--位移
+	"SpeedTest",
 	"SmartGoto",
 	"GoCmuRush",
 	"SimpleGoto",
@@ -245,7 +246,7 @@ gTestPlayTable = {
 	"Test_PassNormal",
 	"Test_ReceivePass",
 	"Test_PassEachOther",
-	
+	"Test_Speed",
 	"Test_Advance",
 	"Test_GoSupport",
 	"Test_AdvanceV4",

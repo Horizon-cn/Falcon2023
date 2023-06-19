@@ -14,6 +14,7 @@ public:
 	CPlayerTask* GoPIDCircle(const TaskT& task);
 	CPlayerTask* Break(const TaskT& task);
 	//ÅÜÎ»µÄSkill. by HXY
+	CPlayerTask* SpeedTest(const TaskT& task);
 	CPlayerTask* GotoPosition(const TaskT& task);
 	CPlayerTask* SmartGotoPosition(const TaskT& task);
 	CPlayerTask* GotoPositionNew(const TaskT& task);
@@ -118,6 +119,7 @@ namespace PlayerRole {
 	CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotvel, const int flags = 0, const int sender = 0);
 	CPlayerTask* makeItSimpleGoto(const int num, const CGeoPoint& target, const double dir, const int flags = 0);
 	CPlayerTask* makeItSimpleGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotvel, const int flags = 0);
+	CPlayerTask* makeItSpeedTest(const int num, const CGeoPoint& p1, const CGeoPoint& p2, double v1, double v2, double v_step);
 	CPlayerTask* makeItInterKickV2(const int num, const double dir, const int flags, const bool kickway = 0);
 	CPlayerTask* makeItInterKickV3(const int num, const double dir, const int flags, const bool kickway = 0);
 	CPlayerTask* makeItInterKickV4(const int num, const double dir, const bool kickway = 0, const double ipower = 9999, const int flags = 0);
