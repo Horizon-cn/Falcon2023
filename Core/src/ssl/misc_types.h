@@ -25,7 +25,7 @@ struct PlayerStatus {
 		is_specify_ctrl_method(false), specified_ctrl_method(ZERO_FINAL), GoRadius(0.0),
 		needkick(true), needdribble(false), ispass(false), ischipkick(false), kickprecision(0.0), kickpower(0.0), chipkickpower(0.0),
 		speed_x(0.0), speed_y(0.0), rotate_speed(0.0), path_plan_in_circle(false), path_plan_circle_center(CGeoPoint(1e8, 1e8)), path_plan_circle_radius(1e8),
-		specify_path_plan_area(false), IsGoMiddle(false), isPenalty(false) { }
+		specify_path_plan_area(false), IsGoMiddle(false), isPenalty(false), IsGetBaller(false) { }
 
 	/// 标签
 	int flag;														// 任务标签
@@ -78,10 +78,11 @@ struct PlayerStatus {
 
 	// 是否现在前往中间点 by TYH Date 20230410
 	bool IsGoMiddle;
-
 	// 点球参数，守门员用 by SYLG 2023/05/12
 	bool isPenalty;
-
+	// getball 设置运动参数 by Tyh
+	bool IsGetBaller;
+	
 	/// 标签常量
 	//默认的flag
 	static const int NOTHING = 0x00000000; // 默认

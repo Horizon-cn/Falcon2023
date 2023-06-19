@@ -51,8 +51,8 @@ namespace {
 
 
 void compute_motion_1d(double x0, double v0, double v1,
-                       double a_max, double d_max, double v_max, double a_factor, double vel_factor,
-                       double &traj_accel, double &traj_time, double &traj_time_acc, double &traj_time_dec, double &traj_time_flat, planType pT, nonZeroMode mode) {
+    double a_max, double d_max, double v_max, double a_factor, double vel_factor,
+    double& traj_accel, double& traj_time, double& traj_time_acc, double& traj_time_dec, double& traj_time_flat, planType pT, nonZeroMode mode) {
     char adebugmsg[100];
     char v0debugmsg[100];
     char v1debugmsg[100];
@@ -66,9 +66,9 @@ void compute_motion_1d(double x0, double v0, double v1,
     //if (pT == MOVE_Y) {
     //    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 400), xdebugmsg, COLOR_YELLOW);
     //}
-    
+
     if (x0 == 0. && v0 == v1) {
-        traj_accel = 0;   
+        traj_accel = 0;
         //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R1").toLatin1(), timeDebugColor);
         if (DEBUG_ENGINE) {
             if (pT == MOVE_X) {
@@ -87,7 +87,7 @@ void compute_motion_1d(double x0, double v0, double v1,
         return;
     }
 
-    if(!finite(x0) || !finite(v0) || !finite(v1)) {
+    if (!finite(x0) || !finite(v0) || !finite(v1)) {
         traj_accel = 0;
         //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R2").toLatin1(), timeDebugColor);
         if (DEBUG_ENGINE) {
@@ -106,8 +106,8 @@ void compute_motion_1d(double x0, double v0, double v1,
         }
         return;
     }
-    if(pT == MOVE_X && fabs(v1) > 1e-8
-            && fabs(v0) < fabs(v1) && v0 * v1 > 0) {
+    if (pT == MOVE_X && fabs(v1) > 1e-8
+        && fabs(v0) < fabs(v1) && v0 * v1 > 0) {
         traj_accel = copysign(a_max, v1);   //期望速度比初速度大，且二者同号，按最大加速度加速
         if (DEBUG_ENGINE) {
             if (pT == MOVE_X) {
@@ -155,36 +155,36 @@ void compute_motion_1d(double x0, double v0, double v1,
     //if (pT == MOVE_X) cout << A_MAX_2 << ' ' << V_LIMIT_2 << ' ' << PERIOD_V_LIMIT_2 << endl;
     //if (pT == MOVE_X) cout << A_MAX_2 << ' ' << V_LIMIT_3 << ' ' << PERIOD_V_LIMIT_3 << endl;
     //if (pT == MOVE_X) cout << A_MAX_2 << ' ' << V_LIMIT_4 << ' ' << PERIOD_V_LIMIT_4 << endl;
-	//double PERIOD_MOVE_X = 0.07692;
-	//double PERIOD_MOVE_Y = 0.01667;
-	//double PERIOD_MOVE_ROT = 0.0625;
-	//double A_MAX_1 = 600;
-	//double V_LIMIT_1 = 150;
-	//double PERIOD_V_LIMIT_1 = 0.02;
-	//double V_LIMIT_2 = 50;
-	//double PERIOD_V_LIMIT_2 = 0.0154;
-	//double A_MAX_2 = 480;
-	//double V_LIMIT_3 = 150;
-	//double PERIOD_V_LIMIT_3 = 0.013;
-	//double V_LIMIT_4 = 50;
-	//double PERIOD_V_LIMIT_4 = 0.0125;
-    if(pT == MOVE_X)
+    //double PERIOD_MOVE_X = 0.07692;
+    //double PERIOD_MOVE_Y = 0.01667;
+    //double PERIOD_MOVE_ROT = 0.0625;
+    //double A_MAX_1 = 600;
+    //double V_LIMIT_1 = 150;
+    //double PERIOD_V_LIMIT_1 = 0.02;
+    //double V_LIMIT_2 = 50;
+    //double PERIOD_V_LIMIT_2 = 0.0154;
+    //double A_MAX_2 = 480;
+    //double V_LIMIT_3 = 150;
+    //double PERIOD_V_LIMIT_3 = 0.013;
+    //double V_LIMIT_4 = 50;
+    //double PERIOD_V_LIMIT_4 = 0.0125;
+    if (pT == MOVE_X)
         period = PERIOD_MOVE_X;
-    else if(pT == MOVE_Y)
+    else if (pT == MOVE_Y)
         period = PERIOD_MOVE_Y;
     else
         period = PERIOD_MOVE_ROT;
 
-    if(a_max > A_MAX_1 && pT != MOVE_Y) {
-        if(fabs(v0) > V_LIMIT_1)
+    if (a_max > A_MAX_1 && pT != MOVE_Y) {
+        if (fabs(v0) > V_LIMIT_1)
             period = PERIOD_V_LIMIT_1;
-        else if(fabs(v0) > V_LIMIT_2)
+        else if (fabs(v0) > V_LIMIT_2)
             period = PERIOD_V_LIMIT_2;
     }
-    else if(a_max > A_MAX_2 && pT != MOVE_Y) {
-        if(fabs(v0) > V_LIMIT_3)
+    else if (a_max > A_MAX_2 && pT != MOVE_Y) {
+        if (fabs(v0) > V_LIMIT_3)
             period = PERIOD_V_LIMIT_3;
-        else if(fabs(v0) > V_LIMIT_4)
+        else if (fabs(v0) > V_LIMIT_4)
             period = PERIOD_V_LIMIT_4;
     }
     // 计算时间部分
@@ -253,46 +253,46 @@ void compute_motion_1d(double x0, double v0, double v1,
         //else {
 
         // why  d_max * a_factor , not d_max * a_factor * paramManager->D_MAX_FACTOR
-            compute_motion_1d(x0 + copysign(x_to_stop, v0), 0, v1, a_max * a_factor, d_max * a_factor,
-                              v_max, a_factor, vel_factor, traj_accel, traj_time, traj_time_acc, traj_time_dec, traj_time_flat, pT, mode);    // 递归运算直到跳出这一条件
-            traj_time += time_to_stop;                                                                    // 加上路径规划时间
-            traj_time_dec += time_to_stop;
-            // 减速
-            //if (pT == MOVE_X) cout << "condition"<<' '<<decel_dist_to_v1 << ' ' << fabs(x0) << endl;
-            if (time_to_stop < period) {
-                if (pT == MOVE_Y) {
-                    traj_accel = compute_stop(v0, a_max); // why a_max?
-                    //if (pT == MOVE_X)cout << "First" << ' ' << compute_stop(v0, a_max) << endl;
-                }
-                else {
-                    traj_accel = time_to_stop / period * (-copysign(d_max * a_factor, v0)) + (1.0 - time_to_stop / period) * traj_accel;
-                    //if (pT == MOVE_X)cout << "second" << ' ' << time_to_stop / period * (-copysign(d_max * a_factor, v0)) << ' ' << (1.0 - time_to_stop / period) * traj_accel << ' ' << traj_accel << endl;
-
-                }
+        compute_motion_1d(x0 + copysign(x_to_stop, v0), 0, v1, a_max * a_factor, d_max * a_factor,
+            v_max, a_factor, vel_factor, traj_accel, traj_time, traj_time_acc, traj_time_dec, traj_time_flat, pT, mode);    // 递归运算直到跳出这一条件
+        traj_time += time_to_stop;                                                                    // 加上路径规划时间
+        traj_time_dec += time_to_stop;
+        // 减速
+        //if (pT == MOVE_X) cout << "condition"<<' '<<decel_dist_to_v1 << ' ' << fabs(x0) << endl;
+        if (time_to_stop < period) {
+            if (pT == MOVE_Y) {
+                traj_accel = compute_stop(v0, a_max); // why a_max?
+                //if (pT == MOVE_X)cout << "First" << ' ' << compute_stop(v0, a_max) << endl;
             }
             else {
-                traj_accel = - copysign(decFactor * d_max * a_factor, v0);
-                //if (pT == MOVE_X)cout << "Third" << ' ' << -copysign(decFactor * d_max * a_factor, v0)  << endl;
-            }
+                traj_accel = time_to_stop / period * (-copysign(d_max * a_factor, v0)) + (1.0 - time_to_stop / period) * traj_accel;
+                //if (pT == MOVE_X)cout << "second" << ' ' << time_to_stop / period * (-copysign(d_max * a_factor, v0)) << ' ' << (1.0 - time_to_stop / period) * traj_accel << ' ' << traj_accel << endl;
 
-            if (DEBUG_ENGINE) {
-                if (pT == MOVE_X) {
-                    sprintf(adebugmsg, "%f", traj_accel);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), adebugmsg, COLOR_YELLOW);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), v0debugmsg, COLOR_YELLOW);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), v1debugmsg, COLOR_YELLOW);
-                }
-                if (pT == MOVE_Y) {
-                    sprintf(adebugmsg, "%f", traj_accel);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 250), adebugmsg, COLOR_YELLOW);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 300), v0debugmsg, COLOR_YELLOW);
-                    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 350), v1debugmsg, COLOR_YELLOW);
-                }
             }
-            //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R5").toLatin1(), timeDebugColor);
-            //if (pT == MOVE_X)cout << "ZeRO" << ' ' << traj_accel << endl;
-            
-            return;
+        }
+        else {
+            traj_accel = -copysign(decFactor * d_max * a_factor, v0);
+            //if (pT == MOVE_X)cout << "Third" << ' ' << -copysign(decFactor * d_max * a_factor, v0)  << endl;
+        }
+
+        if (DEBUG_ENGINE) {
+            if (pT == MOVE_X) {
+                sprintf(adebugmsg, "%f", traj_accel);
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), adebugmsg, COLOR_YELLOW);
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), v0debugmsg, COLOR_YELLOW);
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), v1debugmsg, COLOR_YELLOW);
+            }
+            if (pT == MOVE_Y) {
+                sprintf(adebugmsg, "%f", traj_accel);
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 250), adebugmsg, COLOR_YELLOW);
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 300), v0debugmsg, COLOR_YELLOW);
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, 350), v1debugmsg, COLOR_YELLOW);
+            }
+        }
+        //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R5").toLatin1(), timeDebugColor);
+        //if (pT == MOVE_X)cout << "ZeRO" << ' ' << traj_accel << endl;
+
+        return;
         //}
     }
 
@@ -307,7 +307,7 @@ void compute_motion_1d(double x0, double v0, double v1,
         traj_time_acc = 0;
         traj_time_flat = 0;
         traj_time_dec = (fabs(v0) - sqrt(v0 * v0 - 2 * d_max * fabs(x0))) / d_max;
-    }*/ 
+    }*/
     else {
         double v_max_dist = (v_max * v_max - v0 * v0) / (2 * a_max) + (v_max * v_max - v1 * v1) / (2 * d_max);
         if (v_max_dist > fabs(x0)) {
@@ -315,7 +315,8 @@ void compute_motion_1d(double x0, double v0, double v1,
             traj_time_acc = (v_m - fabs(v0)) / a_max;
             traj_time_flat = 0;
             traj_time_dec = (v_m - fabs(v1)) / d_max;
-        } else {
+        }
+        else {
             traj_time_acc = (v_max - fabs(v0)) / a_max;
             traj_time_flat = (fabs(x0) - v_max_dist) / v_max;
             traj_time_dec = (v_max - fabs(v1)) / d_max;
@@ -326,7 +327,7 @@ void compute_motion_1d(double x0, double v0, double v1,
     double a_to_v1_at_x0 = fabs(v0 * v0 - v1 * v1) / (2 * fabs(x0));
     double t_to_v1_at_x0 = (-fabs(v0) + sqrt(v0 * v0 + 2 * fabs(a_to_v1_at_x0) * fabs(x0))) / fabs(a_to_v1_at_x0);
     if (t_to_v1_at_x0 < period && a_to_v1_at_x0 < a_max) {
-        traj_accel = - copysign(a_to_v1_at_x0, v0);
+        traj_accel = -copysign(a_to_v1_at_x0, v0);
         //if(pT==MOVE_X)cout << "hereeeeeeeeeeeeeeeeeeeeeee" << ' '<< traj_accel<<endl;
         traj_time += t_to_v1_at_x0;
         //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R6").toLatin1(), timeDebugColor);
@@ -349,17 +350,17 @@ void compute_motion_1d(double x0, double v0, double v1,
         return;
     }
 
-    if (FRAME_PERIOD * a_max + fabs(v0) > v_max && traj_time_flat > period ) {                           // 匀速运动阶段
+    if (FRAME_PERIOD * a_max + fabs(v0) > v_max && traj_time_flat > period) {                           // 匀速运动阶段
         traj_time += traj_time_acc + traj_time_flat + traj_time_dec;
         traj_accel = 0;
     }
-    else if (traj_time_acc < vel_factor * period && traj_time_flat <  period && traj_time_dec > 0.0) {                                         // 加速接近结束且需减速
-        traj_time += traj_accel + traj_time_flat +  traj_time_dec;
-        traj_accel =  copysign(d_max * a_factor, -v0);
+    else if (traj_time_acc < vel_factor * period && traj_time_flat < period && traj_time_dec > 0.0) {                                         // 加速接近结束且需减速
+        traj_time += traj_accel + traj_time_flat + traj_time_dec;
+        traj_accel = copysign(d_max * a_factor, -v0);
     }
     else {
         traj_time += traj_time_acc + traj_time_flat + traj_time_dec;
-        traj_accel =  copysign(a_max * a_factor, -x0);
+        traj_accel = copysign(a_max * a_factor, -x0);
     }
     //if (pT == MOVE_X)cout << "second" << ' ' << traj_accel << endl;
     //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R7").toLatin1(), timeDebugColor);
@@ -380,7 +381,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     // 这个时间很关键，设得较大则定位精度将大大降低 
     double period = 1 / 60.0; // 一段很小的时间，处理运动到目标点附近时加速度，稳定到点，防止超调
     if (pT == MOVE_Y) {
-        traj_accel = -copysign(min(d_max, v0/ period), v0);
+        traj_accel = -copysign(min(d_max, v0 / period), v0);
         return;
     }
     if ((x0 == 0. && v0 == v1) || (!finite(x0) || !finite(v0) || !finite(v1))) {
@@ -400,7 +401,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     double accel_dist_to_v1 = fabs((v1 + v0) / 2.0) * accel_time_to_v1;                               // 单一加速到末速度时的位移
     double decel_time_to_v1 = fabs(v0 - v1) / d_max;                                                  // 最大减速度减速到末速度的时间
     double decel_dist_to_v1 = fabs((v0 + v1) / 2.0) * decel_time_to_v1;                               // 单一减速到末速度时的位移
-    
+
     double PERIOD_MOVE_X = paramManager->PERIOD_MOVE_X;
     double PERIOD_MOVE_Y = paramManager->PERIOD_MOVE_Y;
     double PERIOD_MOVE_ROT = paramManager->PERIOD_MOVE_ROT;
@@ -410,6 +411,8 @@ void compute_motion_1d_test(double x0, double v0, double v1,
         period = PERIOD_MOVE_Y;
     else
         period = PERIOD_MOVE_ROT;
+    if (pT == MOVE_X && fabs(x0) > 5.0)period *= 1.15;
+
     double v_max_dist = (v_max * v_max - v0 * v0) / (2 * a_max) + (v_max * v_max - v1 * v1) / (2 * d_max);
     // The Dist of Get the Max Vel
 
@@ -449,7 +452,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
     if (DEBUG_ENGINE) {
         if (pT == MOVE_X) {
             sprintf(adebugmsg, "%f", traj_accel);
-            sprintf(periodmsg, "%f", period);
+            sprintf(periodmsg, "%f", x0);
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), v1debugmsg, COLOR_YELLOW);
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), v0debugmsg, COLOR_YELLOW);
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), adebugmsg, COLOR_YELLOW);
@@ -457,7 +460,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
         }
         if (pT == MOVE_Y) {
             sprintf(adebugmsg, "%f", traj_accel);
-            sprintf(periodmsg, "%f", period);
+            sprintf(periodmsg, "%f", x0);
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-450, -350), v1debugmsg, COLOR_YELLOW);
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-450, -300), v0debugmsg, COLOR_YELLOW);
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-450, -250), adebugmsg, COLOR_YELLOW);
@@ -465,7 +468,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
         }
         if (pT == ROTATE) {
             sprintf(adebugmsg, "%f", traj_accel);
-            sprintf(periodmsg, "%f", period);
+            sprintf(periodmsg, "%f", x0);
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-550, -350), v1debugmsg, COLOR_YELLOW);
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-550, -300), v0debugmsg, COLOR_YELLOW);
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-550, -250), adebugmsg, COLOR_YELLOW);
@@ -497,16 +500,16 @@ void compute_motion_1d_test(double x0, double v0, double v1,
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void compute_motion_2d(CVector x0, CVector v0, CVector v1,
-                       double a_max, double d_max, double v_max,
-                       double a_factor, CVector &traj_accel, double &time, double &time_acc, double &time_dec, double &time_flat, nonZeroMode mode) {
-   
+    double a_max, double d_max, double v_max,
+    double a_factor, CVector& traj_accel, double& time, double& time_acc, double& time_dec, double& time_flat, nonZeroMode mode) {
+
     double time_x = 0, time_x_acc = 0, time_x_dec = 0, time_x_flat = 0;
     double time_y = 0, time_y_acc = 0, time_y_dec = 0, time_y_flat = 0;
     double rotangle = 0;
     double traj_accel_x = 0;
     double traj_accel_y = 0;
     /* 此处是正在反向 让其零速到点 */
-    if(v0 * x0 > 0) {
+    if (v0 * x0 > 0) {
         v1 = CVector(0.0, 0.0);
     }
     /*
@@ -538,11 +541,11 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
 
     isX = 1;
     compute_motion_1d(x0.x(), v0.x(), v1.x(), a_max, d_max, v_max, a_factor, velFactorX,
-                      traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
+        traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
 
     isX = -1;
     compute_motion_1d(x0.y(), v0.y(), v1.y(), a_max, d_max, v_max, a_factor, velFactorY,
-                      traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_Y, mode);//两轴同样的最大速度、加速度独立考虑求两轴运动时间
+        traj_accel_y, time_y, time_y_acc, time_y_dec, time_y_flat, MOVE_Y, mode);//两轴同样的最大速度、加速度独立考虑求两轴运动时间
     //cout << traj_accel_y/60 << ' ' << time_y << ' ' << time_y_acc << ' ' << time_y_dec << ' ' << time_y_flat << endl;
     // 
     //if(v1.mod() > 1e-8 && mode == ACCURATE) {
@@ -554,7 +557,7 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
     //                          traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
     //    }
     //}
-    if(v1.mod() > 0 && DEBUG_NO_ZERO_VEL) {
+    if (v1.mod() > 0 && DEBUG_NO_ZERO_VEL) {
         //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 0.0), QString("xVel: %1").arg(v0.x()).toLatin1());
         //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 20.0*10), QString("xVelFinal: %1").arg(v0.x() + traj_accel_x * FRAME_PERIOD).toLatin1());
         //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0.0, 40.0*10), QString("targetVel:  %1").arg(v1.mod()).toLatin1());
@@ -567,17 +570,18 @@ void compute_motion_2d(CVector x0, CVector v0, CVector v1,
     traj_accel = CVector(traj_accel_x, traj_accel_y);
     if (traj_accel.mod())
         traj_accel = traj_accel.rotate(rotangle);
-    
+
     // 赋值时间
-    if(time_x < 1e-5 || time_x > 50) time_x = 0;
-    if(time_y < 1e-5 || time_y > 50) time_y = 0;
-    if(time_x < time_y) {
+    if (time_x < 1e-5 || time_x > 50) time_x = 0;
+    if (time_y < 1e-5 || time_y > 50) time_y = 0;
+    if (time_x < time_y) {
         //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(320*10 , -270*10), QString("this").toLatin1());
         time = time_y;
         time_acc = time_y_acc;
         time_dec = time_y_dec;
         time_flat = time_y_flat;
-    } else {
+    }
+    else {
         //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320*10 , -270*10), QString("this").toLatin1());
         time = time_x;
         time_acc = time_x_acc;
@@ -630,7 +634,7 @@ void compute_motion_2d_test(CVector x0, CVector v0, CVector v1,
 //        cout << x0.x() << ' ' << v0.x()<<' '<<v1.x() << endl;
     }
     */
-    
+
     double vX_max = min(fabs(vx_max / cos(rotangle - selfDir)), fabs(vy_max / sin(rotangle - selfDir)));
     compute_motion_1d_test(x0.x(), v0.x(), v1.x(), a_max, d_max, min(v_max, vX_max), a_factor, velFactorX,
         traj_accel_x, time_x, time_x_acc, time_x_dec, time_x_flat, MOVE_X, mode);
@@ -695,13 +699,13 @@ double compute_stop(double v, double max_a) {
 /// @param [in,out] nextStep  the next step.
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void goto_point_omni( const PlayerVisionT& start,
-                      const PlayerVisionT& final,
-                      const PlayerCapabilityT& capability,
-                      const double& accel_factor,  // 初值：1.5
-                      const double& angle_accel_factor,  // 初值4.5
-					  PlayerVisionT& nextStep,
-                      nonZeroMode mode) {
+void goto_point_omni(const PlayerVisionT& start,
+    const PlayerVisionT & final,
+    const PlayerCapabilityT& capability,
+    const double& accel_factor,  // 初值：1.5
+    const double& angle_accel_factor,  // 初值4.5
+    PlayerVisionT& nextStep,
+    nonZeroMode mode) {
     CGeoPoint target_pos = final.Pos();
     CVector x = start.Pos() - target_pos;
     CVector v = start.Vel();
@@ -720,11 +724,11 @@ void goto_point_omni( const PlayerVisionT& start,
     double ang_a;
     double time_a, time_a_acc, time_a_dec, time_a_flat, time;
     double time_acc, time_dec, time_flat;
-    
+
     compute_motion_2d(x, v, target_vel, max_accel, max_decel, max_speed, accel_factor, a, time, time_acc, time_dec, time_flat, mode);
     compute_motion_1d(ang, ang_v, 0.0, max_angle_accel, max_angle_decel, max_angle_speed, angle_accel_factor, 1.0, ang_a, time_a, time_a_acc, time_a_dec, time_a_flat, ROTATE, mode);
 
-    if(DISPLAY_ROTATION_LIMIT){
+    if (DISPLAY_ROTATION_LIMIT) {
         //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-40*10), QString("maxRotateAcc:   %1").arg(max_angle_accel).toLatin1());
         //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-20*10), QString("maxRotateSpeed: %1").arg(max_angle_speed).toLatin1());
         //GDebugEngine::Instance()->gui_debug_msg(target_pos+CVector(0,-60*10), QString("rotateVel:      %1").arg(ang_v).toLatin1());
@@ -762,7 +766,7 @@ void goto_point_omni( const PlayerVisionT& start,
     float vx = localVel.x() / 100;
     float vy = localVel.y() / 100;
     float vz = ang_v * 0.025f * WHEEL_CENTER_OFFSET;
-    float wheel_angle[4] = { 
+    float wheel_angle[4] = {
          D_WHEEL_ANGLE_FRONT,
         -D_WHEEL_ANGLE_FRONT,
         -D_WHEEL_ANGLE_BACK_2013,
@@ -770,9 +774,9 @@ void goto_point_omni( const PlayerVisionT& start,
     };
 
     float cur_wheel_speed[4] = { 0,0,0,0 };
-    float wheel_speed[4] = {0,0,0,0};
-    float vz_max_4[4] = {0,0,0,0};
-    float vz_min_4[4] = {0,0,0,0};
+    float wheel_speed[4] = { 0,0,0,0 };
+    float vz_max_4[4] = { 0,0,0,0 };
+    float vz_min_4[4] = { 0,0,0,0 };
     float vz_max = paramManager->MAX_WHEEL_SPEED;
     float vz_min = -paramManager->MAX_WHEEL_SPEED;
     CVector cur_v = start.Vel();
@@ -782,7 +786,7 @@ void goto_point_omni( const PlayerVisionT& start,
     float cur_vz = start.RotVel() * 0.025f * WHEEL_CENTER_OFFSET; //V=2*pi*r/t = w*r µ¥Î»[m/s]
     double largest_wheel_speed = 0;
 
-    for (int i = 0; i < 4; i++) { 
+    for (int i = 0; i < 4; i++) {
         // 先计算在满足xy移动是vz的范围
         double angle = wheel_angle[i] / 180.0f * (float)Param::Math::PI;
         wheel_speed[i] = (sin(angle) * vx + cos(angle) * vy + vz) * 74037;
@@ -792,7 +796,7 @@ void goto_point_omni( const PlayerVisionT& start,
             largest_wheel_speed = fabs(wheel_speed[i]);
         }
     }
-    
+
     if (largest_wheel_speed > paramManager->MAX_WHEEL_SPEED)
     {
         double slow_ratio = paramManager->MAX_WHEEL_SPEED / largest_wheel_speed;
@@ -825,8 +829,8 @@ void goto_point_omni( const PlayerVisionT& start,
         //ang_v = vz / 0.025 / WHEEL_CENTER_OFFSET;
     }
     // std::cout << "vz: " << vz << std::endl;
-    
-    
+
+
     CGeoPoint next_pos = start.Pos() + Utils::Polar2Vector(v.mod() * FRAME_PERIOD, v.dir());
     double next_angle = start.Dir() + ang_v * FRAME_PERIOD;
 
@@ -837,7 +841,7 @@ void goto_point_omni( const PlayerVisionT& start,
 
     nextStep.SetRotVel(ang_v);
 
-    if(DEBUG_TIME) {
+    if (DEBUG_TIME) {
         CVector acc;
         compute_motion_2d(x, v, target_vel, OUR_MAX_ACC, OUR_MAX_DEC, OUR_MAX_SPEED, accel_factor, acc, time, time_acc, time_dec, time_flat);
 
@@ -895,7 +899,7 @@ void goto_point_omni_test(const PlayerVisionT& start,
 
     v = v + a * FRAME_PERIOD;
     ang_v += ang_a * FRAME_PERIOD;
-    
+
     float WHEEL_CENTER_OFFSET = 0.082f;
     float D_WHEEL_ANGLE_FRONT = 55;
     float D_WHEEL_ANGLE_BACK_2013 = 135;
@@ -959,7 +963,7 @@ void goto_point_omni_test(const PlayerVisionT& start,
 /// @return .
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double expectedCMPathTime(const PlayerVisionT& start, const CGeoPoint& final, PlayerCapabilityT capability, CVector target_vel, double accel_factor, bool IsGoMiddle) {
+double expectedCMPathTime(const PlayerVisionT& start, const CGeoPoint & final, PlayerCapabilityT capability, CVector target_vel, double accel_factor, bool IsGoMiddle) {
     CGeoPoint target_pos = final;
     CVector x = start.Pos() - target_pos;
     CVector v = start.Vel();
@@ -979,56 +983,56 @@ double expectedCMPathTime(const PlayerVisionT& start, const CGeoPoint& final, Pl
     double time_a, time_a_acc, time_a_dec, time_a_flat, time = 0;
     double time_acc, time_dec, time_flat;
 
-    compute_motion_2d_test(x, v, target_vel, 
+    compute_motion_2d_test(x, v, target_vel,
         max_accel, max_decel, max_speed, start.Dir(), max_speed_X, max_speed_Y, accel_factor, a, time, time_acc, time_dec, time_flat, FAST, IsGoMiddle);
 
     return time;
 }
 
-double predictedTime(const PlayerVisionT& start, const CGeoPoint & Target, const CVector& targetVel) {
+double predictedTime(const PlayerVisionT& start, const CGeoPoint& Target, const CVector& targetVel) {
     CVector x = start.Pos() - Target;
-    CVector v = (start.Vel().mod() < 2.5*10) ? CVector(0, 0) : start.Vel();
+    CVector v = (start.Vel().mod() < 2.5 * 10) ? CVector(0, 0) : start.Vel();
     double time;
     CVector a;
     double time_acc, time_dec, time_flat;
     double accel_factor = 1.5;
-    if(IS_SIMULATION) {
+    if (IS_SIMULATION) {
         accel_factor = 1.0;
     }
     compute_motion_2d(x, v, targetVel,
-                      OUR_MAX_ACC,
-                      OUR_MAX_DEC,
-                      OUR_MAX_SPEED,
-                      accel_factor,
-                      a, time, time_acc, time_dec, time_flat);
+        OUR_MAX_ACC,
+        OUR_MAX_DEC,
+        OUR_MAX_SPEED,
+        accel_factor,
+        a, time, time_acc, time_dec, time_flat);
 
     return time;
 }
 
-double predictedTimeWithRawVel(const PlayerVisionT& start, const CGeoPoint & Target, const CVector& targetVel) {
+double predictedTimeWithRawVel(const PlayerVisionT& start, const CGeoPoint& Target, const CVector& targetVel) {
     CVector x = start.Pos() - Target;
-    CVector v = (start.Vel().mod() < 2.5*10) ? CVector(0, 0) : start.Vel();
-//    GDebugEngine::Instance()->gui_debug_msg(start.Pos(), QString("vel: (%1, %2)").arg(v.x()).arg(v.y()).toLatin1());
+    CVector v = (start.Vel().mod() < 2.5 * 10) ? CVector(0, 0) : start.Vel();
+    //    GDebugEngine::Instance()->gui_debug_msg(start.Pos(), QString("vel: (%1, %2)").arg(v.x()).arg(v.y()).toLatin1());
     double time;
     CVector a;
     double time_acc, time_dec, time_flat;
     double accel_factor = 1.5;
-    if(IS_SIMULATION) {
+    if (IS_SIMULATION) {
         accel_factor = 1.0;
     }
     compute_motion_2d(x, v, targetVel,
-                      OUR_MAX_ACC,
-                      OUR_MAX_DEC,
-                      OUR_MAX_SPEED,
-                      accel_factor,
-                      a, time, time_acc, time_dec, time_flat);
+        OUR_MAX_ACC,
+        OUR_MAX_DEC,
+        OUR_MAX_SPEED,
+        accel_factor,
+        a, time, time_acc, time_dec, time_flat);
 
     return time;
 }
 
-double predictedTheirTime(const PlayerVisionT& start, const CGeoPoint & Target, const CVector& targetVel) {
-    double max_acc = 500*10;
-    double max_speed = 350*10;
+double predictedTheirTime(const PlayerVisionT& start, const CGeoPoint& Target, const CVector& targetVel) {
+    double max_acc = 500 * 10;
+    double max_speed = 350 * 10;
 
     CVector x = start.Pos() - Target;
     CVector v = start.Vel();
@@ -1036,41 +1040,41 @@ double predictedTheirTime(const PlayerVisionT& start, const CGeoPoint & Target, 
     CVector a;
     double time_acc, time_dec, time_flat;
     compute_motion_2d(x, v, targetVel,
-                      max_acc,
-                      max_acc,
-                      max_speed,
-                      1.5,
-                      a, time, time_acc, time_dec, time_flat);
+        max_acc,
+        max_acc,
+        max_speed,
+        1.5,
+        a, time, time_acc, time_dec, time_flat);
 
     return time;
 }
 
-double predictedTime2d(const PlayerVisionT& start, const CGeoPoint& final, double maxAccel, double maxVelocity, double accel_factor) {
+double predictedTime2d(const PlayerVisionT& start, const CGeoPoint & final, double maxAccel, double maxVelocity, double accel_factor) {
     CVector x0 = start.Pos() - final;
     CVector trajAcc;
     double trajTime;
     double time_acc, time_dec, time_flat;
     compute_motion_2d(x0, start.Vel(), CVector(0, 0),
-                      maxAccel,
-                      maxAccel,
-                      maxVelocity,
-                      accel_factor,
-                      trajAcc, trajTime, time_acc, time_dec, time_flat);
+        maxAccel,
+        maxAccel,
+        maxVelocity,
+        accel_factor,
+        trajAcc, trajTime, time_acc, time_dec, time_flat);
     return trajTime;
 }
 
-double predictedTime1d(const double &start, const double &end, const double &startVel, const double &maxAccel, const double &maxVelocity, const double endVel) {
+double predictedTime1d(const double& start, const double& end, const double& startVel, const double& maxAccel, const double& maxVelocity, const double endVel) {
     double trajTime, trajAcc, accTime, flatTime, decTime;
     compute_motion_1d(start - end, startVel, endVel,
-                      maxAccel,
-                      maxAccel,
-                      maxVelocity,
-                      1.5,
-                      1.0, trajAcc, trajTime, accTime, flatTime, decTime, MOVE_X);
+        maxAccel,
+        maxAccel,
+        maxVelocity,
+        1.5,
+        1.0, trajAcc, trajTime, accTime, flatTime, decTime, MOVE_X);
     return trajTime;
 }
 
-bool predictRushSpeed(const PlayerVisionT& start, const CGeoPoint& final, const double& time, const PlayerCapabilityT& capability, CVector& targetVel) {
+bool predictRushSpeed(const PlayerVisionT& start, const CGeoPoint & final, const double& time, const PlayerCapabilityT& capability, CVector& targetVel) {
     CVector x = start.Pos() - final;
     CVector v = start.Vel();
     double zeroTime;
@@ -1080,21 +1084,23 @@ bool predictRushSpeed(const PlayerVisionT& start, const CGeoPoint& final, const 
     if (zeroTime < time) {
         targetVel = CVector(0, 0);
         return true;
-    } else {
+    }
+    else {
         CVector me2target = final - start.Pos();
         double startVel = start.Vel() * me2target.unit();
-        double triangleDist = (pow(capability.maxSpeed, 2) - pow(startVel, 2))/ (2 * capability.maxAccel);
+        double triangleDist = (pow(capability.maxSpeed, 2) - pow(startVel, 2)) / (2 * capability.maxAccel);
         double triangleTime = (capability.maxSpeed - startVel) / capability.maxAccel;
         double restDist = x.mod() - triangleDist;
         double restTime = time - triangleTime;
         if (restTime - restDist / capability.maxSpeed > 0) {
             double decTime = sqrt(2 * (capability.maxSpeed * restTime - restDist) / capability.maxAccel);
             targetVel = Utils::Polar2Vector(capability.maxSpeed - decTime * capability.maxAccel, (final - start.Pos()).dir());
-            if(isnan(targetVel.x()) || isnan(targetVel.y())) {
+            if (isnan(targetVel.x()) || isnan(targetVel.y())) {
                 cout << "Oh shit!!! Error targetVel!!! ---CMmotion.cpp" << endl;
             }
             return true;
-        } else {
+        }
+        else {
             targetVel = Utils::Polar2Vector(capability.maxSpeed, (final - start.Pos()).dir());
             return false;
         }
@@ -1122,7 +1128,8 @@ void openSpeedCircle(const PlayerVisionT& start, const double dist2Center, const
     if (rotateMethod == 1 || rotateMethod == 4) {
         startDir = Utils::Normalize(start.Dir() + dirDiff);
         finalDir = Utils::Normalize(finalAngle + dirDiff);
-    } else {
+    }
+    else {
         startDir = Utils::Normalize(start.Dir() - dirDiff);
         finalDir = Utils::Normalize(finalAngle - dirDiff);
     }
@@ -1133,7 +1140,8 @@ void openSpeedCircle(const PlayerVisionT& start, const double dist2Center, const
 
     if (rotateMethod == 1 || rotateMethod == 4) {
         compute_motion_1d(posDirDiff, start.RotVel(), 0, 15, 5, 5, 1.5, 1.0, rotAcc, rotTime, rotAccTime, rotDecTime, rotFlatTime, ROTATE);
-    } else {
+    }
+    else {
         compute_motion_1d(-posDirDiff, start.RotVel(), 0, 15, 5, 5, 1.5, 1.0, rotAcc, rotTime, rotAccTime, rotDecTime, rotFlatTime, ROTATE);
     }
 
@@ -1142,11 +1150,12 @@ void openSpeedCircle(const PlayerVisionT& start, const double dist2Center, const
     CVector vel;
     if (rotateMethod == 1 || rotateMethod == 3) {
         vel = Utils::Polar2Vector(velMod, startDir);
-    } else {
+    }
+    else {
         vel = Utils::Polar2Vector(velMod, Utils::Normalize(startDir + Param::Math::PI));
     }
 
-    CVector localVel = vel.rotate(- start.Dir());
+    CVector localVel = vel.rotate(-start.Dir());
     CGeoPoint nextPos = startPos + vel / Param::Vision::FRAME_RATE;
     double nextDir = startDir + rotVel / Param::Vision::FRAME_RATE;
 

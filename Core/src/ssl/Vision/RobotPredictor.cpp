@@ -43,7 +43,7 @@ void CRobotPredictor::updateVision(int cycle, const VehicleInfoT& player, const 
 	predictedVision.SetRotVel(dirVel);
 	//if (player.isYellow && player.ID == 5)
 	//	std::cout << "realVel: " << CVector(vel_x, vel_y) << std::endl;
-
+	
 	if (_isHasRotation && !Param::Vehicle::V2::WHEEL_SPEED_CALLBACK) {//our robot
 		if (_commandLogger.commandValid(cycle - 1)) {
 			cmd = _commandLogger.getCommand(cycle - 1);
@@ -68,6 +68,7 @@ void CRobotPredictor::updateVision(int cycle, const VehicleInfoT& player, const 
 		// 这个地方应引起注意!!!!!!
 		predictedVision.SetRotVel(cmd.rot_speed);
 	}
+	
 }
 
 bool CRobotPredictor::checkValid(int cycle, const CGeoPoint & pos) {

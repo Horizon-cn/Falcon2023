@@ -45,6 +45,7 @@
 #include "WaitTouch.h"
 #include "GetBallV3.h"
 #include "GetBallV4.h"
+#include "GetBallV5.h"
 #include "SlowGetBall.h"
 #include "TimeDelayTest.h"
 #include "Marking.h"
@@ -135,8 +136,11 @@ CPlayerTask* CTaskFactoryV2::OpenSpeed(const TaskT& task) {
 	return MakeTask< COpenSpeed >(task);
 }
 
-CPlayerTask* CTaskFactoryV2::NoneTrajGetBall(const TaskT& task) {
+CPlayerTask* CTaskFactoryV2::NoneTrajGetBallV4(const TaskT& task) {
 	return MakeTask< CGetBallV4 >(task);
+}
+CPlayerTask* CTaskFactoryV2::NoneTrajGetBall(const TaskT& task) {
+	return MakeTask< CGetBallV5 >(task);
 }
 CPlayerTask* CTaskFactoryV2::NoneTrajGetBallV3(const TaskT& task) {
 	return MakeTask< CGetBallV3 >(task);
@@ -484,6 +488,17 @@ namespace PlayerRole {
 		playerTask.player.rotvel = StopDist;
 		playerTask.player.specified_ctrl_method = mode;
 		return TaskFactoryV2::Instance()->NoneTrajGetBall(playerTask);
+	}
+	CPlayerTask* makeItNoneTrajGetBallForStatic(const int num, const double dir, CVector finalVel, int flags, double StopDist, CTRL_METHOD mode)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		playerTask.player.vel = finalVel;
+		playerTask.player.flag = flags;
+		playerTask.player.rotvel = StopDist;
+		playerTask.player.specified_ctrl_method = mode;
+		return TaskFactoryV2::Instance()->NoneTrajGetBallV4(playerTask);
 	}
 	CPlayerTask* makeItNoneTrajGetBallV3(const int num, const double dir, CVector finalVel, int flags, double StopDist, CTRL_METHOD mode)
 	{

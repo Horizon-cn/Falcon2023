@@ -470,7 +470,7 @@ extern "C" int Skill_StaticGetBall(lua_State * L)
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
 	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
 	int flag = LuaModule::Instance()->GetNumberArgument(3, NULL);
-	CPlayerTask* pTask = PlayerRole::makeItNoneTrajGetBall(runner, angle, CVector(0, 0), flag, 8);
+	CPlayerTask* pTask = PlayerRole::makeItNoneTrajGetBallForStatic(runner, angle, CVector(0, 0), flag, 8);
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }
