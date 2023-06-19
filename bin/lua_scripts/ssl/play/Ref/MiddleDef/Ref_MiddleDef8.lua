@@ -1,4 +1,3 @@
-
 gPlayTable.CreatePlay{
 
   firstState = "start",
@@ -19,7 +18,7 @@ gPlayTable.CreatePlay{
   Goalie = task.goalieNew(),
   match    = "[L][HM][SAPD]"
 },
-  name = "Ref_MiddleDefV20",
+  name = "Ref_MiddleDef8",
   applicable = {
     exp = "a",
     a = true
