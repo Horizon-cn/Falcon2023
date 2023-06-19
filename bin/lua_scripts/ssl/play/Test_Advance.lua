@@ -55,7 +55,7 @@ gPlayTable.CreatePlay{
 firstState = "LeftFront",
 
 ["LeftFront"] = {
-	switch = TEST,
+	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader", 0),
 	Powerhouse = task.support("Leader", 1),

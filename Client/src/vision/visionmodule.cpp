@@ -111,7 +111,7 @@ void CVisionModule::udpSocketDisconnect() {
 void CVisionModule::storeData() {
     static QByteArray datagram;
     while (udpReceiveSocket.hasPendingDatagrams()) {
-        qDebug() << "receive new vision";
+        //qDebug() << "receive new vision";
         datagram.resize(udpReceiveSocket.pendingDatagramSize());
         udpReceiveSocket.readDatagram(datagram.data(), datagram.size());
         if(GlobalData::Instance()->refereeMode){

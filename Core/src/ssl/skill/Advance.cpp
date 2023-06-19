@@ -220,7 +220,7 @@ void CAdvance::plan(const CVisionModule* pVision)
         break;
 	}
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-		_state = KICK;
+		_state = PASS;
 	}
 	else _state = GET;
 	/**********************************************************
@@ -309,17 +309,39 @@ void CAdvance::plan(const CVisionModule* pVision)
         TMP = PassDirInside(pVision, _executor);
         KickorPassDir = TMP.dir;
         PassPos = TMP.pos;
+		
+
+		if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
+			double ThePower = 0;
+			bool IsFlatKick = toChipOrToFlat(pVision, _executor, PassPos);
+			if (IsFlatKick) {
+				ThePower = GetFPassPower(me.Pos(), PassPos);
+				KickStatus::Instance()->setKick(_executor, ThePower);
+			}
+			else {
+				ThePower = GetCPassPower(me.Pos(), PassPos);
+				KickStatus::Instance()->setChipKick(_executor, ThePower);
+			}
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick isDirOK", COLOR_ORANGE);
+			setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), (ball.Pos() - me.Pos()).dir(), task().player.flag));
+			TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);
+		}
+		else {
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick is NOT DirOK ", COLOR_ORANGE);
+			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+		}
+		/*
         if (toChipOrToFlat(pVision, _executor, PassPos) == 1) {
-            /*鉴定为可以平传球 则平传球*/
+            /*鉴定为可以平传球 则平传球
             if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "FLATPASS", COLOR_ORANGE);
 			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, GetFPassPower(me.Pos(), PassPos), PassPos));
         }
         else {
-            /*鉴定为不能平传球 则选择挑传 考虑函数同样为flatPassDir*/
+            /*鉴定为不能平传球 则选择挑传 考虑函数同样为flatPassDir
             if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHIPPASS", COLOR_CYAN);
 			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, GetCPassPower(me.Pos(), PassPos), PassPos));
         }
-		TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);
+		*/
 		break;
 
 	case JUSTCHIPPASS:
@@ -363,20 +385,33 @@ void CAdvance::plan(const CVisionModule* pVision)
         KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		PassPoint = generateNormalPushPoint(pVision, _executor);
 		KickorPassDir = (PassPoint - me.Pos()).dir();
-		
+		/*
 		if (ball.Y() < 0)tmpDir = 1.57;
 		if (ball.Y() > 0) tmpDir = -1.57;
 		KickorPassDir = tmpDir;
 		cout << KickorPassDir << endl;
+		*/
+		if(fabs((KickorPassDir - (ball.Pos() - me.Pos()).dir())) < Param::Math::PI * 20.0 / 180)
+			setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos() + Utils::Polar2Vector(10, (ball.Pos() - me.Pos()).dir()), (ball.Pos() - me.Pos()).dir(), task().player.flag));
+		else 
+			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+
 		if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isDirOK", COLOR_ORANGE);
-			KickStatus::Instance()->setKick(_executor, 300);
+			KickStatus::Instance()->setKick(_executor, 320);
+		}
+		//setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos() + Utils::Polar2Vector(10, (ball.Pos() - me.Pos()).dir()), (ball.Pos() - me.Pos()).dir(), task().player.flag));
+		/*
+		if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isDirOK", COLOR_ORANGE);
+			KickStatus::Instance()->setKick(_executor, 350);
 			setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), (ball.Pos() - me.Pos()).dir(), task().player.flag));
 		}
 		else {
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT is NOT DirOK ", COLOR_ORANGE);
 			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		}
+		*/
 		break;
 	}
 	_cycle = pVision->Cycle();
@@ -736,6 +771,17 @@ bool CAdvance::checkTheyCanShoot(const CVisionModule* pVision, int vecNumber) {
 ***********************************************************/
 PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber) {
 
+	for (int i = 0; i < 6; ++i) {
+		const PlayerVisionT& friends = pVision->OurPlayer(i);
+		if (pVision->OurPlayer(i).Valid() && i != vecNumber) {
+			PassDirOrPos ReturnValue;
+			ReturnValue.dir = (friends.Pos() - pVision->OurPlayer(vecNumber).Pos()).dir();
+			ReturnValue.pos = friends.Pos();
+			cout << ReturnValue.pos << endl;
+			//LastPassPoint = NowShootNumber;//保存当前状态
+			return ReturnValue;
+		}
+	}
 	//参数定义部分
 
 	PassDirOrPos ReturnValue; 
