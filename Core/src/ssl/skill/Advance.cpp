@@ -33,7 +33,7 @@ CAdvance::CAdvance()
 	SHOOT_PRECISION = paramManager->SHOOT_PRECISION;	/*允许射门最小精度角分母，越大越慢越精确 最低为7最高17*/
 	GetBallBias = paramManager->AdGetBallBias;	/*AdvanceGetball的偏差*/
 	BalltoMeVelTime = paramManager->BalltoMeVelTime; /*Advance传球给我主动去接的临界时间*/
-
+	OBSTACLE_RADIUS = paramManager->BREAK_OBSTACLE_RADIUS;
 	/*射门力度参数*/
 	KICKPOWER = paramManager->KICKPOWER;
 	CHIPPOWER = paramManager->CHIPPOWER; // 暂时不用了
@@ -291,16 +291,16 @@ void CAdvance::plan(const CVisionModule* pVision)
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Kick", COLOR_ORANGE);
 			
 			//setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, KICKPOWER, PassPos));
-			cout << "let kick" << endl;
-			if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
+			if(canScore(pVision, _executor, OBSTACLE_RADIUS, me.Dir())){
+//			if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick isDirOK", COLOR_ORANGE);
-				cout << "hereeeeeeeeeeeee" << endl;
 				KickStatus::Instance()->setKick(_executor, KICKPOWER);
+				setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), (ball.Pos() - me.Pos()).dir(), task().player.flag));
 			}
 			else {
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick is NOT DirOK ", COLOR_ORANGE);
+				setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 			}
-			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		}
 		break;
 	case PASS:
@@ -363,13 +363,20 @@ void CAdvance::plan(const CVisionModule* pVision)
         KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		PassPoint = generateNormalPushPoint(pVision, _executor);
 		KickorPassDir = (PassPoint - me.Pos()).dir();
-
-		if(Me2OppTooclose(pVision, _executor)) 
-			setSubTask(PlayerRole::makeItBreak(_executor, true, PassPoint, false, 5 * Param::Math::PI / 180, false, 0, PUSHPOWER));
-		else 	
-			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, PUSHPOWER, PassPos));
-
-		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "PUSHOUT isDirOK", COLOR_ORANGE);
+		
+		if (ball.Y() < 0)tmpDir = 1.57;
+		if (ball.Y() > 0) tmpDir = -1.57;
+		KickorPassDir = tmpDir;
+		cout << KickorPassDir << endl;
+		if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isDirOK", COLOR_ORANGE);
+			KickStatus::Instance()->setKick(_executor, 300);
+			setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), (ball.Pos() - me.Pos()).dir(), task().player.flag));
+		}
+		else {
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT is NOT DirOK ", COLOR_ORANGE);
+			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+		}
 		break;
 	}
 	_cycle = pVision->Cycle();
@@ -1029,6 +1036,50 @@ double CAdvance::generateOppIsFarThanMeDir(const CVisionModule* pVision, const i
 	//return Utils::Normalize((opp.Pos() - ball.Pos()).dir() + 20 * Param::Math::PI / 180);
 	return Utils::Normalize((ball.Pos() - opp.Pos()).dir());// +20 * Param::Math::PI / 180);
 }
+
+bool CAdvance::canScore(const CVisionModule* pVision, const int vecNumber, const double radius, const double dir) {
+	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+
+	bool flag = true;
+	double x1 = me.X(), y1 = me.Y(), theta = dir;
+	if (Param::Field::MAX_PLAYER == 0)
+	{
+		double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
+		if (fabs(projection) > (Param::Field::GOAL_WIDTH) / 2) {
+			flag = false;
+		}
+	}
+	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+		if (!pVision->TheirPlayer(i).Valid()) continue;
+		auto enemy = pVision->TheirPlayer(i);
+		double x = enemy.X(), y = enemy.Y();
+		double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
+		double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
+
+		if (r < radius || fabs(projection) + 5 >(Param::Field::GOAL_WIDTH) / 2) {
+			flag = false;
+			break;
+		}
+	}
+	/*
+	char projection[100];
+	sprintf(projection, "%f", projection);
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(160, 230), projection, COLOR_YELLOW);
+	*/
+	CGeoLine ShootLine = CGeoLine(me.Pos(), me.Dir());
+	CGeoLine GoalLine = CGeoLine(theirLeft, theirRight);
+	CGeoSegment Goal = CGeoSegment(theirLeft, theirRight);
+	CGeoLineLineIntersection LineIntersection = CGeoLineLineIntersection(GoalLine, ShootLine);
+	if (LineIntersection.Intersectant() == 0)return false;
+	CGeoPoint Intersection = LineIntersection.IntersectPoint();
+	if (Goal.IsPointOnLineOnSegment(Intersection) == 0) flag = false;
+	/*
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("CanScore:" + to_string(flag)).c_str(), COLOR_YELLOW);
+	*/
+	return flag;
+
+}
+
 CPlayerCommand* CAdvance::execute(const CVisionModule* pVision)
 {
 	if( subTask() ){

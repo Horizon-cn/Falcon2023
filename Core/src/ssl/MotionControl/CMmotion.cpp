@@ -411,7 +411,7 @@ void compute_motion_1d_test(double x0, double v0, double v1,
         period = PERIOD_MOVE_Y;
     else
         period = PERIOD_MOVE_ROT;
-    if (pT == MOVE_X && fabs(x0) > 15.0)period *= 1.15;
+    if (pT == MOVE_X && fabs(x0) > 5.0)period *= 1.15;
 
     double v_max_dist = (v_max * v_max - v0 * v0) / (2 * a_max) + (v_max * v_max - v1 * v1) / (2 * d_max);
     // The Dist of Get the Max Vel
