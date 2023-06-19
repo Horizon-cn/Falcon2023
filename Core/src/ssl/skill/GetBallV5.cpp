@@ -43,7 +43,9 @@ namespace {
     const int maxFrared = 125;	//红外极大值
     const int MaxRotateCnt = 200;
     const int MaxLargeCnt = 100;
-
+    //lsf 6/19
+    const int DRIBBLE_DIST = 80;
+    bool get_ball_last_frame = false;
     // 开关量
     bool DEBUG_ENGINE = false;                          // 调试模式
     bool IS_DRIBBLE = false;                            // 吸球
@@ -61,6 +63,7 @@ namespace {
     double HEAD_LIMIT = 3;
 
     CGeoPoint theirCenter = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
+    CGeoPoint begin_dribble;
 }
 
 CGetBallV5::CGetBallV5()
@@ -153,15 +156,32 @@ void CGetBallV5::plan(const CVisionModule* pVision)
 
 
     }
-    
+    if (BallStatus::Instance()->getBallPossession(true, _executor) <= 0.3)
+        get_ball_last_frame = false;
+
+    if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3 && get_ball_last_frame == false)
+    {
+        get_ball_last_frame = true;
+        begin_dribble = CGeoPoint(me.X(), me.Y());
+    }
+    else if(BallStatus::Instance()->getBallPossession(true, _executor) > 0.3 && get_ball_last_frame == true && sqrt(pow(begin_dribble.x() - me.X(), 2) + pow(begin_dribble.y() - me.Y(), 2)) > DRIBBLE_DIST)
+        {
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -345), "KICK", COLOR_YELLOW);
+            KickStatus::Instance()->setBothKick(_executor, 0, 600);
+        }
+        
+
     char havemsg[100];
     if (checkOppHasBall(pVision)) { // 敌人拿到了球
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -245), "The opponent gets the ball", COLOR_YELLOW);
         const CVector opp2ball = (ball.Pos() - opp.Pos());
-        if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
+        if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) { //我拿到球了
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -225), "I get the ball", COLOR_YELLOW);
             getball_task.player.pos = me.Pos() + Utils::Polar2Vector(maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
             getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
         }
-        else {
+        else { //我没拿到球
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -225), "I don't get the ball", COLOR_YELLOW);
             getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, Utils::Normalize((ball.Pos() - opp.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
             getball_task.player.angle = (opp.Pos() - ball.Pos()).dir();
         }
@@ -169,6 +189,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         
     }
     else if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) { // 我已经拿到球了
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -225), "I get the ball", COLOR_YELLOW);
         if (fabs(me.Dir() - finalDir) < 0.03)
             getball_task.player.pos = ball.Pos();// me.Pos();
         else 
