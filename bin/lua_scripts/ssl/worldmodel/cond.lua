@@ -9,7 +9,7 @@ function ourBallPlace()
 end
 
 function theirBallPlace()
-	return vision:getCurrentRefereeMsg() == "TheirBallPlacement"
+	return vision:GetCurrentRefereeMsg() == "TheirBallPlacement"
 end
 
 
