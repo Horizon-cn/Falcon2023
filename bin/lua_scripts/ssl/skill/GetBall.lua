@@ -9,7 +9,7 @@ function GetBall(task)
 			mdir = task.dir
 		end
 
-		return CGetBall(runner, mdir)
+		return GetBall(runner, mdir)
 	end
 
 	matchPos = function()

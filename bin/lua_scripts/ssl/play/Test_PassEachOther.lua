@@ -3,7 +3,7 @@ local isRecord = false
 local pass_cnt = 0
 local anti_pos = 1
 local init_x = 350 -- 565 -- 300
-local max_speed = 25 -- 标定的时候0~127，测试球速时意义为预期踢出的球速(cm/s)
+local max_speed = 700 -- 标定的时候0~127，测试球速时意义为预期踢出的球速(cm/s)
 local getKickerNum = function()
 	if pass_cnt % 2 == 0 then
 		return "Goalie"
@@ -30,12 +30,12 @@ local getReceiverPos = function()
 	if pass_cnt % 2 == 0 then -- 415
 		return CGeoPoint:new_local(init_x, 220 * anti_pos) -- 定死，不随球移动
 	elseif pass_cnt % 2 == 1 then
-		return CGeoPoint:new_local(init_x, -220 * anti_pos)
+		return CGeoPoint:new_local(-init_x, -220 * anti_pos)
 	end
 end
 local getKickerPos = function()
 	local pos = getReceiverPos()
-	return CGeoPoint:new_local(pos:x(), -pos:y()) -- param.pitchLength/2 - 
+	return CGeoPoint:new_local(-pos:x(), -pos:y()) -- param.pitchLength/2 - 
 end
 local receive_dir = function(num)
 	return (player.pos(gRoleNum[getKickerNum()]) - player.pos(num)):dir()
@@ -83,6 +83,7 @@ firstState = "init",
 
 ["pass"] = {
 	switch = function ()
+		debugEngine:gui_debug_msg(getReceiverPos(), "here______")
 		if pass_power() == 0 then
 			pass_cnt = 0
 			return "getready"

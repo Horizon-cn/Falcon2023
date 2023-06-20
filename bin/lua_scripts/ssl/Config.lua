@@ -245,7 +245,7 @@ gTestPlayTable = {
 	"Test_PassNormal",
 	"Test_ReceivePass",
 	"Test_PassEachOther",
-	
+	"Test_StaticGetBall",
 	"Test_Advance",
 	"Test_GoSupport",
 	"Test_AdvanceV4",

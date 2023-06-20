@@ -16,13 +16,13 @@ firstState = "getball",
 			end
 		end,
 		--Receiver = task.getBall(),
-		Kicker = task.getBall(0),
+		Kicker = task.staticGetBall(0),
 		match    = ""
 },
 
 
 
-name = "Test_GetBall",
+name = "Test_StaticGetBall",
 applicable ={
 	exp = "a",
 	a = true
