@@ -119,7 +119,7 @@ firstState = "start",
   Breaker  = task.multiBack(4,3),
   Crosser  = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
-  match    = "[L][AS][MDBC]"
+  match    = "[L][A][S][MDBC]"
 },
 
 ["temp"] = {
@@ -136,7 +136,7 @@ firstState = "start",
   Breaker  = task.multiBack(4,3),
   Crosser  = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
-  match    = "[L][AS][MDBC]"
+  match    = "[L][A][S][MDBC]"
 },
 
 
@@ -155,7 +155,7 @@ firstState = "start",
   Breaker  = task.multiBack(4,3),
   Crosser  = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
-  match    = "[L][AS][MDBC]"
+  match    = "[L][A][S][MDBC]"
 },
 
 ["receive"] = {

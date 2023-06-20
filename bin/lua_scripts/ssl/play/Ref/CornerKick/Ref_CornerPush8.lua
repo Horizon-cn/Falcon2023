@@ -22,7 +22,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match = "{A}{LM}{SDBC}"
+    match = "{A}{SDBC}{LM}"
   },
 
   ["toBall"] = {
@@ -39,7 +39,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match = "{A}{LM}{SDBC}"
+    match = "{A}{SDBC}{LM}"
   },
 
   ["leaveBall"] = {
@@ -56,7 +56,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match = "{A}{LM}{SDBC}"
+    match = "{A}{SDBC}{LM}"
   },
 
   name = "Ref_CornerPush8",

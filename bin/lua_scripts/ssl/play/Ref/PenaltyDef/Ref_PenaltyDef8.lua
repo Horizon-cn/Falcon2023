@@ -15,7 +15,7 @@ firstState = "init",
 	Breaker = task.goCmuRush(CGeoPoint:new_local(300,-225),_,_,flag.allow_dss),
 	Engine = task.goCmuRush(CGeoPoint:new_local(300,175),_,_,flag.allow_dss),
 	Goalie   = task.goalieNew("penalty"),
-	match = "{LACDMBE}"
+	match = "{CD}{AB}{LME}"
 },
 
 name = "Ref_PenaltyDef8",
