@@ -36,7 +36,16 @@ private:
         JUSTCHIPPASS,
         BREAKSHOOT,
         PUSHOUT,
-        BREAKPASS
+        BREAKPASS,
+        BLOCK
+    };
+    enum {
+        DefenceArea = 0,
+        SideArea,
+        CornerArea,
+        KICKArea,
+        CanNOTBreakArea,
+        CenterArea
     };
     int _lastCycle;
     int _state;
@@ -49,6 +58,8 @@ private:
     int NumberOfSupport;/* Gpu??????????????? */
     int NowIsShoot;
     int NumOfOurPlayer;
+
+    int MeIsInWhichArea;
     /**********************************************************
     * Description: ?????§Ò? ???????ini??????????????
     *              ?????????????
@@ -82,13 +93,14 @@ private:
     * Author: ?????
     * Created Date: 2022/10/10
     ***********************************************************/
-    const CGeoLine GOATLINE = CGeoLine(CGeoPoint(600, -60), CGeoPoint(600, 60));
-    const CGeoPoint GOATPoint1 = CGeoPoint(600, 50);
-    const CGeoPoint GOATPoint2 = CGeoPoint(600, -50);
+    const CGeoLine GOATLINE = CGeoLine(CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2), CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2));
+    const CGeoPoint GOATPoint1 = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 - 10);
+    const CGeoPoint GOATPoint2 = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + 10);
     CGeoPoint theirLeft = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
     CGeoPoint theirRight = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
     CGeoPoint theirCenter = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
     CGeoPoint ourGoal = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
+
 
     CGeoPoint SupportPoint[6];
 
@@ -123,6 +135,7 @@ private:
     bool JudgeIsMeSupport(const CVisionModule* pVision, int vecNumber);
     bool JudgePassMeIsBeBlocked(const CVisionModule *pVision, int vecNumber);
     bool AdJudgeBreakCanDo(const CVisionModule *pVision, int vecNumber, CGeoPoint TargetPoint);
+    int InWhichArea(const CVisionModule* pVision, int vecNumber);
     /**********************************************************
     * Description: ???§Ý??§Ø??????????????????????§Ø?
     * Author: ?????
@@ -141,7 +154,7 @@ private:
     bool isOppFaceOurDoor(const CVisionModule* pVision, double angle);
     bool checkTheyCanShoot(const CVisionModule* pVision, int vecNumber);
 
-
+    bool WeNeedBlockTheBall(const CVisionModule* pVision, const int vecNumber);
     bool OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber);
 
     double generateOppIsNearThanMeDir(const CVisionModule* pVision, const int vecNumber);

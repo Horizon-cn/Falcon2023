@@ -153,7 +153,10 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), deltaTheta, COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -200), deltaBall, COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -150), velmsg, COLOR_YELLOW);
-
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -300), "IsMeHaveBall", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -250), "Delta Theta", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -200), "Delta Mod", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -150), "Ball Vel", COLOR_YELLOW);
 
     }
     if (BallStatus::Instance()->getBallPossession(true, _executor) <= 0.3)
@@ -167,11 +170,11 @@ void CGetBallV5::plan(const CVisionModule* pVision)
     else if(BallStatus::Instance()->getBallPossession(true, _executor) > 0.3 && get_ball_last_frame == true && sqrt(pow(begin_dribble.x() - me.X(), 2) + pow(begin_dribble.y() - me.Y(), 2)) > DRIBBLE_DIST)
         {
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -345), "KICK", COLOR_YELLOW);
-            KickStatus::Instance()->setBothKick(_executor, 0, 600);
+            //KickStatus::Instance()->setBothKick(_executor, 0, 600);
+            // 防止过度带球可能需要加上
         }
         
 
-    char havemsg[100];
     if (checkOppHasBall(pVision)) { // 敌人拿到了球
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -245), "The opponent gets the ball", COLOR_YELLOW);
         const CVector opp2ball = (ball.Pos() - opp.Pos());
@@ -215,7 +218,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         getball_task.player.angle = finalDir;
         getball_task.player.needdribble = !IS_DRIBBLE;
 
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-250, 0), havemsg, COLOR_YELLOW);
+
     }
     else if (ball.Vel().mod() > 30) { // 动态状态下
         
@@ -289,7 +292,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             getball_task.player.max_rot_acceleration = 3 * slowfactor;
             getball_task.player.max_deceleration = 3 * slowfactor;
         }
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-250, 0), havemsg, COLOR_YELLOW);
+
 
     }
     // 调用底层控制
@@ -590,7 +593,9 @@ bool CGetBallV5::checkOppHasBall(const CVisionModule* pVision) {
     CVector opponent2ball = ball.Pos() - opponent.Pos();
     double opponent2ball_diff = fabs(Utils::Normalize(opponent2ball.dir() - opponent.Dir()));
     double judgeDist = OPP_HAS_BALL_DIST;
-    if (opponent2ball.mod() < judgeDist && opponent2ball_diff < Param::Math::PI * 16 / 180)
+    double Dirthreshold = 16.0;
+
+    if (opponent2ball.mod() < judgeDist && opponent2ball_diff < Param::Math::PI * Dirthreshold / 180)
         return true; // take opponent's direction into consideration.If direction not towards the ball,ignore it
     else
         return false;
