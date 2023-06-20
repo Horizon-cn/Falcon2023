@@ -11,11 +11,11 @@ gPlayTable.CreatePlay{
 
   ["start"] = {
     switch = function ()
-      if bufcnt(player.toTargetDist("Assister") and player.toTargetDist("Middle") < 20 , 10, 180) then
+      if bufcnt(player.toTargetDist("Assister") < 20 and player.toTargetDist("Special") < 20 , 10, 180) then
         return "toBall"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),--4
+    Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),--4
     Leader   = task.marking("First"),
     Middle   = task.marking("Second"),
     Special  = task.multiBack(4,1),
@@ -79,7 +79,7 @@ gPlayTable.CreatePlay{
 
 ["shootBall"] = {
     switch = function ()
-      if bufcnt(player.kickBall("Special"), 3, 180) then--
+      if bufcnt(player.kickBall("Special"), 3, 100) then--
         return "exit"
       end
     end,
