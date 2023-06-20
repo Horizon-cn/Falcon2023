@@ -136,7 +136,6 @@ function passToPos(p, c)
 	return {mexe, mpos, kick.flat, idir, pre.middle, ipower, cp.full(), flag.nothing}
 end
 
-
 function chipPass(p, c, f, anti)
 	local idir
 	local ipower
