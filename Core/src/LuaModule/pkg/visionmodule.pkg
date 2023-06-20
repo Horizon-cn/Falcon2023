@@ -17,6 +17,7 @@ class CVisionModule{
 	const BallVisionT& Ball(int cycle) const;
 	void SetPlayerCommand(int num, const CPlayerCommand* pCmd);
 	const GameState& gameState() const;
+	const GameState& next_gameState() const;
 	int Cycle() const;
 	int LastCycle() const;
 	int Side() const;
