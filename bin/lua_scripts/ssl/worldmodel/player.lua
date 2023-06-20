@@ -181,11 +181,12 @@ function toShootOrRobot(role1)
 		else
 			faceDir = (pos(role1) - pos(role2)):dir()
 		end
-		if math.abs(Utils.Normalize(shootDir - faceDir)) > math.pi * 65 / 180 then
-			return faceDir
-		else
-			return shootDir
-		end
+		return faceDir
+		--if math.abs(Utils.Normalize(shootDir - faceDir)) > math.pi * 65 / 180 then
+		--	return faceDir
+		--else
+		--	return shootDir
+		--end
 	end
 end
 

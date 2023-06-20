@@ -299,6 +299,14 @@ void CAdvance::plan(const CVisionModule* pVision)
 			}
 			else {
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick is NOT DirOK ", COLOR_ORANGE);
+
+				CGeoPoint TargetUp = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + 5);
+				CGeoPoint TargetDown = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 - 5);
+				double thetaUp = (TargetUp - ball.Pos()).dir();
+				double thetaDown = (TargetDown - ball.Pos()).dir();
+				if (me.Dir() < thetaUp) KickorPassDir = thetaDown;
+				else if (me.Dir() > thetaDown)KickorPassDir = thetaUp;
+
 				setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 			}
 		}
