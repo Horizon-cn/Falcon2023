@@ -21,7 +21,7 @@ switch = function()
       if ball.toPointDist(ball.placementPos())<=400  then
         return "beginning2"
       else 
-        return "beginning1"
+        return "beginning2"
       end
     end,
    -- Leader   = GET_BALL(),
@@ -138,7 +138,7 @@ switch = function()
 
 ["place2"] = {
 switch = function()
-  if cond.isGameOn() and cond.theirBallPlace() then
+  if cond.theirBallPlace() then
    return "exit"
   end
 end,
