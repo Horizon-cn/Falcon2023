@@ -60,7 +60,7 @@ gPlayTable.CreatePlay{
     match    = "{A}{SDBC}{LM}"
   },
 
-  name = "Ref_BackPush8",
+  name = "Ref_BackPush_normal",
   applicable = {
     exp = "a",
     a   = true

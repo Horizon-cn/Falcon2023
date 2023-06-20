@@ -182,7 +182,7 @@ end,
 	Breaker  = task.multiBack(3,1),
     Crosser  = task.multiBack(3,2),
 	Goalie   = task.goalieNew(),
-	match    = "[ADLSMBC]"
+	match    = "[DL][M][A][S][BC]"
 },
 
 ["attacker1"] = {
@@ -194,7 +194,7 @@ end,
 	Breaker  = task.multiBack(3,1),
     Crosser  = task.multiBack(3,2),
 	Goalie   = task.goalieNew(),
-	match    = "[ADLSMBC]"
+	match    = "[DL][M][A][S][BC]"
 },
 
 ["attacker2"] = {
@@ -206,7 +206,7 @@ end,
 	Breaker  = task.multiBack(3,1),
     Crosser  = task.multiBack(3,2),
 	Goalie   = task.goalieNew(),
-	match    = "[ADLSMBC]"
+	match    = "[DL][M][A][S][BC]"
 },
 
 ["attacker3"] = {
@@ -218,7 +218,7 @@ end,
 	Breaker  = task.multiBack(3,1),
     Crosser  = task.multiBack(3,2),
 	Goalie   = task.goalieNew(),
-	match    = "[ALSMDBC]"
+	match    = "[BC][L][AD][SM]"
 },
 
 ["attacker4"] = {
@@ -230,7 +230,7 @@ end,
 	Breaker  = task.multiBack(3,1),
     Crosser  = task.multiBack(3,2),
 	Goalie   = task.goalieNew(),
-	match    = "[ALSMDBC]"
+	match    = "[BC][L][A][DSM]"
 },
 
 ["attacker5"] = {
@@ -242,7 +242,7 @@ end,
 	Breaker  = task.multiBack(3,1),
     Crosser  = task.multiBack(3,2),
 	Goalie   = task.goalieNew(),
-	match    = "[ALSMDBC]"
+	match    = "[BC][L][A][DSM]"
 },
 
 ["attacker6"] = {
@@ -254,7 +254,7 @@ end,
 	Breaker  = task.multiBack(3,1),
     Crosser  = task.multiBack(3,2),
 	Goalie   = task.goalieNew(),
-	match    = "[ALSMDBC]"
+	match    = "[BC][L][A][DSM]"
 },
 
 name = "Ref1_Stop4CornerDef",

@@ -25,7 +25,7 @@ firstState = "PureDefence",
     match = "[SDBC][LMA]"
 },
 
-name = "NormalPlayPureDefence8",
+name = "NormalPlay",
 applicable ={
 	exp = "a",
 	a = true

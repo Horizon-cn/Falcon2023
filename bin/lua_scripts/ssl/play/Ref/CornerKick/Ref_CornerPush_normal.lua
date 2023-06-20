@@ -15,14 +15,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.markingFront("First"),
-    Leader   = task.markingFront("Second"),
+    Leader   = task.marking("First"),
+    Middle   = task.marking("Second"),
     Special  = task.multiBack(4,1),
     Defender = task.multiBack(4,2),
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match    = "{A}{SDBC}{LM}"
+    match = "{A}{SDBC}{LM}"
   },
 
   ["toBall"] = {
@@ -32,14 +32,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(ball.pos(),_,_,flag.allow_dss),
-    Middle   = task.markingFront("First"),
-    Leader   = task.markingFront("Second"),
+    Leader   = task.marking("First"),
+    Middle   = task.marking("Second"),
     Special  = task.multiBack(4,1),
     Defender = task.multiBack(4,2),
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match    = "{A}{SDBC}{LM}"
+    match = "{A}{SDBC}{LM}"
   },
 
   ["leaveBall"] = {
@@ -48,19 +48,18 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.chaseNew(),
-    --Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.markingFront("First"),
-    Leader   = task.markingFront("Second"),
+    Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
+    Leader   = task.marking("First"),
+    Middle   = task.marking("Second"),
     Special  = task.multiBack(4,1),
     Defender = task.multiBack(4,2),
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match    = "{A}{SDBC}{LM}"
+    match = "{A}{SDBC}{LM}"
   },
 
-  name = "Ref_BackPush8",
+  name = "Ref_CornerPush_normal",
   applicable = {
     exp = "a",
     a   = true

@@ -30,9 +30,9 @@ firstState = "start",
   Leader   = task.leftBack(),
   Assister = task.rightBack(),
 	Breaker  = task.multiBack(3,1),
-    Crosser  = task.multiBack(3,2),
+  Crosser  = task.multiBack(3,2),
   Goalie   = task.goalieNew(),
-  match    = "[LA][MSD][BC]"
+  match    = "[LA][BC][S][MD]"
 },
 
 name = "Ref1_StopV3",

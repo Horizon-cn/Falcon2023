@@ -15,14 +15,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.markingFront("First"),
-    Leader   = task.markingFront("Second"),
-    Special  = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Middle   = task.marking("First"),
+    Leader   = task.marking("Second"),
+    Special  = task.marking("Third"),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "{A}{SDBC}{LM}"
+    match    = "{A}{DBC}{LSM}"
   },
 
   ["toBall"] = {
@@ -32,14 +32,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(ball.pos(),_,_,flag.allow_dss),
-    Middle   = task.markingFront("First"),
-    Leader   = task.markingFront("Second"),
-    Special  = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Middle   = task.marking("First"),
+    Leader   = task.marking("Second"),
+    Special  = task.marking("Third"),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "{A}{SDBC}{LM}"
+    match    = "{A}{DBC}{LSM}"
   },
 
   ["leaveBall"] = {
@@ -50,17 +50,17 @@ gPlayTable.CreatePlay{
     end,
     Assister = task.chaseNew(),
     --Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.markingFront("First"),
-    Leader   = task.markingFront("Second"),
-    Special  = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Middle   = task.marking("First"),
+    Leader   = task.marking("Second"),
+    Special  = task.marking("Third"),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "{A}{SDBC}{LM}"
+    match    = "{A}{DBC}{LSM}"
   },
 
-  name = "Ref_BackPush8",
+  name = "Ref_FrontPush_normal",
   applicable = {
     exp = "a",
     a   = true

@@ -249,6 +249,29 @@ extern "C" int Skill_Break(lua_State * L)
 
 	return 0;
 }
+extern "C" int Skill_SpeedTest(lua_State * L)
+{
+	TaskT playerTask;
+	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
+	playerTask.executor = runner;
+	double x1 = LuaModule::Instance()->GetNumberArgument(2, NULL);
+	double y1 = LuaModule::Instance()->GetNumberArgument(3, NULL);
+	playerTask.player.pos = CGeoPoint(x1, y1);
+	double x2 = LuaModule::Instance()->GetNumberArgument(4, NULL);
+	double y2 = LuaModule::Instance()->GetNumberArgument(5, NULL);
+	playerTask.ball.pos = CGeoPoint(x2, y2);
+	double v1 = LuaModule::Instance()->GetNumberArgument(6, NULL);
+	playerTask.player.speed_x = v1;
+	double v2 = LuaModule::Instance()->GetNumberArgument(7, NULL);
+	playerTask.player.speed_y = v2;
+	double v_step = LuaModule::Instance()->GetNumberArgument(8, NULL);
+	playerTask.player.rotvel = v_step;
+
+	CPlayerTask* pTask = TaskFactoryV2::Instance()->SpeedTest(playerTask);
+	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
+
+	return 0;
+}
 extern "C" int Skill_SmartGotoPoint(lua_State * L)
 {
 	TaskT playerTask;
@@ -1254,6 +1277,7 @@ luaDef GUIGlue[] =
 {
 	//Œª÷√“∆∂Ø
 	{"CGoPIDCircle",		Skill_GoPIDCircle},
+	{"CSpeedTest",			Skill_SpeedTest},
 	{"CPenaltyKickV2",      Skill_PenaltyKickV2},
 	{"SimpleGotoPos",		Skill_SimpleGotoPoint},
 	{"CGoCmuRush",			Skill_GoCmuRush},
