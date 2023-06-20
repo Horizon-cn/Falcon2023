@@ -174,15 +174,15 @@ switch = function()
 end,
 
 ["beginning"] = {
-	Assister   = task.goCmuRush(STOP_POS1, player.toBallDir, _, flag.dodge_ball),
-	Special  = task.marking("First"),
-	Middle   = task.defendHead(),
-	Defender = task.leftBack(),
-	Leader   = task.rightBack(),
-	Breaker  = task.multiBack(3,1),
-    Crosser  = task.multiBack(3,2),
-	Goalie   = task.goalieNew(),
-	match    = "[DL][M][A][S][BC]"
+	Leader = task.defendMiddle(),
+  	Assister = task.defendHead(),
+ 	Special = task.markingFront("First"),
+  	Breaker = task.markingFront("Second"),
+  	Crosser = task.markingFront("Third"),
+  	Middle = task.leftBack(),
+  	Defender = task.rightBack(),
+ 	Goalie = task.goalieNew(),
+	match    = "[MD][AL][SBC]"
 },
 
 ["attacker1"] = {
