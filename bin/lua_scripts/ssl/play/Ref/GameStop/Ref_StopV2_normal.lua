@@ -467,7 +467,7 @@ firstState = "start",
   match    = "[AMDLSBC]"
 },
 
-name = "Ref1_StopV2",
+name = "Ref_StopV2_normal",
 applicable = {
   exp = "a",
   a = true

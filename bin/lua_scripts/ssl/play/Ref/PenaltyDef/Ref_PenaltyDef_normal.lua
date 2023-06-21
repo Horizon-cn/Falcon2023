@@ -18,7 +18,7 @@ firstState = "init",
 	match = "{CD}{AB}{LME}"
 },
 
-name = "Ref_PenaltyDef8",
+name = "Ref_PenaltyDef_normal",
 applicable ={
 	exp = "a",
 	a = true

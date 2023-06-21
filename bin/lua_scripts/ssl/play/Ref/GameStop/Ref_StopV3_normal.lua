@@ -35,7 +35,7 @@ firstState = "start",
   match    = "[LA][BC][S][MD]"
 },
 
-name = "Ref1_StopV3",
+name = "Ref_StopV3_normal",
 applicable = {
   exp = "a",
   a = true

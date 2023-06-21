@@ -20,6 +20,7 @@
 #include "StopRobot.h"
 #include "Speed.h"
 #include "OpenSpeed.h"
+#include "SpeedTest.h"
 #include "InterceptBallV3.h"
 #include "CrazyPush.h"
 #include "CircleAndPass.h"
@@ -104,7 +105,10 @@ CPlayerTask* CTaskFactoryV2::Break(const TaskT& task)
 {
 	return MakeTask<CBreak>(task);
 }
-
+CPlayerTask* CTaskFactoryV2::SpeedTest(const TaskT& task)
+{
+	return MakeTask<CSpeedTest>(task);
+}
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -369,6 +373,21 @@ namespace PlayerRole {
 
 		return TaskFactoryV2::Instance()->Break(playerTask);
 	}
+	CPlayerTask* makeItSpeedTest(const int num, const CGeoPoint& p1, const CGeoPoint& p2, double v1, double v2, double v_step)
+	{
+		TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.pos = p1;
+		playerTask.ball.pos = p2;
+		playerTask.player.speed_x = v1;
+		playerTask.player.speed_y = v2;
+		playerTask.player.rotvel = v_step;
+
+		CPlayerTask* pTask = TaskFactoryV2::Instance()->SpeedTest(playerTask);
+		TaskMediator::Instance()->setPlayerTask(num, pTask, 1);
+
+		return 0;
+	}
 
 
 	CPlayerTask* makeItStop(const int num, const int flags)
@@ -439,13 +458,6 @@ namespace PlayerRole {
 		playerTask.player.vel = vel;
 		playerTask.player.rotvel = rotvel;
 		playerTask.player.flag = flags;
-		if (vision->GetCurrentRefereeMsg() == "ourBallPlacement" && (playerTask.player.pos - vision->OurPlayer(playerTask.executor).Pos()).mod() < paramManager->PlACEBALL_CLOSE_DISTANCE) {
-			playerTask.player.max_speed = paramManager->PlACEBALL_SPEED;
-			playerTask.player.max_rot_speed = paramManager->PlACEBALL_ROT_SPEED;
-			playerTask.player.max_acceleration = paramManager->PlACEBALL_ACCELERATION;
-			playerTask.player.max_deceleration = paramManager->PlACEBALL_DECELERATION;
-			playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
-		}
 		return TaskFactoryV2::Instance()->GotoPosition(playerTask);
 	}
 

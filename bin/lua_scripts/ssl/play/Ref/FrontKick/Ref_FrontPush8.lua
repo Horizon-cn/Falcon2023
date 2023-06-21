@@ -22,7 +22,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "{A}{LSM}{DBC}"
+    match    = "{A}{DBC}{LSM}"
   },
 
   ["toBall"] = {
@@ -39,7 +39,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "{A}{LSM}{DBC}"
+    match    = "{A}{DBC}{LSM}"
   },
 
   ["leaveBall"] = {
@@ -57,7 +57,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "{A}{LSM}{DBC}"
+    match    = "{A}{DBC}{LSM}"
   },
 
   name = "Ref_FrontPush8",
