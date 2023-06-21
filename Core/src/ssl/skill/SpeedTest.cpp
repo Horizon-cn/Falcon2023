@@ -1,7 +1,16 @@
+/*
+测试GotoPosition的处理速度与实车速度的关系
+目前采用僵硬移植，故测试前请保证模拟的是GotoPosition的最新代码
+
+其实更合理的处理方式是，用lua完成来回跑与提速，原始数据记录直接放进GotoPosition，并另用脚本对原始数据记录进行加工
+
+目前bug：初始速度少一轮记录
+*/
+
 #include "SpeedTest.h"
 #include <QDir>
 #include <qdatetime.h>
-
+//temp GotoPosition的头文件
 #include "GDebugEngine.h"
 #include "Vision/VisionModule.h"
 #include "skill/Factory.h"
@@ -21,7 +30,7 @@ namespace {
 	CGeoPoint debug_pos2(-100, -100);
 	QDir dir("../data/speed_test/");
 }
-
+//temp Gotoposition的namespace
 namespace {
 	/// 调试开关
 	bool DRAW_TARGET = false;
@@ -82,7 +91,7 @@ CSpeedTest::CSpeedTest() :_state(STATE_INIT), velocityCounter(1)
 	_file2 = new QFile(name2);
 	_out1 = new QTextStream(_file1);
 	_out2 = new QTextStream(_file2);
-
+	//temp GotoPosition的初始化
 	DRAW_TARGET = paramManager->DRAW_TARGET;
 	RECORD_COMMAND = paramManager->RECORD_COMMAND;
 	NOT_MOVE = paramManager->NOT_MOVE;
@@ -207,9 +216,9 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 	playerTask.ball.Sender = 0;
 	playerTask.player.max_speed = _v;
 
-	GDebugEngine::Instance()->gui_debug_msg(debug_pos1, to_string(_v).c_str());//todo 目前只能显示，不能控制速度
+	GDebugEngine::Instance()->gui_debug_msg(debug_pos1, ("speed test: " + to_string(_v)).c_str());
 	CPlayerTask* pTask;
-	CVector localVel;
+	RET_VEL ret;
 	switch (_state)
 	{
 	case STATE_GET_READY:
@@ -220,18 +229,21 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 		playerTask.player.pos = pos2;
 		pTask = TaskFactoryV2::Instance()->GotoPosition(playerTask);
 		reset(playerTask);
-		localVel = simulate_local(pVision);
-		(*_out1) << _v << " " << localVel.x() << " " << localVel.y() << " " << pVision->Cycle() << " " << me.Pos().x() << " " << me.Pos().y() << endl;
+		ret = simulate_local(pVision);
+		(*_out1) << _v << " " << pVision->Cycle() << " " << me.Pos().x() << " " << me.Pos().y() << " " <<
+			ret.globalVel.x() << " " << ret.globalVel.y() << " " << ret.localVel.x() << " " << ret.localVel.y() << " " << endl;
 		break;
 	case STATE_GOTO_2:
 		playerTask.player.pos = pos1;
 		pTask = TaskFactoryV2::Instance()->GotoPosition(playerTask);
 		reset(playerTask);
-		localVel = simulate_local(pVision);
-		(*_out1) << _v << " " << localVel.x() << " " << localVel.y() << " " << pVision->Cycle() << " " << me.Pos().x() << " " << me.Pos().y() << endl;
+		ret = simulate_local(pVision);
+		(*_out1) << _v << " " << pVision->Cycle() << " " << me.Pos().x() << " " << me.Pos().y() << " " <<
+			ret.globalVel.x() << " " << ret.globalVel.y() << " " << ret.localVel.x() << " " << ret.localVel.y() << " " << endl;
 		break;
 	case STATE_STOP:
 		pTask = PlayerRole::makeItStop(num);
+		GDebugEngine::Instance()->gui_debug_msg(debug_pos2, "speed test finish!");
 		break;
 	case STATE_FAIL:
 		pTask = PlayerRole::makeItStop(num);
@@ -250,7 +262,7 @@ CPlayerCommand* CSpeedTest::execute(const CVisionModule* pVision)
 	return NULL;
 }
 
-CVector CSpeedTest::simulate_local(const CVisionModule* pVision)
+CSpeedTest::RET_VEL CSpeedTest::simulate_local(const CVisionModule* pVision)
 {
 	/************************************************************************/
 	/* 任务参数解析                                                         */
@@ -353,7 +365,8 @@ CVector CSpeedTest::simulate_local(const CVisionModule* pVision)
 	}
 	// 车坐标系里面的速度
 	CVector localVel = (globalVel * alpha).rotate(-self.Dir());
-	return localVel;
+
+	return RET_VEL(globalVel, localVel);
 }
 
 PlayerCapabilityT CSpeedTest::setCapability(const CVisionModule* pVision) {

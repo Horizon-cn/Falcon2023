@@ -32,7 +32,12 @@ protected:
 	virtual void toStream(std::ostream& os) const { os << "Skill: CSpeedTest\n"; }
 private:
 	//模拟GotoPosition，获取其localVel。临时方法
-	CVector simulate_local(const CVisionModule* pVision);
+	struct RET_VEL {
+		RET_VEL() {};
+		RET_VEL(CVector globalVel, CVector localVel) :globalVel(globalVel), localVel(localVel) {}
+		CVector globalVel, localVel;
+	};
+	RET_VEL simulate_local(const CVisionModule* pVision);
 	PlayerCapabilityT setCapability(const CVisionModule* pVision);
 
 	enum State {
