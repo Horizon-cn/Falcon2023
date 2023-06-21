@@ -34,7 +34,7 @@ gPlayTable.CreatePlay{
         return "kickBall"
       end
     end,
-    Assister = task.staticGetBall(ball.pos()),
+    Assister = task.staticGetBall(RECEIVE_POS),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
     Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
@@ -68,7 +68,7 @@ gPlayTable.CreatePlay{
         return "shootBall"
       end
     end,
-    Assister = task.markingFront("Third"),
+    Assister = task.defendHead(),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
     Special  = task.receive(ball.pos()),
