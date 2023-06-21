@@ -5,7 +5,7 @@ end
 --【接球点】可根据实车情况进行调整
 local RECEIVE_POS = ball.antiYPos(CGeoPoint:new_local(0, 100))
 --【传球力度】可根据实车情况进行调整
-local kickPower = 400
+local kickPower = 600
 
 gPlayTable.CreatePlay{
 
@@ -34,7 +34,7 @@ gPlayTable.CreatePlay{
         return "kickBall"
       end
     end,
-    Assister = task.staticGetBall(ball.pos()),
+    Assister = task.staticGetBall(RECEIVE_POS),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
     Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
@@ -76,7 +76,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "{D}{S}{B}{L}{C}{AM}"
   },
 
 ["shootBall"] = {
@@ -93,7 +93,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "{D}{S}{B}{L}{C}{AM}"
   },
 
   name = "Ref_FrontPush_normal",
