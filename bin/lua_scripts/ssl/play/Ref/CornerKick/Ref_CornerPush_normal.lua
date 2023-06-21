@@ -2,8 +2,10 @@ local WAIT_BALL_POS   = function ()
   return ball.pos() + Utils.Polar2Vector(50, ball.syntY(0.5 * math.pi))
 end
 
-local RECEIVE_POS = CGeoPoint:new_local(100, 100)
-local kickPower = 500
+--【接球点】可根据实车情况进行调整
+local RECEIVE_POS = ball.syntYPos(CGeoPoint:new_local(200, 100))
+--【传球力度】可根据实车情况进行调整
+local kickPower = 300
 
 gPlayTable.CreatePlay{
 
@@ -15,15 +17,15 @@ gPlayTable.CreatePlay{
         return "toBall"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),--4
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
-    Special  = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
+    Leader   = task.markingFront("First"),
+    Middle   = task.markingFront("Second"),
+    Special  = task.multiBack(3,1),
+    Defender = task.multiBack(3,2),
+    Breaker  = task.multiBack(3,3),
+    Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{LCM}"
+    match = "{S}{A}{D}{C}{B}{LM}"
   },
 
   ["toBall"] = {
@@ -32,15 +34,15 @@ gPlayTable.CreatePlay{
         return "kickBall"
       end
     end,
-    Assister = task.goCmuRush(ball.pos(),_,_,flag.allow_dss),
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
-    Special  = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss),--tiao
-    Defender = task.multiBack(3,1),
-    Breaker  = task.multiBack(3,2),
-    Crosser  = task.multiBack(3,3),
+    Assister = task.staticGetBall(ball.pos()),
+    Leader   = task.markingFront("First"),
+    Middle   = task.markingFront("Second"),
+    Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
+    Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{LCM}"
+    match = "{D}{A}{B}{S}{C}{LM}"
   },
 
   ["kickBall"] = {
@@ -50,14 +52,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.passToPos(RECEIVE_POS, kickPower),
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
-    Special  = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss),
-    Defender = task.multiBack(3,1),
-    Breaker  = task.multiBack(3,2),
-    Crosser  = task.multiBack(3,3),
+    Leader   = task.markingFront("First"),
+    Middle   = task.markingFront("Second"),
+    Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
+    Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{LCM}"
+    match = "{D}{A}{B}{S}{C}{LM}"
   },
 
   ["receiveBall"] = {
@@ -66,15 +68,15 @@ gPlayTable.CreatePlay{
         return "shootBall"
       end
     end,
-    Assister = task.marking("Third"),
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
-    Special  = task.receive(ball.pos()),--position
-    Defender = task.multiBack(3,1),
-    Breaker  = task.multiBack(3,2),
-    Crosser  = task.multiBack(3,3),
+    Assister = task.markingFront("Third"),
+    Leader   = task.markingFront("First"),
+    Middle   = task.markingFront("Second"),
+    Special  = task.receive(ball.pos()),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
+    Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{LCM}"
+    match = "{D}{A}{B}{S}{C}{LM}"
   },
 
 ["shootBall"] = {
@@ -83,15 +85,15 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.marking("Third"),
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
+    Assister = task.markingFront("Third"),
+    Leader   = task.markingFront("First"),
+    Middle   = task.markingFront("Second"),
     Special  = task.chaseNew(),
-    Defender = task.multiBack(3,1),
-    Breaker  = task.multiBack(3,2),
-    Crosser  = task.multiBack(3,3),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
+    Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{LCM}"
+    match = "{D}{A}{B}{S}{C}{LM}"
   },
 
   name = "Ref_CornerPush_normal",
