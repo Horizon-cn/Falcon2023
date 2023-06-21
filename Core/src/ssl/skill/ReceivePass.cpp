@@ -94,8 +94,9 @@ void CReceivePass::plan(const CVisionModule* pVision)
 	setState(new_state);
 	DribbleStatus::Instance()->setDribbleCommand(vecNumber,3);
 	if (GOTOPROJ == state()){
-		if (isBallMovingToMe){
+		if (ball.Vel().mod() > BalltoMeVel && isBallMovingToMe){
 			CGeoPoint receivePos=ballMoveingLine.projection(_mePos);
+			flags |= PlayerStatus::DRIBBLING;
 			setSubTask(PlayerRole::makeItGoto(vecNumber, receivePos, antiBallVelDir, flags, 0));
 		} 
 		else{
