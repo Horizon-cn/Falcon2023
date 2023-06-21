@@ -707,8 +707,8 @@ CGeoPoint CGetBallV3::GenerateLargeAnglePoint(const CVisionModule* pVision, cons
     {
         getBallDist = maxGetBallDist;
     }
-    CGeoPoint target = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(getBallDist, theta_Dir);
-    if (ball.Vel().mod() < 15) {
+    CGeoPoint target = ball.Pos() + Utils::Polar2Vector(getBallDist, theta_Dir);
+    
         CGeoLine JudgeLine1 = CGeoLine(ball.Pos(), finalDir);
         CGeoLine JudgeLine2 = CGeoLine(me.Pos(), target);
         CGeoLineLineIntersection LineIntersection = CGeoLineLineIntersection(JudgeLine1, JudgeLine2);
@@ -716,11 +716,9 @@ CGeoPoint CGetBallV3::GenerateLargeAnglePoint(const CVisionModule* pVision, cons
             CGeoPoint Intersection = LineIntersection.IntersectPoint();
             CGeoSegment JudgeSegment = CGeoSegment(me.Pos(), target);
             if (JudgeSegment.IsPointOnLineOnSegment(Intersection)) {
-                target = Ball_Predict_Pos(pVision) + Utils::Polar2Vector(getBallDist, Utils::Normalize(finalDir + Param::Math::PI));
+                target = ball.Pos() + Utils::Polar2Vector(getBallDist, Utils::Normalize(finalDir + Param::Math::PI));
             }
         }
-    }
-
     //cout << "GETBALLDIST:   " << getBallDist << "MOD:   " << (target - me.Pos()).mod() << endl;
     
     bool DEBUG_ENGINE = debug;

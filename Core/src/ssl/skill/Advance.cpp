@@ -1299,18 +1299,25 @@ bool CAdvance::canScore(const CVisionModule* pVision, const int vecNumber, const
 	if (Param::Field::MAX_PLAYER == 0)
 	{
 		double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
-		if (fabs(projection) > (Param::Field::GOAL_WIDTH) / 2) {
+		if (fabs(projection) + 2 > (Param::Field::GOAL_WIDTH) / 2) {
 			flag = false;
 		}
+		
 	}
+
+	double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
+	if (fabs(projection) + 5 > (Param::Field::GOAL_WIDTH) / 2) {
+		flag = false;
+		return false;
+	}
+	
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
 		if (!pVision->TheirPlayer(i).Valid()) continue;
 		auto enemy = pVision->TheirPlayer(i);
 		double x = enemy.X(), y = enemy.Y();
 		double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
-		double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
 
-		if (r < radius || fabs(projection) + 5 >(Param::Field::GOAL_WIDTH) / 2) {
+		if (r < radius) {
 			flag = false;
 			break;
 		}
@@ -1337,7 +1344,7 @@ bool CAdvance::canScore(const CVisionModule* pVision, const int vecNumber, const
 bool CAdvance::WeNeedBlockTheBall(const CVisionModule* pVision, const int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const PlayerVisionT& opp = pVision->OurPlayer(opponentID);
-	if (fabs(Utils::Normalize((opp.Dir() - (opp.Pos() - ourGoal).dir()))) < 60 * Param::Math::PI / 180) {
+	if (fabs(Utils::Normalize((opp.Dir() - (opp.Pos() - ourGoal).dir()))) < 30 * Param::Math::PI / 180) {
 		return true;
 	}
 	else return false;
