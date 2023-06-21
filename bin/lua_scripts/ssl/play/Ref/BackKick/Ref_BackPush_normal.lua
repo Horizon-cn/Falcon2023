@@ -80,9 +80,9 @@ gPlayTable.CreatePlay{
     match = "{D}{A}{B}{S}{C}{LM}"
   },
 
-["shootBall"] = {
+["shootBall"] = {--如果special转大半圈还找不到射门角度就会弃球而逃
     switch = function ()
-      if bufcnt(player.kickBall("Special"), 3, 180) then--
+      if bufcnt(player.kickBall("Special"), 3, 1800) then--
         return "exit"
       end
     end,

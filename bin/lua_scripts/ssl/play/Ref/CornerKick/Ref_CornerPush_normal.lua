@@ -64,7 +64,7 @@ gPlayTable.CreatePlay{
 
   ["receiveBall"] = {
     switch = function ()
-      if bufcnt(player.toBallDist("Special")<15, 3, 180) then--
+      if bufcnt(player.toBallDist("Special")<5, 3, 180) then--
         return "shootBall"
       end
     end,
@@ -81,7 +81,7 @@ gPlayTable.CreatePlay{
 
 ["shootBall"] = {
     switch = function ()
-      if bufcnt(player.kickBall("Special"), 3, 100) then--
+      if bufcnt(player.kickBall("Special"), 3, 1800) then--
         return "exit"
       end
     end,
@@ -89,7 +89,7 @@ gPlayTable.CreatePlay{
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
     Special  = task.chaseNew(),
-    Defender = task.multiBack(2,1),
+    Defender = task.multiBack(1,1),
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),

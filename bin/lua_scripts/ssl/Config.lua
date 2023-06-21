@@ -12,7 +12,7 @@ gTestPlay = function ()
 		-- Test_Run6 测testrun
 		-- Test_play6ForTest测三车进攻
 	else
-		return "Test_AdvanceV4" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "Test_Goalie" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
