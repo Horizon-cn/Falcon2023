@@ -25,8 +25,8 @@ gSwitchNum = {
 -- 有0号在场门将就是0号，没有0号在场，看这里设置的号码
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
-	["Kicker"]   = {0},
-	["Goalie"]   = {1},
+	["Kicker"]   = {10},
+	["Goalie"]   = {11},
 	["Tier"]	 = {13},
 	["Receiver"] = {12}
 }
@@ -261,6 +261,7 @@ gTestPlayTable = {
 	"Test_PassNormal",
 	"Test_ReceivePass",
 	"Test_PassEachOther",
+	"Test_StaticGetBall",
 	"Test_Speed",
 	"Test_Advance",
 	"Test_GoSupport",
@@ -286,5 +287,6 @@ gTestPlayTable = {
 	"Test_play6ForTest",
 	"Test_DSS",
 	"Test_Run6",
-	"Test_play3"
+	"Test_play3",
+	"Test_NormalPass"
 }

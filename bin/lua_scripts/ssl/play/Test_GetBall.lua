@@ -20,27 +20,7 @@ firstState = "getball",
 		match    = ""
 },
 
-["chippass"] = {
-		switch = function ()
-			if player.kickBall("Receiver") then
-				return "receive"
-			end
-		end,
-		Receiver = task.passToPos(TargetPos, 450),
-		Goalie = task.goCmuRush(READY_POS),
-		match    = ""
-},
 
-["receive"] = {
-		switch = function ()
-			if true then
-				return "receive"
-			end
-		end,
-		Receiver = task.stop(),
-		Goalie = task.advance(),
-		match    = ""
-},
 
 name = "Test_GetBall",
 applicable ={

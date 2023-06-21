@@ -55,7 +55,7 @@ gPlayTable.CreatePlay{
 firstState = "LeftFront",
 
 ["LeftFront"] = {
-	switch = TEST,
+	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader", 0),
 	Powerhouse = task.support("Leader", 1),
@@ -64,7 +64,7 @@ firstState = "LeftFront",
     Hawk = task.leftBack(),
 	Middle = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[LS][APD][HM]"
+    match = "[L][SAPD][HM]"
 },
 
 ["LeftFrontOurBall"] = {

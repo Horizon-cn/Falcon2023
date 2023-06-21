@@ -458,13 +458,6 @@ namespace PlayerRole {
 		playerTask.player.vel = vel;
 		playerTask.player.rotvel = rotvel;
 		playerTask.player.flag = flags;
-		if (vision->GetCurrentRefereeMsg() == "ourBallPlacement" && (playerTask.player.pos - vision->OurPlayer(playerTask.executor).Pos()).mod() < paramManager->PlACEBALL_CLOSE_DISTANCE) {
-			playerTask.player.max_speed = paramManager->PlACEBALL_SPEED;
-			playerTask.player.max_rot_speed = paramManager->PlACEBALL_ROT_SPEED;
-			playerTask.player.max_acceleration = paramManager->PlACEBALL_ACCELERATION;
-			playerTask.player.max_deceleration = paramManager->PlACEBALL_DECELERATION;
-			playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
-		}
 		return TaskFactoryV2::Instance()->GotoPosition(playerTask);
 	}
 
