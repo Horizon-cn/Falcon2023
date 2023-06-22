@@ -65,10 +65,10 @@ void CProtectBall::plan(const CVisionModule* pVision)
 
         if (self2predictDist > 100)
             new_state = Approach_Ball;
-        else if (self2predictDist < 100)
-            new_state = Protect_Ball;
         else if (oppo2BallDist < 20)
             new_state = Defence;
+        else 
+            new_state = Protect_Ball;
       
         //break;
 
@@ -86,19 +86,19 @@ void CProtectBall::plan(const CVisionModule* pVision)
                 break;
             }
         case Approach_Ball:
-           if(oppo2BallDist<20&&advancer2BallDist>oppo2BallDist){
+           if(oppo2BallDist<10&&advancer2BallDist>oppo2BallDist){
                 if(verBos) cout<<"Approach_Ball-->Defence"<<endl;
                 new_state = Defence;
            }
            break;
         case Protect_Ball:
-            if(oppo2BallDist<20 ){
+            if(oppo2BallDist<10 ){
                 if(verBos) cout<<"Protect_Ball-->Defence"<<endl;
                 new_state = Defence;
             }
             break;
         case Defence:
-            if (oppo2BallDist > 100) {
+            if (oppo2BallDist > 50) {
 				if(verBos) cout<<"Defence-->Protect_Ball"<<endl;
 				new_state = Protect_Ball;
 			}
@@ -119,7 +119,6 @@ void CProtectBall::plan(const CVisionModule* pVision)
     }
 
     TaskT protectTask(task());
-    double SetAcc = 600 - ballSpeed;
 
     switch (state()){
     case Approach_Ball:
@@ -130,12 +129,11 @@ void CProtectBall::plan(const CVisionModule* pVision)
             protectTask.player.angle=approachBallDir;
             protectTask.player.vel=CVector(0,0);
             protectTask.player.rotvel=0;
-            protectTask.player.max_acceleration=SetAcc;
+            protectTask.player.max_acceleration=1000;
             protectTask.player.max_deceleration=1000;
 
             setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,200), "Approach Ball");
-            protectBallNum = TaskMediator::Instance()->ballProtecter();
         }
         break;
  
@@ -145,14 +143,14 @@ void CProtectBall::plan(const CVisionModule* pVision)
             CGeoPoint protectBallPos;
             protectBallPos = pVision->TheirPlayer(theirBestPlayer).Pos() + Utils::Polar2Vector(2*Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER, Utils::Normalize((ball.Pos()-pVision->TheirPlayer(theirBestPlayer).Pos()).dir()));
             double protectBallDir = Utils::Normalize((ball.Pos() - pVision->TheirPlayer(theirBestPlayer).Pos()).dir());
-            if (KickStatus::Instance()->getChipKickDist(advancer) == 0 && KickStatus::Instance()->getKickPower(advancer) == 0)
-                lastProtectBallPos = protectBallPos;
+            //if (KickStatus::Instance()->getChipKickDist(advancer) == 0 && KickStatus::Instance()->getKickPower(advancer) == 0)
+            //    lastProtectBallPos = protectBallPos;
             protectTask.player.pos=lastProtectBallPos;
             protectTask.player.angle=protectBallDir;
             protectTask.player.vel=CVector(0,0);
             protectTask.player.rotvel=0;
             //protectTask.executor = protectBallNum;
-            protectTask.player.max_acceleration=SetAcc;
+            protectTask.player.max_acceleration=500;
             protectTask.player.max_deceleration=1000;
             setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,200), "Protect Ball");
@@ -167,9 +165,9 @@ void CProtectBall::plan(const CVisionModule* pVision)
 			protectTask.player.angle=defenceDir;
 			protectTask.player.vel=CVector(0,0);
 			protectTask.player.rotvel=0;
-			protectTask.player.max_acceleration=600;
+			protectTask.player.max_acceleration=1000;
 			protectTask.player.max_deceleration=1000;
-            protectTask.executor = protectBallNum;
+            //protectTask.executor = protectBallNum;
 			setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,200), "Defence");
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 250), ("DefenceNUm:" + to_string(protectBallNum)).c_str(), COLOR_YELLOW);

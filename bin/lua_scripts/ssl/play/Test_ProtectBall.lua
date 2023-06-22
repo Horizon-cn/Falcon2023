@@ -16,7 +16,7 @@ firstState = "protectBall",
 	end,
 	Leader = task.advance(),
     Assister = task.protectBall(),
-    match = "{LA}"
+    match = "[L][A]"
 },
 
 name = "Test_ProtectBall",
