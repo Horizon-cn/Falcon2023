@@ -26,7 +26,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,3),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{S}{A}{D}{C}{B}{LM}"
+    match = "{D}{A}{SDBC}{LM}"
   },
 
   ["toBall"] = {
@@ -35,44 +35,27 @@ gPlayTable.CreatePlay{
         return "kickBall"
       end
     end,
-    Assister = task.staticGetBall(ball.pos()),
+    Assister = task.staticGetBall(RECEIVE_POS),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
-    Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
+    Special  = task.markingFront("Third"),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "{D}{A}{SDBC}{LM}"
   },
 
-  ["kickBall"] = {
+ ["kickBall"] = {
     switch = function ()
       if bufcnt(player.kickBall("Assister"), "fast", 180) then
-        return "receiveBall"
-      end
-    end,
-    Assister = task.passToPos(RECEIVE_POS, kickPower),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
-    Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
-    Defender = task.multiBack(2,1),
-    Breaker  = task.multiBack(2,2),
-    Crosser  = task.defendHead(),
-    Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
-  },
-
-  ["receiveBall"] = {
-    switch = function ()
-      if bufcnt(player.toBallDist("Special")<15, 3, 180) then--
         return "shootBall"
       end
     end,
-    Assister = task.markingFront("Third"),
+    Assister = task.chaseNew(),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
-    Special  = task.receive(ball.pos()),
+    Special  = task.slowGetBall(ball.pos()),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
@@ -80,9 +63,9 @@ gPlayTable.CreatePlay{
     match = "{D}{A}{B}{S}{C}{LM}"
   },
 
-["shootBall"] = {--如果special转大半圈还找不到射门角度就会弃球而逃
+["shootBall"] = {
     switch = function ()
-      if bufcnt(player.kickBall("Special"), 3, 1800) then--
+      if bufcnt(player.kickBall("Assister"), 3, 500) then--
         return "exit"
       end
     end,
@@ -94,10 +77,10 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "{D}{A}{SDBC}{LM}"
   },
 
-  name = "Ref_BackPush_normal",
+  name = "Ref_BackPush_normal_direct",
   applicable = {
     exp = "a",
     a   = true

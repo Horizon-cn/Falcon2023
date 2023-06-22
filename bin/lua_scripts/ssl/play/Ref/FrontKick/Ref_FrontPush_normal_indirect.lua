@@ -18,8 +18,8 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Leader   = task.markingFrontAvoidBall("First"),
+    Middle   = task.markingFrontAvoidBall("Second"),
     Special  = task.multiBack(3,1),
     Defender = task.multiBack(3,2),
     Breaker  = task.multiBack(3,3),
@@ -35,8 +35,8 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.staticGetBall(RECEIVE_POS),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Leader   = task.markingFrontAvoidBall("First"),
+    Middle   = task.markingFrontAvoidBall("Second"),
     Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
@@ -52,8 +52,8 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.passToPos(RECEIVE_POS, kickPower),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Leader   = task.markingFrontAvoidBall("First"),
+    Middle   = task.markingFrontAvoidBall("Second"),
     Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
@@ -69,8 +69,8 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.defendHead(),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Leader   = task.markingFrontAvoidBall("First"),
+    Middle   = task.markingFrontAvoidBall("Second"),
     Special  = task.receive(ball.pos()),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
@@ -85,9 +85,9 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.markingFront("Third"),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Assister = task.markingFrontAvoidBall("Third"),
+    Leader   = task.markingFrontAvoidBall("First"),
+    Middle   = task.markingFrontAvoidBall("Second"),
     Special  = task.chaseNew(),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
@@ -97,7 +97,7 @@ gPlayTable.CreatePlay{
   },
 
 
-  name = "Ref_FrontPush_normal",
+  name = "Ref_FrontPush_normal_indirect",
   applicable = {
     exp = "a",
     a   = true

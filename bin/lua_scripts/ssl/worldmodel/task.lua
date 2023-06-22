@@ -1089,6 +1089,10 @@ function markingFront(p)
 	return {mexe, mpos}
 end
 
+function markingFrontAvoidBall(p,f)
+	local mexe, mpos = Marking{pri = p, front = true, flag=bit:_or(flag.allow_dss,flag.dodge_ball)}
+	return {mexe, mpos}
+end
 -- function markingFront(p)
 -- 	return marking(p)
 -- end

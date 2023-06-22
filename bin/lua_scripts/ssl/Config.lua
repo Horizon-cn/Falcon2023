@@ -122,7 +122,8 @@ gRefPlayTable = {
 	"Ref/CornerKick/Ref_CornerKickV2",
 	"Ref/CornerKick/Ref_CornerPush",
 	"Ref/CornerKick/Ref_CornerPush8",
-	"Ref/CornerKick/Ref_CornerPush_normal",
+	"Ref/CornerKick/Ref_CornerPush_normal_indirect",
+	"Ref/CornerKick/Ref_CornerPush_normal_direct",
 	--前场进攻
 	"Ref/FrontKick/Ref_FrontKickV23",
 	"Ref/FrontKick/Ref_FrontKickV41",
@@ -131,7 +132,8 @@ gRefPlayTable = {
 	"Ref/FrontKick/Ref_FrontKickV610",
 	"Ref/FrontKick/Ref_FrontPush",
 	"Ref/FrontKick/Ref_FrontPush8",
-	"Ref/FrontKick/Ref_FrontPush_normal",
+	"Ref/FrontKick/Ref_FrontPush_normal_indirect",
+	"Ref/FrontKick/Ref_FrontPush_normal_direct",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
@@ -146,7 +148,8 @@ gRefPlayTable = {
 	"Ref/BackKick/Ref_ImmortalKickV610",
 	"Ref/BackKick/Ref_BackPush",
 	"Ref/BackKick/Ref_BackPush8",
-	"Ref/BackKick/Ref_BackPush_normal",
+	"Ref/BackKick/Ref_BackPush_normal_indirect",
+	"Ref/BackKick/Ref_BackPush_normal_direct",
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
