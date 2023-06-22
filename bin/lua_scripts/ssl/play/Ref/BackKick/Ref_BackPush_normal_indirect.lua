@@ -26,7 +26,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,3),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[A][S][DBC][LM]"
+    match = "[D][A][C][S][B][LM]"
   },
 
   ["toBall"] = {
@@ -43,7 +43,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[A][S][DBC][LM]"
+    match = "[D][A][C][S][B][LM]"
   },
 
   ["kickBall"] = {
@@ -60,7 +60,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[A][S][DBC][LM]"
+    match = "[D][A][C][S][B][LM]"
   },
 
   ["receiveBall"] = {
@@ -77,7 +77,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[S][A][DBC][LM]"
+    match = "[D][S][C][A][B][LM]"
   },
 
 ["shootBall"] = {--如果special转大半圈还找不到射门角度就会弃球而逃
@@ -94,7 +94,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[S][A][DBC][LM]"
+    match = "[D][S][C][A][B][LM]"
   },
 
   name = "Ref_BackPush_normal_indirect",

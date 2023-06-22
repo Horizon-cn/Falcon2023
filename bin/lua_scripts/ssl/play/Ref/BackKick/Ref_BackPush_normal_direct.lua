@@ -26,7 +26,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,3),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[A][S][DBC][LM]"
+    match = "[D][A][C][S][B][LM]"
   },
 
   ["toBall"] = {
@@ -43,7 +43,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[A][S][DBC][LM]"
+    match = "[D][A][C][S][B][LM]"
   },
 
  ["kickBall"] = {
@@ -60,12 +60,12 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[A][S][DBC][LM]"
+    match = "[D][A][C][S][B][LM]"
   },
 
 ["shootBall"] = {
     switch = function ()
-      if bufcnt(player.kickBall("Assister"), 3, 500) then--
+      if bufcnt(player.kickBall("Special"), 3, 500) then--
         return "exit"
       end
     end,
@@ -77,7 +77,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[S][A][DBC][LM]"
+    match = "[D][S][C][A][B][LM]"
   },
 
   name = "Ref_BackPush_normal_direct",
