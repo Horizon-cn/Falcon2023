@@ -25,7 +25,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,3),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{S}{A}{D}{C}{B}{LM}"
+    match = "[A][S][D][C][B][LM]"
   },
 
   ["toBall"] = {--不拿球
@@ -42,7 +42,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "[A][S][D][B][C][LM]"
   },
 
   ["kickBall"] = {
@@ -59,7 +59,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "[A][S][D][B][C][LM]"
   },
 
   ["receiveBall"] = {
@@ -76,7 +76,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{S}{B}{L}{C}{AM}"
+    match = "[S][A][D][B][C][LM]"
   },
 
 ["shootBall"] = {
@@ -93,7 +93,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{S}{B}{L}{C}{AM}"
+    match = "[S][A][D][B][C][LM]"
   },
 
 

@@ -5,7 +5,7 @@ end
 --【接球点】可根据实车情况进行调整
 local RECEIVE_POS = ball.syntYPos(CGeoPoint:new_local(200, 100))
 --【传球力度】可根据实车情况进行调整
-local kickPower = 300
+local kickPower = 500
 
 gPlayTable.CreatePlay{
 
@@ -25,7 +25,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "[A][S][D][B][C][LM]"
   },
 
   ["toBall"] = {
@@ -42,7 +42,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "[A][S][D][B][C][LM]"
   },
 
   ["kickBall"] = {
@@ -59,24 +59,24 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "[A][S][D][B][C][LM]"
   },
 
   ["receiveBall"] = {
     switch = function ()
-      if bufcnt(player.toBallDist("Special")<5, 3, 180) then--
+      if bufcnt(player.toBallDist("Special") < 5, 3, 180) then--
         return "shootBall"
       end
     end,
-    Assister = task.markingFront("Third"),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Assister = task.stop(),
+    Leader   = task.markingFront("Second"),
+    Middle   = task.markingFront("Third"),
     Special  = task.receive(ball.pos()),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "[S][A][D][B][C][LM]"
   },
 
 ["shootBall"] = {
@@ -85,15 +85,15 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.markingFront("Third"),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Assister = task.markingFrontAvoidBall("First"),
+    Leader   = task.markingFront("Second"),
+    Middle   = task.markingFront("Third"),
     Special  = task.chaseNew(),
     Defender = task.multiBack(1,1),
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "[S][A][D][B][C][LM]"
   },
 
   name = "Ref_CornerPush_normal_indirect",

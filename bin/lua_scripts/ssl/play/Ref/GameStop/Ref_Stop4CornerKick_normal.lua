@@ -41,7 +41,7 @@ firstState = "start",
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][A][B][S][C][LM]"
+    match = "[A][S][D][B][C][LM]"
 },
 
 name = "Ref_Stop4CornerKick_normal",

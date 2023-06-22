@@ -5,7 +5,7 @@ end
 --【接球点】可根据实车情况进行调整
 local RECEIVE_POS = ball.syntYPos(CGeoPoint:new_local(100, 100))
 --【传球力度】可根据实车情况进行调整
-local kickPower = 500
+local kickPower = 900
 
 gPlayTable.CreatePlay{
 
@@ -26,7 +26,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,3),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{SDBC}{LM}"
+    match = "[A][S][DBC][LM]"
   },
 
   ["toBall"] = {
@@ -43,7 +43,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{SDBC}{LM}"
+    match = "[A][S][DBC][LM]"
   },
 
  ["kickBall"] = {
@@ -60,7 +60,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{C}{LM}"
+    match = "[A][S][DBC][LM]"
   },
 
 ["shootBall"] = {
@@ -69,7 +69,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.markingFront("Third"),
+    Assister = task.stop(),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
     Special  = task.chaseNew(),
@@ -77,7 +77,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{SDBC}{LM}"
+    match = "[S][A][DBC][LM]"
   },
 
   name = "Ref_BackPush_normal_direct",

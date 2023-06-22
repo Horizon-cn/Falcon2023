@@ -3,7 +3,7 @@ gOppoConfig = {
 
 	CornerKick  = {"Ref_CornerPush_normal_direct"},--80 --"Ref_CornerPush"
 	
-	FrontKick   = {"Ref_FrontPush_normal_indirect"},--610 --"Ref_FrontPush"--对面
+	FrontKick   = {"Ref_FrontPush_normal_direct"},--610 --"Ref_FrontPush"--对面
 
 	BackKick    = {"Ref_BackPush_normal_direct"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
 -------------------------------Def---------------------------------------------------
