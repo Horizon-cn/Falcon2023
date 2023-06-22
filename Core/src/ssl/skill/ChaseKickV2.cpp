@@ -61,7 +61,7 @@ namespace
 	const CGeoPoint LEFT_GOAL_POST = CGeoPoint(-Field::PITCH_LENGTH / 2, -Field::GOAL_WIDTH / 2);
 	const CGeoPoint RIGHT_GOAL_POST = CGeoPoint(-Field::PITCH_LENGTH / 2, Field::GOAL_WIDTH / 2);
 	const double MaxSpeed=350;
-	int KICKPOWER = 550;
+	int KICKPOWER = 200;
 	int CHIPPOWER = 180;
 }
 
@@ -786,7 +786,7 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 			GDebugEngine::Instance()->gui_debug_x(real_predict_ballPos, COLOR_CYAN);
 			//cout << "Getball" << endl;
 		}	
-			setSubTask(PlayerRole::makeItNoneTrajGetBall(task().executor,finalKickDir,CVector(0,0),task().player.flag,-2));
+			setSubTask(PlayerRole::makeItNoneTrajGetBallV3(task().executor,finalKickDir,CVector(0,0),task().player.flag,-2));
 			break;
 	case SPEED_DOWN:
 		chase_kick_task.player.pos = myPos;
