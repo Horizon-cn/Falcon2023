@@ -103,52 +103,7 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 	sort(_ballReceiverList.begin(), _ballReceiverList.end(),
 		[&](int num1, int num2) {return _receiverPotientialList[num1] < _receiverPotientialList[num2]; });
 }
-//Protect ball强制匹配为Advance
-void CDefenceInfoNew::checkProtect(const CVisionModule* pVision)
-{
-	const BallVisionT& ball = pVision->Ball();
-	if (isNeedProtect)
-	{
-		//判断是否仍在Protect ball可拦截状态
-		const PlayerVisionT& protecter = pVision->OurPlayer(_protecter);
-		double ball2protecterDir = (protecter.Pos() - ball.Pos()).dir();
-		double angleDiff = fabs(Utils::Normalize(ball2protecterDir - ball.Vel().dir()));
-		double ball2protecterDist = ball.Pos().dist(protecter.Pos());
-		if (angleDiff > Param::Math::PI / 2.0 || ball2protecterDist > 450 || ball2protecterDist < 50 || ball.Vel().mod() < 70)
-		{
-			isNeedProtect = false;
-			TaskMediator::Instance()->resetAdvancerPassTo();
-			_protecter = -1;
-		}
-	} else
-	{
-		if (BallStatus::Instance()->IsBallKickedOut())
-		{
-			if (display_debug_info)
-				GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "ball kick!");
-			for (_kicker = 0; _kicker < 2 * Param::Field::MAX_PLAYER; _kicker++)
-				if (BallStatus::Instance()->IsBallKickedOut(_kicker))
-					break;
-			if (Param::Field::MAX_PLAYER <= _kicker && _kicker < 2 * Param::Field::MAX_PLAYER)//TheirKick
-			{
-				_kicker -= Param::Field::MAX_PLAYER;
-				matchProtecter(pVision);
-				cout << "match: " << _protecter << endl;
-				GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(150, 200), ("match:" + to_string(_protecter)).c_str());
-				if (_protecter != -1)
-				{
-					isNeedProtect = true;
-				}
-			}
-		}
-	}
-	if (isNeedProtect)
-	{
-		//对应protect车成为我们的advance
-		cout << "protect force match!" << endl;
-		TaskMediator::Instance()->setAdvancerPassTo(pVision->OurPlayer(_protecter).Pos());
-	}
-}
+
 //传球时的特殊处理
 void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 {
