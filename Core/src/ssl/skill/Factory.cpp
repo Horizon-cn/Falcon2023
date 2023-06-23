@@ -552,15 +552,15 @@ namespace PlayerRole {
 		return TaskFactoryV2::Instance()->ChaseKickV1(playerTask);
 	}
 
-	CPlayerTask* makeItChaseKickV2(const int num, double faceDir, int flags)
+	CPlayerTask* makeItChaseKickV2(const int num, double faceDir, int flags, int power)
 	{
 		static TaskT playerTask;
 		playerTask.executor = num;
 		playerTask.player.angle = faceDir;
 		playerTask.player.flag = flags;
+		playerTask.player.kickpower = power;
 		return TaskFactoryV2::Instance()->ChaseKickV2(playerTask);
 	}
-
 	CPlayerTask* makeItProtectBall(const int num, const int flags)
 	{
 		static TaskT playerTask;

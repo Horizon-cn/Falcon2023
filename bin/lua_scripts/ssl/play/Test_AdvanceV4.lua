@@ -14,7 +14,7 @@ firstState = "advance",
 			return "advance";
 		end
 	end,
-	Leader = task.chaseNew(),
+	Leader = task.advance(),
     --Crosser = task.rightCenterBack(),
     --match = ""
 	match    = "[L]"

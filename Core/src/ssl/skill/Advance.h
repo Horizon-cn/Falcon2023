@@ -37,7 +37,9 @@ private:
         BREAKSHOOT,
         PUSHOUT,
         BREAKPASS,
-        BLOCK
+        BLOCK,
+        CHASEKICK,
+        CHASEPUSH
     };
     enum {
         DefenceArea = 0,
@@ -111,6 +113,7 @@ private:
     double LastPassDirToJudge = 0;
 
     bool IsMeSupport = 0;
+    bool IHaveSupport;
 
     /**********************************************************
     * Description: ???????????????????¦Ë???§Ø?
@@ -126,7 +129,7 @@ private:
 
     bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
     bool isPassBalltoMe(const CVisionModule* pVision, int vecNumber);
-    bool isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int ShootOrPass);
+    bool isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int IsShoot);
     
     bool isInBreakArea(const CVisionModule* pVision, int vecNumber);
     bool isInTheCornerArea(const CVisionModule* pVision, int vecNumber);
@@ -180,6 +183,8 @@ private:
     int GenerateStateOfFoulTrouble(const CVisionModule* pVision, const int vecNumber);
 
     bool canScore(const CVisionModule* pVision, const int vecNumber, const double radius, const double dir);
+    int GenerateNextState(const CVisionModule* pVision, const int vecNumber);
+    int CanWeUseChaseBecauseOfGetBallV3(const CVisionModule* pVision, const int vecNumber);
 protected:
 
     CPlayerCommand* _directCommand;

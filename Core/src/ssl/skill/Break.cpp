@@ -198,7 +198,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     //bool shootGoal = (passTarget.x() == Param::Field::PITCH_LENGTH / 2 && fabs(passTarget.y()) <= Param::Field::GOAL_WIDTH / 2); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
     
     double power = shootGoal ? Param::Rule::MAX_BALL_SPEED : passpower; 
-    
+    power = power * 10;
     //以下是运行逻辑
 
     bool frared = (RobotSensor::Instance()->IsInfraredOn(vecNumber));// || isVisionHasBall(pVision, task().executor);
