@@ -12,7 +12,7 @@ gTestPlay = function ()
 		-- Test_Run6 测testrun
 		-- Test_play6ForTest测三车进攻
 	else
-		return "Test_Advance" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "NormalPlayPureDefence" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -26,7 +26,7 @@ gSwitchNum = {
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
 	["Kicker"]   = {10},
-	["Goalie"]   = {11},
+	["Goalie"]   = {0},
 	["Tier"]	 = {13},
 	["Receiver"] = {12}
 }

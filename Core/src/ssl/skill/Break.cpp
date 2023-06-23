@@ -517,7 +517,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             //std::cout << "break start find best point" << std::endl;
             float best_score = 2147483647;
             float best_idx = -1;
-            CGeoPoint best_point(-100, -100);
+            CGeoPoint best_point(0, 0);
             for (int i = 0; i < target_point_num; i++) {
                 CGeoPoint target_point(target_info[2 * i], target_info[2 * i + 1]);
                 float current_score = results[3 * i];
@@ -559,6 +559,8 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                 }
 
             }
+            if (best_point == CGeoPoint(0, 0) || best_point == me.Pos())
+                return me.Pos()+Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER, Utils::Normalize(me.Dir()));
             return best_point;
             //return me.Pos();
 

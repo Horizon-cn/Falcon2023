@@ -1391,7 +1391,9 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 		return BREAKSHOOT;
 	} // 持久化
 	else if (MeIsInWhichArea == DefenceArea) { // 在后场防守区域
-		if ((!Me2OppTooclose(pVision, vecNumber)) || (!IHaveSupport)) {
+		if ((!IHaveSupport) && Me2OppTooclose(pVision, vecNumber))
+			return JUSTCHIPPASS;
+		else if ((!Me2OppTooclose(pVision, vecNumber)) || (!IHaveSupport)) {
 			// 无人防守状态 或 不存在支援车
 			return PUSHOUT;
 		}
@@ -1405,7 +1407,7 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 			return PASS;
 		}
 		else if (Me2OppTooclose(pVision, vecNumber)) {
-			return KICK;
+			return BREAKSHOOT;
 		}  // 首先判断射门
 		else {	// 不存在防守
 			return PUSHOUT;
@@ -1413,14 +1415,14 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 	}
 	else if (MeIsInWhichArea == CenterArea) {
 		if (tendToShoot(pVision, vecNumber)) {
-			return KICK;
+			return BREAKSHOOT;
 		}  // 首先判断射门
 		else if (!IHaveSupport) {  // 不存在支援车
 			//return PUSHOUT;
 			//return KICK;	//changed
 			//judge the opp
 			if (opp_ahead(pVision, vecNumber) <= 3)
-				_state = KICK;
+				_state = BREAKSHOOT;
 			else
 				_state = PUSHOUT;
 		}
@@ -1433,24 +1435,21 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 	}	// 在前中场
 	else if (MeIsInWhichArea == CornerArea) {
 		if (IHaveSupport) { 
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 300), "IHaveSupport", COLOR_YELLOW);
 		}
 		else
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 300), "IHaveSupport", COLOR_YELLOW);
 		if (IHaveSupport) { //pass first
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), "IHaveSupport", COLOR_YELLOW);
 			return PASS;
 		}
 		else if (Me2OppTooclose(pVision, vecNumber) && opp_ahead(pVision, vecNumber) > 3) { // 存在防守
 			return PASS;
 		}
 		else if (Me2OppTooclose(pVision, vecNumber)) {
-			return KICK;
-		}  // 首先判断射门
-		else {	// 不存在防守
+			return BREAKSHOOT;
+		} 
+		else {	
 			return PUSHOUT;
-		}	// 在双边区域
-	}	// 在角球区
+		}	
+	}	
 	else if (MeIsInWhichArea == CanNOTBreakArea) {
 		if (IHaveSupport) { //pass first
 			return PASS;
@@ -1459,8 +1458,8 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 			return PASS;
 		}
 		else if (Me2OppTooclose(pVision, vecNumber)) {
-			return KICK;
-		}  // 首先判断射门
+			return BREAKSHOOT;
+		}  
 		else {	// 不存在防守
 			return PUSHOUT;
 		}	// 在双边区域
