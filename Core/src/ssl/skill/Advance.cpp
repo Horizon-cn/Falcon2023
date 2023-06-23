@@ -108,6 +108,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 	PassDirOrPos TMP;
 	CGeoPoint PassPos;
 	/*??痦??*/
+	
+	if(canScore(pVision, _executor, OBSTACLE_RADIUS, me.Dir()))
+		KickStatus::Instance()->setKick(_executor, KICKPOWER);
 
 	CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
 	ShootPoint = GenerateBreakShootPoint(pVision, _executor);
@@ -165,17 +168,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case GET:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
 
-		if (checkOppHasBall(pVision)) {
-			if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-				_state = GET; break;
-			} // 正在两方对吸
-			else {
-				if (WeNeedBlockTheBall(pVision, _executor)) {
-					_state = BLOCK;
-					break;
-				}
-				else { _state = GET; break; }
-			}
+		if (isOppHasBall){
+			_state = GET;
+			break;
 		}	// 敌人持球，此时需要进行防守
 
 		/*
@@ -246,10 +241,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
 		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
-	case BLOCK:
-		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push BreakPass", COLOR_YELLOW);
-		if (!WeNeedBlockTheBall(pVision, _executor)) _state = GET;
-		break;
+
 
 	case CHASEKICK:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHASEKICK", COLOR_YELLOW);
@@ -265,9 +257,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 	}
 	
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-		_state = CHASEKICK;
+		_state = GET;
 	}
-	else _state = CHASEKICK;
+	else _state = GET;
 	
 	/**********************************************************
 	* Description: 状态执行
@@ -548,15 +540,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		else KickStatus::Instance()->setKick(_executor, 0);
 		setSubTask(PlayerRole::makeItChaseKickV2(_executor, KickorPassDir, ShootNotNeedDribble, GetFPassPower(ball.Pos(), PassPoint)));
 		break;
-	case BLOCK:
-		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BLOCK", COLOR_YELLOW);
-		KickorPassDir = (opp.Pos() - me.Pos()).dir();
-		TaskT BlockTask(task());
-		BlockTask.player.pos = opp.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER, Utils::Normalize((me.Pos() - opp.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
-		BlockTask.player.angle = (opp.Pos() - me.Pos()).dir();
-		BlockTask.player.needdribble = 0;
-		setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(BlockTask));
-		break;
+
 
 	}
 	//setSubTask(PlayerRole::makeItStop(_executor, 0));

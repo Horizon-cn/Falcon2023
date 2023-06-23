@@ -24,6 +24,8 @@ public:
 	//½ø¹¥µÄSkill. by HXY
 	CPlayerTask* ChaseKickV1(const TaskT& task);
 	CPlayerTask* ChaseKickV2(const TaskT& task);
+	CPlayerTask* ChaseToGetBall(const TaskT& task);
+	
 	CPlayerTask* AdvanceBallV1(const TaskT& task);
 	CPlayerTask* AdvanceBallV2(const TaskT& task);
 	CPlayerTask* AdvanceBallV3(const TaskT& task);
@@ -135,6 +137,7 @@ namespace PlayerRole {
 	CPlayerTask* makeItForceStartRush(const int num, double faceDir, int flags = 0);
 	CPlayerTask* makeItChaseKickV1(const int num, double faceDir, int flags = 0);
 	CPlayerTask* makeItChaseKickV2(const int num, double faceDir, int flags = 0, int power = 0);
+	CPlayerTask* makeItChaseToGetBall(const int num, double faceDir, int flags, int isneedkick = 0, int power = 650);
 
 	CPlayerTask* makeItDriftKick(const int num, double faceDir, int flags = 0);
 	CPlayerTask* makeItProtectBall(const int num, int flags = 0);

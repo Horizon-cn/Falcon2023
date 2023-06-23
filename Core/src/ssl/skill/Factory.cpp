@@ -77,6 +77,7 @@
 #include "GoTechChalPos.h"
 #include "GotoPositionNew.h"
 #include "GoPIDCircle.h"
+#include <ChaseToGetBall.h>
 
 /************************************************************************/
 /*                      TaskFactoryV2                                    */
@@ -159,6 +160,9 @@ CPlayerTask* CTaskFactoryV2::ChaseKickV1(const TaskT& task) {
 
 CPlayerTask* CTaskFactoryV2::ChaseKickV2(const TaskT& task) {
 	return MakeTask< CChaseKickV2>(task);
+}
+CPlayerTask* CTaskFactoryV2::ChaseToGetBall(const TaskT& task) {
+	return MakeTask< CChaseToGetBall>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::ProtectBall(const TaskT& task) {
@@ -561,6 +565,17 @@ namespace PlayerRole {
 		playerTask.player.kickpower = power;
 		return TaskFactoryV2::Instance()->ChaseKickV2(playerTask);
 	}
+	CPlayerTask* makeItChaseToGetBall(const int num, double faceDir, int flags, int isneedkick, int power)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = faceDir;
+		playerTask.player.flag = flags;
+		playerTask.player.needkick = isneedkick;
+		playerTask.player.kickpower = power;
+		return TaskFactoryV2::Instance()->ChaseToGetBall(playerTask);
+	}
+
 	CPlayerTask* makeItProtectBall(const int num, const int flags)
 	{
 		static TaskT playerTask;
