@@ -15,8 +15,6 @@ firstState = "advance",
 		end
 	end,
 	Leader = task.advance(),
-    --Crosser = task.rightCenterBack(),
-    --match = ""
 	match    = "[L]"
 },
 

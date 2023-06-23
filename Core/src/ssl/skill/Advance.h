@@ -103,7 +103,7 @@ private:
     CGeoPoint theirCenter = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
     CGeoPoint ourGoal = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
 
-
+    int NumOfTheirPlayerfrontMe;
     CGeoPoint SupportPoint[6];
 
     int LastPassPoint = 0; /*????????????*/
@@ -139,6 +139,8 @@ private:
     bool JudgePassMeIsBeBlocked(const CVisionModule *pVision, int vecNumber);
     bool AdJudgeBreakCanDo(const CVisionModule *pVision, int vecNumber, CGeoPoint TargetPoint);
     int InWhichArea(const CVisionModule* pVision, int vecNumber);
+
+    bool WeCanAlwaysSetKick(const CVisionModule* pVision, const int vecNumber);
     /**********************************************************
     * Description: ???§Ý??§Ø??????????????????????§Ø?
     * Author: ?????

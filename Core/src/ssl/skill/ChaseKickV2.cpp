@@ -545,7 +545,7 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 		if (isVerticalBall){
 			chase_kick_task.player.max_acceleration = MAX_TRANSLATION_ACC;
 			if (testOn){
-				cout << "Crazy Vertical speed up"<< endl;
+				//cout << "Crazy Vertical speed up"<< endl;
 			}
 			/*speedUpDistanceY = fabs(kickPos.y() - me.Pos().y()) + crossWiseFactor[realNum] * Param::Vehicle::V2::PLAYER_SIZE + max((ballSpeed - 100)*sin(fabs(max(ballVelDir - Param::Math::PI * 35 / 180, 0)))*0.18, 0);*/
 			speedUpDistanceY = fieldFactor*fabs(kickPos.y() - me.Pos().y()) * crossWiseFactor[realNum-1] * Param::Vehicle::V2::PLAYER_SIZE + max(ballSpeed - 80, 0.0)*max(sin(fabs(ballVelDir) - Param::Math::PI * 8 / 180), 0.0)*0.28;
@@ -578,7 +578,7 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 		}
 		else if(isCrossBall){
 			if (testOn){
-				cout << "Crazy cross speed up" << endl;
+				//cout << "Crazy cross speed up" << endl;
 			}
 			/*speedUpDistanceY = 0.8*fabs(kickPos.y() - me.Pos().y()) + crossWiseFactor[realNum] * Param::Vehicle::V2::PLAYER_SIZE + max((ballSpeed - 100)*sin(fabs(max(ballVelDir - Param::Math::PI * 35 / 180, 0)))*0.18, 0);*/
 			speedUpDistanceY = fieldFactor*fabs(kickPos.y() - me.Pos().y()) * crossWiseFactor[realNum-1] * Param::Vehicle::V2::PLAYER_SIZE + max(ballSpeed - 80, 0.0)*max(sin(fabs(ballVelDir) - Param::Math::PI * 2 / 180), 0.0)*0.40;
@@ -611,7 +611,7 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 
 		else{
 			if (testOn){
-				cout << "Crazy abnormal speed up" << endl;
+				//cout << "Crazy abnormal speed up" << endl;
 			}
 			/*speedUpDistanceY = 0.8*fabs(kickPos.y() - me.Pos().y()) + crossWiseFactor[realNum] * Param::Vehicle::V2::PLAYER_SIZE + max((ballSpeed - 100)*sin(fabs(max(ballVelDir - Param::Math::PI * 35 / 180, 0)))*0.3, 0);*/
 			speedUpDistanceY = fieldFactor*fabs(kickPos.y() - me.Pos().y()) * crossWiseFactor[realNum-1] * Param::Vehicle::V2::PLAYER_SIZE + max(ballSpeed - 80, 0.0)*max(sin(fabs(ballVelDir) - Param::Math::PI * 10 / 180), 0.0)*0.35;
@@ -642,8 +642,8 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 		}
 
 		if (testOn){
-			cout << speedUpDistanceX << endl;
-			cout << speedUpDistanceY << endl;
+			//cout << speedUpDistanceX << endl;
+			//cout << speedUpDistanceY << endl;
 		}
 		chase_kick_task.player.pos = CGeoPoint(kickPos.x() + speedUpDistanceX, kickPos.y() - isLeft*speedUpDistanceY);
 		chase_kick_task.player.vel = speedUpVel;
@@ -882,13 +882,13 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 			if (me.Pos().x() > 220){    //TODO need Compensate for bigangle
 				if (me.Pos().y() > 170){
 					if (testOn){
-						cout << "Compen" << endl;
+						//cout << "Compen" << endl;
 					}
 					finalKickDir = finalKickDir + Param::Math::PI * 15 / 180;
 				}
 				else if (me.Pos().y() < -170){
 					if (testOn){
-						cout << "Compen" << endl;
+						//cout << "Compen" << endl;
 					}
 
 					finalKickDir = finalKickDir - Param::Math::PI * 15 / 180;
