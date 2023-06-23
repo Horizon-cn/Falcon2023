@@ -364,7 +364,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		PassPos = TMP.pos;
 
 
-		if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
+		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
 			double ThePower = 0;
 			bool IsFlatKick = toChipOrToFlat(pVision, _executor, PassPos);
 			if (IsFlatKick) {
@@ -897,6 +897,8 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 	for (int i = 0; i < NumberOfSupport; ++i) {
 		if (!IsOurNearHere(pVision, SupportPoint[i], vecNumber)) continue;
 		if (SupportPoint[i].x() < me.Pos().x() && MeIsInWhichArea != CornerArea) continue;
+		double PasstoSupportDir = (SupportPoint[i] - me.Pos()).dir();
+		//if (!isDirOK(pVision, vecNumber, PasstoSupportDir, 0)) continue;
 		return 1;
 		/*
 		MeToSupportDist = (me.Pos() - SupportPoint[i]).mod();
@@ -1073,6 +1075,8 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 			int NowIdx = TheidxOfCanShootPoint[i];
 			double shoot_dist = sqrt((SupportPoint[i].x() - Param::Field::PITCH_LENGTH / 2) * (SupportPoint[i].x() - Param::Field::PITCH_LENGTH / 2) + SupportPoint[i].y() * SupportPoint[i].y());
 			final_score = near_para * Me2OppTooclose(pVision, vecNumber) + shoot_para * shoot_dist + change_para * ChangeDir[i];
+			double PasstoSupportDir = -(SupportPoint[i] - me.Pos()).dir();
+			if (!isDirOK(pVision, vecNumber, PasstoSupportDir, 0)) continue;
 			if (final_score > max_value) Maxidx = NowIdx;
 		}
 		if (Maxidx < 0)
@@ -1354,6 +1358,23 @@ bool CAdvance::WeNeedBlockTheBall(const CVisionModule* pVision, const int vecNum
 }
 
 
+int CAdvance::opp_ahead(const CVisionModule* pVision, const int vecNumber) {
+	int cnt = 0;
+	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+	double x1 = me.X(), y1 = me.Y();
+	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+		if (!pVision->TheirPlayer(i).Valid()) continue;
+		auto enemy = pVision->TheirPlayer(i);
+		double x = enemy.X(), y = enemy.Y();
+		if (x > x1 && fabs(y) < Param::Field::PITCH_WIDTH * 4 / 5)
+			cnt++;
+	}
+	return cnt;
+}
+
+
+
+
 int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumber) {
 	// 需要完全拿住球
 	/*DefenceArea = 0,
@@ -1377,15 +1398,15 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 		else { return JUSTCHIPPASS; }// 否则向前挑传
 	}
 	else if (MeIsInWhichArea == SideArea) {
-		if (tendToShoot(pVision, vecNumber)) {
-			return KICK;
-		}  // 首先判断射门
-		else if (!IHaveSupport) {  // 不存在支援车
-			return PUSHOUT;
-		}
-		else if (Me2OppTooclose(pVision, vecNumber)) { // 存在防守
+		if (IHaveSupport) { //pass first
 			return PASS;
 		}
+		else if (Me2OppTooclose(pVision, vecNumber) && opp_ahead(pVision, vecNumber) > 3) { // 存在防守
+			return PASS;
+		}
+		else if (Me2OppTooclose(pVision, vecNumber)) {
+			return KICK;
+		}  // 首先判断射门
 		else {	// 不存在防守
 			return PUSHOUT;
 		}	// 在双边区域
@@ -1395,7 +1416,13 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 			return KICK;
 		}  // 首先判断射门
 		else if (!IHaveSupport) {  // 不存在支援车
-			return PUSHOUT;
+			//return PUSHOUT;
+			//return KICK;	//changed
+			//judge the opp
+			if (opp_ahead(pVision, vecNumber) <= 3)
+				_state = KICK;
+			else
+				_state = PUSHOUT;
 		}
 		else if (Me2OppTooclose(pVision, vecNumber)) { // 存在防守
 			return PASS;
@@ -1404,7 +1431,41 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 			return PUSHOUT;
 		}
 	}	// 在前中场
-	else { // Corner区域 Kick区域 cannotBreak区域
+	else if (MeIsInWhichArea == CornerArea) {
+		if (IHaveSupport) { 
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 300), "IHaveSupport", COLOR_YELLOW);
+		}
+		else
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 300), "IHaveSupport", COLOR_YELLOW);
+		if (IHaveSupport) { //pass first
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), "IHaveSupport", COLOR_YELLOW);
+			return PASS;
+		}
+		else if (Me2OppTooclose(pVision, vecNumber) && opp_ahead(pVision, vecNumber) > 3) { // 存在防守
+			return PASS;
+		}
+		else if (Me2OppTooclose(pVision, vecNumber)) {
+			return KICK;
+		}  // 首先判断射门
+		else {	// 不存在防守
+			return PUSHOUT;
+		}	// 在双边区域
+	}	// 在角球区
+	else if (MeIsInWhichArea == CanNOTBreakArea) {
+		if (IHaveSupport) { //pass first
+			return PASS;
+		}
+		else if (Me2OppTooclose(pVision, vecNumber) && opp_ahead(pVision, vecNumber) > 3) { // 存在防守
+			return PASS;
+		}
+		else if (Me2OppTooclose(pVision, vecNumber)) {
+			return KICK;
+		}  // 首先判断射门
+		else {	// 不存在防守
+			return PUSHOUT;
+		}	// 在双边区域
+	}	// 不能break
+	else { // Kick区域
 		if (tendToShoot(pVision, vecNumber)) {
 			return KICK;
 		}  // 首先判断射门
