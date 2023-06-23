@@ -189,7 +189,7 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 		if (statusCounter.timeOut(vision->Cycle(), pos2.dist(me.Pos()) < distThreshold)) {
 			statusCounter.clear();
 			_state = STATE_GOTO_2;
-			(*_out1) << "#" << endl;
+			//(*_out1) << "#" << endl;
 			(*_out2) << pVision->Cycle() << endl;
 		}
 		break;
@@ -201,7 +201,7 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 		if (statusCounter.timeOut(vision->Cycle(), (pos1.dist(me.Pos()) < distThreshold))) {
 			statusCounter.clear();
 			_state = STATE_GOTO_1;
-			(*_out1) << "#" << endl;
+			//(*_out1) << "#" << endl;
 			(*_out2) << pVision->Cycle() << endl;
 		}
 		break;
