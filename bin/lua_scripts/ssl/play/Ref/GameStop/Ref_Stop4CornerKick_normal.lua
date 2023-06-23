@@ -36,12 +36,12 @@ firstState = "start",
 	Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),--4
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
-    Special  = task.multiBack(3,1),
-    Defender = task.multiBack(3,2),
-    Breaker  = task.multiBack(3,3),
+    Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "{D}{A}{B}{S}{LCM}"
+    match = "[D][A][B][S][C][LM]"
 },
 
 name = "Ref_Stop4CornerKick_normal",
