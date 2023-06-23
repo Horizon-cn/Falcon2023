@@ -63,6 +63,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
     double oppo2BallDir = Utils::Normalize((ball.Pos() - pVision->TheirPlayer(theirBestPlayer).Pos()).dir());
     CVector oppo2Ball = ball.Pos() - pVision->TheirPlayer(theirBestPlayer).Pos();
     CVector advancer2oppo= pVision->TheirPlayer(theirBestPlayer).Pos() - pVision->OurPlayer(advancer).Pos();
+    CGeoPoint ourGoalPos = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
 
  
     int new_state = state(), old_state = state();
@@ -171,16 +172,14 @@ void CProtectBall::plan(const CVisionModule* pVision)
         break;
     case Defence:
         {
-            static CGeoPoint lastDefencePos;
+            CVector vec_1 = (CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0) - predictBallPos) / (CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0) - predictBallPos).mod();
+            CVector vec_2 = oppo2Ball / oppo2Ball.mod();
             CGeoPoint defencePos = CGeoPoint(0, 0);
             if (oppo2BallDir > -Param::Math::PI * 2 / 3 && oppo2BallDir < Param::Math::PI * 2 / 3) {
-                defencePos = predictBallPos + Utils::Polar2Vector(75, Utils::Normalize((ball.Pos() - CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0)).dir() + Param::Math::PI));
+                defencePos = predictBallPos + Utils::Polar2Vector(75, Utils::Normalize((predictBallPos - CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0)).dir() + Param::Math::PI));
             }
-            else if (oppo2BallDir <= -Param::Math::PI * 2 / 3) {
-                defencePos = predictBallPos + Utils::Polar2Vector(75, Utils::Normalize(oppo2Ball.dir()) - (Param::Math::PI - fabs(oppo2BallDir)) * (Param::Math::PI - fabs(oppo2BallDir))/Param::Math::PI);//方向修正
-            }
-            else if (oppo2BallDir >= Param::Math::PI * 2 / 3) {
-                defencePos = predictBallPos + Utils::Polar2Vector(75, Utils::Normalize(oppo2Ball.dir()) + (Param::Math::PI - fabs(oppo2BallDir)) * (Param::Math::PI - fabs(oppo2BallDir)) / Param::Math::PI);//方向修正
+            else {
+                defencePos = predictBallPos + Utils::Polar2Vector(75, Utils::Normalize(((vec_1+vec_2)/2).dir()));//方向修正
             }
 			double defenceDir = (predictBallPos -self.Pos()).dir();
 			protectTask.player.pos=defencePos;
