@@ -594,7 +594,7 @@ void ObstaclesNew::addObs(const CVisionModule* pVision, const TaskT& task, bool 
 	// 设置球的障碍
 	if (flags & PlayerStatus::DODGE_BALL) {
 		const BallVisionT& ball = pVision->Ball();
-		addCircle(ball.Pos(), ball.Vel(), stopBallAvoidDist, OBS_CIRCLE_NEW);
+		addCircle(ball.Pos(), ball.Vel(), ballAvoidDist, OBS_CIRCLE_NEW);
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -300), "DODGE_BALL", COLOR_YELLOW);
 	}
 	//const PlayerVisionT& opp = pVision->OurPlayer(1);
