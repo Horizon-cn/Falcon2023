@@ -30,7 +30,7 @@ gPlayTable.CreatePlay{
 
   ["toBall"] = {
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) < 10, 3, 180) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 10, 500) then
         return "shootBall"
       end
     end,
