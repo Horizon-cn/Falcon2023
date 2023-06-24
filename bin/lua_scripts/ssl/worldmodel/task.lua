@@ -143,7 +143,7 @@ function chipPass(p, c, f, anti)
 		idir = ball.toPlayerHeadDir(p)
 	elseif type(p) == "function" then
 		if f == nil or f == true then
-			idir = p()
+			idir = player.toPointDir(p)
 		elseif anti == false then 
 			idir = function (role)
 				return (p() - player.pos(role)):dir()
