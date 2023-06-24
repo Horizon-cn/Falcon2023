@@ -63,6 +63,11 @@ CGeoPoint CGlobalSettings::saoConvert(CGeoPoint originPoint) {
         result.setX(-originPoint.x());
         result.setY(-originPoint.y());
         break;    
+    case 5:
+        //convert small field to big field (penalty area)
+        result.setX(originPoint.x() + 1500);
+        result.setY(originPoint.y());
+        break;
     default:
         result.setX(originPoint.x());
         result.setY(originPoint.y());
@@ -96,7 +101,10 @@ double CGlobalSettings::saoConvert(double direction) {
         break;
     case 4:
         result = direction;
-        break;    
+        break;
+    case 5:
+        result = direction;
+        break;
     default:
         result = direction;
         break;
