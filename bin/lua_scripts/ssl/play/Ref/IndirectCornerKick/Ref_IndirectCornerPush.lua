@@ -6,7 +6,22 @@ end
 
 gPlayTable.CreatePlay{
 
-  firstState = "start",
+  firstState = "init",
+
+  ["init"] = {
+    switch = function ()
+      if false then
+        return "exit"
+      end
+    end,
+    Assister = task.defendKick(),
+    Middle   = task.markingFront("First"),
+    Leader   = task.rightBack(),
+    Special  = task.leftBack(),
+    Defender = task.sideBack(),
+    Goalie   = task.goalieNew(),
+    match    = "{LS}{A}{M}{D}"
+  },
 
   ["start"] = {
     switch = function ()
@@ -15,14 +30,12 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
-    Special  = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Middle   = task.goCmuRush(WAIT_BALL_POS(0),_,_,flag.allow_dss + flag.dodge_ball),
+    Leader   = task.rightBack(),
+    Special  = task.leftBack(),
+    Defender = task.sideBack(),
     Goalie   = task.goalieNew(),
-    match = "{A}{SDBC}{LM}"
+    match    = "{LS}{A}{M}{D}"
   },
 
   ["toBall"] = {
@@ -32,14 +45,12 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(ball.pos(),_,_,flag.allow_dss),
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
-    Special  = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Middle   = task.goCmuRush(WAIT_BALL_POS(0),_,_,flag.allow_dss + flag.dodge_ball),
+    Leader   = task.rightBack(),
+    Special  = task.leftBack(),
+    Defender = task.sideBack(),
     Goalie   = task.goalieNew(),
-    match = "{A}{SDBC}{LM}"
+    match    = "{LS}{A}{M}{D}"
   },
 
   ["leaveBall"] = {
@@ -49,17 +60,15 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
-    Special  = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Leader   = task.rightBack(),
+    Special  = task.leftBack(),
+    Middle   = task.advance(),
+    Defender = task.sideBack(),
     Goalie   = task.goalieNew(),
-    match = "{A}{SDBC}{LM}"
+    match    = "{LS}{A}{M}{D}"
   },
 
-  name = "Ref_CornerPush8",
+  name = "Ref_IndirectCornerPush",
   applicable = {
     exp = "a",
     a   = true
