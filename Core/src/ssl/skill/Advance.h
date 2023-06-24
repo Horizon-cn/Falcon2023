@@ -185,6 +185,7 @@ private:
     int GenerateStateOfFoulTrouble(const CVisionModule* pVision, const int vecNumber);
 
     bool canScore(const CVisionModule* pVision, const int vecNumber, const double radius, const double dir);
+    int opp_ahead(const CVisionModule* pVision, const int vecNumber);
     int GenerateNextState(const CVisionModule* pVision, const int vecNumber);
     int CanWeUseChaseBecauseOfGetBallV3(const CVisionModule* pVision, const int vecNumber);
 protected:
