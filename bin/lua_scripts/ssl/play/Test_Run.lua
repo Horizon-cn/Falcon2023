@@ -3,10 +3,10 @@ local ALL_NOT_AVOID = flag.not_avoid_their_vehicle + flag.not_avoid_our_vehicle 
 local FLAG = ALL_NOT_AVOID --+ flag.dribbling
 local DSS=flag.allow_dss
 
-local TargetPos1  = CGeoPoint:new_local(-200,100)
-local TargetPos2  = CGeoPoint:new_local(-200,0)
-local TargetPos3  = CGeoPoint:new_local(-200,-100)
-local TargetPos4  = CGeoPoint:new_local(-200,-200)
+local TargetPos1  = CGeoPoint:new_local(112,190)
+local TargetPos2  = CGeoPoint:new_local(330,190)
+local TargetPos3  = CGeoPoint:new_local(300,-200)
+local TargetPos4  = CGeoPoint:new_local(-100,200)
 
 local DIR1  = 0
 
@@ -23,7 +23,7 @@ firstState = "run1",
 			return "run2";
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos1, DIR1),
+	Kicker = task.goCmuRush(TargetPos1, -1.57),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
@@ -32,10 +32,10 @@ firstState = "run1",
 ["run2"] = {
 	switch = function ()
 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 150, 1000) then
-			return "run3";
+			return "run1";
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos2, DIR1),
+	Kicker = task.goCmuRush(TargetPos2, -1.57),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""

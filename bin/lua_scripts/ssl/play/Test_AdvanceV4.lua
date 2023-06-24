@@ -14,11 +14,10 @@ firstState = "advance",
 			return "advance";
 		end
 	end,
-	Goalie = task.advance(),
-    --Assister = task.support("Leader", 0),
+	Leader = task.chaseNew(),
     --Crosser = task.rightCenterBack(),
     --match = ""
-	match    = ""
+	match    = "[L]"
 },
 
 name = "Test_AdvanceV4",

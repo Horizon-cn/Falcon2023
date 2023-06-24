@@ -28,7 +28,7 @@ protected:
 	bool OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber);
 	bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
 	CGeoPoint GenerateLargeAnglePoint(const CVisionModule* pVision, double finalDir, const bool debug);
-
+	bool HaveBeenBlockPoint(const CVisionModule* pVision, const int vecNumber);
 	bool checkOppHasBall(const CVisionModule* pVision);
 private:
 	enum {

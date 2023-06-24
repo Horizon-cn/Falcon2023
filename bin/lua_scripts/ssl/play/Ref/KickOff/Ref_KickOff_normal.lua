@@ -176,7 +176,7 @@ firstState = "start",
 },
 
 
-name = "Ref_KickOff8",
+name = "Ref_KickOff_normal",
 applicable = {
   exp = "a",
   a = true

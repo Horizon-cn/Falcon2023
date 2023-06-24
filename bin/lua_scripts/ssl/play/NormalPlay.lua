@@ -17,15 +17,15 @@ firstState = "PureDefence",
 	Leader   = task.marking("First"),
 	Assister = task.marking("Second"),
     Middle   = task.marking("Third"),
-    Special  = task.advance(),
-	Defender = task.multiBack(3,1),
-	Breaker  = task.multiBack(3,2),
-	Crosser  = task.multiBack(3,3),
+    Special  = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker  = task.multiBack(3,3),
+	Crosser  = task.advance(),
 	Goalie   = task.goalieNew(),
-    match = "[S][DBC][LMA]"
+    match = "[SDBC][LMA]"
 },
 
-name = "NormalPlayPureDefence8",
+name = "NormalPlay",
 applicable ={
 	exp = "a",
 	a = true

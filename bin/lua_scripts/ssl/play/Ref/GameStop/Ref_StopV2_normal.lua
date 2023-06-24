@@ -256,8 +256,8 @@ firstState = "start",
   Leader   = task.goCmuRush(KICKOF_POS_3, dir.playerToBall, ACC, STOP_DSS),
   Defender = task.rightBack(),--task.defendMiddle4Stop(),--TODO
   Middle   = task.leftBack(),
-	Breaker  = task.multiBack(3,1),
-  Crosser  = task.multiBack(3,2),
+	Breaker  = task.multiBack(2,1),
+  Crosser  = task.multiBack(2,2),
   Goalie   = task.goalieNew(),
   match    = "[DM][BC][ASL]"
 },
@@ -313,8 +313,8 @@ firstState = "start",
   Leader   = task.sideBack(),
   Defender = task.rightBack(),--task.defendMiddle4Stop(),--TODO
   Middle   = task.leftBack(),
-	Breaker  = task.multiBack(3,1),
-  Crosser  = task.multiBack(3,2),
+	Breaker  = task.multiBack(2,1),
+  Crosser  = task.multiBack(2,2),
   Goalie   = task.goalieNew(),
   match    = "[DM][BC][L][AS]"
 },
@@ -441,10 +441,10 @@ firstState = "start",
   --Center   = task.stop(),
   --Fronter = task.stop(),
   Middle   = task.leftBack(),
-	Breaker  = task.multiBack(3,1),
-  Crosser  = task.multiBack(3,2),
+	Breaker  = task.multiBack(2,1),
+  Crosser  = task.multiBack(2,2),
   Goalie   = task.goalieNew(),
-  match    = "[DM][BC][LA][S]"
+  match    = "[A][DM][BC][L][S]"
 },
 
 ["reDoStop"] = {
@@ -467,7 +467,7 @@ firstState = "start",
   match    = "[AMDLSBC]"
 },
 
-name = "Ref1_StopV2",
+name = "Ref_StopV2_normal",
 applicable = {
   exp = "a",
   a = true

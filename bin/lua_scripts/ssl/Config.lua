@@ -2,7 +2,7 @@ IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 USE_SWITCH = false
-OPPONENT_NAME = "PureDefence8"--"Avoidfoul" PureDefence6 PureDefence8
+OPPONENT_NAME = "NormalKick"--"Avoidfoul" PureDefence6 PureDefence8 NormalKick
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
@@ -25,8 +25,8 @@ gSwitchNum = {
 -- 有0号在场门将就是0号，没有0号在场，看这里设置的号码
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
-	["Kicker"]   = {0},
-	["Goalie"]   = {1},
+	["Kicker"]   = {10},
+	["Goalie"]   = {11},
 	["Tier"]	 = {13},
 	["Receiver"] = {12}
 }
@@ -45,6 +45,7 @@ gSkill = {
 	"DribbleTurn",
 	"GoSupport",
 	--位移
+	"SpeedTest",
 	"SmartGoto",
 	"GoCmuRush",
 	"SimpleGoto",
@@ -106,6 +107,7 @@ gRefPlayTable = {
 	"Ref/KickOff/Ref_KickOffV23",
 	"Ref/KickOff/Ref_KickOffV230",
 	"Ref/KickOff/Ref_KickOff8",
+	"Ref/KickOff/Ref_KickOff_normal",
 
 
 	--角球进攻
@@ -120,6 +122,7 @@ gRefPlayTable = {
 	"Ref/CornerKick/Ref_CornerKickV2",
 	"Ref/CornerKick/Ref_CornerPush",
 	"Ref/CornerKick/Ref_CornerPush8",
+	"Ref/CornerKick/Ref_CornerPush_normal",
 	--前场进攻
 	"Ref/FrontKick/Ref_FrontKickV23",
 	"Ref/FrontKick/Ref_FrontKickV41",
@@ -128,6 +131,7 @@ gRefPlayTable = {
 	"Ref/FrontKick/Ref_FrontKickV610",
 	"Ref/FrontKick/Ref_FrontPush",
 	"Ref/FrontKick/Ref_FrontPush8",
+	"Ref/FrontKick/Ref_FrontPush_normal",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
@@ -142,18 +146,21 @@ gRefPlayTable = {
 	"Ref/BackKick/Ref_ImmortalKickV610",
 	"Ref/BackKick/Ref_BackPush",
 	"Ref/BackKick/Ref_BackPush8",
+	"Ref/BackKick/Ref_BackPush_normal",
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
 	"Ref/KickOffDef/Ref_KickOffDefV23",
 	"Ref/KickOffDef/Ref_KickOffDefV230",
 	"Ref/KickOffDef/Ref_KickOffDef8",
+	"Ref/KickOffDef/Ref_KickOffDef_normal",
 
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDefV5",
 	"Ref/CornerDef/Ref_CornerDefV2",
 	"Ref/CornerDef/Ref_CornerDefV20",
 	"Ref/CornerDef/Ref_CornerDef8",
+	"Ref/CornerDef/Ref_CornerDef_normal",
 
 	--中场防守
 	"Ref/MiddleDef/Ref_MiddleDefV10",
@@ -161,6 +168,7 @@ gRefPlayTable = {
 	"Ref/MiddleDef/Ref_MiddleDefV2",
 	"Ref/MiddleDef/Ref_MiddleDefV20",
 	"Ref/MiddleDef/Ref_MiddleDef8",
+	"Ref/MiddleDef/Ref_MiddleDef_normal",
 
 	--前场防守
 	"Ref/FrontDef/Ref_FrontDefV8",
@@ -168,6 +176,7 @@ gRefPlayTable = {
 	"Ref/FrontDef/Ref_FrontDefV2",
 	"Ref/FrontDef/Ref_FrontDefV20",
 	"Ref/FrontDef/Ref_FrontDef8",
+	"Ref/FrontDef/Ref_FrontDef_normal",
 
 	--后场防守
 	"Ref/BackDef/Ref_BackDefV10",
@@ -176,6 +185,7 @@ gRefPlayTable = {
 	"Ref/BackDef/Ref_BackDefV2",
 	"Ref/BackDef/Ref_BackDefV20",
 	"Ref/BackDef/Ref_BackDef8",
+	"Ref/BackDef/Ref_BackDef_normal",
 
 	--己方放球
 	"Ref/BallPlace/Ref_OurBallPlaceV2",
@@ -188,12 +198,14 @@ gRefPlayTable = {
 	"Ref/PenaltyKick/Ref_PenaltyKickV6",
 	"Ref/PenaltyKick/Ref_PenaltyKickV60",
 	"Ref/PenaltyKick/Ref_PenaltyKick8",
+	"Ref/PenaltyKick/Ref_PenaltyKick_normal",
 
 	--点球防守
 	"Ref/PenaltyDef/Ref_PenaltyDefV1",
 	"Ref/PenaltyDef/Ref_PenaltyDefV6",
 	"Ref/PenaltyDef/Ref_PenaltyDefV60",
 	"Ref/PenaltyDef/Ref_PenaltyDef8",
+	"Ref/PenaltyDef/Ref_PenaltyDef_normal",
 
 	--停止站位
 	"Ref/GameStop/Ref_Stop4BackKick",
@@ -218,11 +230,15 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_Stop4CornerDefV8",
 	"Ref/GameStop/Ref_Stop4CornerKickV8",
 
-	
 	"Ref/GameStop/Ref1_StopV2",
 	"Ref/GameStop/Ref1_StopV3",
 	"Ref/GameStop/Ref1_Stop4CornerDef",
 	"Ref/GameStop/Ref1_Stop4CornerKick",
+
+	"Ref/GameStop/Ref_StopV2_normal",
+	"Ref/GameStop/Ref_StopV3_normal",
+	"Ref/GameStop/Ref_Stop4CornerDef_normal",
+	"Ref/GameStop/Ref_Stop4CornerKick_normal",
 
 
 	"Ref/GameStop/Ref_StopBack",
@@ -246,6 +262,7 @@ gTestPlayTable = {
 	"Test_ReceivePass",
 	"Test_PassEachOther",
 	"Test_StaticGetBall",
+	"Test_Speed",
 	"Test_Advance",
 	"Test_GoSupport",
 	"Test_AdvanceV4",
@@ -263,11 +280,13 @@ gTestPlayTable = {
 	"Test_NormalMiddleDefend",
 	"Test_Circle",
 	"Test_play6",
+	"NormalPlay",
 	"NormalPlayPureDefence",
 	"NormalPlayPureDefence8",
 	"Test_defend6",
 	"Test_play6ForTest",
 	"Test_DSS",
 	"Test_Run6",
-	"Test_play3"
+	"Test_play3",
+	"Test_NormalPass"
 }

@@ -7,7 +7,10 @@ module(..., package.seeall)
 --------------------------------------------------------------------------------------------
 
 ------------------------------------- 跑位相关的skill ---------------------------------------
-
+function speedTest(p1,p2,v1,v2,v_step)
+	local mexe,mpos=SpeedTest{p1=p1,p2=p2,v1=v1,v2=v2,v_step=v_step}
+	return {mexe,mpos}
+end
 --~ p为要走的点, d默认为射门朝向, f为相关的flag
 function goSimplePos(p, d, f)
 	local idir
@@ -132,7 +135,6 @@ function passToPos(p, c)
 	local mexe, mpos = ChaseKick{pos = ball.pos, dir = idir}
 	return {mexe, mpos, kick.flat, idir, pre.middle, ipower, cp.full(), flag.nothing}
 end
-
 
 function chipPass(p, c, f, anti)
 	local idir
