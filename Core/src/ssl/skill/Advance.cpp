@@ -255,12 +255,12 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) _state = PUSHOUT;
 		break;
 	}
-	
+	/*
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-		_state = GET;
+		_state = PASS;
 	}
 	else _state = GET;
-	
+	*/
 	/**********************************************************
 	* Description: ×´Ì¬Ö´ÐÐ
 	* Author: Ì·Óîºê

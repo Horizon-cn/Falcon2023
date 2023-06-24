@@ -226,14 +226,14 @@ void CGetBallV5::plan(const CVisionModule* pVision)
 
         if (fabs(me.Dir() - finalDir) > Param::Math::PI * 90 / 180) {
             getball_task.player.max_acceleration = getball_task.player.max_deceleration = 650;
-            getball_task.player.max_rot_acceleration = 12 * slowfactor;
-            getball_task.player.max_deceleration = 12 * slowfactor;
+            getball_task.player.max_rot_acceleration = 16 * slowfactor;
+            getball_task.player.max_deceleration = 16 * slowfactor;
         }
         // 误差90+，高速转动
         else if (fabs(me.Dir() - finalDir) < Param::Math::PI * 20 / 180) {
             getball_task.player.max_acceleration = getball_task.player.max_deceleration = 300;
-            getball_task.player.max_rot_acceleration = 6 * slowfactor;
-            getball_task.player.max_deceleration = 6 * slowfactor;
+            getball_task.player.max_rot_acceleration = 7 * slowfactor;
+            getball_task.player.max_deceleration = 7 * slowfactor;
         }
         // 误差小于20，不需要高速转动，降低速度
 
@@ -307,23 +307,31 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                     // 缓慢接近
                 }*/
 
-                setSubTask(PlayerRole::makeItChaseToGetBall(_executor, ball.Vel().mod(), 0));
+                setSubTask(PlayerRole::makeItChaseToGetBall(_executor, ball.Vel().dir(), 0));
                 haveset = 1;
             }
             else {
-                //CGeoLine ballMoveingLine(ball.Pos(), ball.Vel().dir());
-                //CGeoPoint projMe = ballMoveingLine.projection(me.Pos());
+                CGeoLine ballMoveingLine(ball.Pos(), ball.Vel().dir());
+                CGeoPoint projMe = ballMoveingLine.projection(me.Pos());
                 bool IsMyPosIsOK = (fabs(Utils::Normalize((me.Pos() - ball.Pos()).dir() - ball.Vel().dir())) < Param::Math::PI * 30 / 180);
                 bool IsMyDirIsOK = (fabs(Utils::Normalize((ball.Pos() - me.Pos()).dir() - me.Dir())) < Param::Math::PI * 3 / 180);
 
                 if (IsMyPosIsOK && IsMyDirIsOK) {
                     // 已经对准
-                    getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(maxGetBallDist, Utils::Normalize((ball.Pos() - me.Pos()).dir()));
+                    //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(-Param::Field::BALL_SIZE, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
+                    getball_task.player.pos = ball.Pos();// ball.Pos() + Utils::Polar2Vector(-1.0 * maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir()));;
+                    getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
+                    getball_task.player.needdribble = IS_DRIBBLE;
+                }
+                else if ((expectedGetPos - ball.Pos()).mod() < (projMe - ball.Pos()).mod() && (!IsBehind)) {
+                    // 已经对准
+                    //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(-Param::Field::BALL_SIZE, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
+                    getball_task.player.pos = projMe;// ball.Pos() + Utils::Polar2Vector(-1.0 * maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir()));;
                     getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
                     getball_task.player.needdribble = IS_DRIBBLE;
                 }
                 else {
-                    getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(-maxGetBallDist, Utils::Normalize((ball.Pos() - me.Pos()).dir()));
+                    getball_task.player.pos = expectedGetPos;
                     getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
 
                     if (ball2meDist < 75)getball_task.player.needdribble = IS_DRIBBLE;
@@ -336,8 +344,8 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             CGeoLine ballMoveingLine(ball.Pos(), ball.Vel().dir());
             CGeoPoint projMe = ballMoveingLine.projection(me.Pos());
             bool IsMyDirIsOK = (fabs(Utils::Normalize((ball.Pos() - me.Pos()).dir() - me.Dir())) < Param::Math::PI * 2.5 / 180);
-            if ((me.Pos() - ball.Pos()).mod() < 30) {
-                setSubTask(PlayerRole::makeItChaseToGetBall(_executor, ball.Vel().mod(), 0));
+            if ((me.Pos() - ball.Pos()).mod() > 20) {
+                setSubTask(PlayerRole::makeItChaseToGetBall(_executor, ball.Vel().dir(), 0));
                 haveset = 1;
             }
             
@@ -842,7 +850,7 @@ double CGetBallV5::TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVisio
 bool CGetBallV5::NotDanger(const CVisionModule* pVision, const int _executor) {
     CGeoPoint ourGoal = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
     const BallVisionT& ball = pVision->Ball();
-    if ((ball.Pos() - ourGoal).mod() < Param::Field::PITCH_LENGTH / 900 * 425 )
+    if ((ball.Pos() - ourGoal).mod() < Param::Field::PITCH_LENGTH / 900 * 425)
         return false;
     return true;
 }

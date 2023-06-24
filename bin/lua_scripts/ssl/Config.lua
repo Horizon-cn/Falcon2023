@@ -2,7 +2,7 @@ IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 USE_SWITCH = false
-OPPONENT_NAME = "NormalKick"--"Avoidfoul" PureDefence6 PureDefence8 NormalKick
+OPPONENT_NAME = "other"--"Avoidfoul" PureDefence6 PureDefence8 NormalKick
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
@@ -25,7 +25,7 @@ gSwitchNum = {
 -- 有0号在场门将就是0号，没有0号在场，看这里设置的号码
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
-	["Kicker"]   = {10},
+	["Kicker"]   = {0},
 	["Goalie"]   = {11},
 	["Tier"]	 = {13},
 	["Receiver"] = {12}

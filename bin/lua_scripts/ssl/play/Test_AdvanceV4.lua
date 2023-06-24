@@ -15,7 +15,9 @@ firstState = "advance",
 		end
 	end,
 	Leader = task.advance(),
-	match    = "[L]"
+	Assister = task.protectBall(),
+	goalie = task.goalie(),
+	match    = "[L][A]"
 },
 
 name = "Test_AdvanceV4",
