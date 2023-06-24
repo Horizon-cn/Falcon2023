@@ -254,14 +254,14 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3 ) _state = PUSHOUT;
 		break;
 	}
-	/*
+	/*debug here
+	*/
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-		//_state = BREAKPASS;
+		_state = BREAKPASS;
 		//_state = BREAKSHOOT;
-		_state = PUSHOUT;
+		//_state = PUSHOUT;
 	}
 	else _state = GET;
-	*/
 	/**********************************************************
 	* Description: ×´Ì¬Ö´ÐÐ
 	* Author: Ì·Óîºê
@@ -1181,11 +1181,11 @@ CGeoPoint CAdvance::GenerateBreakPassPoint(const CVisionModule* pVision, int vec
 
 double CAdvance::GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
 	double dist = (StartPoint - targetPoint).mod() - Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER;
-	cout << "dist::"<<' '<<dist << endl;
+	//cout << "dist::"<<' '<<dist << endl;
 	double passPower = sqrt(powf(ParamManager::Instance()->FASTEST_RECEIVE_VEL, 2) + 2 * ParamManager::Instance()->BALL_DEC * dist) * ADV_FPASSPOWER_Alpha;
 	// std::cout << "passPower" << passPower << std::endl;
 
-	cout << "passpower::" << ' ' << passPower << endl;
+	//cout << "passpower::" << ' ' << passPower << endl;
 	return min(passPower, (double)Param::Rule::MAX_BALL_SPEED - 10);
 	// return max(min(650.0, ADV_FPASSPOWER_Alpha* dist ), 200.0);
 }
