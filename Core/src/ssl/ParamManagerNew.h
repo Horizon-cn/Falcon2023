@@ -182,7 +182,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(PASS_PRECISION, "Advance/PASS_PRECISION", 7);
             loadParam(AdGetBallBias, "Advance/AdGetBallBias", 0);
             loadParam(BalltoMeVelTime, "Advance/BalltoMeVelTime", 1.0);
-            loadParam(KICKPOWER, "Advance/KICKPOWER", 700);
+            loadParam(KICKPOWER, "Advance/KICKPOWER", 650);
             loadParam(CHIPPOWER, "Advance/CHIPPOWER", 240);
             loadParam(ADV_FPASSPOWER, "Advance/ADV_FPASSPOWER", 2);
             loadParam(ADV_CPASSPOWER, "Advance/ADV_CPASSPOWER", 1);

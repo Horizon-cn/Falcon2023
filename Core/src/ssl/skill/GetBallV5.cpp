@@ -404,7 +404,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
     /*
     if (HaveBeenBlockPoint(pVision, _executor, getball_task.player.pos)) {
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -225), "We Have To Solve The Block!!!", COLOR_CYAN);
-        
+
         CGeoPoint Target = getball_task.player.pos;
 
         CGeoLine TargetLine(ball.Pos(), Target);
@@ -428,7 +428,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         }
         */
         //if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 220),"GET:I have Been Block", COLOR_CYAN);
-        
+
     //}
 
     // 调用底层控制
@@ -445,8 +445,9 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         getball_task.player.needdribble = IS_DRIBBLE;
     else getball_task.player.needdribble = !IS_DRIBBLE;
     getball_task.player.IsGetBaller = true;
-    
-    if(!haveset)setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(getball_task));
+
+    //if(!haveset)
+        setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(getball_task));
     //setSubTask(PlayerRole::makeItStop(_executor, 0));
     _lastCycle = pVision->Cycle();
     CStatedTask::plan(pVision);

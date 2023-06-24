@@ -77,7 +77,8 @@
 #include "GoTechChalPos.h"
 #include "GotoPositionNew.h"
 #include "GoPIDCircle.h"
-#include <ChaseToGetBall.h>
+#include "ChaseToGetBall.h"
+#include "lightkick.h"
 
 /************************************************************************/
 /*                      TaskFactoryV2                                    */
@@ -102,6 +103,10 @@ CPlayerTask* CTaskFactoryV2::MakeTask(const TaskT& task)
 
 //working
 //
+CPlayerTask* CTaskFactoryV2::lightkick(const TaskT& task)
+{
+	return MakeTask<Clightkick>(task);
+}
 CPlayerTask* CTaskFactoryV2::Break(const TaskT& task)
 {
 	return MakeTask<CBreak>(task);
@@ -363,6 +368,13 @@ CPlayerTask* CTaskFactoryV2::DribbleTurnKickV2(const TaskT& task) {
 //////////////////////////////////////////////////////////////////////////
 // define the namespace used to provide interface for task calling
 namespace PlayerRole {
+	CPlayerTask* makeItlightkick(const int num, const double dir)
+	{	
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = dir;
+		return TaskFactoryV2::Instance()->lightkick(playerTask);
+	}
 	CPlayerTask* makeItBreak(const int num, const bool needkick,  const bool isPenalty, const bool isSpin)
 	{	// needkick = 1 £∫ƒ√«ÚÕª∆∆£ªtarget£∫√ª”√¡À£ª
 		static TaskT playerTask;

@@ -108,9 +108,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 	//CGeoPoint PassPoint;
 	/*??痦??*/
 	
-	if(canScore(pVision, _executor, OBSTACLE_RADIUS, me.Dir()))
+	if (WeCanAlwaysSetKick(pVision, _executor))
 		KickStatus::Instance()->setKick(_executor, KICKPOWER);
-	
 	//CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
 	//ShootPoint = GenerateBreakShootPoint(pVision, _executor);
 	//PassPoint = GenerateBreakPassPoint(pVision, _executor);
@@ -198,11 +197,15 @@ void CAdvance::plan(const CVisionModule* pVision)
 				if (_state == KICK) {
 					_state = CHASEKICK;
 					break;
-				}
+				}/*
 				else if (_state == PUSHOUT) {
-					_state = CHASEPUSH;
-					break;
-				}
+					//_state = CHASEPUSH;
+					//break;
+				}*/
+			}
+			if (OppIsFarThanMe(pVision, _executor) && _state == PUSHOUT) {
+				_state = PUSHOUT;
+				break;
 			}
 			_state = GET;
 			break;
@@ -247,11 +250,15 @@ void CAdvance::plan(const CVisionModule* pVision)
 				if (_state == KICK) {
 					_state = CHASEKICK;
 					break;
-				}
+				}/*
 				else if (_state == PUSHOUT) {
-					_state = CHASEPUSH;
-					break;
-				}
+					//_state = CHASEPUSH;
+					//break;
+				}*/
+			}
+			if (OppIsFarThanMe(pVision, _executor) && _state == PUSHOUT) {
+				_state = PUSHOUT;
+				break;
 			}
 			_state = GET;
 			break;
@@ -259,8 +266,28 @@ void CAdvance::plan(const CVisionModule* pVision)
 		break;
 	case CHASEKICK:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHASEKICK", COLOR_YELLOW);
-		if (GenerateNextState(pVision, _executor) != KICK || !CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) _state = GET;
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) _state = KICK;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.5) {
+			_state = GenerateNextState(pVision, _executor);
+			break;
+		}
+		else {
+			_state = GenerateNextState(pVision, _executor);
+			if (CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) {
+				if (_state == KICK) {
+					_state = CHASEKICK;
+					break;
+				}/*
+				else if (_state == PUSHOUT) {
+					//_state = CHASEPUSH;
+					//break;
+				}*/
+			}
+			if (OppIsFarThanMe(pVision, _executor) && _state == PUSHOUT) {
+				_state = PUSHOUT;
+				break;
+			}
+			_state = GET;
+		}
 		break;
 	case CHASEPUSH:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHASEPUSH", COLOR_YELLOW);
@@ -269,14 +296,14 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) _state = PUSHOUT;
 		break;
 	}
-	/*debug here
-	*//*
+
+	/*
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-		_state = BREAKING;
+		_state = PUSHOUT;
 		//_state = BREAKSHOOT;
 		//_state = PUSHOUT;
 	}
-	else _state = GET;
+	else _state = PUSHOUT;
 	*/
 	/**********************************************************
 	* Description: 状态执行
@@ -407,9 +434,15 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case JUSTCHIPPASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "JUSTCHIP", COLOR_YELLOW);
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
-		TMP = PassDirInside(pVision, _executor);
-		KickorPassDir = TMP.dir;
-		PassPoint = TMP.pos;
+		if (IHaveSupport) {
+			TMP = PassDirInside(pVision, _executor);
+			KickorPassDir = TMP.dir;
+			PassPoint = TMP.pos;
+		}
+		else {
+			PassPoint = theirCenter;
+			KickorPassDir = (PassPoint - me.Pos()).dir();
+		}
 		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
 			double ThePower = GetCPassPower(me.Pos(), PassPoint);
 			setSubTask(PlayerRole::makeItJustKick(_executor, 1, ThePower));
@@ -444,19 +477,20 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 	case PUSHOUT:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "PUSHOUT", COLOR_YELLOW);
-
+		
 		PassPoint = generateNormalPushPoint(pVision, _executor);// : PassPoint;
-		//bool;
-		isChipKick = toChipOrToFlat(pVision, _executor, PassPoint) == 0;
-		//double;
-		kickPower = 0;
 		KickorPassDir = (PassPoint - me.Pos()).dir();
+		/*
+		isChipKick = toChipOrToFlat(pVision, _executor, PassPoint) == 0;
+		kickPower = 0;
 		if (isChipKick)
 			kickPower = GetCPassPower(me.Pos(), PassPoint);
 		else
 			kickPower = GetFPassPower(me.Pos(), PassPoint);
 
 		setSubTask(PlayerRole::makeItJustKick(_executor, isChipKick, kickPower));
+		*/
+		setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
 		break;
 
 	case CHASEKICK:
@@ -511,6 +545,7 @@ bool CAdvance::checkOppHasBall(const CVisionModule* pVision) {
 	const PlayerVisionT& me = pVision->OurPlayer(_executor);
 	const CVector self2ball = ball.Pos() - me.Pos();
 	opponentID = getTheirMostClosetoPosPlayerNum(pVision, pVision->Ball().Pos());
+	Oppfront = getTheirMostCloseAndFronttoPosPlayerNum(pVision, pVision->Ball().Pos());
 	const PlayerVisionT& opponent = pVision->TheirPlayer(opponentID);
 	if (Advance_DEBUG_ENGINE)GDebugEngine::Instance()->gui_debug_msg(opponent.Pos(), "Best Opp!", COLOR_WHITE);
 	CVector opponent2ball = ball.Pos() - opponent.Pos();
@@ -528,6 +563,19 @@ int CAdvance::getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeo
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
 		if (pVision->TheirPlayer(i).Valid()) {
 			if (pVision->TheirPlayer(i).Pos().dist(pos) < dist) {
+				dist = pVision->TheirPlayer(i).Pos().dist(pos);
+				num = i;
+			}
+		}
+	}
+	return num;
+}
+int CAdvance::getTheirMostCloseAndFronttoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos) {
+	double dist = 1000;
+	int num = 0;
+	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+		if (pVision->TheirPlayer(i).Valid()) {
+			if (pVision->TheirPlayer(i).Pos().dist(pos) < dist && pVision->TheirPlayer(i).X() > pos.x()) {
 				dist = pVision->TheirPlayer(i).Pos().dist(pos);
 				num = i;
 			}
@@ -673,8 +721,13 @@ int CAdvance::InWhichArea(const CVisionModule* pVision, int vecNumber) {
 	const double KICKDist = KICK_DIST * Param::Field::PITCH_LENGTH / 900;
 	const double CanNotBreakAreaX = 425.0 * Param::Field::PITCH_LENGTH / 900;
 	const double CanNotBreakAreaY = 260.0 * Param::Field::PITCH_WIDTH / 600;
+	const double ReliefDist = RELIEF_DIST * Param::Field::PITCH_LENGTH / 900;
 	int NowArea = 0;
-	if (MeX < DefenceLineX) {
+	if ((me.Pos() - ourGoal).mod() < ReliefDist) {
+		NowArea = ReliefArea;
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(525, -345), "ReliefArea", COLOR_CYAN);
+	}
+	else if (MeX < DefenceLineX) {
 		NowArea = DefenceArea;
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(525, -345), "DefenceArea", COLOR_CYAN);
 	}
@@ -1007,7 +1060,7 @@ CGeoPoint CAdvance::generateNormalPushPoint(const CVisionModule* pVision, const 
 
 	CGeoPoint FinalTarget = CGeoPoint(-999, -999);
 	double Dist = -1e9;
-	for (int step = -8; step <= 8; ++step) {
+	for (int step = -5; step <= 5; ++step) {
 		const CGeoPoint target = me.Pos() + Utils::Polar2Vector(VectorDist, Param::Math::PI / 180 * 5 * step);
 		const double SingleDist = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), target);
 		if (SingleDist > Dist) FinalTarget = target, Dist = SingleDist;
@@ -1015,7 +1068,7 @@ CGeoPoint CAdvance::generateNormalPushPoint(const CVisionModule* pVision, const 
 	}
 	if (Dist > ThresholdForOpp) {
 		Dist = 1e9;
-		for (int step = -8; step <= 8; ++step) {
+		for (int step = -5; step <= 5; ++step) {
 			const CGeoPoint target = me.Pos() + Utils::Polar2Vector(VectorDist, Param::Math::PI / 180 * 5 * step);
 			if (TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), target) < 60)continue;
 			const double SingleDist = (target - theirCenter).mod();
@@ -1063,13 +1116,17 @@ bool CAdvance::OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber
 bool CAdvance::OppIsFarThanMe(const CVisionModule* pVision, const int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+	const PlayerVisionT& opp2 = pVision->TheirPlayer(Oppfront);
 	const BallVisionT& ball = pVision->Ball();
 	CVector me2Ball = ball.Pos() - me.Pos();
-	CVector Ball2Opp = opp.Pos() - ball.Pos();
+	CVector Ball2Opp = opp2.Pos() - ball.Pos();
 
-	const double threshold = 70;
-	if (me2Ball.mod() < Ball2Opp.mod())return true;
-	return false;
+	const double threshold = 100;
+	if ((me2Ball.mod() < Ball2Opp.mod() && Ball2Opp.mod() > threshold))
+		return true;
+	if (fabs((me2Ball.dir() - Ball2Opp.dir()) < Param::Math::PI / 3) || Ball2Opp.mod() < threshold * 0.6)
+		return false;
+	return true;
 }
 
 double CAdvance::generateOppIsNearThanMeDir(const CVisionModule* pVision, const int vecNumber) {
@@ -1164,10 +1221,15 @@ int CAdvance::opp_ahead(const CVisionModule* pVision, const int vecNumber) {
 
 bool CAdvance::WeCanAlwaysSetKick(const CVisionModule* pVision, const int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	if (canScore(pVision, vecNumber, OBSTACLE_RADIUS * 0.5, me.Dir()))
-		return true;
+	if (MeIsInWhichArea == CenterArea)
+		if (canScore(pVision, vecNumber, OBSTACLE_RADIUS * 2.5, me.Dir()))
+			return true;
+		else return false;
+	if(MeIsInWhichArea == KICKArea)
+		if (canScore(pVision, vecNumber, OBSTACLE_RADIUS * 0.8, me.Dir()))
+			return true;
+		else return false;
 	return false;
-
 }
 
 
@@ -1192,19 +1254,24 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 			return BREAKSHOOT;
 		else return BREAKING;
 	}
+	else if (MeIsInWhichArea == ReliefArea) {
+		return JUSTCHIPPASS;
+	}
 
 	else if (MeIsInWhichArea == DefenceArea) { // 在后场防守区域
-		if (!IHaveSupport)
-			return JUSTCHIPPASS;
+		if (OppIsFarThanMe(pVision, vecNumber))
+			return PUSHOUT;
 		return JUSTCHIPPASS;
 	}
 	else if (MeIsInWhichArea == SideArea) { // 在双边区域
-		if (IHaveSupport) { //pass first
+		if (OppIsFarThanMe(pVision, vecNumber))
+			return PUSHOUT;
+		else if (IHaveSupport) { //pass first
 			return PASS;
 		}
-		else {
-			return PUSHOUT;
-		}	
+		//else {
+		//	return PUSHOUT;
+		//}	
 	}
 	else if (MeIsInWhichArea == CenterArea) { // 在前中场
 		if (tendToShoot(pVision, vecNumber)) {

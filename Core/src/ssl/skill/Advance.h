@@ -47,7 +47,8 @@ private:
         CornerArea,
         KICKArea,
         CanNOTBreakArea,
-        CenterArea
+        CenterArea,
+        ReliefArea,
     };
     int _lastCycle;
     int _state;
@@ -57,6 +58,8 @@ private:
     int meLoseBall;
 
     int opponentID;
+    int Oppfront;
+
     int NumberOfSupport;/* Gpu??????????????? */
     int NowIsShoot;
     int NumOfOurPlayer;
@@ -124,6 +127,7 @@ private:
     bool isVisionHasBall(const CVisionModule* pVision, const int vecNumber);
     bool checkOppHasBall(const CVisionModule* pVision);
     int getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
+    int getTheirMostCloseAndFronttoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
     bool checkBallFront(const CVisionModule* pVision, double angle);
     bool IsOurNearHere(const CVisionModule* pVision, const int supportIndex);
     bool IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber);
