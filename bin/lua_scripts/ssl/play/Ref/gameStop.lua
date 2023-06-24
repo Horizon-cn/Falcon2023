@@ -54,7 +54,6 @@ local ourDirectKick=vision:next_gameState():ourDirectKick()
 local ourIndirectKick=vision:next_gameState():ourIndirectKick()
 local theirDirectKick=vision:next_gameState():theirDirectKick()
 local theirIndirectKick=vision:next_gameState():theirIndirectKick()
-
 -- 1200*900 used
 if OPPONENT_NAME == "PureDefence8" then
     if ball.refPosX() < -360 and math.abs(ball.refPosY()) > 200 then
@@ -107,6 +106,8 @@ elseif OPPONENT_NAME == "NormalKick" then
         else
             gCurrentPlay = "Ref_StopV2_normal"
         end
+    else
+        gCurrentPlay = "Ref_StopV2_normal"
     end
 else
     if ball.refPosX() < -360 and math.abs(ball.refPosY()) > 200 then
