@@ -157,7 +157,8 @@ bool CGoalie2022::ShouldAttack(const CVisionModule* pVision)
 	int robotNum = task().executor;
 	const PlayerVisionT& enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	const BallVisionT& ball = pVision->Ball();
-
+	if (IsFarFromBack(enemy.Pos(), -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH * 2))
+		return false;
 	if (abs(enemy.Pos().y()) > Param::Field::PENALTY_AREA_WIDTH / 2.0 + 30
 		|| enemy.Pos().dist(ball.Pos()) > CLOSE_DIST)
 		return false;
@@ -528,7 +529,7 @@ double CGoalie2022::CalClearBallDir(const CVisionModule* pVision)
 			if (ball2rightDir - ball2leftDir > Param::Math::PI / 2) {
 				clearBallDir = Utils::Normalize((ball2leftDir + ball2rightDir) / 2);
 			} else {
-				vector<double> blockDirList{ -Param::Math::PI,Param::Math::PI };
+				vector<double> blockDirList{ -Param::Math::PI, Param::Math::PI };
 				for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 				{
 					CGeoPoint pos = pVision->OurPlayer(i).Pos();
