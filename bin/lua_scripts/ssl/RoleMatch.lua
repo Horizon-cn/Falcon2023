@@ -251,8 +251,12 @@ function UpdateRole(matchTactic, isPlaySwitched, isStateSwitched)
 			table.insert(matchList, value)
 		else
 			for _, rolename in ipairs(value) do -- 沿用上一周期的匹配
-				gRoleNum[rolename] = gLastRoleNum[rolename]
-				RemoveExistNum(gRoleNum[rolename])
+				if gOurExistNum[gLastRoleNum[rolename]] ~=-1 then
+					gRoleNum[rolename] = gLastRoleNum[rolename]
+					RemoveExistNum(gRoleNum[rolename])
+				else
+					gRoleNum[rolename] = -1
+				end
 			end
 		end
 	end
