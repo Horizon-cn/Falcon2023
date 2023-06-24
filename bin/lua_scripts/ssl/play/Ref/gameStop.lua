@@ -50,7 +50,10 @@ else
     end
 end
 --]]
-
+local ourDirectKick=vision:next_gameState():ourDirectKick()
+local ourIndirectKick=vision:next_gameState():ourIndirectKick()
+local theirDirectKick=vision:next_gameState():theirDirectKick()
+local theirIndirectKick=vision:next_gameState():theirIndirectKick()
 
 -- 1200*900 used
 if OPPONENT_NAME == "PureDefence8" then
@@ -64,14 +67,46 @@ if OPPONENT_NAME == "PureDefence8" then
         gCurrentPlay = "Ref1_StopV2"
     end
 elseif OPPONENT_NAME == "NormalKick" then
-    if ball.refPosX() < -360 and math.abs(ball.refPosY()) > 200 then
-        gCurrentPlay = "Ref_Stop4CornerDef_normal"
-    elseif ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
-        gCurrentPlay = "Ref_Stop4CornerKick_normal"
-    elseif ball.refPosX() < -(param.pitchLength/2 - param.penaltyDepth - 100) and -(param.pitchLength/2 - param.penaltyDepth)<= ball.refPosX() and math.abs(ball.refPosY()) < param.penaltyWidth/2 + 100 then
-        gCurrentPlay = "Ref_StopV3_normal"
-    else
-        gCurrentPlay = "Ref_StopV2_normal"
+    if ourDirectKick then
+        if ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
+            gCurrentPlay = "Ref_Stop4CornerKick"
+        elseif ball.refPosX() > 0 and math.abs(ball.refPosY()) < 220 then
+            gCurrentPlay = "Ref_Stop4FrontKick"
+        elseif ball.refPosX() < 0 then
+            gCurrentPlay = "Ref_Stop4BackKick"
+        end
+    elseif ourIndirectKick then
+        if ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
+            gCurrentPlay = "Ref_Stop4CornerKick"
+        elseif ball.refPosX() > 0 and math.abs(ball.refPosY()) < 220 then
+            gCurrentPlay = "Ref_Stop4FrontKick"
+        elseif ball.refPosX() < 0 then
+            gCurrentPlay = "Ref_Stop4BackKick"
+        end
+    elseif theirDirectKick then
+        if ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
+            gCurrentPlay = "Ref_Stop4CornerDef"
+        elseif ball.refPosX() > 0 and math.abs(ball.refPosY()) < 220 then
+            gCurrentPlay = "Ref_FrontDef_normal"
+        elseif ball.refPosX() < 0 then
+            gCurrentPlay = "Ref_BackDef_normal"
+        elseif ball.refPosX() < -(param.pitchLength/2 - param.penaltyDepth - 100) and -(param.pitchLength/2 - param.penaltyDepth)<= ball.refPosX() and math.abs(ball.refPosY()) < param.penaltyWidth/2 + 100 then
+            gCurrentPlay = "Ref_StopV3_normal"
+        else
+            gCurrentPlay = "Ref_StopV2_normal"
+        end
+    elseif theirIndirectKick then
+        if ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
+            gCurrentPlay = "Ref_Stop4CornerDef"
+        elseif ball.refPosX() > 0 and math.abs(ball.refPosY()) < 220 then
+            gCurrentPlay = "Ref_FrontDef_normal"
+        elseif ball.refPosX() < 0 then
+            gCurrentPlay = "Ref_BackDef_normal"
+        elseif ball.refPosX() < -(param.pitchLength/2 - param.penaltyDepth - 100) and -(param.pitchLength/2 - param.penaltyDepth)<= ball.refPosX() and math.abs(ball.refPosY()) < param.penaltyWidth/2 + 100 then
+            gCurrentPlay = "Ref_StopV3_normal"
+        else
+            gCurrentPlay = "Ref_StopV2_normal"
+        end
     end
 else
     if ball.refPosX() < -360 and math.abs(ball.refPosY()) > 200 then

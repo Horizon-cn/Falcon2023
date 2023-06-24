@@ -1,15 +1,15 @@
 gOppoConfig = {
   ----------------------play---------------------------------------------------------------
 
-	IndirectCornerKick  = {"Ref_IndirectCornerPush_normal"},--80 --"Ref_CornerPush"
+	IndirectCornerKick  = {"Ref_IndirectCornerPush_normal_chip"},--80 --"Ref_CornerPush"
 
 	DirectCornerKick  = {"Ref_DirectCornerPush_normal"},--80 --"Ref_CornerPush"
 
-	IndirectFrontKick   = {"Ref_IndirectFrontPush_normal"},--610 --"Ref_FrontPush"--对面
+	IndirectFrontKick   = {"Ref_IndirectFrontPush_normal_chip"},--610 --"Ref_FrontPush"--对面
 
 	DirectFrontKick   = {"Ref_DirectFrontPush_normal"},--610 --"Ref_FrontPush"--对面
 
-	IndirectBackKick    = {"Ref_IndirectBackPush_normal"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
+	IndirectBackKick    = {"Ref_IndirectBackPush_normal_chip"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
 
 	DirectBackKick    = {"Ref_DirectBackPush_normal"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
 -------------------------------Def---------------------------------------------------

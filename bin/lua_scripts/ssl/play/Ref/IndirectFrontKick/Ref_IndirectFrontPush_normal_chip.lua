@@ -5,7 +5,7 @@ end
 --【接球点】可根据实车情况进行调整
 local RECEIVE_POS = ball.antiYPos(CGeoPoint:new_local(30, 100))
 --【传球力度】可根据实车情况进行调整
-local kickPower = 700
+local kickPower = 500
 
 gPlayTable.CreatePlay{
 
