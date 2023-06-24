@@ -410,7 +410,6 @@ void CAdvance::plan(const CVisionModule* pVision)
 		TMP = PassDirInside(pVision, _executor);
 		KickorPassDir = TMP.dir;
 		PassPoint = TMP.pos;
-		cout << KickorPassDir << ' ' << me.Dir() << ' ' << PassPoint << endl;
 		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
 			double ThePower = GetCPassPower(me.Pos(), PassPoint);
 			setSubTask(PlayerRole::makeItJustKick(_executor, 1, ThePower));
@@ -615,21 +614,13 @@ bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber)
 	const BallVisionT& ball = pVision->Ball();
 	CVector me2Ball = ball.Pos() - me.Pos();
 	CVector me2Opp = opp.Pos() - me.Pos();
-
-	/*
-	char me2Ball1[100];
-	char me2Opp1[100];
-	char dir1[100];
-	sprintf(me2Ball1, "%f", abs(me2Ball.mod()));
-	sprintf(me2Opp1, "%f", abs(me2Opp.mod()));
-	sprintf(dir1, "%f", (me2Ball.dir() - me2Opp.dir()) / Param::Math::PI * 180);
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), me2Ball1, COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), me2Opp1, COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), dir1, COLOR_YELLOW);
-	*/
-
+	
+	char me2opp[100];
+	sprintf(me2opp, "%f", me2Opp.mod());
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), me2opp, COLOR_YELLOW);
 	//changed by lsf
-	if (fabs(me2Opp.mod()) <= 40)
+	
+	if (fabs(me2Opp.mod()) <= 50 && opp.X() > me.X() && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 2.7))
 		return true;
 
 	if ((fabs(me2Ball.mod()) * 1.5 > fabs(me2Opp.mod()) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 3))) {
@@ -655,7 +646,6 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 
 	else return false;
 }
-
 /*
 *		The Data List
 		const double PITCH_LENGTH = OParamManager::Instance()->value(field + "/field_length", 12000).toDouble() * 0.1; //1200; // ³¡µØ³¤

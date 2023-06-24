@@ -48,7 +48,7 @@ namespace gpuCalcArea {
 	const double PI = 3.1415926;
 	const int Color_Size = 256;
 
-	const double differenceX = Param::Field::PITCH_LENGTH / 9;
+	const double differenceX = Param::Field::PITCH_LENGTH / 15;
 
 	const double middleFrontBorderX = Param::Field::PITCH_LENGTH / 6;
 	const double middleBackBorderX = -Param::Field::PITCH_LENGTH / 6;
@@ -82,12 +82,12 @@ namespace gpuCalcArea {
 
 	FieldRectangle fieldRectangleArray[AREANUM] = {
 		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX, sideLineLeftBorderY)),
-        FieldRectangle(CGeoPoint(middleFrontBorderX + differenceX,centerRightBorderY),CGeoPoint(goalLineFrontBorderX,centerLeftBorderY)),
+        FieldRectangle(CGeoPoint(middleFrontBorderX,centerRightBorderY),CGeoPoint(goalLineFrontBorderX - differenceX,centerLeftBorderY)),
         //FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)), 
         FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
-        FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + differenceX,centerLeftBorderY)),
+        FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX,centerLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleBackBorderX,sideLineRightBorderY),CGeoPoint(middleFrontBorderX,centerRightBorderY)),
 
 		// FieldRectangle(CGeoPoint(goalLineBackBorderX,centerLeftBorderY),CGeoPoint(middleBackBorderX,sideLineLeftBorderY)),
@@ -95,13 +95,13 @@ namespace gpuCalcArea {
 		// FieldRectangle(CGeoPoint(goalLineBackBorderX,sideLineRightBorderY),CGeoPoint(middleBackBorderX,centerRightBorderY)),
 	};
 	FieldRectangle processed_fieldRectangleArray[AREANUM] = {
-		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX,sideLineLeftBorderY)),
-		FieldRectangle(CGeoPoint(middleFrontBorderX + differenceX,centerRightBorderY),CGeoPoint(goalLineFrontBorderX,centerLeftBorderY)),
-		//FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,centerLeftBorderY),CGeoPoint(goalLineFrontBorderX, sideLineLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleFrontBorderX,centerRightBorderY),CGeoPoint(goalLineFrontBorderX - differenceX,centerLeftBorderY)),
+		//FieldRectangle(CGeoPoint(450,0),CGeoPoint(450,0)), 
 		FieldRectangle(CGeoPoint(middleFrontBorderX,sideLineRightBorderY),CGeoPoint(goalLineFrontBorderX,centerRightBorderY)),
 
 		FieldRectangle(CGeoPoint(middleBackBorderX,centerLeftBorderY),CGeoPoint(middleFrontBorderX,sideLineLeftBorderY)),
-		FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX + differenceX,centerLeftBorderY)),
+		FieldRectangle(CGeoPoint(middleBackBorderX,centerRightBorderY),CGeoPoint(middleFrontBorderX,centerLeftBorderY)),
 		FieldRectangle(CGeoPoint(middleBackBorderX,sideLineRightBorderY),CGeoPoint(middleFrontBorderX,centerRightBorderY)),
 
 		// FieldRectangle(CGeoPoint(goalLineBackBorderX,centerLeftBorderY),CGeoPoint(middleBackBorderX,sideLineLeftBorderY)),
@@ -489,7 +489,7 @@ void CGPUBestAlgThread::supportSortV2() {
 }
 
 CGeoPoint CGPUBestAlgThread::getBestPointFromArea(int support_idx) {
-	
+
 	CGeoPoint temp_bestSupport;
 	_value_getter_mutex->lock();
 	if (support_idx > AREANUM) { // 处理越界情况，但是后三个点的位置并没有生成
@@ -872,6 +872,7 @@ double CGPUBestAlgThread::getPosPotential(const CGeoPoint p) {
 void CGPUBestAlgThread::setPointValue() {
 	// _value_getter_mutex->lock();
 	pointValueList.clear();
+
 	int size = _l * _w;
 	for (int i = 0; i < size; i++) {
 		if (_PointPotentialOrigin[i] < 0) _PointPotentialOrigin[i] = 0;
@@ -955,7 +956,7 @@ void CGPUBestAlgThread::sendFieldRectangle() {
 		CGeoPoint leftDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftDownPos;
 		CGeoPoint rightDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightDownPos;
 		CGeoPoint centerPos = gpuCalcArea::processed_fieldRectangleArray[i].getCenter();
-		/*
+		
 		GDebugEngine::Instance()->gui_debug_line(leftUpPos, rightUpPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(rightUpPos, rightDownPos, COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_line(rightDownPos, leftDownPos, COLOR_BLACK);
@@ -963,7 +964,7 @@ void CGPUBestAlgThread::sendFieldRectangle() {
 		GDebugEngine::Instance()->gui_debug_x(_bestSupport[i], COLOR_WHITE);
 		GDebugEngine::Instance()->gui_debug_msg(_bestSupport[i], QString::number(i).toStdString().c_str(), COLOR_BLACK);
 		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(_pointPotential[i]).toStdString().c_str(), COLOR_BLACK);
-		*/
+		
 	}
 	//支撑点顺序debug信息
 	

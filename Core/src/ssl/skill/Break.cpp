@@ -547,6 +547,15 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             if (best_point == CGeoPoint(0, 0) || best_point == me.Pos())
                 return best_point=me.Pos()+Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER, Utils::Normalize(me.Dir()));
             GDebugEngine::Instance()->gui_debug_x(best_point, COLOR_ORANGE);
+            if (abs(best_point.y()) > Param::Field::PENALTY_AREA_WIDTH / 2 + 30 || abs(best_point.x()) < (Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30)) {
+                if (abs(best_point.y()) > Param::Field::PENALTY_AREA_WIDTH / 2 + 30)
+                    best_point.setY(Param::Field::PENALTY_AREA_WIDTH / 2 + 30);
+                if (abs(best_point.x()) < (Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30))
+                    best_point.setX(Param::Field::PENALTY_AREA_WIDTH / 2 + 30);
+            }
+            if ((best_point - dribblePoint).mod() > DRIBBLE_DIST) {  // dribblePoint是中心点还是当前点？？？？
+                best_point = makeInCircle(best_point, dribblePoint, DRIBBLE_DIST);
+            }
             return best_point;
         }
 
@@ -578,7 +587,14 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                     for (int y_test = y_min; y_test <= y_max; y_test += 10)
                     {
                         CGeoPoint now_point = CGeoPoint(x_test, y_test);
-                        dist_score_dribble = CVector(pVision->TheirPlayer(num).Pos() - now_point).mod();
+                        dist_score_dribble = 0;
+                        for (int player_num = 0; player_num < Param::Field::MAX_PLAYER; player_num++) {
+                            if (pVision->TheirPlayer(player_num).Valid()) {
+                                if (pVision->TheirPlayer(player_num).Pos().dist(now_point) < 140) {
+                                    dist_score_dribble = dist_score_dribble + CVector(pVision->TheirPlayer(num).Pos() - now_point).mod();
+                                }
+                            }
+                        }
                         CGeoPoint goal_point = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
                         to_goal_score_dribble = CVector(now_point - goal_point).mod();
                         total_score = para_dist * dist_score_dribble + para_goal * to_goal_score_dribble;
@@ -600,6 +616,15 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                     //if (DEBUG) GDebugEngine::Instance()->gui_debug_x(best_point, COLOR_BLUE);
                 }
             GDebugEngine::Instance()->gui_debug_x(best_point, COLOR_ORANGE);
+            if (abs(best_point.y()) > Param::Field::PENALTY_AREA_WIDTH / 2 + 30 || abs(best_point.x()) < (Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30)) {
+                if (abs(best_point.y()) > Param::Field::PENALTY_AREA_WIDTH / 2 + 30)
+                    best_point.setY(Param::Field::PENALTY_AREA_WIDTH / 2 + 30);
+                if (abs(best_point.x()) < (Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30))
+                    best_point.setX(Param::Field::PENALTY_AREA_WIDTH / 2 + 30);
+            }
+            if ((best_point - dribblePoint).mod() > DRIBBLE_DIST) {  // dribblePoint是中心点还是当前点？？？？
+                best_point = makeInCircle(best_point, dribblePoint, DRIBBLE_DIST);
+            }
             return best_point;
         }
 }
