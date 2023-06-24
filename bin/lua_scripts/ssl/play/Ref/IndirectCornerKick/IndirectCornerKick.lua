@@ -6,10 +6,10 @@
 -- 在进入每一个定位球时，需要在第一次进时进行保持
 
 
-if type(gOppoConfig.CornerKick) == "function" then
-	gCurrentPlay = cond.getOpponentScript("Ref_CornerKickV",gOppoConfig.CornerKick(),20)
+if type(gOppoConfig.IndirectCornerKick) == "function" then
+	gCurrentPlay = cond.getOpponentScript("Ref_IndirectCornerKickV",gOppoConfig.IndirectCornerKick(),20)
 else
-	gCurrentPlay = cond.getOpponentScript("Ref_CornerKickV",gOppoConfig.CornerKick,20)
+	gCurrentPlay = cond.getOpponentScript("Ref_IndirectCornerKickV",gOppoConfig.IndirectCornerKick,20)
 end
 
 

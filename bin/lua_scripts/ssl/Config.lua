@@ -111,20 +111,12 @@ gRefPlayTable = {
 
 
 	--角球进攻
-	"Ref/CornerKick/Ref_CornerKickV1",
-	"Ref/CornerKick/Ref_CornerKickV6",
-	"Ref/CornerKick/Ref_CornerKickV8",
-	"Ref/CornerKick/Ref_CornerKickV80",
-	"Ref/CornerKick/Ref_CornerKickV30",
-	"Ref/CornerKick/Ref_CornerKickV201",
-	"Ref/CornerKick/Ref_CornerKickV202",
-	"Ref/CornerKick/Ref_CornerKickV300",
-	"Ref/CornerKick/Ref_CornerKickV2",
-	"Ref/CornerKick/Ref_CornerPush",
-	"Ref/CornerKick/Ref_CornerPush8",
-	"Ref/CornerKick/Ref_CornerPush_normal_indirect",
-	"Ref/CornerKick/Ref_CornerPush_normal_indirect_chip",
-	"Ref/CornerKick/Ref_CornerPush_normal_direct",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush8",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal_chip",
+
+	"Ref/DirectCornerKick/Ref_DirectCornerPush_normal",
 	--前场进攻
 	"Ref/FrontKick/Ref_FrontKickV23",
 	"Ref/FrontKick/Ref_FrontKickV41",

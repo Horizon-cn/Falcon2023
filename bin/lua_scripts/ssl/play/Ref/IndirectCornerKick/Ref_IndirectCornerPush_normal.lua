@@ -96,7 +96,7 @@ gPlayTable.CreatePlay{
     match = "[S][A][D][C][B][LM]"
   },
 
-  name = "Ref_CornerPush_normal_indirect",
+  name = "Ref_IndirectCornerPush_normal",
   applicable = {
     exp = "a",
     a   = true
