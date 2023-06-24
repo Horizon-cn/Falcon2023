@@ -4,6 +4,8 @@ end
 
 --【接球点】可根据实车情况进行调整
 local RECEIVE_POS = ball.antiYPos(CGeoPoint:new_local(0, 100))
+--【射门点】可根据实车情况进行调整
+local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(300, 200))
 --【传球力度】可根据实车情况进行调整
 local kickPower = 600
 
@@ -34,7 +36,7 @@ gPlayTable.CreatePlay{
         return "shootBall"
       end
     end,
-    Assister = task.staticGetBall(RECEIVE_POS),
+    Assister = task.staticGetBall(SHOOT_POS),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
     Special  = task.multiBack(3,1),
@@ -63,7 +65,7 @@ gPlayTable.CreatePlay{
   },
 
 
-  name = "Ref_FrontPush_normal_direct",
+  name = "Ref_DirectFrontPush_normal",
   applicable = {
     exp = "a",
     a   = true

@@ -21,12 +21,12 @@ gPlayTable.CreatePlay{
     Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
-    Special  = task.multiBack(3,1),
-    Defender = task.multiBack(3,2),
-    Breaker  = task.multiBack(3,3),
+    Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[A][S][D][C][B][LM]"
+    match = "[A][S][C][D][B][LM]"
   },
 
   ["toBall"] = {
@@ -43,7 +43,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[A][S][D][C][B][LM]"
+    match =  "[A][S][C][D][B][LM]"
   },
 
   ["kickBall"] = {
@@ -52,7 +52,7 @@ gPlayTable.CreatePlay{
         return "receiveBall"
       end
     end,
-    Assister = task.chipPass(RECEIVE_POS, kickPower),
+    Assister = task.passToPos(RECEIVE_POS, kickPower),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
     Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
@@ -60,16 +60,16 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[A][S][D][C][B][LM]"
+    match = "[A][S][C][D][B][LM]"
   },
 
   ["receiveBall"] = {
     switch = function ()
-      if bufcnt(ball.toPlayerHeadDist("Special") < 5, "fast", 180) then--
+      if bufcnt(player.toBallDist("Special")<15, 3, 180) then--
         return "shootBall"
       end
     end,
-    Assister = task.markingFront("Third"),
+    Assister = task.stop(),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
     Special  = task.receive(ball.pos(),RECEIVE_POS),
@@ -77,7 +77,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[S][A][D][C][B][LM]"
+    match = "[S][A][C][D][B][LM]"
   },
 
 ["shootBall"] = {--如果special转大半圈还找不到射门角度就会弃球而逃
@@ -86,7 +86,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.markingFront("Third"),
+    Assister = task.stop(),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
     Special  = task.chaseNew(),
@@ -94,10 +94,10 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[S][A][D][C][B][LM]"
+    match = "[S][A][C][D][B][LM]"
   },
 
-  name = "Ref_BackPush_normal_indirect_chip",
+  name = "Ref_IndirectBackPush_normal",
   applicable = {
     exp = "a",
     a   = true

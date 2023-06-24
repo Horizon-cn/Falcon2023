@@ -53,7 +53,7 @@ gPlayTable.CreatePlay{
     match    = "{LS}{A}{M}{D}"
   },
 
-  name = "Ref_BackPush",
+  name = "Ref_IndirectFrontPush",
   applicable = {
     exp = "a",
     a   = true
