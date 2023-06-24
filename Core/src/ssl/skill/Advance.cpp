@@ -30,7 +30,7 @@ CAdvance::CAdvance()
 	OPP_HAS_BALL_DIST = paramManager->OPP_HAS_BALL_DIST; /*判断敌方是否有球的距离 需要调整*/
 	CanPassToWingDist = paramManager->CanPassToWingDist; /*Advance能够传给边锋的临界距离*/
 	CanWingShootDist = paramManager->CanWingShootDist; /*边锋能够射门的临界距离*/
-	SHOOT_PRECISION = paramManager->SHOOT_PRECISION;	/*允许射门最小精度角分母，越大越慢越精确 最低为7最高17*/
+	PASS_PRECISION = paramManager->PASS_PRECISION;	/*允许射门最小精度角分母，越大越慢越精确 最低为7最高17*/
 	GetBallBias = paramManager->AdGetBallBias;	/*AdvanceGetball的偏差*/
 	BalltoMeVelTime = paramManager->BalltoMeVelTime; /*Advance传球给我主动去接的临界时间*/
 	OBSTACLE_RADIUS = paramManager->BREAK_OBSTACLE_RADIUS;
@@ -46,7 +46,6 @@ CAdvance::CAdvance()
 	Advance_DEBUG_ENGINE = paramManager->Advance_DEBUG_ENGINE;
 	// GetBallV4
 	LARGE_ADJUST_ANGLE = paramManager->LARGE_ADJUST_ANGLE;
-
 
 }
 
@@ -235,13 +234,29 @@ void CAdvance::plan(const CVisionModule* pVision)
 		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
 		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
-	case BREAKPASS:
+	case BREAKING:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push BreakPass", COLOR_YELLOW);
 		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
-		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
+			_state = GenerateNextState(pVision, _executor);
+			break;
+		}
+		else {
+			_state = GenerateNextState(pVision, _executor);
+			if (CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) {
+				if (_state == KICK) {
+					_state = CHASEKICK;
+					break;
+				}
+				else if (_state == PUSHOUT) {
+					_state = CHASEPUSH;
+					break;
+				}
+			}
+			_state = GET;
+			break;
+		}
 		break;
-
-
 	case CHASEKICK:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHASEKICK", COLOR_YELLOW);
 		if (GenerateNextState(pVision, _executor) != KICK || !CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) _state = GET;
@@ -255,13 +270,14 @@ void CAdvance::plan(const CVisionModule* pVision)
 		break;
 	}
 	/*debug here
-	*/
+	*//*
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-		_state = BREAKPASS;
+		_state = BREAKING;
 		//_state = BREAKSHOOT;
 		//_state = PUSHOUT;
 	}
 	else _state = GET;
+	*/
 	/**********************************************************
 	* Description: 状态执行
 	* Author: 谭宇宏
@@ -367,17 +383,14 @@ void CAdvance::plan(const CVisionModule* pVision)
 		KickorPassDir = TMP.dir;
 		PassPoint = TMP.pos;
 
-
 		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
 			double ThePower = 0;
 			bool IsFlatKick = toChipOrToFlat(pVision, _executor, PassPoint);
 			if (IsFlatKick) {
 				ThePower = GetFPassPower(me.Pos(), PassPoint);
-				//KickStatus::Instance()->setKick(_executor, ThePower);
 			}
 			else {
 				ThePower = GetCPassPower(me.Pos(), PassPoint);
-				//KickStatus::Instance()->setChipKick(_executor, ThePower);
 			}
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PASS isDirOK", COLOR_ORANGE);
 
@@ -389,18 +402,6 @@ void CAdvance::plan(const CVisionModule* pVision)
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PASS is NOT DirOK ", COLOR_ORANGE);
 			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		}
-		/*
-		if (toChipOrToFlat(pVision, _executor, PassPoint) == 1) {
-			/*鉴定为可以平传球 则平传球
-			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "FLATPASS", COLOR_ORANGE);
-			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, GetFPassPower(me.Pos(), PassPoint), PassPoint));
-		}
-		else {
-			/*鉴定为不能平传球 则选择挑传 考虑函数同样为flatPassDir
-			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHIPPASS", COLOR_CYAN);
-			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, GetCPassPower(me.Pos(), PassPoint), PassPoint));
-		}
-		*/
 		break;
 
 	case JUSTCHIPPASS:
@@ -409,11 +410,11 @@ void CAdvance::plan(const CVisionModule* pVision)
 		TMP = PassDirInside(pVision, _executor);
 		KickorPassDir = TMP.dir;
 		PassPoint = TMP.pos;
-		if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
+		cout << KickorPassDir << ' ' << me.Dir() << ' ' << PassPoint << endl;
+		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
 			double ThePower = GetCPassPower(me.Pos(), PassPoint);
-			KickStatus::Instance()->setChipKick(_executor, ThePower);
+			setSubTask(PlayerRole::makeItJustKick(_executor, 1, ThePower));
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "JUSTCHIP isDirOK", COLOR_ORANGE);
-			setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), (ball.Pos() - me.Pos()).dir(), task().player.flag));
 			TaskMediator::Instance()->setAdvancerPassTo(PassPoint, NumberOfSupport);
 		}
 		else {
@@ -428,100 +429,35 @@ void CAdvance::plan(const CVisionModule* pVision)
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		ShootPoint = (pVision->Cycle() % 60 == 0) ? GenerateBreakShootPoint(pVision, _executor) : ShootPoint;
 		KickorPassDir = (ShootPoint - me.Pos()).dir();
-		setSubTask(PlayerRole::makeItBreak(_executor, false, ShootPoint));
+		setSubTask(PlayerRole::makeItBreak(_executor, true));
 		/*
 		if(AdJudgeBreakCanDo(pVision, _executor, ShootPoint)||true)setSubTask(PlayerRole::makeItBreak(_executor, false, ShootPoint));
 		else setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, generateGetballDir(pVision, _executor), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		*/
 		break;
 
-	case BREAKPASS:
+	case BREAKING:
 	{
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS", COLOR_YELLOW);
-		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
-		PassPoint = (pVision->Cycle() % 60 == 0) ? GenerateBreakPassPoint(pVision, _executor) : PassPoint;
-		//PassPoint = GenerateBreakPassPoint(pVision, _executor);
-		TaskMediator::Instance()->setAdvancerPassTo(PassPoint, NumberOfSupport);  //breakpass具有连续性 不适合采用setpass的技术
-		bool isChipKick = toChipOrToFlat(pVision, _executor, PassPoint) == 0;
-		double kickPower = 0;
-		//cout << "if_chip:" << isChipKick << endl;
-		KickorPassDir = (PassPoint - me.Pos()).dir();
-		if (isChipKick)
-			kickPower = GetCPassPower(me.Pos(), PassPoint);
-		else
-			kickPower = GetFPassPower(me.Pos(), PassPoint);
-		//cout << "Pass Point: " << PassPoint.x() << "," << PassPoint.y() << endl;
-		setSubTask(PlayerRole::makeItBreak(_executor, true, PassPoint, false, 5 * Param::Math::PI / 180, false, isChipKick, kickPower));
+		setSubTask(PlayerRole::makeItBreak(_executor, false, false, false));
 		break;
 	}
 
 	case PUSHOUT:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "PUSHOUT", COLOR_YELLOW);
 
-		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
-
 		PassPoint = generateNormalPushPoint(pVision, _executor);// : PassPoint;
-		TaskMediator::Instance()->setAdvancerPassTo(PassPoint, NumberOfSupport);  //breakpass : 具有连续性 不适合采用setpass的技术
 		//bool;
 		isChipKick = toChipOrToFlat(pVision, _executor, PassPoint) == 0;
 		//double;
 		kickPower = 0;
 		KickorPassDir = (PassPoint - me.Pos()).dir();
 		if (isChipKick)
-			kickPower = GetCPassPower(me.Pos(), PassPoint) * 0.7;
+			kickPower = GetCPassPower(me.Pos(), PassPoint);
 		else
-			kickPower = GetFPassPower(me.Pos(), PassPoint) * 0.7;
-		setSubTask(PlayerRole::makeItBreak(_executor, true, PassPoint, false, 15 * Param::Math::PI / 180, false, isChipKick, kickPower));
-		/*
-		if ((pVision->Cycle() % 6000 == 0)) {
-			PassPoint = generateNormalPushPoint(pVision, _executor);
-			KickorPassDir = (PassPoint - me.Pos()).dir();
-		}
-		if (!IsSimulator) {
-			if (fabs((KickorPassDir - (ball.Pos() - me.Pos()).dir())) < Param::Math::PI * 20.0 / 180) {
-				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Crash The Ball", COLOR_ORANGE);
-				setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos() + Utils::Polar2Vector(100, (ball.Pos() - me.Pos()).dir()), (ball.Pos() - me.Pos()).dir(), task().player.flag));
-			}
-			else {
-				if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
-					if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isDirOK", COLOR_ORANGE);
-					KickStatus::Instance()->setKick(_executor, 260);
-					setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
-				}
-				else {
-					if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isNotDirOK", COLOR_ORANGE);
-					setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
-					KickStatus::Instance()->setBothKick(_executor, 0, 0);
-				}
-			}
-		}
-		else {
-			if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
-				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isDirOK", COLOR_ORANGE);
-				if(isTheLineBlocked(pVision, ball.Pos(), opp.Pos())) KickStatus::Instance()->setChipKick(_executor, 100);
-				else KickStatus::Instance()->setKick(_executor, 260);
-				setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), task().player.flag));
+			kickPower = GetFPassPower(me.Pos(), PassPoint);
 
-			}
-			else {
-				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isNotDirOK", COLOR_ORANGE);
-				setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
-				KickStatus::Instance()->setBothKick(_executor, 0, 0);
-			}
-		}
-		*/
-		//setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos() + Utils::Polar2Vector(10, (ball.Pos() - me.Pos()).dir()), (ball.Pos() - me.Pos()).dir(), task().player.flag));
-		/*
-		if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
-			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isDirOK", COLOR_ORANGE);
-			KickStatus::Instance()->setKick(_executor, 350);
-			setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), (ball.Pos() - me.Pos()).dir(), task().player.flag));
-		}
-		else {
-			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT is NOT DirOK ", COLOR_ORANGE);
-			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
-		}
-		*/
+		setSubTask(PlayerRole::makeItJustKick(_executor, isChipKick, kickPower));
 		break;
 
 	case CHASEKICK:
@@ -542,8 +478,6 @@ void CAdvance::plan(const CVisionModule* pVision)
 		else KickStatus::Instance()->setKick(_executor, 0);
 		setSubTask(PlayerRole::makeItChaseKickV2(_executor, KickorPassDir, ShootNotNeedDribble, GetFPassPower(ball.Pos(), PassPoint)));
 		break;
-
-
 	}
 	//setSubTask(PlayerRole::makeItStop(_executor, 0));
 	_cycle = pVision->Cycle();
@@ -695,7 +629,7 @@ bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber)
 	*/
 
 	//changed by lsf
-	if (fabs(me2Opp.mod()) <= 50)
+	if (fabs(me2Opp.mod()) <= 40)
 		return true;
 
 	if ((fabs(me2Ball.mod()) * 1.5 > fabs(me2Opp.mod()) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 3))) {
@@ -708,7 +642,7 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 	if (IsShoot) {
 		return canScore(pVision, vecNumber, OBSTACLE_RADIUS, pVision->OurPlayer(vecNumber).Dir());
 	}
-	double ShootPrecision = SHOOT_PRECISION;
+	double PASSPrecision = PASS_PRECISION * Param::Math::PI / 180;
 	//double offset = 0.05;
 	const BallVisionT& ball = pVision->Ball();
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
@@ -717,64 +651,9 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 	CVector opp2ball = ball.Pos() - opp.Pos();
 	CVector ball2goal = theirCenter - ball.Pos();
 
-	if (fabs(me.Dir() - targetDir) < ShootPrecision * 3) return true;
+	if (fabs(me.Dir() - targetDir) < PASSPrecision) return true;
 
 	else return false;
-	/*
-	cout << fabs(me.Dir() - targetDir) << ' ' << abs(targetDir - last_target_dir) <<' '<<SHOOT_PRECISION << endl;
-	//if (!ShootOrPass) ShootPrecision = ShootPrecision * 0.8;
-	/*if (myDir - targetDir > 0)targetDir -= offset;
-	else targetDir += offset;
-			是峪狍镝  妄荇租咛
-
-	last_target_dir = targetDir;
-
-	if (ShootOrPass) {
-		CGeoLine start2Target = CGeoLine(me.Pos(), myDir);
-		CGeoLineLineIntersection Intersection = CGeoLineLineIntersection(start2Target, GOATLINE);
-		if (abs(Intersection.IntersectPoint().y()) > 60) return false;
-	}
-	/*交点必须位于球门里面
-
-	if (abs(targetDir - last_target_dir) > 3.0 * SHOOT_PRECISION) {
-		last_dir_deviation = 100;  //重置角度差
-	}
-	if (Me2OppTooclose(pVision, vecNumber)) {
-		/*太近了 快射
-		if (abs(myDir - targetDir) < 2.0 * SHOOT_PRECISION) {
-			last_dir_deviation = 100;
-			return true;
-		}
-	}
-	if ((ShootOrPass && ball2goal.mod() < 250) || (opp2ball.mod() < 200)) {
-		/*如果现在是射门且距离球门足够近 不需要过多的调整
-		  如果敌人离我比较近了 再调整就无法出球了
-		if (abs(myDir - targetDir) < 1.5 * SHOOT_PRECISION) {
-			last_dir_deviation = 100;
-			return true;
-		}
-	}
-	if (abs(myDir - targetDir) > 1.5 * SHOOT_PRECISION) {
-		/*如果角度过大 应当为false
-		last_dir_deviation = myDir - targetDir;
-		return false;
-	}
-	else if ((abs(myDir - targetDir) > abs(last_dir_deviation) || (myDir - targetDir) * last_dir_deviation <= 0)){
-		/*如果相比上次角度并没有得到有效调整
-		if (abs(myDir - targetDir) < 1.25 * SHOOT_PRECISION) {
-			/*误差相对而言可以接受了
-			last_dir_deviation = 100;
-			return true;
-		}
-	}
-	else if (abs(myDir - targetDir) < SHOOT_PRECISION) {
-		/*尽管仍然在调整 但是可以在误差允许的范围内射门
-		last_dir_deviation = 100;
-		return true;
-	}
-	last_dir_deviation = myDir - targetDir;
-	return false;
-*/
 }
 
 /*
@@ -984,15 +863,13 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 	//当前持球车号
 	bool isOurNearPoint[9] = { 0 }/*, isBlockPoint[9] = { 0 }*/, isCanUse[9] = { 0 }, OneOfUsCanShoot = 0;
 	/*依次为：我是否有人在传球点附近，敌人是否阻挡该传球路径，该点能否使用，我们有没有点满足要求*/
-	int TheNumberOfCanShootPoint = 0, NowShootNumber = 0, TheidxOfCanShootPoint[9] = { 0 };
+	int TheNumberOfCanShootPoint = 0, NowShootNumber = 1, TheidxOfCanShootPoint[9] = { 0 };
 	/*依次为：满足要求的点的数量TheNumberOfCanShootPoint，持久化点的number，能够shoot的点的idx*/
 	double ShootDir[9] = { 0 }, ChangeDir[9] = { 0 }, DistToPoint[9] = { 0 }, DistOppToTheLine[9] = { 0 }, FinalDir = 0;
 	/*依次为：shootdir，需要转变方向的Dir，最终角度Dir*/
 
 	/**********************************************************************************************************************/
-
 	//判定支撑点是否可用
-
 	for (int i = 0; i < NumberOfSupport; ++i) {
 		isOurNearPoint[i] = IsOurNearHere(pVision, i); // IsOurNearHere(pVision, SupportPoint[i], vecNumber);						//我方有人在旁边
 		//isBlockPoint[i] = isTheLineBlocked(pVision, me.Pos(), SupportPoint[i]);
@@ -1011,67 +888,6 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 			TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
 		}
 	}
-
-	/**********************************************************************************************************************/
-
-	/*//保持系统稳定性，返回上一次决策的情况
-
-	ReturnValue.dir = (SupportPoint[LastPassPoint] - me.Pos()).dir();
-	ReturnValue.pos = SupportPoint[LastPassPoint];
-	if (SupportPoint[LastPassPoint].x() > me.X()	&& //向前传球
-		isOurNearPoint[LastPassPoint]				&& //我方旁边有人
-		(abs(me.Dir() - (SupportPoint[LastPassPoint] - me.Pos()).dir()) < 0.5 * Param::Math::PI / SHOOT_PRECISION)) //“我”传球需要转动的角度合适
-	{
-		return ReturnValue;
-	}*/
-
-	/**********************************************************************************************************************/
-
-
-	/*
-	if (OneOfUsCanShoot) {
-		//如果其中有一个满足大前提，就只考虑这些可以满足要求的点
-		IsMeSupport = JudgeIsMeSupport(pVision, vecNumber);
-		if (IsMeSupport) { // 着重向中心传球
-			if (isCanUse[1]) {
-				ReturnValue.dir = (SupportPoint[1] - me.Pos()).dir();
-				ReturnValue.pos = SupportPoint[1];
-				return ReturnValue;
-			}
-			if (isCanUse[4]) {
-				ReturnValue.dir = (SupportPoint[4] - me.Pos()).dir();
-				ReturnValue.pos = SupportPoint[4];
-				return ReturnValue;
-			}
-		}
-
-		for (int i = 0; i < NumberOfSupport; ++i)
-			if (isCanUse[i] && SupportPoint[i].x() > -330)
-				TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
-
-	}
-	else {
-		//否则就有人的地方全都可以传 因为现在已经在决定传球方向了
-		IsMeSupport = JudgeIsMeSupport(pVision, vecNumber);
-		if (IsMeSupport) { // 着重向中心传球
-			if (isOurNearPoint[1]) {
-				ReturnValue.dir = (SupportPoint[1] - me.Pos()).dir();
-				ReturnValue.pos = SupportPoint[1];
-				return ReturnValue;
-			}
-			if (isOurNearPoint[4]) {
-				ReturnValue.dir = (SupportPoint[4] - me.Pos()).dir();
-				ReturnValue.pos = SupportPoint[4];
-				return ReturnValue;
-			}
-		}
-		for (int i = 0; i < NumberOfSupport; ++i)
-			if(isOurNearPoint[i] && SupportPoint[i].x() > -330)
-				TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
-	}
-	*/
-	//choose the one to pass		
-	/**********************************************************************************************************************/
 	if (!OneOfUsCanShoot)
 	{
 		NowShootNumber = 1;
@@ -1093,33 +909,6 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 	//char shootnumber[100];
 	//sprintf(shootnumber, "%f", NowShootNumber);
 	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -175), shootnumber, COLOR_YELLOW);
-	/**********************************************************************************************************************/
-	/*
-	if (!OneOfUsCanShoot)
-	{
-		NowShootNumber = 0;
-	}
-	else { //按照需要转的角度进行排序
-
-		double NowValue = -1, MinValue = 1e9, threshValue = LARGE_ADJUST_ANGLE * Param::Math::PI / 180.0;
-		int Maxidx = -1;
-
-		for (int i = 0; i < TheNumberOfCanShootPoint; ++i) {
-			int NowIdx = TheidxOfCanShootPoint[i];
-			NowValue = ChangeDir[NowIdx];
-			if (NowValue < threshValue) {
-				Maxidx = NowIdx;
-				break;
-			}//角度合适立刻返回
-			if (NowValue < MinValue)
-				Maxidx = NowIdx, MinValue = NowValue;
-		}
-		if (Maxidx < 0)
-			Maxidx = 0;
-		NowShootNumber = Maxidx;
-	}
-	*/
-	/**********************************************************************************************************************/
 
 	//经过两轮筛选得到返回值
 
@@ -1407,27 +1196,23 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 	else if ((NowIsShoot == 2) && MeIsInWhichArea != CanNOTBreakArea) {
 		return BREAKSHOOT;
 	} // 持久化
-	else if (MeIsInWhichArea == DefenceArea) { // 在后场防守区域
-		if ((!IHaveSupport) && Me2OppTooclose(pVision, vecNumber))
-			return JUSTCHIPPASS;
-		else if ((!Me2OppTooclose(pVision, vecNumber))) {
-			// 无人防守状态 或 不存在支援车
-			//return PUSHOUT;
+
+	else if (Me2OppTooclose(pVision, vecNumber)) {
+		if (MeIsInWhichArea == CornerArea || MeIsInWhichArea == KICKArea)
 			return BREAKSHOOT;
-		}
-		else { return JUSTCHIPPASS; }// 否则向前挑传
+		else return BREAKING;
+	}
+
+	else if (MeIsInWhichArea == DefenceArea) { // 在后场防守区域
+		if (!IHaveSupport)
+			return JUSTCHIPPASS;
+		return JUSTCHIPPASS;
 	}
 	else if (MeIsInWhichArea == SideArea) { // 在双边区域
 		if (IHaveSupport) { //pass first
 			return PASS;
 		}
-		else if (Me2OppTooclose(pVision, vecNumber) && opp_ahead(pVision, vecNumber) > 3) { // 存在防守
-			return BREAKPASS;
-		}
-		else if (Me2OppTooclose(pVision, vecNumber)) {
-			return BREAKSHOOT;
-		}  // 首先判断射门
-		else {	// 不存在防守
+		else {
 			return PUSHOUT;
 		}	
 	}
@@ -1436,44 +1221,23 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 			return BREAKSHOOT;
 		}  // 首先判断射门
 		else if (!IHaveSupport) {  // 不存在支援车
-			//return PUSHOUT;
-			//return KICK;	//changed
-			//judge the opp
-			if (opp_ahead(pVision, vecNumber) <= 3)
-				_state = BREAKSHOOT;
-			else
-				_state = PUSHOUT;
-		}
-		else if (Me2OppTooclose(pVision, vecNumber)) { // 存在防守
-			return BREAKPASS;
-		}
-		else {	// 不存在防守
 			return PUSHOUT;
+		}
+		else {	// 存在支援车
+			return PASS;
 		}
 	}	
 	else if (MeIsInWhichArea == CornerArea) { //在角球区
-		if (IHaveSupport) { 
-		}
-		else
 		if (IHaveSupport) { //pass first
 			return PASS;
 		}
-		else if (Me2OppTooclose(pVision, vecNumber) && opp_ahead(pVision, vecNumber) > 3) { // 存在防守
-			return BREAKPASS;
-		}
-		else if (Me2OppTooclose(pVision, vecNumber)) {
-			return BREAKSHOOT;
-		} 
 		else {	
-			return PUSHOUT;
+			return BREAKSHOOT;
 		}	
 	}	
 	else if (MeIsInWhichArea == CanNOTBreakArea) {  // 不能break
 		if (IHaveSupport) { //pass first
 			return PASS;
-		}
-		else if (Me2OppTooclose(pVision, vecNumber) && opp_ahead(pVision, vecNumber) > 3) { // 存在防守
-			return BREAKPASS;
 		}
 		else {
 			return BREAKSHOOT;
