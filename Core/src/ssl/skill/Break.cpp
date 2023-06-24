@@ -309,7 +309,7 @@ void CBreak::plan(const CVisionModule* pVision) {
         KickStatus::Instance()->setKick(vecNumber, power);//力度可调
     }
     else if (!shootGoal && fabs(Utils::Normalize(me.Dir() - finalDir)) <= precision) {
-        cout << "Break Here" << power << endl;
+        //cout << "Break Here" << power << endl;
         if (isChipKick)
             KickStatus::Instance()->setChipKick(vecNumber, power);//力度可调
         else

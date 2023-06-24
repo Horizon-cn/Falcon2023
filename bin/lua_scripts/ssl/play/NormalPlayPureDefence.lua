@@ -15,15 +15,15 @@ firstState = "PureDefence",
 		end
 	end,
 	Leader = task.advance(),
-	Assister = task.multiBack(1,1),
-	Middle = task.leftBack(),
+	Middle = task.support("Leader",2),
+	Assister = task.singleBack(),
     Special = task.rightBack(),
 
 	--Assister = task.leftBack(),
     --Middle = task.rightBack(),
 	Defender = task.goMWPassPos("Leader"),
 	Goalie = task.goalieNew(),
-    match = "[L][A][M][S][D]"
+    match = "[L][M][A][S][D]"
 },
 
 name = "NormalPlayPureDefence",

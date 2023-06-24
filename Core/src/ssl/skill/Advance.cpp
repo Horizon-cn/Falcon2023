@@ -695,6 +695,10 @@ bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber)
 	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), dir1, COLOR_YELLOW);
 	*/
 
+	//changed by lsf
+	if (fabs(me2Opp.mod()) <= 50)
+		return true;
+
 	if ((fabs(me2Ball.mod()) * 1.5 > fabs(me2Opp.mod()) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 3))) {
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(450, 450), "TOO CLOSE with ball", COLOR_ORANGE);
 		return true;
@@ -1402,9 +1406,10 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 	else if (MeIsInWhichArea == DefenceArea) { // 在后场防守区域
 		if ((!IHaveSupport) && Me2OppTooclose(pVision, vecNumber))
 			return JUSTCHIPPASS;
-		else if ((!Me2OppTooclose(pVision, vecNumber)) || (!IHaveSupport)) {
+		else if ((!Me2OppTooclose(pVision, vecNumber))) {
 			// 无人防守状态 或 不存在支援车
-			return PUSHOUT;
+			//return PUSHOUT;
+			return BREAKSHOOT;
 		}
 		else { return JUSTCHIPPASS; }// 否则向前挑传
 	}
