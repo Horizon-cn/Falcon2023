@@ -4,6 +4,8 @@ end
 
 --【接球点】可根据实车情况进行调整
 local RECEIVE_POS = ball.syntYPos(CGeoPoint:new_local(200, 100))
+--【射门点】可根据实车情况进行调整
+local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(300, 100))
 --【传球力度】可根据实车情况进行调整
 local kickPower = 300
 
@@ -30,11 +32,11 @@ gPlayTable.CreatePlay{
 
   ["toBall"] = {
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) < 10, 3, 180) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 10, 500) then
         return "shootBall"
       end
     end,
-    Assister = task.staticGetBall(RECEIVE_POS),
+    Assister = task.staticGetBall(SHOOT_POS),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
     Special  = task.multiBack(3,1),

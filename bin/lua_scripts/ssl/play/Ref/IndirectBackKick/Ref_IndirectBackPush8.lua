@@ -15,12 +15,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.goCmuRush(WAIT_BALL_POS(0),_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.rightBack(),
-    Special  = task.leftBack(),
-    Defender = task.sideBack(),
+    Middle   = task.markingFront("First"),
+    Leader   = task.markingFront("Second"),
+    Special  = task.multiBack(4,1),
+    Defender = task.multiBack(4,2),
+    Breaker  = task.multiBack(4,3),
+    Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match    = "{LS}{A}{M}{D}"
+    match    = "{A}{SDBC}{LM}"
   },
 
   ["toBall"] = {
@@ -30,12 +32,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(ball.pos(),_,_,flag.allow_dss),
-    Middle   = task.goCmuRush(WAIT_BALL_POS(0),_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.rightBack(),
-    Special  = task.leftBack(),
-    Defender = task.sideBack(),
+    Middle   = task.markingFront("First"),
+    Leader   = task.markingFront("Second"),
+    Special  = task.multiBack(4,1),
+    Defender = task.multiBack(4,2),
+    Breaker  = task.multiBack(4,3),
+    Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match    = "{LS}{A}{M}{D}"
+    match    = "{A}{SDBC}{LM}"
   },
 
   ["leaveBall"] = {
@@ -44,16 +48,19 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.rightBack(),
-    Special  = task.leftBack(),
-    Middle   = task.advance(),
-    Defender = task.sideBack(),
+    Assister = task.chaseNew(),
+    --Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
+    Middle   = task.markingFront("First"),
+    Leader   = task.markingFront("Second"),
+    Special  = task.multiBack(4,1),
+    Defender = task.multiBack(4,2),
+    Breaker  = task.multiBack(4,3),
+    Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match    = "{LS}{A}{M}{D}"
+    match    = "{A}{SDBC}{LM}"
   },
 
-  name = "Ref_FrontPush",
+  name = "Ref_IndirectBackPush8",
   applicable = {
     exp = "a",
     a   = true

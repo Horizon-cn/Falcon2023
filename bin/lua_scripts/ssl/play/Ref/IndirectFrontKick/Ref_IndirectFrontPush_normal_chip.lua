@@ -1,43 +1,42 @@
 local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(50, math.pi)
+  return ball.pos() + Utils.Polar2Vector(50, ball.syntY(0.3 * math.pi))
 end
 
 --【接球点】可根据实车情况进行调整
-local RECEIVE_POS = ball.syntYPos(CGeoPoint:new_local(100, 100))
+local RECEIVE_POS = ball.antiYPos(CGeoPoint:new_local(30, 100))
 --【传球力度】可根据实车情况进行调整
-local kickPower = 500
+local kickPower = 700
 
 gPlayTable.CreatePlay{
 
   firstState = "start",
 
-  
-["start"] = {
+  ["start"] = {
     switch = function ()
       if bufcnt(player.toTargetDist("Assister") < 20 , 10, 180) then
         return "toBall"
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
-    Special  = task.multiBack(3,1),
-    Defender = task.multiBack(3,2),
-    Breaker  = task.multiBack(3,3),
+    Leader   = task.markingFrontAvoidBall("First"),
+    Middle   = task.markingFrontAvoidBall("Second"),
+    Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
     match = "[A][S][D][C][B][LM]"
   },
 
-  ["toBall"] = {
+  ["toBall"] = {--不拿球
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 10, 500) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 20, 500) then
         return "kickBall"
       end
     end,
     Assister = task.staticGetBall(RECEIVE_POS),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Leader   = task.markingFrontAvoidBall("First"),
+    Middle   = task.markingFrontAvoidBall("Second"),
     Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
@@ -53,8 +52,8 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.chipPass(RECEIVE_POS, kickPower),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Leader   = task.markingFrontAvoidBall("First"),
+    Middle   = task.markingFrontAvoidBall("Second"),
     Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
@@ -69,9 +68,9 @@ gPlayTable.CreatePlay{
         return "shootBall"
       end
     end,
-    Assister = task.markingFront("Third"),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Assister = task.stop(),
+    Leader   = task.markingFrontAvoidBall("First"),
+    Middle   = task.markingFrontAvoidBall("Second"),
     Special  = task.receive(ball.pos(),RECEIVE_POS),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
@@ -80,15 +79,15 @@ gPlayTable.CreatePlay{
     match = "[S][A][D][C][B][LM]"
   },
 
-["shootBall"] = {--如果special转大半圈还找不到射门角度就会弃球而逃
+["shootBall"] = {
     switch = function ()
-      if bufcnt(player.kickBall("Special"), 3, 1800) then--
+      if bufcnt(player.kickBall("Special"), 3, 180) then--
         return "exit"
       end
     end,
-    Assister = task.markingFront("Third"),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
+    Assister = task.stop(),
+    Leader   = task.markingFrontAvoidBall("First"),
+    Middle   = task.markingFrontAvoidBall("Second"),
     Special  = task.chaseNew(),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
@@ -97,7 +96,8 @@ gPlayTable.CreatePlay{
     match = "[S][A][D][C][B][LM]"
   },
 
-  name = "Ref_BackPush_normal_indirect_chip",
+
+  name = "Ref_IndirectFrontPush_normal_chip",
   applicable = {
     exp = "a",
     a   = true

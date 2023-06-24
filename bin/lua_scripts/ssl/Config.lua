@@ -39,6 +39,12 @@ gOurIndirectTable = {
 	lastRefCycle = 0
 }
 
+gOurDirectTable = {
+	-- 在OurDirectKick控制脚本中可以进行改变的值
+	-- 上一次定位球的Cycle
+	lastRefCycle = 0
+}
+
 gSkill = {
 	--走位
 	"GoAndTurn",
@@ -115,19 +121,13 @@ gRefPlayTable = {
 	"Ref/IndirectCornerKick/Ref_IndirectCornerPush8",
 	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal",
 	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal_chip",
-
 	"Ref/DirectCornerKick/Ref_DirectCornerPush_normal",
 	--前场进攻
-	"Ref/FrontKick/Ref_FrontKickV23",
-	"Ref/FrontKick/Ref_FrontKickV41",
-	"Ref/FrontKick/Ref_FrontKickV2",
-	"Ref/FrontKick/Ref_FrontKickV61",
-	"Ref/FrontKick/Ref_FrontKickV610",
-	"Ref/FrontKick/Ref_FrontPush",
-	"Ref/FrontKick/Ref_FrontPush8",
-	"Ref/FrontKick/Ref_FrontPush_normal_indirect",
-	"Ref/FrontKick/Ref_FrontPush_normal_indirect_chip",
-	"Ref/FrontKick/Ref_FrontPush_normal_direct",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush8",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush_normal",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush_normal_chip",
+	"Ref/DirectFrontKick/Ref_DirectFrontPush_normal",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
@@ -135,16 +135,11 @@ gRefPlayTable = {
 	"Ref/MiddleKick/Ref_MiddleKickV2",
 
 	--后场进攻
-	"Ref/BackKick/Ref_BackKickV1",
-	"Ref/BackKick/Ref_ImmortalKickV1",
-	"Ref/BackKick/Ref_BackKickV2",
-	"Ref/BackKick/Ref_ImmortalKickV61",
-	"Ref/BackKick/Ref_ImmortalKickV610",
-	"Ref/BackKick/Ref_BackPush",
-	"Ref/BackKick/Ref_BackPush8",
-	"Ref/BackKick/Ref_BackPush_normal_indirect",
-	"Ref/BackKick/Ref_BackPush_normal_indirect_chip",
-	"Ref/BackKick/Ref_BackPush_normal_direct",
+	"Ref/IndirectBackKick/Ref_IndirectBackPush",
+	"Ref/IndirectBackKick/Ref_IndirectBackPush8",
+	"Ref/IndirectBackKick/Ref_IndirectBackPush_normal",
+	"Ref/IndirectBackKick/Ref_IndirectBackPush_normal_chip",
+	"Ref/DirectBackKick/Ref_DirectBackPush_normal",
 	
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
