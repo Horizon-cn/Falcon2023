@@ -25,7 +25,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][A][B][S][C][LM]"
+    match = "[A][S][D][C][B][LM]"
   },
 
   ["toBall"] = {--不拿球
@@ -42,7 +42,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][A][B][S][C][LM]"
+    match = "[A][S][D][C][B][LM]"
   },
 
   ["kickBall"] = {
@@ -51,7 +51,7 @@ gPlayTable.CreatePlay{
         return "receiveBall"
       end
     end,
-    Assister = task.passToPos(RECEIVE_POS, kickPower),
+    Assister = task.chipPass(RECEIVE_POS, kickPower),
     Leader   = task.markingFrontAvoidBall("First"),
     Middle   = task.markingFrontAvoidBall("Second"),
     Special  = task.goCmuRush(RECEIVE_POS,player.toBallDir("Special"),_,flag.allow_dss),
@@ -59,7 +59,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][A][C][S][B][LM]"
+    match = "[A][S][D][C][B][LM]"
   },
 
   ["receiveBall"] = {
@@ -76,7 +76,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][S][C][A][B][LM]"
+    match = "[S][A][D][C][B][LM]"
   },
 
 ["shootBall"] = {
@@ -93,11 +93,11 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][S][C][A][B][LM]"
+    match = "[S][A][D][C][B][LM]"
   },
 
 
-  name = "Ref_FrontPush_normal_indirect",
+  name = "Ref_FrontPush_normal_indirect_chip",
   applicable = {
     exp = "a",
     a   = true

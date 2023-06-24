@@ -13,7 +13,7 @@ gPlayTable.CreatePlay{
 
   ["start"] = {
     switch = function ()
-      if bufcnt(player.toTargetDist("Assister") < 20 and player.toTargetDist("Special") < 20 , 10, 180) then
+      if bufcnt(player.toTargetDist("Assister") < 20, 10, 180) then
         return "toBall"
       end
     end,
@@ -25,12 +25,12 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][A][B][S][C][LM]"
+    match = "[A][S][D][C][B][LM]"
   },
 
   ["toBall"] = {
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) < 10, 3, 180) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 10, 500) then
         return "kickBall"
       end
     end,
@@ -42,7 +42,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][A][B][S][C][LM]"
+    match = "[A][S][D][C][B][LM]"
   },
 
   ["kickBall"] = {
@@ -59,24 +59,24 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][A][B][S][C][LM]"
+    match = "[A][S][D][C][B][LM]"
   },
 
   ["receiveBall"] = {
     switch = function ()
-      if bufcnt(player.toBallDist("Special") < 5, 3, 180) then--
+      if bufcnt(ball.toPlayerHeadDist("Special") < 5, "fast", 180) then--
         return "shootBall"
       end
     end,
     Assister = task.stop(),
     Leader   = task.markingFront("Second"),
     Middle   = task.markingFront("Third"),
-    Special  = task.receive(ball.pos()),
+    Special  = task.receive(ball.pos(),RECEIVE_POS),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][S][B][A][C][LM]"
+    match = "[S][A][D][C][B][LM]"
   },
 
 ["shootBall"] = {
@@ -85,15 +85,15 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.markingFrontAvoidBall("First"),
+    Assister = task.stop(),
     Leader   = task.markingFront("Second"),
     Middle   = task.markingFront("Third"),
     Special  = task.chaseNew(),
-    Defender = task.multiBack(1,1),
+    Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
-    match = "[D][S][B][A][C][LM]"
+    match = "[S][A][D][C][B][LM]"
   },
 
   name = "Ref_CornerPush_normal_indirect",

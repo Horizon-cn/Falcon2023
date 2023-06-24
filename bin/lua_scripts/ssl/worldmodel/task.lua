@@ -143,7 +143,7 @@ function chipPass(p, c, f, anti)
 		idir = ball.toPlayerHeadDir(p)
 	elseif type(p) == "function" then
 		if f == nil or f == true then
-			idir = p
+			idir = p()
 		elseif anti == false then 
 			idir = function (role)
 				return (p() - player.pos(role)):dir()
@@ -420,8 +420,8 @@ function dribbleTurnShootV2(d,precision,mode,power)
 	return {mexe, mpos}
 end
 
-function receive(p)
-	local idir
+function receive(p,match_p)
+	local idir,imatch_p
 	if type(p) == "string" then
 		idir = player.toPlayerHeadDir(p)
 	elseif type(p) == "function" then
@@ -430,7 +430,14 @@ function receive(p)
 		idir = player.toPointDir(p)
 	end
 
-	local mexe, mpos = ReceivePass{dir = idir}
+	-- if type(match_p) == "function" then
+	-- 	imatch_p = match_p()
+	-- else
+	-- 	imatch_p = match_p
+	-- end
+	imatch_p=match_p
+
+	local mexe, mpos = ReceivePass{dir = idir,match_p=imatch_p}
 	return {mexe, mpos}
 end
 

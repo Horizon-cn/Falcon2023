@@ -123,6 +123,7 @@ gRefPlayTable = {
 	"Ref/CornerKick/Ref_CornerPush",
 	"Ref/CornerKick/Ref_CornerPush8",
 	"Ref/CornerKick/Ref_CornerPush_normal_indirect",
+	"Ref/CornerKick/Ref_CornerPush_normal_indirect_chip",
 	"Ref/CornerKick/Ref_CornerPush_normal_direct",
 	--前场进攻
 	"Ref/FrontKick/Ref_FrontKickV23",
@@ -133,6 +134,7 @@ gRefPlayTable = {
 	"Ref/FrontKick/Ref_FrontPush",
 	"Ref/FrontKick/Ref_FrontPush8",
 	"Ref/FrontKick/Ref_FrontPush_normal_indirect",
+	"Ref/FrontKick/Ref_FrontPush_normal_indirect_chip",
 	"Ref/FrontKick/Ref_FrontPush_normal_direct",
 
 	--中场进攻
@@ -149,6 +151,7 @@ gRefPlayTable = {
 	"Ref/BackKick/Ref_BackPush",
 	"Ref/BackKick/Ref_BackPush8",
 	"Ref/BackKick/Ref_BackPush_normal_indirect",
+	"Ref/BackKick/Ref_BackPush_normal_indirect_chip",
 	"Ref/BackKick/Ref_BackPush_normal_direct",
 	
 	--开球防守
