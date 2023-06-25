@@ -113,11 +113,11 @@ private:
     double last_dir_deviation = 100;
     double last_target_dir = 0; /*isDirOk???????*/
     double KickorPassDir = 0;/*?????????????? ??????????????? ???п????????????*/
-    double LastPassDirToJudge = 0;
 
-    bool IsMeSupport = 0;
-    bool IHaveSupport;
-    CGeoPoint ShootPoint, PassPoint;
+    bool IHaveSupport = false;
+    int TheBestSupportNumber = 1;
+
+    CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
 
     /**********************************************************
     * Description: ???????????????????λ???ж?
@@ -132,17 +132,19 @@ private:
     bool IsOurNearHere(const CVisionModule* pVision, const int supportIndex);
     bool IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber);
 
+    bool isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int IsShoot);
     bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
     bool isPassBalltoMe(const CVisionModule* pVision, int vecNumber);
-    bool isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int IsShoot);
-    
+    /*
     bool isInBreakArea(const CVisionModule* pVision, int vecNumber);
     bool isInTheCornerArea(const CVisionModule* pVision, int vecNumber);
     bool MeIsInTheSide(const CVisionModule* pVision, int vecNumber);
     
     bool JudgeIsMeSupport(const CVisionModule* pVision, int vecNumber);
     bool JudgePassMeIsBeBlocked(const CVisionModule *pVision, int vecNumber);
+    
     bool AdJudgeBreakCanDo(const CVisionModule *pVision, int vecNumber, CGeoPoint TargetPoint);
+    */
     int InWhichArea(const CVisionModule* pVision, int vecNumber);
 
     bool WeCanAlwaysSetKick(const CVisionModule* pVision, const int vecNumber);
