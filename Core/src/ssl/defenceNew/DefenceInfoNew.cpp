@@ -85,7 +85,7 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 	_receiverPotientialList.clear();
 	//加权计算接球潜力，越小越容易作为接球者被传球
 	for (int num = 0; num < Param::Field::MAX_PLAYER; num++)
-		_receiverPotientialList.push_back(ballReceiverAttributeSet::Instance()->evaluate(pVision, num));
+		_receiverPotientialList.push_back(ballReceiverAttributeSet::Instance()->evaluate(pVision, num, false));
 	//ballChaser不能是Receiver
 	_receiverPotientialList[_ballChaserList[0]] = 10000;
 	//门将不应太容易成为最优
@@ -103,6 +103,7 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 	sort(_ballReceiverList.begin(), _ballReceiverList.end(),
 		[&](int num1, int num2) {return _receiverPotientialList[num1] < _receiverPotientialList[num2]; });
 }
+
 //传球时的特殊处理
 void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 {
