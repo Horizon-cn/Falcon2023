@@ -149,8 +149,8 @@ void CProtectBall::plan(const CVisionModule* pVision)
                 CGeoPoint Pos2 = predictBallPos + Utils::Polar2Vector(50, Utils::Normalize((self.Pos() - predictBallPos).dir() + Param::Math::PI / 6));
                 //GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_BLUE); ²âÊÔÓÃ
                 //GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_BLUE); ²âÊÔÓÃ
-                double Dist1 = (Pos1 - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
-                double Dist2 = (Pos2 - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
+                double Dist1 = (Pos1 - self.Pos()).mod();
+                double Dist2 = (Pos2 - self.Pos()).mod();
                 if (Dist1 < Dist2) {
                     approachBallPos = Pos1;
                 }
