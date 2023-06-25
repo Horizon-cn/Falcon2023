@@ -28,8 +28,12 @@ protected:
 	bool OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber);
 	bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
 	CGeoPoint GenerateLargeAnglePoint(const CVisionModule* pVision, double finalDir, const bool debug);
-	bool HaveBeenBlockPoint(const CVisionModule* pVision, const int vecNumber);
+	bool HaveBeenBlockPoint(const CVisionModule* pVision, const int vecNumber, const CGeoPoint Target);
 	bool checkOppHasBall(const CVisionModule* pVision);
+	bool isTheLineBlocked(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint);
+	double TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint);
+
+	bool NotDanger(const CVisionModule* pVision, const int _executor);
 private:
 	enum {
 		BEGIN = 0,
@@ -48,6 +52,7 @@ private:
 	double last_dir_deviation = 100;
 	double GetBall_Precision_alpha = 3.0;
 	double OPP_HAS_BALL_DIST = 12;
+
 };
 
 #endif //_GET_BALL_V4_H__

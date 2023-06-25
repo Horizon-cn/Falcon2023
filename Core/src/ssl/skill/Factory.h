@@ -134,7 +134,8 @@ namespace PlayerRole {
 	CPlayerTask* makeItGoAndTurnKickV4(const int num, const double dir, CVector finalVel = CVector(0.0, 0.0), int flags = 0, double StopDist = -2, CTRL_METHOD mode = CMU_TRAJ);
 	CPlayerTask* makeItForceStartRush(const int num, double faceDir, int flags = 0);
 	CPlayerTask* makeItChaseKickV1(const int num, double faceDir, int flags = 0);
-	CPlayerTask* makeItChaseKickV2(const int num, double faceDir, int flags = 0);
+	CPlayerTask* makeItChaseKickV2(const int num, double faceDir, int flags = 0, int power = 0);
+
 	CPlayerTask* makeItDriftKick(const int num, double faceDir, int flags = 0);
 	CPlayerTask* makeItProtectBall(const int num, int flags = 0);
 	CPlayerTask* makeItTouchKick(const int num, double kickDir, bool isPass = false, int flags = 0);

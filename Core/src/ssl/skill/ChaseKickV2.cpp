@@ -61,7 +61,7 @@ namespace
 	const CGeoPoint LEFT_GOAL_POST = CGeoPoint(-Field::PITCH_LENGTH / 2, -Field::GOAL_WIDTH / 2);
 	const CGeoPoint RIGHT_GOAL_POST = CGeoPoint(-Field::PITCH_LENGTH / 2, Field::GOAL_WIDTH / 2);
 	const double MaxSpeed=350;
-	int KICKPOWER = 200;
+	int KICKPOWER = 630;
 	int CHIPPOWER = 180;
 }
 
@@ -870,8 +870,9 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 		{
 			KickStatus::Instance()->setChipKick(robotNum, CHIPPOWER);
 		}else{
-			KickStatus::Instance()->setKick(robotNum, KICKPOWER);
-	}
+			if(task().player.kickpower)KickStatus::Instance()->setKick(robotNum, task().player.kickpower);
+			else KickStatus::Instance()->setKick(robotNum, KICKPOWER);
+		}
 	}
 	if (state() != GET_BALL){
 		//SubTaskµÄµ÷ÓÃ
@@ -903,7 +904,8 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 				chase_kick_task.player.max_acceleration = MAX_TRANSLATION_ACC;
 			}
 			chase_kick_task.player.pos = checkPointAvoidOurPenalty(pVision, chase_kick_task.player.pos);
-			setSubTask(TaskFactoryV2::Instance()->GotoPosition(chase_kick_task));
+			//setSubTask(TaskFactoryV2::Instance()->GotoPosition(chase_kick_task));
+			setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(chase_kick_task));
 			//if (verBos) cout << "angle " << chase_kick_task.player.angle << endl;
 		}
 	}

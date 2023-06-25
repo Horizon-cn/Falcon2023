@@ -574,7 +574,7 @@ void ObstaclesNew::addObs(const CVisionModule * pVision, const TaskT & task, boo
 //                        GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 10, 0.0, 360.0, COLOR_YELLOW);
 //                    }
                 }
-                addCircle(opp.Pos(), opp.Vel(), tempAvoidDist, OBS_CIRCLE_NEW);
+                addCircle(opp.Pos(), opp.Vel(), tempAvoidDist * 1.25, OBS_CIRCLE_NEW);
             }
         }
     }

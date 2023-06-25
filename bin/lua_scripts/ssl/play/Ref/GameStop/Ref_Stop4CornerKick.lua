@@ -10,11 +10,11 @@ end
 
 local KICK_DIR  = ball.antiYDir(1.57)
 
-local MIDDLE_POS = ball.antiYPos(CGeoPoint:new_local(190, -50))
-
-local FRONT_POS1 = ball.antiYPos(CGeoPoint:new_local(400, 150))
-local FRONT_POS2 = ball.antiYPos(CGeoPoint:new_local(300, 75))
+local FRONT_POS1 = ball.antiYPos(CGeoPoint:new_local(320, 200))
+local FRONT_POS2 = ball.antiYPos(CGeoPoint:new_local(0, -200))
+local FRONT_POS5=ball.antiYPos(CGeoPoint:new_local(200,-100))
 local FRONT_POS3 = ball.antiYPos(CGeoPoint:new_local(300, -200))
+local FRONT_POS4 = ball.antiYPos(CGeoPoint:new_local(0,0))
 
 local ACC = 300
 
@@ -29,14 +29,14 @@ firstState = "start",
 		end	  
 	end,
 	Assister = task.goCmuRush(KICK_POS, KICK_DIR, ACC, STOP_DSS),
-	Special  = task.goCmuRush(FRONT_POS1, _, ACC, STOP_DSS),
-	Leader   = task.goCmuRush(MIDDLE_POS, _, ACC, STOP_DSS),
-	-- Middle   = task.goCmuRush(MIDDLE_POS, _, ACC, STOP_DSS),
-	-- Defender = task.singleBack4Stop(),
-	Middle   = task.leftBack(),
-	Defender = task.rightBack(),
+	Leader   = task.goCmuRush(FRONT_POS1, _, ACC, STOP_DSS),
+	Middle   = task.goCmuRush(FRONT_POS5, _, ACC, STOP_DSS),
+	Special  = task.goCmuRush(FRONT_POS2, _, ACC, STOP_DSS),
+	Defender = task.goCmuRush(FRONT_POS4, _, ACC, STOP_DSS),
+	Breaker   = task.leftBack(),
+	Crosser = task.rightBack(),
 	Goalie   = task.goalieNew(),
-	match    = "[ALSMD]"
+	match    = "[A][S][D][C][B][LM]"
 },
 
 name = "Ref_Stop4CornerKick",
