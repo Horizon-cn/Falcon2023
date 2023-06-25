@@ -89,8 +89,8 @@ CSpeedTest::CSpeedTest() :_state(STATE_INIT), velocityCounter(1)
 	QString name2 = dir.path() + "/2-" + time + ".txt";
 	_file1 = new QFile(name1);
 	_file2 = new QFile(name2);
-	_out1 = new QTextStream(_file1);
-	_out2 = new QTextStream(_file2);
+	_fileout1 = new QTextStream(_file1);
+	_fileout2 = new QTextStream(_file2);
 	//temp GotoPositionµÄ³õÊ¼»¯
 	DRAW_TARGET = paramManager->DRAW_TARGET;
 	RECORD_COMMAND = paramManager->RECORD_COMMAND;
@@ -166,13 +166,13 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 		if (statusCounter.timeOut(vision->Cycle(), pos1.dist(me.Pos()) < distThreshold)) {
 			statusCounter.clear();
 			_state = STATE_GOTO_1;
-			//(*_out2) << _v << " " << pVision->Cycle() << " ";
+			//_out2 << _v << " " << pVision->Cycle() << " ";
 		}
 		break;
 	case STATE_GOTO_1:
 		if (statusCounter.isClear(vision->Cycle())) {
 			statusCounter.startCount(vision->Cycle(), pos2.dist(me.Pos()) < distThreshold, waitBuf, forceBuf);
-			(*_out2) << _v << " " << pVision->Cycle() << " ";
+			_out2 << _v << " " << pVision->Cycle() << " ";
 			if (velocityCounter < repeatTime) {
 				velocityCounter++;
 			} else {
@@ -180,7 +180,9 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 				_v += v_step;
 				if (_v > v_end) {
 					_state = STATE_STOP;
-					(*_out2) << pVision->Cycle() << endl;
+					_out2 << pVision->Cycle() << endl;
+					(*_fileout1) << QString::fromStdString(_out1.str());
+					(*_fileout2) << QString::fromStdString(_out2.str());
 					_file1->close();
 					_file2->close();
 				}
@@ -189,20 +191,20 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 		if (statusCounter.timeOut(vision->Cycle(), pos2.dist(me.Pos()) < distThreshold)) {
 			statusCounter.clear();
 			_state = STATE_GOTO_2;
-			(*_out1) << "#" << endl;
-			(*_out2) << pVision->Cycle() << endl;
+			//_out1 << "#" << endl;
+			_out2 << pVision->Cycle() << endl;
 		}
 		break;
 	case STATE_GOTO_2:
 		if (statusCounter.isClear(vision->Cycle())) {
 			statusCounter.startCount(vision->Cycle(), pos1.dist(me.Pos()) < distThreshold, waitBuf, forceBuf);
-			(*_out2) << _v << " " << pVision->Cycle() << " ";
+			_out2 << _v << " " << pVision->Cycle() << " ";
 		}
 		if (statusCounter.timeOut(vision->Cycle(), (pos1.dist(me.Pos()) < distThreshold))) {
 			statusCounter.clear();
 			_state = STATE_GOTO_1;
-			(*_out1) << "#" << endl;
-			(*_out2) << pVision->Cycle() << endl;
+			//_out1 << "#" << endl;
+			_out2 << pVision->Cycle() << endl;
 		}
 		break;
 	}
@@ -230,7 +232,7 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 		pTask = TaskFactoryV2::Instance()->GotoPosition(playerTask);
 		reset(playerTask);
 		ret = simulate_local(pVision);
-		(*_out1) << _v << " " << pVision->Cycle() << " " << me.Pos().x() << " " << me.Pos().y() << " " <<
+		_out1 << _v << " " << pVision->Cycle() << " " << me.Pos().x() << " " << me.Pos().y() << " " <<
 			ret.globalVel.x() << " " << ret.globalVel.y() << " " << ret.localVel.x() << " " << ret.localVel.y() << " " << endl;
 		break;
 	case STATE_GOTO_2:
@@ -238,7 +240,7 @@ void CSpeedTest::plan(const CVisionModule* pVision)
 		pTask = TaskFactoryV2::Instance()->GotoPosition(playerTask);
 		reset(playerTask);
 		ret = simulate_local(pVision);
-		(*_out1) << _v << " " << pVision->Cycle() << " " << me.Pos().x() << " " << me.Pos().y() << " " <<
+		_out1 << _v << " " << pVision->Cycle() << " " << me.Pos().x() << " " << me.Pos().y() << " " <<
 			ret.globalVel.x() << " " << ret.globalVel.y() << " " << ret.localVel.x() << " " << ret.localVel.y() << " " << endl;
 		break;
 	case STATE_STOP:
