@@ -48,8 +48,9 @@ private:
 		STATE_STOP,
 		STATE_FAIL
 	};
+	stringstream _out1, _out2;
 	QFile* _file1, * _file2;
-	QTextStream* _out1, * _out2;
+	QTextStream* _fileout1, * _fileout2;
 	State _state;
 	CBufferCounter statusCounter;
 	int velocityCounter;

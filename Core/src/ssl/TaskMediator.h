@@ -51,6 +51,8 @@ public:
         return _leftBack.num;
     }
 
+
+
     // ?????
     int rightBack(){
         if(vision->Cycle() - _rightBack.lastCycle > 5){
@@ -112,6 +114,14 @@ public:
         }
         return _advancer.num;
     }
+
+    int ballProtecter() {
+        if (vision->Cycle() - _ballProtecter.lastCycle > 5) {
+            _ballProtecter.num = 0;
+        }
+        return _ballProtecter.num;
+    }
+
     // 0号要么不在场，要么是门将
     bool isGoalie(int vecNumber) {
         return (goalie() == vecNumber);
@@ -220,7 +230,10 @@ public:
         }else if ("advancer" == role){
             _advancer.num = num;
             _advancer.lastCycle = vision->Cycle();
-        }else{
+        } else if ("ballProtecter" == role) {
+            _ballProtecter.num = num;
+            _ballProtecter.lastCycle = vision->Cycle();
+        } else{
             int support_size = string("support").size();
             auto role_str = role.substr(0, support_size);
             if (role_str == "support") {
@@ -290,6 +303,7 @@ private:
     SpecialRole _defendHead;
     SpecialRole _sideBack;
     SpecialRole _advancer;
+    SpecialRole _ballProtecter;
     SpecialRole _multiBack[Param::Field::MAX_PLAYER];
     SpecialRole _supporter[AREANUM];
     int nextAdvancer;
