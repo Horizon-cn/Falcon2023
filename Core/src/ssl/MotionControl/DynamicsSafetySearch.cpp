@@ -134,10 +134,11 @@ _C：表示程序一个周期的时间
 _CNum：表示程序的预测小车运行的周期
 /************************************************************************/
 CVector CDynamicSafetySearch::SafetySearch(const int player, CVector Vnext, const CVisionModule* pVision, const int t_priority, const CGeoPoint target, const int flags, const float stoptime, double max_acc) { // 获得下一帧的速度
-
+	/*
 	char msgVel[100];
 	sprintf(msgVel, "%f", pVision->OurPlayer(player).Vel().mod());
 	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), msgVel, COLOR_YELLOW);
+	*/
 	if ((pVision->OurPlayer(player).Vel().mod() < MIN_SPEED_OPEN_DSS &&
 		!(flags & PlayerStatus::DODGE_BALL))) { ///速度较小的时候强行关掉DSS
 		return Vnext;
@@ -174,12 +175,12 @@ CVector CDynamicSafetySearch::SafetySearch(const int player, CVector Vnext, cons
 		_t_acc = _acc;
 		_e = 1.0f;
 		find_flag[player] = true;
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(300, 0), "always safe!!", COLOR_YELLOW);
+		//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(300, 0), "always safe!!", COLOR_YELLOW);
 		//GDebugEngine::Instance()->gui_debug_msg(pVision->OurPlayer(player).Pos(), "Me", COLOR_YELLOW);
 	}
 	else {
 
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(300, 0), "It is unsafe!!", COLOR_YELLOW);
+		//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(300, 0), "It is unsafe!!", COLOR_YELLOW);
 		float angle_start, angle_end, max_radius, t_mid_angle;
 		float safe_angle_start, safe_angle_end;
 		float avoid_dist, avoid_angle;
@@ -427,7 +428,6 @@ bool CDynamicSafetySearch::CheckRobot(const int player, vector2f pi, vector2f vi
 	float tend = 0.0f; // 小车终止时刻
 	Pi._limitTime = limitTime;
 	Pj._limitTime = limitTime;
-
 	Pi.MakeTrajectory(player, pi, vi, Ai, 0.0f, _gamma, _stoptime, tradius ,_DECMAX, THISPLAYER); // 构建自己的路径
 	float tc = min(vj.length() / _DECMAX, _C * _CNum);
 	if (type == THEIRPLAYER) {

@@ -370,7 +370,6 @@ void compute_motion_1d(double x0, double v0, double v1,
 void compute_motion_1d_test(double x0, double v0, double v1,
     double a_max, double d_max, double v_max, double a_factor, double vel_factor,
     double& traj_accel, double& traj_time, double& traj_time_acc, double& traj_time_dec, double& traj_time_flat, planType pT, nonZeroMode mode) {
-    
     char adebugmsg[100];
     char v0debugmsg[100];
     char v1debugmsg[100];
