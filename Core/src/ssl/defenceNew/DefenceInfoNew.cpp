@@ -16,7 +16,7 @@ namespace {
 	GDebugEngine::Instance()->gui_debug_msg(p, str_##arr.toLatin1(), COLOR_YELLOW);\
 }
 
-CDefenceInfoNew::CDefenceInfoNew() :isInTheirPass(false), _ballChaserChanged(false), _ballReceiverChanged(false), _markerAmount(0), _lastMarkerAmount(0)
+CDefenceInfoNew::CDefenceInfoNew() :isNeedProtect(false), isInTheirPass(false), _ballChaserChanged(false), _ballReceiverChanged(false), _protecter(-1), _markerAmount(0), _lastMarkerAmount(0)
 {
 	display_debug_info = paramManager->display_debug_info;
 	_chaserPotientialList.resize(Param::Field::MAX_PLAYER, 0);
@@ -41,6 +41,7 @@ void CDefenceInfoNew::updateDefenceInfoNew(const CVisionModule* pVision)
 	_markerAmount = 0;
 	updateBallChaserList(pVision);
 	updateBallReceiverList(pVision);
+	checkProtect(pVision);
 	checkPass(pVision);
 	updateSteady();
 	//debug输出
@@ -104,6 +105,53 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 		[&](int num1, int num2) {return _receiverPotientialList[num1] < _receiverPotientialList[num2]; });
 }
 
+//Protect ball强制匹配为Advance
+void CDefenceInfoNew::checkProtect(const CVisionModule* pVision)
+{
+	const BallVisionT& ball = pVision->Ball();
+	if (isNeedProtect)
+	{
+		//判断是否仍在Protect ball可拦截状态
+		const PlayerVisionT& protecter = pVision->OurPlayer(_protecter);
+		double ball2protecterDir = (protecter.Pos() - ball.Pos()).dir();
+		double angleDiff = fabs(Utils::Normalize(ball2protecterDir - ball.Vel().dir()));
+		double ball2protecterDist = ball.Pos().dist(protecter.Pos());
+		if (angleDiff > Param::Math::PI / 2.0 || ball2protecterDist > 450 || ball2protecterDist < 50 || ball.Vel().mod() < 70)
+		{
+			isNeedProtect = false;
+			TaskMediator::Instance()->resetAdvancerPassTo();
+			_protecter = -1;
+		}
+	}
+	else
+	{
+		if (BallStatus::Instance()->IsBallKickedOut())
+		{
+			if (display_debug_info)
+				GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "ball kick!");
+			for (_kicker = 0; _kicker < 2 * Param::Field::MAX_PLAYER; _kicker++)
+				if (BallStatus::Instance()->IsBallKickedOut(_kicker))
+					break;
+			if (Param::Field::MAX_PLAYER <= _kicker && _kicker < 2 * Param::Field::MAX_PLAYER)//TheirKick
+			{
+				_kicker -= Param::Field::MAX_PLAYER;
+				matchProtecter(pVision);
+				cout << "match: " << _protecter << endl;
+				GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(150, 200), ("match:" + to_string(_protecter)).c_str());
+				if (_protecter != -1)
+				{
+					isNeedProtect = true;
+				}
+			}
+		}
+	}
+	if (isNeedProtect)
+	{
+		//对应protect车成为我们的advance
+		cout << "protect force match!" << endl;
+		TaskMediator::Instance()->setAdvancerPassTo(pVision->OurPlayer(_protecter).Pos());
+	}
+}
 //传球时的特殊处理
 void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 {
@@ -120,9 +168,10 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 			isInTheirPass = false;
 			TaskMediator::Instance()->resetAdvancerPassTo();
 		}
-	} else
+	}
+	else
 	{
-		if (BallStatus::Instance()->IsBallKickedOut())
+		if (BallStatus::Instance()->IsBallKickedOut() && _protecter == -1)
 		{
 			if (display_debug_info)
 				GDebugEngine::Instance()->gui_debug_msg(ball.Pos(), "ball kick!");
@@ -159,6 +208,25 @@ void CDefenceInfoNew::checkPass(const CVisionModule* pVision)
 			_ballReceiverList.erase(tmp);
 		_ballReceiverList.push_back(bestBallChaserNoPass);
 	}
+}
+
+void CDefenceInfoNew::matchProtecter(const CVisionModule* pVision)
+{
+	const BallVisionT& ball = pVision->Ball();
+	int maybeProtecterNum = TaskMediator::Instance()->ballProtecter();
+	if (maybeProtecterNum == -1)
+	{
+		_protecter = -1;
+		return;
+	}
+	const PlayerVisionT& maybeProtecter = pVision->OurPlayer(maybeProtecterNum);
+	double ball2ProtecterDir = (maybeProtecter.Pos() - ball.Pos()).dir();
+	double angleDiff = fabs(Utils::Normalize(ball2ProtecterDir - ball.Vel().dir()));
+	double ball2ProtecterDist = ball.Pos().dist(maybeProtecter.Pos());
+	if (angleDiff > Param::Math::PI / 2.0 || ball2ProtecterDist > 450 || ball2ProtecterDist < 50)
+		_protecter = maybeProtecterNum;
+	else
+		_protecter = -1;
 }
 
 void CDefenceInfoNew::matchReceiver(const CVisionModule* pVision)
