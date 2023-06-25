@@ -55,7 +55,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
 
     double self2predictDist =(predictBallPos-self.Pos()).mod();
     const int advancer = TaskMediator::Instance()->advancer();
-    const int theirBestPlayer = NormalPlayUtils::getTheirMostClosetoPos(pVision, ball.Pos());
+    const int theirBestPlayer = DefenceInfoNew::Instance()->getBestBallChaser();
     double advancer2BallDist = (ball.Pos() - pVision->OurPlayer(advancer).Pos()).mod();
     double oppo2BallDist = (ball.Pos() - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
     double self2BallDist = (ball.Pos() - self.Pos()).mod();
@@ -64,6 +64,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
     CVector oppo2Ball = ball.Pos() - pVision->TheirPlayer(theirBestPlayer).Pos();
     CVector advancer2oppo= pVision->TheirPlayer(theirBestPlayer).Pos() - pVision->OurPlayer(advancer).Pos();
     CGeoPoint ourGoalPos = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
+    CVector advancer2Ball = ball.Pos() - pVision->OurPlayer(advancer).Pos();
 
  
     int new_state = state(), old_state = state();
@@ -157,8 +158,23 @@ void CProtectBall::plan(const CVisionModule* pVision)
  
     case Protect_Ball:
         {
-            CGeoPoint protectBallPos;
-            protectBallPos = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2oppo.dir()));
+            CGeoPoint protectBallPos; 
+            double dir = Utils::Normalize(advancer2oppo.dir());
+            if (Utils::Normalize(fabs(dir - advancer2Ball.dir())) <= Param::Math::PI / 12) {
+                CGeoPoint Pos1 = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2Ball.dir() - Param::Math::PI / 12));
+                CGeoPoint Pos2 = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2Ball.dir() + Param::Math::PI / 12));
+                double Dist1 = (Pos1 - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
+                double Dist2 = (Pos2 - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
+                if (Dist1 < Dist2) {
+                    protectBallPos = Pos1;
+                }
+                else {
+                    protectBallPos = Pos2;
+                }
+            }
+            else {
+                protectBallPos = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2oppo.dir()));
+            }
             double protectBallDir = (Utils::Normalize((predictBallPos - pVision->TheirPlayer(theirBestPlayer).Pos()).dir()) + Utils::Normalize((predictBallPos - self.Pos()).dir())) / 2;
             protectTask.player.pos= protectBallPos;
             protectTask.player.angle=protectBallDir;
