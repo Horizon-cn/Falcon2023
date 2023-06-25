@@ -12,6 +12,7 @@
 #include "BestPlayer.h"
 #include "BallSpeedModel.h"
 #include "TaskMediator.h"
+#include "defenceNew/DefenceInfoNew.h"
 
 namespace
 {
@@ -55,7 +56,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
 
     double self2predictDist =(predictBallPos-self.Pos()).mod();
     const int advancer = TaskMediator::Instance()->advancer();
-    const int theirBestPlayer = NormalPlayUtils::getTheirMostClosetoPos(pVision, ball.Pos());
+    const int theirBestPlayer = DefenceInfoNew::Instance()->getBestBallChaser();
     double advancer2BallDist = (ball.Pos() - pVision->OurPlayer(advancer).Pos()).mod();
     double oppo2BallDist = (ball.Pos() - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
     double self2BallDist = (ball.Pos() - self.Pos()).mod();
@@ -158,7 +159,13 @@ void CProtectBall::plan(const CVisionModule* pVision)
     case Protect_Ball:
         {
             CGeoPoint protectBallPos;
-            protectBallPos = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2oppo.dir()));
+            double dir = Utils::Normalize(advancer2oppo.dir());
+            if () {
+				protectBallPos = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, dir);
+			}
+            else {
+                protectBallPos = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, dir);
+            }
             double protectBallDir = (Utils::Normalize((predictBallPos - pVision->TheirPlayer(theirBestPlayer).Pos()).dir()) + Utils::Normalize((predictBallPos - self.Pos()).dir())) / 2;
             protectTask.player.pos= protectBallPos;
             protectTask.player.angle=protectBallDir;
@@ -166,6 +173,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
             protectTask.player.rotvel=0;
             protectTask.player.max_acceleration=1000;
             protectTask.player.max_deceleration=1000;
+            protectTask.player.flag = flags | PlayerStatus::AVOID_SHOOTLINE;
             setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,200), "Protect Ball");
         }
