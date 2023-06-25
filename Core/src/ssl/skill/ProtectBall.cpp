@@ -65,6 +65,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
     CVector oppo2Ball = ball.Pos() - pVision->TheirPlayer(theirBestPlayer).Pos();
     CVector advancer2oppo= pVision->TheirPlayer(theirBestPlayer).Pos() - pVision->OurPlayer(advancer).Pos();
     CGeoPoint ourGoalPos = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
+    CVector advancer2Ball = ball.Pos() - pVision->OurPlayer(advancer).Pos();
 
  
     int new_state = state(), old_state = state();
@@ -142,7 +143,25 @@ void CProtectBall::plan(const CVisionModule* pVision)
     switch (state()){
     case Approach_Ball:
         {
-            CGeoPoint approachBallPos = predictBallPos+ Utils::Polar2Vector(50, Utils::Normalize((predictBallPos-self.Pos()).dir())+Param::Math::PI);
+            CGeoPoint approachBallPos;
+            double dir = Utils::Normalize(advancer2Ball.dir());
+            if (Utils::Normalize(fabs(dir - (self.Pos()-predictBallPos).dir())) <= Param::Math::PI / 6) {
+                CGeoPoint Pos1 = predictBallPos + Utils::Polar2Vector(50, Utils::Normalize((self.Pos() - predictBallPos).dir() - Param::Math::PI / 6));
+                CGeoPoint Pos2 = predictBallPos + Utils::Polar2Vector(50, Utils::Normalize((self.Pos() - predictBallPos).dir() + Param::Math::PI / 6));
+                //GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_BLUE); ≤‚ ‘”√
+                //GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_BLUE); ≤‚ ‘”√
+                double Dist1 = (Pos1 - self.Pos()).mod();
+                double Dist2 = (Pos2 - self.Pos()).mod();
+                if (Dist1 < Dist2) {
+                    approachBallPos = Pos1;
+                }
+                else {
+                    approachBallPos = Pos2;
+                }
+            }
+            else {
+                approachBallPos = predictBallPos + Utils::Polar2Vector(50, Utils::Normalize((self.Pos()-predictBallPos).dir()));
+            }
             double approachBallDir = (approachBallPos - self.Pos()).dir();
             protectTask.player.pos=approachBallPos;
             protectTask.player.angle=approachBallDir;
@@ -158,13 +177,24 @@ void CProtectBall::plan(const CVisionModule* pVision)
  
     case Protect_Ball:
         {
-            CGeoPoint protectBallPos;
+            CGeoPoint protectBallPos; 
             double dir = Utils::Normalize(advancer2oppo.dir());
-            if () {
-				protectBallPos = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, dir);
-			}
+            if (Utils::Normalize(fabs(dir - advancer2Ball.dir())) <= Param::Math::PI / 6) {
+                CGeoPoint Pos1 = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2Ball.dir() - Param::Math::PI / 6));
+                CGeoPoint Pos2 = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2Ball.dir() + Param::Math::PI / 6));
+                //GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_GREEN); ≤‚ ‘”√
+                //GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_GREEN); ≤‚ ‘”√
+                double Dist1 = (Pos1 - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
+                double Dist2 = (Pos2 - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
+                if (Dist1 < Dist2) {
+                    protectBallPos = Pos1;
+                }
+                else {
+                    protectBallPos = Pos2;
+                }
+            }
             else {
-                protectBallPos = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, dir);
+                protectBallPos = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2oppo.dir()));
             }
             double protectBallDir = (Utils::Normalize((predictBallPos - pVision->TheirPlayer(theirBestPlayer).Pos()).dir()) + Utils::Normalize((predictBallPos - self.Pos()).dir())) / 2;
             protectTask.player.pos= protectBallPos;

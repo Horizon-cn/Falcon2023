@@ -234,6 +234,8 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		setSubTask(PlayerRole::makeItGoto(vecNumber,ball.Pos()+ Utils::Polar2Vector(100, Utils::Normalize((me.Pos()-ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
 		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
 	}
+	_lastCycle = pVision->Cycle();
+	return CStatedTask::plan(pVision);
 
 }
 
