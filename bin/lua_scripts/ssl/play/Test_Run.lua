@@ -3,9 +3,9 @@ local ALL_NOT_AVOID = flag.not_avoid_their_vehicle + flag.not_avoid_our_vehicle 
 local FLAG = ALL_NOT_AVOID --+ flag.dribbling
 local DSS=flag.allow_dss
 
-local TargetPos1  = CGeoPoint:new_local(216,130)
-local TargetPos2  = CGeoPoint:new_local(92,34)
-local TargetPos3  = CGeoPoint:new_local(175,-165)
+local TargetPos1  = CGeoPoint:new_local(-166,123)
+local TargetPos2  = CGeoPoint:new_local(-171,-136)
+local TargetPos3  = CGeoPoint:new_local(-245,105)
 local TargetPos4  = CGeoPoint:new_local(-100,200)
 
 local DIR1  = 0

@@ -152,7 +152,7 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	}
 	double arrivedDist = self.Vel().mod() * 0.12 + 0.1;
 	// 记录当前的规划执行目标点
-	DRAW_TARGET = 0;
+	//DRAW_TARGET = 1;
 	if (DRAW_TARGET) {
 		GDebugEngine::Instance()->gui_debug_x(target, TASK_TARGET_COLOR);
 		GDebugEngine::Instance()->gui_debug_line(self.Pos(), target, TASK_TARGET_COLOR);
@@ -203,9 +203,10 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 	if (!((isGoalie || isBack || isMultiBack) && Utils::InOurPenaltyArea(vecPos, 40))) {
 		playerFlag |= PlayerStatus::ALLOW_DSS;
 	}
-
+	//CVector rawVel = globalVel;
 	if (playerFlag & PlayerStatus::ALLOW_DSS) {
 		int priority = 0;
+
 		CVector tempVel = DynamicSafetySearch::Instance()->SafetySearch(vecNumber, globalVel, pVision, priority, target, task().player.flag, usedtime, capability.maxAccel);
 		// 不加这个在stop的时候车可能会冲出去
 		if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop" && tempVel.mod() > 150) { 
@@ -213,7 +214,11 @@ CPlayerCommand* CGotoPosition::execute(const CVisionModule* pVision)
 		else {
 			globalVel = tempVel;
 		}
+
 	}
+	//if(fabs(rawVel.x() - globalVel.x()) < 2 && fabs(rawVel.y() - globalVel.y()) < 2)
+
+	//	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-450, 0), "DSS do not WORK!", COLOR_YELLOW);
 
 	/************************************************************************/
 	/* 处理最后的指令                                                        */

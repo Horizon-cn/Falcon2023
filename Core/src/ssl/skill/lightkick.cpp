@@ -35,17 +35,23 @@ void Clightkick::plan(const CVisionModule* pVision)
     TaskT lightkick(task());
     //lightkick.player.max_rot_acceleration = 40;
     //lightkick.player.max_deceleration = 40;
-    if (fabs(me.Dir() - finalDir) < Param::Math::PI * 20 / 180) {
-        lightkick.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist, Utils::Normalize((ball.Pos() - me.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
-        lightkick.player.angle = (ball.Pos() - me.Pos()).dir();
-        lightkick.player.needdribble = 0;
-        if (BallStatus::Instance()->getBallPossession(true, runner) > 0.5)
-            KickStatus::Instance()->setKick(runner, 100);
+    
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -350), "lightkick", COLOR_WHITE);
 
+    if (fabs(me.Dir() - finalDir) < Param::Math::PI * 15 / 180) {
+        lightkick.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist, Utils::Normalize((ball.Pos() - me.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
+        lightkick.player.needdribble = 0;
+        if (BallStatus::Instance()->getBallPossession(true, runner) > 0.02)
+            lightkick.player.angle = finalDir;
+        else 
+            lightkick.player.angle = (ball.Pos() - me.Pos()).dir();
+            KickStatus::Instance()->setKick(runner, 100);
         setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(lightkick));
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(320, -350), "pushkick", COLOR_WHITE);
     }
     else {
         setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, finalDir, CVector(0, 0), 0, 0));
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(320, -350), "must get", COLOR_WHITE);
     }
     CStatedTask::plan(pVision);
 }

@@ -273,18 +273,18 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     }
     // 第三种情况：其它，则重新规划
     else {
-        planner[vecNumber].initPlanner(250, 15, 20, 0.05, 0.55, Param::Vehicle::V2::PLAYER_SIZE);
-        planner[vecNumber].planPath(&obsNew, startNew, targetNew);
-        viaPoint[vecNumber] = planner[vecNumber].getPathPoints();
+            planner[vecNumber].initPlanner(250, 15, 20, 0.05, 0.55, Param::Vehicle::V2::PLAYER_SIZE);
+            planner[vecNumber].planPath(&obsNew, startNew, targetNew);
+            viaPoint[vecNumber] = planner[vecNumber].getPathPoints();
 
-        // 规划成功的情况则给中间点赋值，一般都是有中间点的
-        if (viaPoint[vecNumber].size() > 2) {
-            middlePoint = viaPoint[vecNumber][1].pos;
-            nextPoint[vecNumber] = viaPoint[vecNumber][2].pos;
-        }
+            // 规划成功的情况则给中间点赋值，一般都是有中间点的
+            if (viaPoint[vecNumber].size() > 2) {
+                middlePoint = viaPoint[vecNumber][1].pos;
+                nextPoint[vecNumber] = viaPoint[vecNumber][2].pos;
+            }
     }
 
-    //GDebugEngine::Instance()->gui_debug_x(lastPoint[vecNumber], 1);
+    //GDebugEngine::Instance()->gui_debug_x(lastPoint[vecNumber], COLOR_BLUE);
 
     // 记录中间点，作为下一次规划基础
     lastPoint[vecNumber] = middlePoint;
@@ -317,15 +317,16 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     /* 调试信息显示                                                           */
     /************************************************************************/
     // 信息输出：画出当前位置点，初始目标点，处理过的目标点
+    //DRAW_TRAJ = 1;
     if (DRAW_TRAJ) {
         GDebugEngine::Instance()->gui_debug_x(myPos, COLOR_PURPLE);
         GDebugEngine::Instance()->gui_debug_arc(self.Pos(), avoidLength, 0, 360, 1);
         //GDebugEngine::Instance()->gui_debug_x(task().player.pos, COLOR_RED);
         GDebugEngine::Instance()->gui_debug_x(finalTargetPos, COLOR_YELLOW);
     }
-
+    //DRAW_RRT = 1;
     // 信息输出：画出RRT撒点，看规划范围是否正确
-    if (DRAW_RRT && vecNumber == 1) {
+    if (DRAW_RRT /* && vecNumber == 1*/) {
         tree[vecNumber] = planner[vecNumber].getNodes();
         for (size_t i = 0; viaPoint[vecNumber].size() > 0 && i < viaPoint[vecNumber].size() - 1; i++) {
             GDebugEngine::Instance()->gui_debug_line(viaPoint[vecNumber][i].pos, viaPoint[vecNumber][i + 1].pos, COLOR_CYAN);

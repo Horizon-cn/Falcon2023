@@ -441,7 +441,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
     if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000, getball_task.player.angle), COLOR_RED);
     if (DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000, me.Dir()), COLOR_PURPLE);
     GDebugEngine::Instance()->gui_debug_x(getball_task.player.pos, COLOR_BLUE);
-    if ((me.Pos() - ball.Pos()).mod() < 75)
+    if ((me.Pos() - ball.Pos()).mod() < 35)
         getball_task.player.needdribble = IS_DRIBBLE;
     else getball_task.player.needdribble = !IS_DRIBBLE;
     getball_task.player.IsGetBaller = true;
@@ -772,6 +772,7 @@ CGeoPoint CGetBallV5::GenerateLargeAnglePoint(const CVisionModule* pVision, doub
     {
         getBallDist = maxGetBallDist;
     }
+    getBallDist = minGetBallDist;
     if (Me2OppTooclose(pVision, robotNum));
     else getBallDist = (me.Pos() - ball.Pos()).mod();
     CGeoPoint target = ball.Pos() + Utils::Polar2Vector(getBallDist, theta_Dir);

@@ -18,8 +18,8 @@
 #define ENEMY_NUM 6
 #define SELF_NUM 6  // 己方机器人数目
 #define POS_INFO_LENGTH 6 // 每个机器人位置所占的float数目
-#define GPU_COEF_BLOCKSCORE -1
-#define GPU_COEF_DISTSCORE 0
+#define GPU_COEF_BLOCKSCORE 5
+#define GPU_COEF_DISTSCORE 0.8
 #define GPU_COEF_NEARSCORE 1.5
 #define INPUT_DIM 10
 #define HIDDEN_LAYER_DIM 80
@@ -923,7 +923,7 @@ __global__ void break_gpu_calc(float pos_info[], float target_info[], float resu
         int line_status1 = get_line(test_point, target_point, a1, b1);
         
         // 距离指标
-        float dist_score = dist(test_point, target_point);
+        float dist_score = fabs(test_point[0]) / PITCH_LENGTH + fabs(test_point[1]) / PITCH_WIDTH;
         
         float block_score = 8888, near_score = 9999;
         

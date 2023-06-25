@@ -235,7 +235,29 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case PUSHOUT:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push OUT", COLOR_YELLOW);
 		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
-		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
+			_state = GenerateNextState(pVision, _executor);
+			break;
+		}
+		else {
+			_state = GenerateNextState(pVision, _executor);
+			if (CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) {
+				if (_state == KICK) {
+					_state = CHASEKICK;
+					break;
+				}/*
+				else if (_state == PUSHOUT) {
+					//_state = CHASEPUSH;
+					//break;
+				}*/
+			}
+			if (OppIsFarThanMe(pVision, _executor) && _state == PUSHOUT) {
+				_state = PUSHOUT;
+				break;
+			}
+			_state = GET;
+			break;
+		}
 		break;
 	case BREAKING:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push BreakPass", COLOR_YELLOW);
@@ -315,7 +337,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 	if (_state != KICK && _state != BREAKSHOOT) {
 		NowIsShoot = 0;
 	}
-
+	cout << _state << endl;
 	switch (_state) {
 	case GET:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "let GET", COLOR_YELLOW);
@@ -1122,6 +1144,8 @@ bool CAdvance::OppIsFarThanMe(const CVisionModule* pVision, const int vecNumber)
 	CVector Ball2Opp = opp2.Pos() - ball.Pos();
 
 	const double threshold = 100;
+	if (!(pVision->TheirPlayer(Oppfront).Valid()))
+		return true;
 	if ((me2Ball.mod() < Ball2Opp.mod() && Ball2Opp.mod() > threshold))
 		return true;
 	if (fabs((me2Ball.dir() - Ball2Opp.dir()) < Param::Math::PI / 3) || Ball2Opp.mod() < threshold * 0.6)
@@ -1251,11 +1275,14 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 
 	else if (Me2OppTooclose(pVision, vecNumber)) {
 		if (MeIsInWhichArea == CornerArea || MeIsInWhichArea == KICKArea)
-			return BREAKSHOOT;
+			if (tendToShoot(pVision, vecNumber))
+				return KICK;
+			else return BREAKSHOOT;
 		else return BREAKING;
 	}
 	else if (MeIsInWhichArea == ReliefArea) {
-		return JUSTCHIPPASS;
+		//return JUSTCHIPPASS;
+		return PUSHOUT;
 	}
 
 	else if (MeIsInWhichArea == DefenceArea) { // 在后场防守区域
@@ -1267,7 +1294,7 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 		if (OppIsFarThanMe(pVision, vecNumber))
 			return PUSHOUT;
 		else if (IHaveSupport) { //pass first
-			return PASS;
+			return BREAKSHOOT;
 		}
 		//else {
 		//	return PUSHOUT;
@@ -1275,7 +1302,7 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 	}
 	else if (MeIsInWhichArea == CenterArea) { // 在前中场
 		if (tendToShoot(pVision, vecNumber)) {
-			return BREAKSHOOT;
+			return KICK;
 		}  // 首先判断射门
 		else if (!IHaveSupport) {  // 不存在支援车
 			return PUSHOUT;

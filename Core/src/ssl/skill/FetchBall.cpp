@@ -231,11 +231,11 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 
 	}
 	else if (S_BACK == state()) {
-<<<<<<< HEAD
+//<<<<<<< HEAD
 		setSubTask(PlayerRole::makeItGoto(vecNumber,ball.Pos()+ Utils::Polar2Vector(100, Utils::Normalize((me.Pos()-ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
 		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
 	}
-=======
+//=======
 		setSubTask(PlayerRole::makeItRun(vecNumber, -100 * cos(me.Dir()), -100 * sin(me.Dir()), 0.0, flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
 		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
 	}
@@ -250,7 +250,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
 
 	}
->>>>>>> 9d119eb64869c83bb0e152f13afc6f493a0286d9
+//>>>>>>> 9d119eb64869c83bb0e152f13afc6f493a0286d9
 
 	_lastCycle = pVision->Cycle();
 	return CStatedTask::plan(pVision);
