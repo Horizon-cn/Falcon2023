@@ -446,7 +446,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
     else getball_task.player.needdribble = !IS_DRIBBLE;
     getball_task.player.IsGetBaller = true;
 
-    //if(!haveset)
+    if(!haveset)
         setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(getball_task));
     //setSubTask(PlayerRole::makeItStop(_executor, 0));
     _lastCycle = pVision->Cycle();
