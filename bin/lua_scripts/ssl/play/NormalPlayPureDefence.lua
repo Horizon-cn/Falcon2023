@@ -21,7 +21,7 @@ firstState = "PureDefence",
 
 	--Assister = task.leftBack(),
     --Middle = task.rightBack(),
-	Defender = task.goMWPassPos("Leader"),
+	Defender = task.support("Leader",1),
 	Goalie = task.goalieNew(),
     match = "[L][M][A][S][D]"
 },
