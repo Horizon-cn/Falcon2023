@@ -22,8 +22,8 @@
 #include <iomanip>
 #include <iostream>
 
-#define OURPLAYER_NUM	11
-#define THEIRPLAYER_NUM 11
+#define OURPLAYER_NUM	16
+#define THEIRPLAYER_NUM 16
 #define BALL_NUM		1
 
 #ifdef ENABLE_CUDA

@@ -15,8 +15,8 @@
 //}
 
 // 小场参数
-#define ENEMY_NUM 11
-#define SELF_NUM 11  // 己方机器人数目
+#define ENEMY_NUM 16
+#define SELF_NUM 16  // 己方机器人数目
 #define POS_INFO_LENGTH 6 // 每个机器人位置所占的float数目
 #define GPU_COEF_BLOCKSCORE -1.8
 #define GPU_COEF_DISTSCORE 0.8
