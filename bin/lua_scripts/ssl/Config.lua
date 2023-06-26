@@ -122,6 +122,7 @@ gRefPlayTable = {
 	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal",
 	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal_chip",
 	"Ref/DirectCornerKick/Ref_DirectCornerPush_normal",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerKick",
 	--前场进攻
 	"Ref/IndirectFrontKick/Ref_IndirectFrontPush",
 	"Ref/IndirectFrontKick/Ref_IndirectFrontPush8",

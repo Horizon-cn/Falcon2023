@@ -88,7 +88,7 @@ gPlayTable.CreatePlay{
     Assister = task.stop(),
     Leader   = task.markingFront("Second"),
     Middle   = task.markingFront("Third"),
-    Special  = task.chaseNew(),
+    Special  = task.advance(),
     Defender = task.multiBack(2,1),
     Breaker  = task.multiBack(2,2),
     Crosser  = task.defendHead(),
