@@ -155,8 +155,10 @@ void CBreak::plan(const CVisionModule* pVision) {
     bool shootGoal = task().player.needkick; // Utils::InTheirPenaltyArea(passTarget, 0); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
 
     if (shootGoal) {
-        CGeoPoint TargetUp = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + 5);
-        CGeoPoint TargetDown = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 - 5);
+        float corrected_parameter = fabs(me.VelY()) * 0.2 + 5;
+        CGeoPoint TargetUp = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + 5 + corrected_parameter);
+        CGeoPoint TargetDown = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 - 5 - corrected_parameter);
+        passTarget = TargetUp;
         double thetaUp = (TargetUp - ball.Pos()).dir();
         double thetaDown = (TargetDown - ball.Pos()).dir();
         if (me.Dir() < thetaUp) passTarget = TargetDown;
@@ -432,6 +434,34 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             int target_size = 2 * target_point_num * sizeof(float);
             int results_size = 3 * target_point_num * sizeof(float);
 
+            canShoot = false;
+            needBreakThrough = true;
+            break;
+        }
+    }
+    bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
+    double finalDir = me2target.dir();
+    //if (canShoot)
+    if (task().player.needkick && dirok)
+    {
+        //cout << "don't score" << endl;
+        return test_point;
+    }
+
+    else if (task().player.needkick)  // 需要进行射门
+    {
+        //std::cout << "============break calc with gpu===============" << std::endl;
+        // 使用GPU
+        int _palyer_pos_num = 6;
+        int pos_num = 2 + 1 + 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
+        int pos_size = pos_num * sizeof(float);
+        int target_point_num = 15;
+        float corrected_parameter = fabs(me.VelY()) * 0.2 + 5;
+        float target_step = (Param::Field::GOAL_WIDTH - 2 * corrected_parameter) / (target_point_num - 1);
+        CGeoPoint target_point = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + corrected_parameter);
+        int target_size = 2 * target_point_num * sizeof(float);
+        int results_size = 3 * target_point_num * sizeof(float);
+
 
             float* pos_info = (float*)malloc(pos_size); // 用于存储计算后的结果
             float* target_info = (float*)malloc(target_size);
@@ -627,10 +657,17 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
 
     bool flag = true;
     double x1 = me.X(), y1 = me.Y(), theta = dir;
+    float corrected_parameter = fabs(me.VelY()) * 0.2;
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("theta:" + to_string(theta)).c_str(), COLOR_YELLOW);
+    if ((theta >= -Param::Math::PI && theta <= -Param::Math::PI / 2) || ((theta <= Param::Math::PI && theta >= Param::Math::PI / 2))) {
+        flag = false;
+        return flag;
+    }
     if (Param::Field::MAX_PLAYER == 0)
     {
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
         if (fabs(projection) > (Param::Field::GOAL_WIDTH) / 2) {
+        if (fabs(projection) + corrected_parameter > (Param::Field::GOAL_WIDTH - 10) / 2) {
             flag = false;
         }
     }
@@ -642,6 +679,8 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
         
         if (r < radius || fabs(projection) + 5 > (Param::Field::GOAL_WIDTH ) / 2 ) {
+
+        if (r < radius || fabs(projection) + 2 >(Param::Field::GOAL_WIDTH - 10) / 2) {
             flag = false;
             break;
         }

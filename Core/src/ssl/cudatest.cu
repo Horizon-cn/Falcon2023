@@ -15,11 +15,11 @@
 //}
 
 // 小场参数
-#define ENEMY_NUM 6
-#define SELF_NUM 6  // 己方机器人数目
+#define ENEMY_NUM 16
+#define SELF_NUM 16  // 己方机器人数目
 #define POS_INFO_LENGTH 6 // 每个机器人位置所占的float数目
-#define GPU_COEF_BLOCKSCORE -1
-#define GPU_COEF_DISTSCORE 0
+#define GPU_COEF_BLOCKSCORE -1.8
+#define GPU_COEF_DISTSCORE 0.8
 #define GPU_COEF_NEARSCORE 1.5
 #define INPUT_DIM 10
 #define HIDDEN_LAYER_DIM 80
@@ -923,7 +923,23 @@ __global__ void break_gpu_calc(float pos_info[], float target_info[], float resu
         int line_status1 = get_line(test_point, target_point, a1, b1);
         
         // 距离指标
-        float dist_score = dist(test_point, target_point);
+        float dist_score;
+        if (fabs(test_point[0]) > PITCH_LENGTH * 7 / 18 && fabs(test_point[1]) > PITCH_WIDTH * 3 / 10)
+        {
+            dist_score = fabs(test_point[0]) / PITCH_LENGTH + fabs(test_point[1]) / PITCH_WIDTH;
+        }
+        else if (fabs(test_point[0]) > PITCH_LENGTH * 7 / 18)
+        {
+            dist_score = fabs(test_point[0]) / PITCH_LENGTH;
+        }
+        else if (fabs(test_point[1]) > PITCH_WIDTH * 3 / 10)
+        {
+            dist_score = fabs(test_point[1]) / PITCH_WIDTH;
+        }
+        else
+            dist_score = 0;
+        
+        
         
         float block_score = 8888, near_score = 9999;
         
@@ -931,6 +947,7 @@ __global__ void break_gpu_calc(float pos_info[], float target_info[], float resu
             if (their_player_ptr[i * POS_INFO_LENGTH]) {
                 float* their_player_pos = their_player_ptr + i * POS_INFO_LENGTH + 1;
                 float straight_dist = dist(their_player_pos, test_point);
+                //float straight_dist = (test_point[0] - PITCH_LENGTH / 2) * (test_point[0] - PITCH_LENGTH / 2) + test_point[1] * test_point[1];
                 near_score = min(near_score, straight_dist);
                 //// 判断敌方是否在test_point与target_point中间
                 float r = ((their_player_pos[0] - target_point[0]) * (test_point[0] - target_point[0]) + (their_player_pos[1] - target_point[1]) * (test_point[1] - target_point[1])) / (dist2(target_point, test_point));
@@ -942,7 +959,7 @@ __global__ void break_gpu_calc(float pos_info[], float target_info[], float resu
                 get_projection(a1, b1, line_status1, their_player_pos, projection_point);
                 float projection_dist = dist(projection_point, their_player_pos);
                 if (projection_dist > 60) {
-                    continue;
+                    projection_dist = 60;
                 }
                 block_score = min(projection_dist, block_score);
             }
