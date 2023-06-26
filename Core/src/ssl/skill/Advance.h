@@ -11,10 +11,6 @@
 * Created Date: 2022/10/10
 ***********************************************************/
 
-struct PassDirOrPos {
-    double dir;
-    CGeoPoint pos;
-};
 
 class CAdvance : public  CStatedTask{
 
@@ -129,8 +125,8 @@ private:
     int getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
     int getTheirMostCloseAndFronttoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
     bool checkBallFront(const CVisionModule* pVision, double angle);
-    bool IsOurNearHere(const CVisionModule* pVision, const int supportIndex);
-    bool IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber);
+    bool IsOurNearHere(const CVisionModule* pVision, const int supportIndex, const int vecNumber);
+    //bool IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber);
 
     bool isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int IsShoot);
     bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
@@ -178,8 +174,6 @@ private:
     * Created Date: 2022/10/10
 ***********************************************************/
 
-    PassDirOrPos PassDirInside(const CVisionModule* pVision, int vecNumber);
-    double PassDir(const CVisionModule* pVision, int vecNumber);
     CGeoPoint GenerateBreakShootPoint(const CVisionModule* pVision, int vecNumber);
     CGeoPoint GenerateBreakPassPoint(const CVisionModule* pVision, int vecNumber);
     double TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint);

@@ -96,7 +96,6 @@ void CAdvance::plan(const CVisionModule* pVision)
 	if (fabs(KickorPassDir) < 1e-3) {
 		KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 	}
-	PassDirOrPos TMP;
 	
 	if (WeCanAlwaysSetKick(pVision, _executor))
 		KickStatus::Instance()->setKick(_executor, KICKPOWER);
@@ -104,25 +103,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 	NumberOfSupport = min(6, AREANUM);/*暂时只考虑对面半场六个*/
 	for (int i = 0; i < NumberOfSupport; ++i)
 		SupportPoint[i] = GPUBestAlgThread::Instance()->getBestPointFromArea(i);/* Gpu算点 */
-	
-	// 可视化球的预测位置
-	/*
-	for (int i = 0; i < 6; i++) {
-		CGeoPoint ball_predict_pos = GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), i * 8);
-		GDebugEngine::Instance()->gui_debug_msg(ball_predict_pos, (to_string(i * 8)).c_str(), COLOR_YELLOW);
-		GDebugEngine::Instance()->gui_debug_x(ball_predict_pos, COLOR_BLUE);
-	}
-	*/
 
-	//	NormalPlayUtils::generatePassPoint(ball.Pos(), SupportPoifnt[0], SupportPoint[1], SupportPoint[2], SupportPoint[3]);
+	IHaveSupport = CanSupportKick(pVision, _executor); // 是否存在支援车,并生成支援车
 
-	IHaveSupport = CanSupportKick(pVision, _executor); // 是否存在支援车
-
-	/**********************************************************
-	* Description: 屏幕右侧 画出has与lose的图像
-	* Author: 谭宇宏
-	* Created Date: 2022/10/10
-	***********************************************************/
 
 	NumOfOurPlayer = NumOfTheirPlayerfrontMe = 0;
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
@@ -136,6 +119,14 @@ void CAdvance::plan(const CVisionModule* pVision)
 				NumOfTheirPlayerfrontMe++;
 		}
 	}
+	// 可视化球的预测位置
+	/*
+	for (int i = 0; i < 6; i++) {
+		CGeoPoint ball_predict_pos = GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), i * 8);
+		GDebugEngine::Instance()->gui_debug_msg(ball_predict_pos, (to_string(i * 8)).c_str(), COLOR_YELLOW);
+		GDebugEngine::Instance()->gui_debug_x(ball_predict_pos, COLOR_BLUE);
+	}
+	*/
 	/**********************************************************
 	* Description: 状态分配
 	* Author: 谭宇宏
@@ -347,7 +338,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			if (me2goal.mod() < KICK_DIST && (Me2OppTooclose(pVision, _executor))) {
 				KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 			}
-			else KickorPassDir = PassDir(pVision, _executor);
+			else KickorPassDir = (PassPoint - me.Pos()).dir();
 			setSubTask(PlayerRole::makeItReceivePass(_executor, KickorPassDir));
 		}
 		else {
@@ -391,9 +382,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 		break;
 	case PASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "PASS", COLOR_YELLOW);
-		TMP = PassDirInside(pVision, _executor);
-		KickorPassDir = TMP.dir;
-		PassPoint = TMP.pos;
+		PassPoint = SupportPoint[TheBestSupportNumber];
+		KickorPassDir = (PassPoint - me.Pos()).dir();
 
 		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
 			double ThePower = 0;
@@ -420,9 +410,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "JUSTCHIP", COLOR_YELLOW);
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		if (IHaveSupport) {
-			TMP = PassDirInside(pVision, _executor);
-			KickorPassDir = TMP.dir;
-			PassPoint = TMP.pos;
+			PassPoint = SupportPoint[TheBestSupportNumber];
+			KickorPassDir = (PassPoint - me.Pos()).dir();
 		}
 		else {
 			PassPoint = theirCenter;
@@ -594,25 +583,12 @@ bool CAdvance::isTheLineBlocked(const CVisionModule* pVision, CGeoPoint startPoi
 	return false;
 }
 
-bool CAdvance::IsOurNearHere(const CVisionModule* pVision, int supportIndex) {
+bool CAdvance::IsOurNearHere(const CVisionModule* pVision, int supportIndex, int vecNumber) {
 	int supporter = TaskMediator::Instance()->supporter(supportIndex);
-	if (supporter != 0 && pVision->OurPlayer(supporter).Pos().dist(SupportPoint[supportIndex]) < 35)
-		return true;
-	return false;
-}
-bool CAdvance::IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber) {
-	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-	const BallVisionT& ball = pVision->Ball();
-
-	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
-		if (vecNumber == i)continue;
-		if (pVision->OurPlayer(i).Valid()) {
-			const PlayerVisionT& me = pVision->OurPlayer(i);
-			if ((me.Pos() - checkPoint).mod() < 100) {
-				return true;
-			}
-		}
-	}
+	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+	if(pVision->OurPlayer(supporter).Pos().dist(me.Pos()) > 200)
+		if (supporter != 0 && pVision->OurPlayer(supporter).Pos().dist(SupportPoint[supportIndex]) < 35)
+			return true;
 	return false;
 }
 int CAdvance::TheirRobotInBreakArea(const CVisionModule* pVision, const int vecNumber) {
@@ -797,95 +773,66 @@ bool CAdvance::tendToShoot(const CVisionModule* pVision, int vecNumber) {
 }
 
 int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
-	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	double SupportShootDir = 0, MeToSupportDist = 0, SupportToGoal = 0;
-	for (int i = 0; i < NumberOfSupport; ++i) {
-		if (!IsOurNearHere(pVision, SupportPoint[i], vecNumber)) continue;
-		if (SupportPoint[i].x() < me.Pos().x() && MeIsInWhichArea != CornerArea) continue;
-
-		if()
-		double PasstoSupportDir = (SupportPoint[i] - me.Pos()).dir();
-		//if (!isDirOK(pVision, vecNumber, PasstoSupportDir, 0)) continue;
-		return 1;
-		/*
-		MeToSupportDist = (me.Pos() - SupportPoint[i]).mod();
-		SupportToGoal = (CGeoPoint(Param::Field::PITCH_LENGTH / 2.0, 0) - SupportPoint[i]).mod();
-		if (MeToSupportDist < CanPassToWingDist && SupportToGoal < CanWingShootDist)
-			return 1;
-		*/
-	}
-	return 0;
-
-	
+	/*
 	bool IsTestPass = 0;
 	if (IsTestPass) {
 		for (int i = 0; i < 6; ++i) {
 			const PlayerVisionT& friends = pVision->OurPlayer(i);
 			if (pVision->OurPlayer(i).Valid() && i != vecNumber) {
-				TheBestSupportNumber = i;
-				break;
+				PassDirOrPos ReturnValue;
+				ReturnValue.dir = (friends.Pos() - pVision->OurPlayer(vecNumber).Pos()).dir();
+				ReturnValue.pos = friends.Pos();
+				//LastPassPoint = NowShootNumber;//保存当前状态
+				return ReturnValue;
 			}
 		}
-		return 1;
 	}
-	//参数定义部分
+	*/
 
+	//返回值
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	//当前持球车号
-	bool isOurNearPoint[9] = { 0 }/*, isBlockPoint[9] = { 0 }*/, isCanUse[9] = { 0 }, OneOfUsCanShoot = 0;
-	/*依次为：我是否有人在传球点附近，敌人是否阻挡该传球路径，该点能否使用，我们有没有点满足要求*/
-	int TheNumberOfCanShootPoint = 0, NowShootNumber = 1, TheidxOfCanShootPoint[9] = { 0 };
-	/*依次为：满足要求的点的数量TheNumberOfCanShootPoint，持久化点的number，能够shoot的点的idx*/
-	double ShootDir[9] = { 0 }, ChangeDir[9] = { 0 }, DistToPoint[9] = { 0 }, DistOppToTheLine[9] = { 0 }, FinalDir = 0;
-	/*依次为：shootdir，需要转变方向的Dir，最终角度Dir*/
-
+	bool isOurNearPointAndFarOfMe[15] = { 0 }, NearThanMe[15] = { 0 }, OneOfUsCanShoot = 0, isCanUse[15] = {0};
+	int TheNumberOfCanShootPoint = 0, TheidxOfCanShootPoint[9] = { 0 };
+	double ShootDir[15] = { 0 }, ChangeDir[15] = { 0 }, FinalDir = 0, theMinOppDistToThePoint[15] = {0};
+	
+	double theMinOppDist_threshold = 50, supportMustNearerDist = 100;
 	/**********************************************************************************************************************/
 	//判定支撑点是否可用
 	for (int i = 0; i < NumberOfSupport; ++i) {
-		isOurNearPoint[i] = IsOurNearHere(pVision, i);
-		ShootDir[i] = KickDirection::Instance()->getPointShootDir(pVision, SupportPoint[i]);		//射门角度
-		//DistToPoint[i] = (SupportPoint[i] - me.Pos()).mod();										//支撑点到“我”的距离
-		ChangeDir[i] = fabs(Utils::Normalize(me.Dir() - (SupportPoint[i] - me.Pos()).dir()));		//传球到点“我”需要改变的角度
+		isOurNearPointAndFarOfMe[i] = IsOurNearHere(pVision, i, vecNumber);
+		ChangeDir[i] = fabs(Utils::Normalize(me.Dir() - (SupportPoint[i] - me.Pos()).dir()));								//传球到点“我”需要改变的角度
+		theMinOppDistToThePoint[i] =  getTheirMostClosetoPosPlayerNum(pVision, me.Pos());
+		NearThanMe[i] = (theirCenter.dist(SupportPoint[i]) + supportMustNearerDist < theirCenter.dist(me.Pos()));
 
-		//最终的判定条件
-		//if ()isCanUse[i] = isOurNearPoint[i] && (ShootDir[i] != 1000);
-		//else isCanUse[i] = isOurNearPoint[i] && (ShootDir[i] != 1000) && (SupportPoint[i].x() > me.X());
-		//当前点可以射门的条件：我方有人在旁边，//没有阻挡//，射门可以，向前传球
-		if (isOurNearPoint[i])
+		if (isOurNearPointAndFarOfMe[i] && theMinOppDistToThePoint[i] < theMinOppDist_threshold) {
+			if (MeIsInWhichArea == CanNOTBreakArea || MeIsInWhichArea == CornerArea) {
+				isCanUse[i] = 1;
+			}
+			else {
+				isCanUse[i] = NearThanMe[i];
+			}
+		}
+		if (isCanUse[i])
 		{
 			OneOfUsCanShoot = 1;
-			TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
 		}
 	}
 	if (!OneOfUsCanShoot)
 	{
-		NowShootNumber = 1;
+		TheBestSupportNumber = 1;
+		return 0;
 	}
 	else {
-		double final_score = -1, max_value = -100;
-		double near_para = -10, shoot_para = 7, change_para = 12;
-		int Maxidx = -1;
-		for (int i = 0; i < TheNumberOfCanShootPoint; ++i) {
-			int NowIdx = TheidxOfCanShootPoint[i];
-			double shoot_dist = sqrt((SupportPoint[i].x() - Param::Field::PITCH_LENGTH / 2) * (SupportPoint[i].x() - Param::Field::PITCH_LENGTH / 2) + SupportPoint[i].y() * SupportPoint[i].y());
-			final_score = near_para * Me2OppTooclose(pVision, vecNumber) + shoot_para * shoot_dist + change_para * ChangeDir[i];
-			if (final_score > max_value) Maxidx = NowIdx;
+		int idx = -1, minDir = 1e9;
+		for (int i = 0; i < NumberOfSupport; ++i) {
+			if (isCanUse[i]) {
+				if (ChangeDir[i] < minDir)idx = i;
+			}
 		}
-		if (Maxidx < 0)
-			Maxidx = 0;
-		NowShootNumber = Maxidx;
+		TheBestSupportNumber = idx;
 	}
-	//char shootnumber[100];
-	//sprintf(shootnumber, "%f", NowShootNumber);
-	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -175), shootnumber, COLOR_YELLOW);
-
-	//经过两轮筛选得到返回值
-
-	ReturnValue.dir = (SupportPoint[NowShootNumber] - me.Pos()).dir();
-	ReturnValue.pos = SupportPoint[NowShootNumber];
-	//LastPassPoint = NowShootNumber;//保存当前状态
-	return ReturnValue;
-
+	return 1;
 }
 int CAdvance::toChipOrToFlat(const CVisionModule* pVision, int vecNumber, CGeoPoint TargetPoint) {
 	// 0chip 1flat
@@ -930,89 +877,6 @@ bool CAdvance::checkTheyCanShoot(const CVisionModule* pVision, int vecNumber) {
 	* Author: 谭宇宏
 	* Created Date: 2022/10/10
 ***********************************************************/
-PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber) {
-
-	bool IsTestPass = 0;
-	if (IsTestPass) {
-		for (int i = 0; i < 6; ++i) {
-			const PlayerVisionT& friends = pVision->OurPlayer(i);
-			if (pVision->OurPlayer(i).Valid() && i != vecNumber) {
-				PassDirOrPos ReturnValue;
-				ReturnValue.dir = (friends.Pos() - pVision->OurPlayer(vecNumber).Pos()).dir();
-				ReturnValue.pos = friends.Pos();
-				//LastPassPoint = NowShootNumber;//保存当前状态
-				return ReturnValue;
-			}
-		}
-	}
-	//参数定义部分
-
-	PassDirOrPos ReturnValue;
-	//返回值
-	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	//当前持球车号
-	bool isOurNearPoint[9] = { 0 }/*, isBlockPoint[9] = { 0 }*/, isCanUse[9] = { 0 }, OneOfUsCanShoot = 0;
-	/*依次为：我是否有人在传球点附近，敌人是否阻挡该传球路径，该点能否使用，我们有没有点满足要求*/
-	int TheNumberOfCanShootPoint = 0, NowShootNumber = 1, TheidxOfCanShootPoint[9] = { 0 };
-	/*依次为：满足要求的点的数量TheNumberOfCanShootPoint，持久化点的number，能够shoot的点的idx*/
-	double ShootDir[9] = { 0 }, ChangeDir[9] = { 0 }, DistToPoint[9] = { 0 }, DistOppToTheLine[9] = { 0 }, FinalDir = 0;
-	/*依次为：shootdir，需要转变方向的Dir，最终角度Dir*/
-
-	/**********************************************************************************************************************/
-	//判定支撑点是否可用
-	for (int i = 0; i < NumberOfSupport; ++i) {
-		isOurNearPoint[i] = IsOurNearHere(pVision, i); // IsOurNearHere(pVision, SupportPoint[i], vecNumber);						//我方有人在旁边
-		//isBlockPoint[i] = isTheLineBlocked(pVision, me.Pos(), SupportPoint[i]);
-		//DistOppToTheLine[i] = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), SupportPoint[i]);//对手队员离传球线最短距离
-		ShootDir[i] = KickDirection::Instance()->getPointShootDir(pVision, SupportPoint[i]);		//射门角度
-		//DistToPoint[i] = (SupportPoint[i] - me.Pos()).mod();										//支撑点到“我”的距离
-		ChangeDir[i] = fabs(Utils::Normalize(me.Dir() - (SupportPoint[i] - me.Pos()).dir()));								//传球到点“我”需要改变的角度
-
-		//最终的判定条件
-		//if ()isCanUse[i] = isOurNearPoint[i] && (ShootDir[i] != 1000);
-		//else isCanUse[i] = isOurNearPoint[i] && (ShootDir[i] != 1000) && (SupportPoint[i].x() > me.X());
-		//当前点可以射门的条件：我方有人在旁边，//没有阻挡//，射门可以，向前传球
-		if (isOurNearPoint[i])
-		{
-			OneOfUsCanShoot = 1;
-			TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
-		}
-	}
-	if (!OneOfUsCanShoot)
-	{
-		NowShootNumber = 1;
-	}
-	else {
-		double final_score = -1, max_value = -100;
-		double near_para = -10, shoot_para = 7, change_para = 12;
-		int Maxidx = -1;
-		for (int i = 0; i < TheNumberOfCanShootPoint; ++i) {
-			int NowIdx = TheidxOfCanShootPoint[i];
-			double shoot_dist = sqrt((SupportPoint[i].x() - Param::Field::PITCH_LENGTH / 2) * (SupportPoint[i].x() - Param::Field::PITCH_LENGTH / 2) + SupportPoint[i].y() * SupportPoint[i].y());
-			final_score = near_para * Me2OppTooclose(pVision, vecNumber) + shoot_para * shoot_dist + change_para * ChangeDir[i];
-			if (final_score > max_value) Maxidx = NowIdx;
-		}
-		if (Maxidx < 0)
-			Maxidx = 0;
-		NowShootNumber = Maxidx;
-	}
-	//char shootnumber[100];
-	//sprintf(shootnumber, "%f", NowShootNumber);
-	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -175), shootnumber, COLOR_YELLOW);
-
-	//经过两轮筛选得到返回值
-
-	ReturnValue.dir = (SupportPoint[NowShootNumber] - me.Pos()).dir();
-	ReturnValue.pos = SupportPoint[NowShootNumber];
-	//LastPassPoint = NowShootNumber;//保存当前状态
-	return ReturnValue;
-
-}
-
-double CAdvance::PassDir(const CVisionModule* pVision, int vecNumber) {
-	PassDirOrPos ReturnValue = PassDirInside(pVision, vecNumber);
-	return ReturnValue.dir;
-}
 double CAdvance::TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint) {
 	/*该条路径上是否会被敌人阻挡*/
 	int n = 0;
@@ -1046,13 +910,14 @@ CGeoPoint CAdvance::GenerateBreakShootPoint(const CVisionModule* pVision, int ve
 }
 
 CGeoPoint CAdvance::GenerateBreakPassPoint(const CVisionModule* pVision, int vecNumber) {
-	PassDirOrPos ReturnValue = PassDirInside(pVision, vecNumber);
+
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	CGeoPoint ShootPoint = ReturnValue.pos;
-	ShootPoint.setY(ShootPoint.y() - me.VelY() * 0.75);
-	if (me.Y() < -90)ShootPoint.setY(ShootPoint.y() + me.VelX() * 0.4);
-	else if (me.Y() > 90)ShootPoint.setY(ShootPoint.y() - me.VelX() * 0.4);
-	return ShootPoint;
+	PassPoint = SupportPoint[TheBestSupportNumber];
+	KickorPassDir = (PassPoint - me.Pos()).dir();
+	PassPoint.setY(PassPoint.y() - me.VelY() * 0.75);
+	if (me.Y() < -90)PassPoint.setY(PassPoint.y() + me.VelX() * 0.4);
+	else if (me.Y() > 90)PassPoint.setY(PassPoint.y() - me.VelX() * 0.4);
+	return PassPoint;
 }
 
 double CAdvance::GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
@@ -1171,7 +1036,7 @@ bool CAdvance::OppIsFarThanMe(const CVisionModule* pVision, const int vecNumber)
 	CVector me2Ball = ball.Pos() - me.Pos();
 	CVector Ball2Opp = opp2.Pos() - ball.Pos();
 
-	const double threshold = 100;
+	const double threshold = 130;
 	if (!(pVision->TheirPlayer(Oppfront).Valid()))
 		return true;
 	if ((me2Ball.mod() < Ball2Opp.mod() && Ball2Opp.mod() > threshold))
@@ -1201,7 +1066,7 @@ bool CAdvance::canScore(const CVisionModule* pVision, const int vecNumber, const
 
 	bool flag = true;
 	double x1 = me.X(), y1 = me.Y(), theta = dir;
-	if (fabs(me.Dir()) < Param::Math::PI / 2)return false;
+	if (!(fabs(me.Dir()) < Param::Math::PI / 2))return false;
 	if (Param::Field::MAX_PLAYER == 0)
 	{
 		double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
@@ -1311,23 +1176,24 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 	}
 	else if (MeIsInWhichArea == ReliefArea) {
 		//return JUSTCHIPPASS;
-		return PUSHOUT;
+		return JUSTCHIPPASS;
 	}
 
 	else if (MeIsInWhichArea == DefenceArea) { // 在后场防守区域
+		if (IHaveSupport)
+			return PASS;
 		if (OppIsFarThanMe(pVision, vecNumber))
 			return PUSHOUT;
 		return JUSTCHIPPASS;
 	}
 	else if (MeIsInWhichArea == SideArea) { // 在双边区域
-		if (OppIsFarThanMe(pVision, vecNumber))
+		if (IHaveSupport)
+			return PASS;
+		else if (OppIsFarThanMe(pVision, vecNumber))
 			return PUSHOUT;
-		else if (IHaveSupport) { //pass first
-			return BREAKSHOOT;
-		}
-		//else {
-		//	return PUSHOUT;
-		//}	
+		else {
+			return BREAKING;
+		}	
 	}
 	else if (MeIsInWhichArea == CenterArea) { // 在前中场
 		if (tendToShoot(pVision, vecNumber)) {
@@ -1363,9 +1229,10 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 		else if (MeIsInWhichArea != CanNOTBreakArea) {  // 不存在支援车 //
 			return BREAKSHOOT;
 		}
-		else {
+		else if (IHaveSupport) {
 			return PASS;
 		}
+		else BREAKING;
 	}
 	return KICK;
 }
