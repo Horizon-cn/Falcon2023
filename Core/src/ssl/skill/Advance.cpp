@@ -108,8 +108,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 	//CGeoPoint PassPoint;
 	/*??痦??*/
 	
-	if(canScore(pVision, _executor, OBSTACLE_RADIUS, me.Dir()))
-		KickStatus::Instance()->setKick(_executor, KICKPOWER);
+	//if(canScore(pVision, _executor, OBSTACLE_RADIUS, me.Dir()))
+	//	KickStatus::Instance()->setKick(_executor, KICKPOWER);
 	
 	//CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
 	//ShootPoint = GenerateBreakShootPoint(pVision, _executor);

@@ -1057,6 +1057,7 @@ extern "C" int break_calc_with_gpu(float* target_point_cpu, int target_point_num
     cudaFree(target_point_gpu);
     cudaFree(pos_info_gpu);
     cudaFree(results_gpu);
+    cudaFree(vis_points_gpu);
     return 1;
 
     //end = clock();
