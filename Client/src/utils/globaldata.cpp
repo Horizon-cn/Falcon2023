@@ -285,6 +285,18 @@ void CGlobalData::saoConvertEdge() {
             cameraMatrix[i].upedge.max = cameraMatrix[i].upedge.max;
         }
         break;
+    case 5:
+        for (int i = 0; i < opm->total_cameras; i++) {
+            cameraMatrix[i].leftedge.min = cameraMatrix[i].leftedge.min;
+            cameraMatrix[i].leftedge.max = cameraMatrix[i].leftedge.max;
+            cameraMatrix[i].rightedge.min = cameraMatrix[i].rightedge.min;
+            cameraMatrix[i].rightedge.max = cameraMatrix[i].rightedge.max;
+            cameraMatrix[i].downedge.min = cameraMatrix[i].downedge.min;
+            cameraMatrix[i].downedge.max = cameraMatrix[i].downedge.max;
+            cameraMatrix[i].upedge.min = cameraMatrix[i].upedge.min;
+            cameraMatrix[i].upedge.max = cameraMatrix[i].upedge.max;
+        }
+        break;
     default:
         break;
     }    

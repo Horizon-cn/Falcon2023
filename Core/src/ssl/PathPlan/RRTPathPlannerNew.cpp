@@ -130,6 +130,31 @@ inline void CRRTPathPlannerNew::extendRev(size_t parent, stateNew nodeToAdd) {
     return;
 }
 
+/*
+By Tan Yuhong
+这段代码是一个RRT（快速随机树）路径规划器的初始化函数。这个函数的参数包括：
+
+maxNodesNum：规划器最多能生成的节点数。
+maxWayPointsNum：规划器最多能生成的路径点数。
+maxPathPointsNum：规划器最多能生成的路径点数（包括从起点到终点的路径）。
+targetChooseProb：在规划器中选择目标点的概率。
+wayPointsChooseProb：在规划器中选择路径点的概率。
+stepSize：扩展树时每个步骤的长度。
+planInOurField：一个布尔值，指示规划器是否应该在场地内规划。
+searchInCircle：一个布尔值，指示规划器是否应该在一个圆形搜索区域内进行规划。
+circleCenter：如果在圆形搜索区域内进行规划，圆心的位置。
+circleRadius：如果在圆形搜索区域内进行规划，圆的半径。
+函数首先将_inited标志设置为true，表示规划器已经初始化。
+然后，它将参数值存储在规划器的成员变量中。接下来，它清空并分配内存用于存储路径点、节点和路径的向量。
+它还计算了用于查找最近节点的距离_findDist，它是步长的一半。
+
+函数接下来根据planInOurField的值设置搜索区域的边界。
+如果planInOurField为true，则搜索区域边界将被设置为场地内的一侧。
+否则，搜索区域的边界将被设置为整个场地。这个操作的目的是缩小树的搜索范围，避免规划器规划出界。
+
+最后，函数生成随机的路径点和它们的反向路径点，并初始化两个搜索树，
+一个用于正向搜索，另一个用于反向搜索。搜索树的边界是根据搜索区域的边界计算出来的。
+*/
 void CRRTPathPlannerNew::initPlanner(int maxNodesNum, int maxWayPointsNum, int maxPathPointsNum,double targetChooseProb, double wayPointsChooseProb, double stepSize, bool planInOurField, bool searchInCircle, CGeoPoint circleCenter, double circleRadius) {
     this->_inited = true;
     this->_maxNodesNum = maxNodesNum;

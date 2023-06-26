@@ -14,9 +14,9 @@ firstState = "protectBall",
 			return "protectBall";
 		end
 	end,
-	
-    Kicker = task.protectBall(),
-    match = ""
+	Leader = task.advance(),
+    Assister = task.protectBall(),
+    match = "[L][A]"
 },
 
 name = "Test_ProtectBall",

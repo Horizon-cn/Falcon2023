@@ -52,7 +52,7 @@ private:
 	double last_dir_deviation = 100;
 	double GetBall_Precision_alpha = 3.0;
 	double OPP_HAS_BALL_DIST = 12;
-
+	int last_Dir;
 };
 
 #endif //_GET_BALL_V4_H__

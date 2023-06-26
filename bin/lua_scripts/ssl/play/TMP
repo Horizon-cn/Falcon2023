@@ -24,19 +24,19 @@ CAdvance::CAdvance()
 {
 	NowIsShoot = 0;
 	KickorPassDir = 0;
-	KICK_DIST = paramManager->KICK_DIST;  /*ÉäÃÅÔÊĞí·¶Î§ Ô½¸ßÔ½ÈİÒ×ÉäÃÅ*/
-	WantToLessShoot = paramManager->WantToLessShoot; /*ÉäÃÅÇãÏò£¬Ô½µÍÔ½ÈİÒ×ÉäÃÅ ×îµÍÎª0 ×î¸ßÎª5*/
-	RELIEF_DIST = paramManager->RELIEF_DIST;  /*GETÖĞ½ô¼±×´¿öÏÂµÄRELIEFÅĞ¶Ï¾àÀë*/
-	OPP_HAS_BALL_DIST = paramManager->OPP_HAS_BALL_DIST; /*ÅĞ¶ÏµĞ·½ÊÇ·ñÓĞÇòµÄ¾àÀë ĞèÒªµ÷Õû*/
-	CanPassToWingDist = paramManager->CanPassToWingDist; /*AdvanceÄÜ¹»´«¸ø±ß·æµÄÁÙ½ç¾àÀë*/
-	CanWingShootDist = paramManager->CanWingShootDist; /*±ß·æÄÜ¹»ÉäÃÅµÄÁÙ½ç¾àÀë*/
-	PASS_PRECISION = paramManager->PASS_PRECISION;	/*ÔÊĞíÉäÃÅ×îĞ¡¾«¶È½Ç·ÖÄ¸£¬Ô½´óÔ½ÂıÔ½¾«È· ×îµÍÎª7×î¸ß17*/
-	GetBallBias = paramManager->AdGetBallBias;	/*AdvanceGetballµÄÆ«²î*/
-	BalltoMeVelTime = paramManager->BalltoMeVelTime; /*Advance´«Çò¸øÎÒÖ÷¶¯È¥½ÓµÄÁÙ½çÊ±¼ä*/
+	KICK_DIST = paramManager->KICK_DIST;  /*å°„é—¨å…è®¸èŒƒå›´ è¶Šé«˜è¶Šå®¹æ˜“å°„é—¨*/
+	WantToLessShoot = paramManager->WantToLessShoot; /*å°„é—¨å€¾å‘ï¼Œè¶Šä½è¶Šå®¹æ˜“å°„é—¨ æœ€ä½ä¸º0 æœ€é«˜ä¸º5*/
+	RELIEF_DIST = paramManager->RELIEF_DIST;  /*GETä¸­ç´§æ€¥çŠ¶å†µä¸‹çš„RELIEFåˆ¤æ–­è·ç¦»*/
+	OPP_HAS_BALL_DIST = paramManager->OPP_HAS_BALL_DIST; /*åˆ¤æ–­æ•Œæ–¹æ˜¯å¦æœ‰çƒçš„è·ç¦» éœ€è¦è°ƒæ•´*/
+	CanPassToWingDist = paramManager->CanPassToWingDist; /*Advanceèƒ½å¤Ÿä¼ ç»™è¾¹é”‹çš„ä¸´ç•Œè·ç¦»*/
+	CanWingShootDist = paramManager->CanWingShootDist; /*è¾¹é”‹èƒ½å¤Ÿå°„é—¨çš„ä¸´ç•Œè·ç¦»*/
+	SHOOT_PRECISION = paramManager->SHOOT_PRECISION;	/*å…è®¸å°„é—¨æœ€å°ç²¾åº¦è§’åˆ†æ¯ï¼Œè¶Šå¤§è¶Šæ…¢è¶Šç²¾ç¡® æœ€ä½ä¸º7æœ€é«˜17*/
+	GetBallBias = paramManager->AdGetBallBias;	/*AdvanceGetballçš„åå·®*/
+	BalltoMeVelTime = paramManager->BalltoMeVelTime; /*Advanceä¼ çƒç»™æˆ‘ä¸»åŠ¨å»æ¥çš„ä¸´ç•Œæ—¶é—´*/
 	OBSTACLE_RADIUS = paramManager->BREAK_OBSTACLE_RADIUS;
-	/*ÉäÃÅÁ¦¶È²ÎÊı*/
+	/*å°„é—¨åŠ›åº¦å‚æ•°*/
 	KICKPOWER = paramManager->KICKPOWER;
-	CHIPPOWER = paramManager->CHIPPOWER; // ÔİÊ±²»ÓÃÁË
+	CHIPPOWER = paramManager->CHIPPOWER; // æš‚æ—¶ä¸ç”¨äº†
 	ADV_FPASSPOWER_Alpha = paramManager->ADV_FPASSPOWER;
 	ADV_CPASSPOWER_Alpha = paramManager->ADV_CPASSPOWER;
 	PUSHPOWER = paramManager->ADV_PUSHPOWER;
@@ -46,6 +46,7 @@ CAdvance::CAdvance()
 	Advance_DEBUG_ENGINE = paramManager->Advance_DEBUG_ENGINE;
 	// GetBallV4
 	LARGE_ADJUST_ANGLE = paramManager->LARGE_ADJUST_ANGLE;
+
 
 }
 
@@ -60,8 +61,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 		_state = BEGIN;
 	}
 	/**********************************************************
-	* Description: ³õÊ¼»¯±ØÒª»ù´¡²ÎÊıÁĞ±í
-	* Author: Ì·Óîºê
+	* Description: åˆå§‹åŒ–å¿…è¦åŸºç¡€å‚æ•°åˆ—è¡¨
+	* Author: è°­å®‡å®
 	* Created Date: 2022/10/10
 	***********************************************************/
 	const int maxFrared = 100 * 1.25;
@@ -77,8 +78,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 	else { infraredOn = 0; }
 
 	/**********************************************************
-	* Description: ³õÊ¼»¯ÈÎÎñ²ÎÊıÁĞ±í
-	* Author: Ì·Óîºê
+	* Description: åˆå§‹åŒ–ä»»åŠ¡å‚æ•°åˆ—è¡¨
+	* Author: è°­å®‡å®
 	* Created Date: 2022/10/10
 	***********************************************************/
 	const PlayerVisionT& me = pVision->OurPlayer(_executor);
@@ -105,18 +106,15 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 
 	PassDirOrPos TMP;
-	//CGeoPoint PassPoint;
-	/*??ğí??*/
-	
-	if (WeCanAlwaysSetKick(pVision, _executor))
-		KickStatus::Instance()->setKick(_executor, KICKPOWER);
-	//CGeoPoint ShootPoint, PassPoint;/*´«ÇòÓëÉäÃÅµÄ·½Ïò Ó¦¸ÃÓÃÒ»¸ö±äÁ¿±íÊ¾ ¾ßÓĞ¿É³ÖĞø»¯µÄ×÷ÓÃ*/
-	//ShootPoint = GenerateBreakShootPoint(pVision, _executor);
-	//PassPoint = GenerateBreakPassPoint(pVision, _executor);
-	NumberOfSupport = min(6, AREANUM);/*ÔİÊ±Ö»¿¼ÂÇ¶ÔÃæ°ë³¡Áù¸ö*/
+	CGeoPoint PassPos;
+	/*??ç—¦??*/
+
+	CGeoPoint ShootPoint, PassPoint;/*ä¼ çƒä¸å°„é—¨çš„æ–¹å‘ åº”è¯¥ç”¨ä¸€ä¸ªå˜é‡è¡¨ç¤º å…·æœ‰å¯æŒç»­åŒ–çš„ä½œç”¨*/
+	ShootPoint = GenerateBreakShootPoint(pVision, _executor);
+	NumberOfSupport = min(6, AREANUM);/*æš‚æ—¶åªè€ƒè™‘å¯¹é¢åŠåœºå…­ä¸ª*/
 	for (int i = 0; i < NumberOfSupport; ++i)
-		SupportPoint[i] = GPUBestAlgThread::Instance()->getBestPointFromArea(i);/* GpuËãµã */
-	// ¿ÉÊÓ»¯ÇòµÄÔ¤²âÎ»ÖÃ
+		SupportPoint[i] = GPUBestAlgThread::Instance()->getBestPointFromArea(i);/* Gpuç®—ç‚¹ */
+	// å¯è§†åŒ–çƒçš„é¢„æµ‹ä½ç½®
 	/*
 	for (int i = 0; i < 6; i++) {
 		CGeoPoint ball_predict_pos = GPUBestAlgThread::Instance()->getBallPosFromFrame(ball.Pos(), ball.Vel(), i * 8);
@@ -127,12 +125,12 @@ void CAdvance::plan(const CVisionModule* pVision)
 
 	//	NormalPlayUtils::generatePassPoint(ball.Pos(), SupportPoifnt[0], SupportPoint[1], SupportPoint[2], SupportPoint[3]);
 
-	IsMeSupport = JudgeIsMeSupport(pVision, _executor);/*ÅĞ¶ÏÎÒÊÇ²»ÊÇsupport ÓÃÓÚ´«ÖĞ*/
-	IHaveSupport = CanSupportKick(pVision, _executor); // ÊÇ·ñ´æÔÚÖ§Ô®³µ
+	IsMeSupport = JudgeIsMeSupport(pVision, _executor);/*åˆ¤æ–­æˆ‘æ˜¯ä¸æ˜¯support ç”¨äºä¼ ä¸­*/
+	IHaveSupport = CanSupportKick(pVision, _executor); // æ˜¯å¦å­˜åœ¨æ”¯æ´è½¦
 
 	/**********************************************************
-	* Description: ÆÁÄ»ÓÒ²à »­³öhasÓëloseµÄÍ¼Ïñ
-	* Author: Ì·Óîºê
+	* Description: å±å¹•å³ä¾§ ç”»å‡ºhasä¸loseçš„å›¾åƒ
+	* Author: è°­å®‡å®
 	* Created Date: 2022/10/10
 	***********************************************************/
 
@@ -149,14 +147,16 @@ void CAdvance::plan(const CVisionModule* pVision)
 		}
 	}
 	/**********************************************************
-	* Description: ×´Ì¬·ÖÅä
-	* Author: Ì·Óîºê
+	* Description: çŠ¶æ€åˆ†é…
+	* Author: è°­å®‡å®
 	* Created Date: 2022/10/10
 	***********************************************************/
 	Advance_DEBUG_ENGINE = 1;
 
 	bool IsSimulator = 1;
 	MeIsInWhichArea = InWhichArea(pVision, _executor);
+
+
 
 	switch (_state) {
 	case BEGIN:
@@ -165,10 +165,18 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case GET:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
 
-		if (isOppHasBall){
-			_state = GET;
-			break;
-		}	// µĞÈË³ÖÇò£¬´ËÊ±ĞèÒª½øĞĞ·ÀÊØ
+		if (checkOppHasBall(pVision)) {
+			if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
+				_state = GET; break;
+			} // æ­£åœ¨ä¸¤æ–¹å¯¹å¸
+			else {
+				if (WeNeedBlockTheBall(pVision, _executor)) {
+					_state = BLOCK;
+					break;
+				}
+				else { _state = GET; break; }
+			}
+		}	// æ•ŒäººæŒçƒï¼Œæ­¤æ—¶éœ€è¦è¿›è¡Œé˜²å®ˆ
 
 		/*
 		else if (NumOfOurPlayer <= 2) {
@@ -181,31 +189,27 @@ void CAdvance::plan(const CVisionModule* pVision)
 				_state = GET;
 				break;
 			}
-		}	// ÎÒ·½ÏİÈë·¸¹æÂé·³
+		}	// æˆ‘æ–¹é™·å…¥çŠ¯è§„éº»çƒ¦
 		*/
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 			_state = GenerateNextState(pVision, _executor);
 			break;
-		}/*
+		}
 		else if (NumOfTheirPlayerfrontMe < 2) {
 			_state = CHASEKICK;
 			break;
-		}*/
+		}
 		else {
 			_state = GenerateNextState(pVision, _executor);
 			if (CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) {
 				if (_state == KICK) {
 					_state = CHASEKICK;
 					break;
-				}/*
+				}
 				else if (_state == PUSHOUT) {
-					//_state = CHASEPUSH;
-					//break;
-				}*/
-			}
-			if (OppIsFarThanMe(pVision, _executor) && _state == PUSHOUT) {
-				_state = PUSHOUT;
-				break;
+					_state = CHASEPUSH;
+					break;
+				}
 			}
 			_state = GET;
 			break;
@@ -235,101 +239,39 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case PUSHOUT:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push OUT", COLOR_YELLOW);
 		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-			_state = GenerateNextState(pVision, _executor);
-			break;
-		}
-		else {
-			_state = GenerateNextState(pVision, _executor);
-			if (CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) {
-				if (_state == KICK) {
-					_state = CHASEKICK;
-					break;
-				}/*
-				else if (_state == PUSHOUT) {
-					//_state = CHASEPUSH;
-					//break;
-				}*/
-			}
-			if (OppIsFarThanMe(pVision, _executor) && _state == PUSHOUT) {
-				_state = PUSHOUT;
-				break;
-			}
-			_state = GET;
-			break;
-		}
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
-	case BREAKING:
+	case BREAKPASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push BreakPass", COLOR_YELLOW);
 		// if (meLoseBall > 10 && ball2meDist > 10) _state = GET;
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-			_state = GenerateNextState(pVision, _executor);
-			break;
-		}
-		else {
-			_state = GenerateNextState(pVision, _executor);
-			if (CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) {
-				if (_state == KICK) {
-					_state = CHASEKICK;
-					break;
-				}/*
-				else if (_state == PUSHOUT) {
-					//_state = CHASEPUSH;
-					//break;
-				}*/
-			}
-			if (OppIsFarThanMe(pVision, _executor) && _state == PUSHOUT) {
-				_state = PUSHOUT;
-				break;
-			}
-			_state = GET;
-			break;
-		}
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
+	case BLOCK:
+		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push BreakPass", COLOR_YELLOW);
+		if (!WeNeedBlockTheBall(pVision, _executor)) _state = GET;
+		break;
+
 	case CHASEKICK:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHASEKICK", COLOR_YELLOW);
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.5) {
-			_state = GenerateNextState(pVision, _executor);
-			break;
-		}
-		else {
-			_state = GenerateNextState(pVision, _executor);
-			if (CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) {
-				if (_state == KICK) {
-					_state = CHASEKICK;
-					break;
-				}/*
-				else if (_state == PUSHOUT) {
-					//_state = CHASEPUSH;
-					//break;
-				}*/
-			}
-			if (OppIsFarThanMe(pVision, _executor) && _state == PUSHOUT) {
-				_state = PUSHOUT;
-				break;
-			}
-			_state = GET;
-		}
+		if (GenerateNextState(pVision, _executor) != KICK || !CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) _state = GET;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3 ) _state = KICK;
 		break;
 	case CHASEPUSH:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHASEPUSH", COLOR_YELLOW);
-		if (GenerateNextState(pVision, _executor) != PUSHOUT || !CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) _state = GET;// , cout << "why hereeeee??" << ' ' << GenerateNextState(pVision, _executor) << endl;
+		if (GenerateNextState(pVision, _executor) != PUSHOUT || !CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) _state = GET, cout << "why hereeeee??" << ' ' << GenerateNextState(pVision, _executor) << endl;
 
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) _state = PUSHOUT;
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3 ) _state = PUSHOUT;
 		break;
 	}
-
 	/*
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-		_state = PUSHOUT;
-		//_state = BREAKSHOOT;
-		//_state = PUSHOUT;
+		_state = CHASEKICK;
 	}
-	else _state = PUSHOUT;
+	else _state = CHASEKICK;
 	*/
 	/**********************************************************
-	* Description: ×´Ì¬Ö´ĞĞ
-	* Author: Ì·Óîºê
+	* Description: çŠ¶æ€æ‰§è¡Œ
+	* Author: è°­å®‡å®
 	* Created Date: 2022/10/10
 	***********************************************************/
 	bool isChipKick = 0;
@@ -337,15 +279,15 @@ void CAdvance::plan(const CVisionModule* pVision)
 	if (_state != KICK && _state != BREAKSHOOT) {
 		NowIsShoot = 0;
 	}
-	cout << _state << endl;
+
 	switch (_state) {
 	case GET:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "let GET", COLOR_YELLOW);
 		if (ball2meDist > 50 || (isPassBalltoMe(pVision, _executor)))NowIsShoot = 0;
-		/*Çå¿Õshoot±ê¼Ç*/
+		/*æ¸…ç©ºshootæ ‡è®°*/
 		/*
 		if (BallToOurGoal < RELIEF_DIST && ball2oppDist < 30) {
-			/*ĞèÒªRELIEFµÄ½ô¼±Çé¿ö
+			/*éœ€è¦RELIEFçš„ç´§æ€¥æƒ…å†µ
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "RELIEF", COLOR_ORANGE);
 			KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 			KickStatus::Instance()->setChipKick(_executor, RELIEF_POWER);
@@ -354,19 +296,19 @@ void CAdvance::plan(const CVisionModule* pVision)
 		else
 		*/
 		if (!ball.Valid()) {
-			/*Çò²»ºÏ·¨µÄÇé¿ö*/
+			/*çƒä¸åˆæ³•çš„æƒ…å†µ*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Ball invalid", COLOR_ORANGE);
 			double faceDir = opp.Dir() + Param::Math::PI;
 			setSubTask(PlayerRole::makeItChaseKickV2(_executor, faceDir, ShootNotNeedDribble));
 		}
 		else if (checkTheyCanShoot(pVision, _executor)) {
-			/*µĞÈËÓĞÉäÃÅ»ú»á ½øĞĞ·â¶Â*/
+			/*æ•Œäººæœ‰å°„é—¨æœºä¼š è¿›è¡Œå°å µ*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "they can shoot", COLOR_ORANGE);
 			double faceDir = opp.Dir() + Param::Math::PI;
 			setSubTask(PlayerRole::makeItChaseKickV2(_executor, faceDir, ShootNotNeedDribble));
 		}
 		else if (isPassBalltoMe(pVision, _executor) /*&& !JudgePassMeIsBeBlocked(pVision, _executor)*/) {
-			/*ÎÒ·½¸øÎÒ½øĞĞ´«Çò*/
+			/*æˆ‘æ–¹ç»™æˆ‘è¿›è¡Œä¼ çƒ*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "pass ball to me", COLOR_ORANGE);
 
 			if (me2goal.mod() < KICK_DIST && (Me2OppTooclose(pVision, _executor) || isInBreakArea(pVision, _executor))) {
@@ -376,10 +318,10 @@ void CAdvance::plan(const CVisionModule* pVision)
 			setSubTask(PlayerRole::makeItReceivePass(_executor, KickorPassDir));
 		}
 		else {
-			/*²¢Ã»ÓĞµÃµ½Çò ĞèÒªÈ¥getball*/
+			/*å¹¶æ²¡æœ‰å¾—åˆ°çƒ éœ€è¦å»getball*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -300), "LOSE and GETBALL", COLOR_ORANGE);
 			//KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
-			/*´Ë´¦³¯Ïò¿É³Ö¾Ã»¯¼´¿É ²»ĞèÒª½øĞĞ¸Ä±ä*/
+			/*æ­¤å¤„æœå‘å¯æŒä¹…åŒ–å³å¯ ä¸éœ€è¦è¿›è¡Œæ”¹å˜*/
 			LastPassDirToJudge = -999;
 			//cout << OppIsNearThanMe(pVision, _executor) << ' ' << OppIsFarThanMe(pVision, _executor) << endl;
 			//if (OppIsNearThanMe(pVision, _executor)) KickorPassDir = generateOppIsNearThanMeDir(pVision, _executor);
@@ -388,22 +330,22 @@ void CAdvance::plan(const CVisionModule* pVision)
 			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		}
 		break;
-	case KICK:   // ÉäÃÅ
+	case KICK:   // å°„é—¨
 		NowIsShoot = 1;
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "KICK", COLOR_YELLOW);
 		KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		if (Utils::InTheirPenaltyArea(ball.Pos(), 0)) {
-			/*Èç¹ûÇòÔÚ¶Ô·½½ûÇø*/
+			/*å¦‚æœçƒåœ¨å¯¹æ–¹ç¦åŒº*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "ball in their PEN", COLOR_ORANGE);
 			KickStatus::Instance()->setKick(_executor, KICKPOWER);
 			//setSubTask(PlayerRole::makeItShootBallV2(_executor, KickorPassDir, ShootNotNeedDribble));
 		}
 		else {
-			/*Õı³£KICK½×¶Î  ĞèÒªÇø·ÖÊÇ·ñ·½ÏòÒÑ¾­×ªÏò³É¹¦  ´Ë´¦ÉĞÎ´Íê±¸¿ÉÄÜ´æÔÚBUG*/
+			/*æ­£å¸¸KICKé˜¶æ®µ  éœ€è¦åŒºåˆ†æ˜¯å¦æ–¹å‘å·²ç»è½¬å‘æˆåŠŸ  æ­¤å¤„å°šæœªå®Œå¤‡å¯èƒ½å­˜åœ¨BUG*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Kick", COLOR_ORANGE);
 
-			//setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, KICKPOWER, PassPoint));
+			//setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, KICKPOWER, PassPos));
 			//if (canScore(pVision, _executor, OBSTACLE_RADIUS, me.Dir())) {
 			if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick isDirOK", COLOR_ORANGE);
@@ -430,46 +372,58 @@ void CAdvance::plan(const CVisionModule* pVision)
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		TMP = PassDirInside(pVision, _executor);
 		KickorPassDir = TMP.dir;
-		PassPoint = TMP.pos;
+		PassPos = TMP.pos;
+
 
 		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
 			double ThePower = 0;
-			bool IsFlatKick = toChipOrToFlat(pVision, _executor, PassPoint);
+			bool IsFlatKick = toChipOrToFlat(pVision, _executor, PassPos);
 			if (IsFlatKick) {
-				ThePower = GetFPassPower(me.Pos(), PassPoint);
+				ThePower = GetFPassPower(me.Pos(), PassPos);
+				//KickStatus::Instance()->setKick(_executor, ThePower);
 			}
 			else {
-				ThePower = GetCPassPower(me.Pos(), PassPoint);
+				ThePower = GetCPassPower(me.Pos(), PassPos);
+				//KickStatus::Instance()->setChipKick(_executor, ThePower);
 			}
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PASS isDirOK", COLOR_ORANGE);
 
 			setSubTask(PlayerRole::makeItJustKick(_executor, !IsFlatKick, ThePower));
 			//setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), (ball.Pos() - me.Pos()).dir(), task().player.flag));
-			TaskMediator::Instance()->setAdvancerPassTo(PassPoint, NumberOfSupport);
+			TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);
 		}
 		else {
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PASS is NOT DirOK ", COLOR_ORANGE);
 			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		}
+		/*
+		if (toChipOrToFlat(pVision, _executor, PassPos) == 1) {
+			/*é‰´å®šä¸ºå¯ä»¥å¹³ä¼ çƒ åˆ™å¹³ä¼ çƒ
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "FLATPASS", COLOR_ORANGE);
+			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 0, GetFPassPower(me.Pos(), PassPos), PassPos));
+		}
+		else {
+			/*é‰´å®šä¸ºä¸èƒ½å¹³ä¼ çƒ åˆ™é€‰æ‹©æŒ‘ä¼  è€ƒè™‘å‡½æ•°åŒæ ·ä¸ºflatPassDir
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHIPPASS", COLOR_CYAN);
+			setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI / SHOOT_PRECISION, 1, GetCPassPower(me.Pos(), PassPos), PassPos));
+		}
+		*/
 		break;
 
 	case JUSTCHIPPASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "JUSTCHIP", COLOR_YELLOW);
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
-		if (IHaveSupport) {
-			TMP = PassDirInside(pVision, _executor);
-			KickorPassDir = TMP.dir;
-			PassPoint = TMP.pos;
-		}
-		else {
-			PassPoint = theirCenter;
-			KickorPassDir = (PassPoint - me.Pos()).dir();
-		}
+		TMP = PassDirInside(pVision, _executor);
+		KickorPassDir = TMP.dir;
+		PassPos = TMP.pos;
 		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
-			double ThePower = GetCPassPower(me.Pos(), PassPoint);
-			setSubTask(PlayerRole::makeItJustKick(_executor, 1, ThePower));
+			double ThePower = GetCPassPower(me.Pos(), PassPos);
+			//KickStatus::Instance()->setChipKick(_executor, ThePower);
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "JUSTCHIP isDirOK", COLOR_ORANGE);
-			TaskMediator::Instance()->setAdvancerPassTo(PassPoint, NumberOfSupport);
+
+			setSubTask(PlayerRole::makeItJustKick(_executor, 1, ThePower));
+			//setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), (ball.Pos() - me.Pos()).dir(), task().player.flag));
+			TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);
 		}
 		else {
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "JUSTCHIP is NOT DirOK ", COLOR_ORANGE);
@@ -483,45 +437,105 @@ void CAdvance::plan(const CVisionModule* pVision)
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		ShootPoint = (pVision->Cycle() % 60 == 0) ? GenerateBreakShootPoint(pVision, _executor) : ShootPoint;
 		KickorPassDir = (ShootPoint - me.Pos()).dir();
-		setSubTask(PlayerRole::makeItBreak(_executor, true));
+		setSubTask(PlayerRole::makeItBreak(_executor, false, ShootPoint));
 		/*
 		if(AdJudgeBreakCanDo(pVision, _executor, ShootPoint)||true)setSubTask(PlayerRole::makeItBreak(_executor, false, ShootPoint));
 		else setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, generateGetballDir(pVision, _executor), CVector(0, 0), ShootNotNeedDribble, GetBallBias));
 		*/
 		break;
 
-	case BREAKING:
+	case BREAKPASS:
 	{
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS", COLOR_YELLOW);
-		setSubTask(PlayerRole::makeItBreak(_executor, false, false, false));
+		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
+		PassPoint = (pVision->Cycle() % 60 == 0) ? GenerateBreakPassPoint(pVision, _executor) : PassPoint;
+		TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);  //breakpasså…·æœ‰è¿ç»­æ€§ ä¸é€‚åˆé‡‡ç”¨setpassçš„æŠ€æœ¯
+		bool isChipKick = toChipOrToFlat(pVision, _executor, PassPos) == 0;
+		double kickPower = 0;
+		KickorPassDir = (PassPoint - me.Pos()).dir();
+		if (isChipKick)
+			kickPower = GetCPassPower(me.Pos(), PassPoint);
+		else
+			kickPower = GetFPassPower(me.Pos(), PassPoint);
+		setSubTask(PlayerRole::makeItBreak(_executor, true, PassPoint, false, 5 * Param::Math::PI / 180, false, isChipKick, kickPower));
 		break;
 	}
 
 	case PUSHOUT:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "PUSHOUT", COLOR_YELLOW);
-		
+
+		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
+
 		PassPoint = generateNormalPushPoint(pVision, _executor);// : PassPoint;
-		KickorPassDir = (PassPoint - me.Pos()).dir();
-		/*
-		isChipKick = toChipOrToFlat(pVision, _executor, PassPoint) == 0;
+		TaskMediator::Instance()->setAdvancerPassTo(PassPos, NumberOfSupport);  //breakpass : å…·æœ‰è¿ç»­æ€§ ä¸é€‚åˆé‡‡ç”¨setpassçš„æŠ€æœ¯
+		//bool;
+		isChipKick = toChipOrToFlat(pVision, _executor, PassPos) == 0;
+		//double;
 		kickPower = 0;
+		KickorPassDir = (PassPoint - me.Pos()).dir();
 		if (isChipKick)
 			kickPower = GetCPassPower(me.Pos(), PassPoint);
 		else
 			kickPower = GetFPassPower(me.Pos(), PassPoint);
+		setSubTask(PlayerRole::makeItBreak(_executor, true, PassPoint, false, 15 * Param::Math::PI / 180, false, isChipKick, kickPower));
+		/*
+		if ((pVision->Cycle() % 6000 == 0)) {
+			PassPoint = generateNormalPushPoint(pVision, _executor);
+			KickorPassDir = (PassPoint - me.Pos()).dir();
+		}
+		if (!IsSimulator) {
+			if (fabs((KickorPassDir - (ball.Pos() - me.Pos()).dir())) < Param::Math::PI * 20.0 / 180) {
+				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Crash The Ball", COLOR_ORANGE);
+				setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos() + Utils::Polar2Vector(100, (ball.Pos() - me.Pos()).dir()), (ball.Pos() - me.Pos()).dir(), task().player.flag));
+			}
+			else {
+				if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
+					if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isDirOK", COLOR_ORANGE);
+					KickStatus::Instance()->setKick(_executor, 260);
+					setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+				}
+				else {
+					if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isNotDirOK", COLOR_ORANGE);
+					setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+					KickStatus::Instance()->setBothKick(_executor, 0, 0);
+				}
+			}
+		}
+		else {
+			if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
+				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isDirOK", COLOR_ORANGE);
+				if(isTheLineBlocked(pVision, ball.Pos(), opp.Pos())) KickStatus::Instance()->setChipKick(_executor, 100);
+				else KickStatus::Instance()->setKick(_executor, 260);
+				setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), task().player.flag));
 
-		setSubTask(PlayerRole::makeItJustKick(_executor, isChipKick, kickPower));
+			}
+			else {
+				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isNotDirOK", COLOR_ORANGE);
+				setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+				KickStatus::Instance()->setBothKick(_executor, 0, 0);
+			}
+		}
 		*/
-		setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
+		//setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos() + Utils::Polar2Vector(10, (ball.Pos() - me.Pos()).dir()), (ball.Pos() - me.Pos()).dir(), task().player.flag));
+		/*
+		if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT isDirOK", COLOR_ORANGE);
+			KickStatus::Instance()->setKick(_executor, 350);
+			setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), (ball.Pos() - me.Pos()).dir(), task().player.flag));
+		}
+		else {
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "PUSHOUT is NOT DirOK ", COLOR_ORANGE);
+			setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+		}
+		*/
 		break;
 
 	case CHASEKICK:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "CHASEKICK", COLOR_YELLOW);
 		KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHASEKICK", COLOR_ORANGE);
-		if (WeCanAlwaysSetKick(pVision, _executor))
+		if(WeCanAlwaysSetKick(pVision, _executor))
 			KickStatus::Instance()->setKick(_executor, KICKPOWER);
-		else KickStatus::Instance()->setKick(_executor, 0);
 		setSubTask(PlayerRole::makeItChaseKickV2(_executor, KickorPassDir, ShootNotNeedDribble));
 		break;
 	case CHASEPUSH:
@@ -529,19 +543,29 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHASEPUSH", COLOR_ORANGE);
 		PassPoint = generateNormalPushPoint(pVision, _executor);
 		KickorPassDir = (PassPoint - me.Pos()).dir();
-		if(fabs(me.Dir()) < 1.5) KickStatus::Instance()->setKick(_executor, GetFPassPower(ball.Pos(), PassPoint) * 0.7);
-		else KickStatus::Instance()->setKick(_executor, 0);
+		KickStatus::Instance()->setKick(_executor, GetFPassPower(ball.Pos(), PassPoint));
 		setSubTask(PlayerRole::makeItChaseKickV2(_executor, KickorPassDir, ShootNotNeedDribble, GetFPassPower(ball.Pos(), PassPoint)));
 		break;
+	case BLOCK:
+		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BLOCK", COLOR_YELLOW);
+		KickorPassDir = (opp.Pos() - me.Pos()).dir();
+		TaskT BlockTask(task());
+		BlockTask.player.pos = opp.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER, Utils::Normalize((me.Pos() - opp.Pos()).dir())); // é¢„æµ‹çƒçš„ä½ç½® + 5.85     è¿™ä¸ªé•¿åº¦è¶Šå¤§ç¦»çƒè¶Šè¿œ
+		BlockTask.player.angle = (opp.Pos() - me.Pos()).dir();
+		BlockTask.player.needdribble = 0;
+		setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(BlockTask));
+		break;
+
 	}
 	//setSubTask(PlayerRole::makeItStop(_executor, 0));
+
 	_cycle = pVision->Cycle();
 	CStatedTask::plan(pVision);
 }
 
 /**********************************************************
-	* Description: ¼ì²âÀàº¯Êı£¬ÓÃÓÚÊÓ¾õÓëÎ»ÖÃµÈÅĞ¶Ï
-	* Author: Ì·Óîºê
+	* Description: æ£€æµ‹ç±»å‡½æ•°ï¼Œç”¨äºè§†è§‰ä¸ä½ç½®ç­‰åˆ¤æ–­
+	* Author: è°­å®‡å®
 	* Created Date: 2022/10/10
 ***********************************************************/
 bool CAdvance::isVisionHasBall(const CVisionModule* pVision, const int vecNumber) {
@@ -567,7 +591,6 @@ bool CAdvance::checkOppHasBall(const CVisionModule* pVision) {
 	const PlayerVisionT& me = pVision->OurPlayer(_executor);
 	const CVector self2ball = ball.Pos() - me.Pos();
 	opponentID = getTheirMostClosetoPosPlayerNum(pVision, pVision->Ball().Pos());
-	Oppfront = getTheirMostCloseAndFronttoPosPlayerNum(pVision, pVision->Ball().Pos());
 	const PlayerVisionT& opponent = pVision->TheirPlayer(opponentID);
 	if (Advance_DEBUG_ENGINE)GDebugEngine::Instance()->gui_debug_msg(opponent.Pos(), "Best Opp!", COLOR_WHITE);
 	CVector opponent2ball = ball.Pos() - opponent.Pos();
@@ -592,21 +615,8 @@ int CAdvance::getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeo
 	}
 	return num;
 }
-int CAdvance::getTheirMostCloseAndFronttoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos) {
-	double dist = 1000;
-	int num = 0;
-	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
-		if (pVision->TheirPlayer(i).Valid()) {
-			if (pVision->TheirPlayer(i).Pos().dist(pos) < dist && pVision->TheirPlayer(i).X() > pos.x()) {
-				dist = pVision->TheirPlayer(i).Pos().dist(pos);
-				num = i;
-			}
-		}
-	}
-	return num;
-}
 bool CAdvance::checkBallFront(const CVisionModule* pVision, double angle) {
-	/*ÅĞ¶ÏÇòÊÇ·ñÔÚµĞÈËÇ°Ãæ ´æÔÚ¼Ğ½ÇÒªÇó*/
+	/*åˆ¤æ–­çƒæ˜¯å¦åœ¨æ•Œäººå‰é¢ å­˜åœ¨å¤¹è§’è¦æ±‚*/
 
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
 	const BallVisionT& ball = pVision->Ball();
@@ -628,7 +638,7 @@ bool CAdvance::isPassBalltoMe(const CVisionModule* pVision, int vecNumber) {
 	CVector opp2me = me.Pos() - opp.Pos();
 	//    printf("%.3f %.3f\n",(opp.Pos() - me.Pos()).mod(), Utils::Normalize(ball2me.dir() - opp2me.dir()));
 	bool nearBoundary = fabs(me.Pos().x()) > Param::Field::PITCH_LENGTH / 2 - Param::Vehicle::V2::PLAYER_SIZE * 4 ||
-		fabs(me.Pos().y()) > Param::Field::PITCH_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE * 4; // ¿¿½ü±ß½ç²»ÄÜÈÃ¿ª
+		fabs(me.Pos().y()) > Param::Field::PITCH_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE * 4; // é è¿‘è¾¹ç•Œä¸èƒ½è®©å¼€
 	if ((opp.Pos() - me.Pos()).mod() < 60 && Utils::Normalize(ball2me.dir() - opp2me.dir()) < Param::Math::PI / 7 && !nearBoundary) return false;
 	if (ball.Vel().mod() < 175.0 && !nearBoundary) return false;
 	if (ball.Valid() && abs(diff_ballMoving2Me) < Param::Math::PI / 7.5 && (ball2me.mod() / ball.Vel().mod() < BalltoMeVelTime)) {//
@@ -638,7 +648,7 @@ bool CAdvance::isPassBalltoMe(const CVisionModule* pVision, int vecNumber) {
 }
 
 bool CAdvance::isTheLineBlocked(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint) {
-	/*¸ÃÌõÂ·¾¶ÉÏÊÇ·ñ»á±»µĞÈË×èµ²*/
+	/*è¯¥æ¡è·¯å¾„ä¸Šæ˜¯å¦ä¼šè¢«æ•Œäººé˜»æŒ¡*/
 	double k_m = WantToLessShoot;
 	double opp2LineDist = TheMinDistBetweenTheOppAndTheLine(pVision, startPoint, targetPoint);
 	if (opp2LineDist < k_m * Param::Vehicle::V2::PLAYER_SIZE)return true;
@@ -678,20 +688,24 @@ int CAdvance::TheirRobotInBreakArea(const CVisionModule* pVision, const int vecN
 	}
 	return cnt;
 }
-bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber) { //ÊÇ·ñÌ«½üÁË
+bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber) { //æ˜¯å¦å¤ªè¿‘äº†
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
 	const BallVisionT& ball = pVision->Ball();
 	CVector me2Ball = ball.Pos() - me.Pos();
 	CVector me2Opp = opp.Pos() - me.Pos();
-	
-	char me2opp[100];
-	sprintf(me2opp, "%f", me2Opp.mod());
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), me2opp, COLOR_YELLOW);
-	//changed by lsf
-	
-	if (fabs(me2Opp.mod()) <= 50 && opp.X() > me.X() && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 2.7))
-		return true;
+
+	/*
+	char me2Ball1[100];
+	char me2Opp1[100];
+	char dir1[100];
+	sprintf(me2Ball1, "%f", abs(me2Ball.mod()));
+	sprintf(me2Opp1, "%f", abs(me2Opp.mod()));
+	sprintf(dir1, "%f", (me2Ball.dir() - me2Opp.dir()) / Param::Math::PI * 180);
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), me2Ball1, COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), me2Opp1, COLOR_YELLOW);
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), dir1, COLOR_YELLOW);
+	*/
 
 	if ((fabs(me2Ball.mod()) * 1.5 > fabs(me2Opp.mod()) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 3))) {
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(450, 450), "TOO CLOSE with ball", COLOR_ORANGE);
@@ -703,7 +717,7 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 	if (IsShoot) {
 		return canScore(pVision, vecNumber, OBSTACLE_RADIUS, pVision->OurPlayer(vecNumber).Dir());
 	}
-	double PASSPrecision = PASS_PRECISION * Param::Math::PI / 180;
+	double ShootPrecision = SHOOT_PRECISION;
 	//double offset = 0.05;
 	const BallVisionT& ball = pVision->Ball();
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
@@ -712,18 +726,74 @@ bool CAdvance::isDirOK(const CVisionModule* pVision, int vecNumber, double targe
 	CVector opp2ball = ball.Pos() - opp.Pos();
 	CVector ball2goal = theirCenter - ball.Pos();
 
-	if (fabs(me.Dir() - targetDir) < PASSPrecision) return true;
+	if (fabs(me.Dir() - targetDir) < ShootPrecision * 3) return true;
 
 	else return false;
+	/*
+	cout << fabs(me.Dir() - targetDir) << ' ' << abs(targetDir - last_target_dir) <<' '<<SHOOT_PRECISION << endl;
+	//if (!ShootOrPass) ShootPrecision = ShootPrecision * 0.8;
+	/*if (myDir - targetDir > 0)targetDir -= offset;
+	else targetDir += offset;
+			æ˜¯å³ªç‹é•  î„å¦„è‡ç§Ÿå’›
+
+	last_target_dir = targetDir;
+
+	if (ShootOrPass) {
+		CGeoLine start2Target = CGeoLine(me.Pos(), myDir);
+		CGeoLineLineIntersection Intersection = CGeoLineLineIntersection(start2Target, GOATLINE);
+		if (abs(Intersection.IntersectPoint().y()) > 60) return false;
+	}
+	/*äº¤ç‚¹å¿…é¡»ä½äºçƒé—¨é‡Œé¢
+
+	if (abs(targetDir - last_target_dir) > 3.0 * SHOOT_PRECISION) {
+		last_dir_deviation = 100;  //é‡ç½®è§’åº¦å·®
+	}
+	if (Me2OppTooclose(pVision, vecNumber)) {
+		/*å¤ªè¿‘äº† å¿«å°„
+		if (abs(myDir - targetDir) < 2.0 * SHOOT_PRECISION) {
+			last_dir_deviation = 100;
+			return true;
+		}
+	}
+	if ((ShootOrPass && ball2goal.mod() < 250) || (opp2ball.mod() < 200)) {
+		/*å¦‚æœç°åœ¨æ˜¯å°„é—¨ä¸”è·ç¦»çƒé—¨è¶³å¤Ÿè¿‘ ä¸éœ€è¦è¿‡å¤šçš„è°ƒæ•´
+		  å¦‚æœæ•Œäººç¦»æˆ‘æ¯”è¾ƒè¿‘äº† å†è°ƒæ•´å°±æ— æ³•å‡ºçƒäº†
+		if (abs(myDir - targetDir) < 1.5 * SHOOT_PRECISION) {
+			last_dir_deviation = 100;
+			return true;
+		}
+	}
+	if (abs(myDir - targetDir) > 1.5 * SHOOT_PRECISION) {
+		/*å¦‚æœè§’åº¦è¿‡å¤§ åº”å½“ä¸ºfalse
+		last_dir_deviation = myDir - targetDir;
+		return false;
+	}
+	else if ((abs(myDir - targetDir) > abs(last_dir_deviation) || (myDir - targetDir) * last_dir_deviation <= 0)){
+		/*å¦‚æœç›¸æ¯”ä¸Šæ¬¡è§’åº¦å¹¶æ²¡æœ‰å¾—åˆ°æœ‰æ•ˆè°ƒæ•´
+		if (abs(myDir - targetDir) < 1.25 * SHOOT_PRECISION) {
+			/*è¯¯å·®ç›¸å¯¹è€Œè¨€å¯ä»¥æ¥å—äº†
+			last_dir_deviation = 100;
+			return true;
+		}
+	}
+	else if (abs(myDir - targetDir) < SHOOT_PRECISION) {
+		/*å°½ç®¡ä»ç„¶åœ¨è°ƒæ•´ ä½†æ˜¯å¯ä»¥åœ¨è¯¯å·®å…è®¸çš„èŒƒå›´å†…å°„é—¨
+		last_dir_deviation = 100;
+		return true;
+	}
+	last_dir_deviation = myDir - targetDir;
+	return false;
+*/
 }
+
 /*
 *		The Data List
-		const double PITCH_LENGTH = OParamManager::Instance()->value(field + "/field_length", 12000).toDouble() * 0.1; //1200; // ³¡µØ³¤
-		const double PITCH_WIDTH = OParamManager::Instance()->value(field + "/field_width", 9000).toDouble() * 0.1; //900; // ³¡µØ¿í
-		const double PITCH_MARGIN = OParamManager::Instance()->value(field + "/field_line_width", 10).toDouble() * 0.1; //1; // ³¡µØµÄ±ß½ç¿í¶È
-		const double CENTER_CIRCLE_R = OParamManager::Instance()->value(field + "/center_radius", 500).toDouble() * 0.1 * 2; //100; // ÖĞÈ¦°ë¾¶?Ö±¾¶
-		const double PENALTY_AREA_WIDTH = OParamManager::Instance()->value(field + "/penalty_width", 2400).toDouble() * 0.1; //240; // ½ûÇø¿í¶È
-		const double PENALTY_AREA_DEPTH = OParamManager::Instance()->value(field + "/penalty_depth", 1200).toDouble() * 0.1; //120; // ½ûÇøÉî¶È
+		const double PITCH_LENGTH = OParamManager::Instance()->value(field + "/field_length", 12000).toDouble() * 0.1; //1200; // åœºåœ°é•¿
+		const double PITCH_WIDTH = OParamManager::Instance()->value(field + "/field_width", 9000).toDouble() * 0.1; //900; // åœºåœ°å®½
+		const double PITCH_MARGIN = OParamManager::Instance()->value(field + "/field_line_width", 10).toDouble() * 0.1; //1; // åœºåœ°çš„è¾¹ç•Œå®½åº¦
+		const double CENTER_CIRCLE_R = OParamManager::Instance()->value(field + "/center_radius", 500).toDouble() * 0.1 * 2; //100; // ä¸­åœˆåŠå¾„?ç›´å¾„
+		const double PENALTY_AREA_WIDTH = OParamManager::Instance()->value(field + "/penalty_width", 2400).toDouble() * 0.1; //240; // ç¦åŒºå®½åº¦
+		const double PENALTY_AREA_DEPTH = OParamManager::Instance()->value(field + "/penalty_depth", 1200).toDouble() * 0.1; //120; // ç¦åŒºæ·±åº¦
 
 		DefenceArea = 0,
 		SideArea,
@@ -743,13 +813,8 @@ int CAdvance::InWhichArea(const CVisionModule* pVision, int vecNumber) {
 	const double KICKDist = KICK_DIST * Param::Field::PITCH_LENGTH / 900;
 	const double CanNotBreakAreaX = 425.0 * Param::Field::PITCH_LENGTH / 900;
 	const double CanNotBreakAreaY = 260.0 * Param::Field::PITCH_WIDTH / 600;
-	const double ReliefDist = RELIEF_DIST * Param::Field::PITCH_LENGTH / 900;
 	int NowArea = 0;
-	if ((me.Pos() - ourGoal).mod() < ReliefDist) {
-		NowArea = ReliefArea;
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(525, -345), "ReliefArea", COLOR_CYAN);
-	}
-	else if (MeX < DefenceLineX) {
+	if (MeX < DefenceLineX) {
 		NowArea = DefenceArea;
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(525, -345), "DefenceArea", COLOR_CYAN);
 	}
@@ -809,12 +874,12 @@ bool CAdvance::AdJudgeBreakCanDo(const CVisionModule* pVision, int vecNumber, CG
 	return true;
 }
 /**********************************************************
-	* Description: ×´Ì¬ÇĞ»»ÅĞ¶¨Ààº¯Êı£¬ÓÃÓÚ×´Ì¬×ª»¯Ö®¼äµÄÅĞ¶Ï
-	* Author: Ì·Óîºê
+	* Description: çŠ¶æ€åˆ‡æ¢åˆ¤å®šç±»å‡½æ•°ï¼Œç”¨äºçŠ¶æ€è½¬åŒ–ä¹‹é—´çš„åˆ¤æ–­
+	* Author: è°­å®‡å®
 	* Created Date: 2022/10/10
 ***********************************************************/
 bool CAdvance::tendToShoot(const CVisionModule* pVision, int vecNumber) {
-	/*ÅĞ¶ÏÏÖÔÚÄÜ·ñÉäÃÅ*/
+	/*åˆ¤æ–­ç°åœ¨èƒ½å¦å°„é—¨*/
 	// NEEDMODIFY
 	int n = 0;
 	int best_n = 0;
@@ -822,7 +887,7 @@ bool CAdvance::tendToShoot(const CVisionModule* pVision, int vecNumber) {
 	bool shootBlocked = false;
 	double kickDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(vecNumber).Pos());
 	if (fabs(kickDir - 1000.0) < 10) return false;
-	/*ĞŞ¸´tendToShootÓëgetPointShootDirÅĞ¶Ï²»¼æÈİµÄÎÊÌâ*/
+	/*ä¿®å¤tendToShootä¸getPointShootDiråˆ¤æ–­ä¸å…¼å®¹çš„é—®é¢˜*/
 	CGeoLine ball2ourGoal = CGeoLine(ball.Pos(), kickDir);
 	CGeoPoint projectionPoint;
 	double k_m = WantToLessShoot;
@@ -850,8 +915,6 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 	for (int i = 0; i < NumberOfSupport; ++i) {
 		if (!IsOurNearHere(pVision, SupportPoint[i], vecNumber)) continue;
 		if (SupportPoint[i].x() < me.Pos().x() && MeIsInWhichArea != CornerArea) continue;
-		double PasstoSupportDir = (SupportPoint[i] - me.Pos()).dir();
-		//if (!isDirOK(pVision, vecNumber, PasstoSupportDir, 0)) continue;
 		return 1;
 		/*
 		MeToSupportDist = (me.Pos() - SupportPoint[i]).mod();
@@ -872,12 +935,12 @@ int CAdvance::toChipOrToFlat(const CVisionModule* pVision, int vecNumber, CGeoPo
 }
 
 /**********************************************************
-	* Description: ·ÀÊØÀàº¯Êı£¬½öÏŞÓÚGETÖĞÊ¹ÓÃ
-	* Author: Ì·Óîºê
+	* Description: é˜²å®ˆç±»å‡½æ•°ï¼Œä»…é™äºGETä¸­ä½¿ç”¨
+	* Author: è°­å®‡å®
 	* Created Date: 2022/10/10
 ***********************************************************/
 bool CAdvance::isOppFaceOurDoor(const CVisionModule* pVision, double angle) {
-	//ÅĞ¶ÏÊÇ·ñÇò¾àÀëoppºÜ½ü£¬opp¾àÀëÎÒÃÇÇòÃÅºÜ½ü
+	//åˆ¤æ–­æ˜¯å¦çƒè·ç¦»oppå¾ˆè¿‘ï¼Œoppè·ç¦»æˆ‘ä»¬çƒé—¨å¾ˆè¿‘
 	const BallVisionT& ball = pVision->Ball();
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
 	double opp2BallDist = (opp.Pos() - ball.Pos()).mod();
@@ -901,8 +964,8 @@ bool CAdvance::checkTheyCanShoot(const CVisionModule* pVision, int vecNumber) {
 }
 
 /**********************************************************
-	* Description: Éú³ÉÀàº¯Êı£¬¾ßÓĞ¾ßÌåÊµÒå
-	* Author: Ì·Óîºê
+	* Description: ç”Ÿæˆç±»å‡½æ•°ï¼Œå…·æœ‰å…·ä½“å®ä¹‰
+	* Author: è°­å®‡å®
 	* Created Date: 2022/10/10
 ***********************************************************/
 PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber) {
@@ -915,44 +978,107 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 				PassDirOrPos ReturnValue;
 				ReturnValue.dir = (friends.Pos() - pVision->OurPlayer(vecNumber).Pos()).dir();
 				ReturnValue.pos = friends.Pos();
-				//LastPassPoint = NowShootNumber;//±£´æµ±Ç°×´Ì¬
+				//LastPassPoint = NowShootNumber;//ä¿å­˜å½“å‰çŠ¶æ€
 				return ReturnValue;
 			}
 		}
 	}
-	//²ÎÊı¶¨Òå²¿·Ö
+	//å‚æ•°å®šä¹‰éƒ¨åˆ†
 
 	PassDirOrPos ReturnValue;
-	//·µ»ØÖµ
+	//è¿”å›å€¼
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	//µ±Ç°³ÖÇò³µºÅ
+	//å½“å‰æŒçƒè½¦å·
 	bool isOurNearPoint[9] = { 0 }/*, isBlockPoint[9] = { 0 }*/, isCanUse[9] = { 0 }, OneOfUsCanShoot = 0;
-	/*ÒÀ´ÎÎª£ºÎÒÊÇ·ñÓĞÈËÔÚ´«Çòµã¸½½ü£¬µĞÈËÊÇ·ñ×èµ²¸Ã´«ÇòÂ·¾¶£¬¸ÃµãÄÜ·ñÊ¹ÓÃ£¬ÎÒÃÇÓĞÃ»ÓĞµãÂú×ãÒªÇó*/
-	int TheNumberOfCanShootPoint = 0, NowShootNumber = 1, TheidxOfCanShootPoint[9] = { 0 };
-	/*ÒÀ´ÎÎª£ºÂú×ãÒªÇóµÄµãµÄÊıÁ¿TheNumberOfCanShootPoint£¬³Ö¾Ã»¯µãµÄnumber£¬ÄÜ¹»shootµÄµãµÄidx*/
+	/*ä¾æ¬¡ä¸ºï¼šæˆ‘æ˜¯å¦æœ‰äººåœ¨ä¼ çƒç‚¹é™„è¿‘ï¼Œæ•Œäººæ˜¯å¦é˜»æŒ¡è¯¥ä¼ çƒè·¯å¾„ï¼Œè¯¥ç‚¹èƒ½å¦ä½¿ç”¨ï¼Œæˆ‘ä»¬æœ‰æ²¡æœ‰ç‚¹æ»¡è¶³è¦æ±‚*/
+	int TheNumberOfCanShootPoint = 0, NowShootNumber = 0, TheidxOfCanShootPoint[9] = { 0 };
+	/*ä¾æ¬¡ä¸ºï¼šæ»¡è¶³è¦æ±‚çš„ç‚¹çš„æ•°é‡TheNumberOfCanShootPointï¼ŒæŒä¹…åŒ–ç‚¹çš„numberï¼Œèƒ½å¤Ÿshootçš„ç‚¹çš„idx*/
 	double ShootDir[9] = { 0 }, ChangeDir[9] = { 0 }, DistToPoint[9] = { 0 }, DistOppToTheLine[9] = { 0 }, FinalDir = 0;
-	/*ÒÀ´ÎÎª£ºshootdir£¬ĞèÒª×ª±ä·½ÏòµÄDir£¬×îÖÕ½Ç¶ÈDir*/
+	/*ä¾æ¬¡ä¸ºï¼šshootdirï¼Œéœ€è¦è½¬å˜æ–¹å‘çš„Dirï¼Œæœ€ç»ˆè§’åº¦Dir*/
 
 	/**********************************************************************************************************************/
-	//ÅĞ¶¨Ö§³ÅµãÊÇ·ñ¿ÉÓÃ
-	for (int i = 0; i < NumberOfSupport; ++i) {
-		isOurNearPoint[i] = IsOurNearHere(pVision, i); // IsOurNearHere(pVision, SupportPoint[i], vecNumber);						//ÎÒ·½ÓĞÈËÔÚÅÔ±ß
-		//isBlockPoint[i] = isTheLineBlocked(pVision, me.Pos(), SupportPoint[i]);
-		//DistOppToTheLine[i] = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), SupportPoint[i]);//¶ÔÊÖ¶ÓÔ±Àë´«ÇòÏß×î¶Ì¾àÀë
-		ShootDir[i] = KickDirection::Instance()->getPointShootDir(pVision, SupportPoint[i]);		//ÉäÃÅ½Ç¶È
-		//DistToPoint[i] = (SupportPoint[i] - me.Pos()).mod();										//Ö§³Åµãµ½¡°ÎÒ¡±µÄ¾àÀë
-		ChangeDir[i] = fabs(Utils::Normalize(me.Dir() - (SupportPoint[i] - me.Pos()).dir()));								//´«Çòµ½µã¡°ÎÒ¡±ĞèÒª¸Ä±äµÄ½Ç¶È
 
-		//×îÖÕµÄÅĞ¶¨Ìõ¼ş
+	//åˆ¤å®šæ”¯æ’‘ç‚¹æ˜¯å¦å¯ç”¨
+
+	for (int i = 0; i < NumberOfSupport; ++i) {
+		isOurNearPoint[i] = IsOurNearHere(pVision, i); // IsOurNearHere(pVision, SupportPoint[i], vecNumber);						//æˆ‘æ–¹æœ‰äººåœ¨æ—è¾¹
+		//isBlockPoint[i] = isTheLineBlocked(pVision, me.Pos(), SupportPoint[i]);
+		//DistOppToTheLine[i] = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), SupportPoint[i]);//å¯¹æ‰‹é˜Ÿå‘˜ç¦»ä¼ çƒçº¿æœ€çŸ­è·ç¦»
+		ShootDir[i] = KickDirection::Instance()->getPointShootDir(pVision, SupportPoint[i]);		//å°„é—¨è§’åº¦
+		//DistToPoint[i] = (SupportPoint[i] - me.Pos()).mod();										//æ”¯æ’‘ç‚¹åˆ°â€œæˆ‘â€çš„è·ç¦»
+		ChangeDir[i] = fabs(Utils::Normalize(me.Dir() - (SupportPoint[i] - me.Pos()).dir()));								//ä¼ çƒåˆ°ç‚¹â€œæˆ‘â€éœ€è¦æ”¹å˜çš„è§’åº¦
+
+		//æœ€ç»ˆçš„åˆ¤å®šæ¡ä»¶
 		//if ()isCanUse[i] = isOurNearPoint[i] && (ShootDir[i] != 1000);
 		//else isCanUse[i] = isOurNearPoint[i] && (ShootDir[i] != 1000) && (SupportPoint[i].x() > me.X());
-		//µ±Ç°µã¿ÉÒÔÉäÃÅµÄÌõ¼ş£ºÎÒ·½ÓĞÈËÔÚÅÔ±ß£¬//Ã»ÓĞ×èµ²//£¬ÉäÃÅ¿ÉÒÔ£¬ÏòÇ°´«Çò
+		//å½“å‰ç‚¹å¯ä»¥å°„é—¨çš„æ¡ä»¶ï¼šæˆ‘æ–¹æœ‰äººåœ¨æ—è¾¹ï¼Œ//æ²¡æœ‰é˜»æŒ¡//ï¼Œå°„é—¨å¯ä»¥ï¼Œå‘å‰ä¼ çƒ
 		if (isOurNearPoint[i])
 		{
 			OneOfUsCanShoot = 1;
 			TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
 		}
 	}
+
+	/**********************************************************************************************************************/
+
+	/*//ä¿æŒç³»ç»Ÿç¨³å®šæ€§ï¼Œè¿”å›ä¸Šä¸€æ¬¡å†³ç­–çš„æƒ…å†µ
+
+	ReturnValue.dir = (SupportPoint[LastPassPoint] - me.Pos()).dir();
+	ReturnValue.pos = SupportPoint[LastPassPoint];
+	if (SupportPoint[LastPassPoint].x() > me.X()	&& //å‘å‰ä¼ çƒ
+		isOurNearPoint[LastPassPoint]				&& //æˆ‘æ–¹æ—è¾¹æœ‰äºº
+		(abs(me.Dir() - (SupportPoint[LastPassPoint] - me.Pos()).dir()) < 0.5 * Param::Math::PI / SHOOT_PRECISION)) //â€œæˆ‘â€ä¼ çƒéœ€è¦è½¬åŠ¨çš„è§’åº¦åˆé€‚
+	{
+		return ReturnValue;
+	}*/
+
+	/**********************************************************************************************************************/
+
+
+	/*
+	if (OneOfUsCanShoot) {
+		//å¦‚æœå…¶ä¸­æœ‰ä¸€ä¸ªæ»¡è¶³å¤§å‰æï¼Œå°±åªè€ƒè™‘è¿™äº›å¯ä»¥æ»¡è¶³è¦æ±‚çš„ç‚¹
+		IsMeSupport = JudgeIsMeSupport(pVision, vecNumber);
+		if (IsMeSupport) { // ç€é‡å‘ä¸­å¿ƒä¼ çƒ
+			if (isCanUse[1]) {
+				ReturnValue.dir = (SupportPoint[1] - me.Pos()).dir();
+				ReturnValue.pos = SupportPoint[1];
+				return ReturnValue;
+			}
+			if (isCanUse[4]) {
+				ReturnValue.dir = (SupportPoint[4] - me.Pos()).dir();
+				ReturnValue.pos = SupportPoint[4];
+				return ReturnValue;
+			}
+		}
+
+		for (int i = 0; i < NumberOfSupport; ++i)
+			if (isCanUse[i] && SupportPoint[i].x() > -330)
+				TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
+
+	}
+	else {
+		//å¦åˆ™å°±æœ‰äººçš„åœ°æ–¹å…¨éƒ½å¯ä»¥ä¼  å› ä¸ºç°åœ¨å·²ç»åœ¨å†³å®šä¼ çƒæ–¹å‘äº†
+		IsMeSupport = JudgeIsMeSupport(pVision, vecNumber);
+		if (IsMeSupport) { // ç€é‡å‘ä¸­å¿ƒä¼ çƒ
+			if (isOurNearPoint[1]) {
+				ReturnValue.dir = (SupportPoint[1] - me.Pos()).dir();
+				ReturnValue.pos = SupportPoint[1];
+				return ReturnValue;
+			}
+			if (isOurNearPoint[4]) {
+				ReturnValue.dir = (SupportPoint[4] - me.Pos()).dir();
+				ReturnValue.pos = SupportPoint[4];
+				return ReturnValue;
+			}
+		}
+		for (int i = 0; i < NumberOfSupport; ++i)
+			if(isOurNearPoint[i] && SupportPoint[i].x() > -330)
+				TheidxOfCanShootPoint[TheNumberOfCanShootPoint++] = i;
+	}
+	*/
+	//choose the one to pass		
+	/**********************************************************************************************************************/
 	if (!OneOfUsCanShoot)
 	{
 		NowShootNumber = 1;
@@ -974,12 +1100,39 @@ PassDirOrPos CAdvance::PassDirInside(const CVisionModule* pVision, int vecNumber
 	//char shootnumber[100];
 	//sprintf(shootnumber, "%f", NowShootNumber);
 	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -175), shootnumber, COLOR_YELLOW);
+	/**********************************************************************************************************************/
+	/*
+	if (!OneOfUsCanShoot)
+	{
+		NowShootNumber = 0;
+	}
+	else { //æŒ‰ç…§éœ€è¦è½¬çš„è§’åº¦è¿›è¡Œæ’åº
 
-	//¾­¹ıÁ½ÂÖÉ¸Ñ¡µÃµ½·µ»ØÖµ
+		double NowValue = -1, MinValue = 1e9, threshValue = LARGE_ADJUST_ANGLE * Param::Math::PI / 180.0;
+		int Maxidx = -1;
+
+		for (int i = 0; i < TheNumberOfCanShootPoint; ++i) {
+			int NowIdx = TheidxOfCanShootPoint[i];
+			NowValue = ChangeDir[NowIdx];
+			if (NowValue < threshValue) {
+				Maxidx = NowIdx;
+				break;
+			}//è§’åº¦åˆé€‚ç«‹åˆ»è¿”å›
+			if (NowValue < MinValue)
+				Maxidx = NowIdx, MinValue = NowValue;
+		}
+		if (Maxidx < 0)
+			Maxidx = 0;
+		NowShootNumber = Maxidx;
+	}
+	*/
+	/**********************************************************************************************************************/
+
+	//ç»è¿‡ä¸¤è½®ç­›é€‰å¾—åˆ°è¿”å›å€¼
 
 	ReturnValue.dir = (SupportPoint[NowShootNumber] - me.Pos()).dir();
 	ReturnValue.pos = SupportPoint[NowShootNumber];
-	//LastPassPoint = NowShootNumber;//±£´æµ±Ç°×´Ì¬
+	//LastPassPoint = NowShootNumber;//ä¿å­˜å½“å‰çŠ¶æ€
 	return ReturnValue;
 
 }
@@ -989,7 +1142,7 @@ double CAdvance::PassDir(const CVisionModule* pVision, int vecNumber) {
 	return ReturnValue.dir;
 }
 double CAdvance::TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint) {
-	/*¸ÃÌõÂ·¾¶ÉÏÊÇ·ñ»á±»µĞÈË×èµ²*/
+	/*è¯¥æ¡è·¯å¾„ä¸Šæ˜¯å¦ä¼šè¢«æ•Œäººé˜»æŒ¡*/
 	int n = 0;
 	const BallVisionT& ball = pVision->Ball();
 	double passDir = (targetPoint - startPoint).dir();
@@ -1032,16 +1185,13 @@ CGeoPoint CAdvance::GenerateBreakPassPoint(const CVisionModule* pVision, int vec
 
 double CAdvance::GetFPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
 	double dist = (StartPoint - targetPoint).mod() - Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER;
-	//cout << "dist::"<<' '<<dist << endl;
 	double passPower = sqrt(powf(ParamManager::Instance()->FASTEST_RECEIVE_VEL, 2) + 2 * ParamManager::Instance()->BALL_DEC * dist) * ADV_FPASSPOWER_Alpha;
 	// std::cout << "passPower" << passPower << std::endl;
-
-	//cout << "passpower::" << ' ' << passPower << endl;
 	return min(passPower, (double)Param::Rule::MAX_BALL_SPEED - 10);
 	// return max(min(650.0, ADV_FPASSPOWER_Alpha* dist ), 200.0);
 }
 double CAdvance::GetCPassPower(CGeoPoint StartPoint, CGeoPoint targetPoint) {
-	double dist = ((StartPoint - targetPoint).mod() - 9.0 * Param::Vehicle::V2::PLAYER_SIZE) * ADV_CPASSPOWER_Alpha;
+	double dist = ((StartPoint - targetPoint).mod() - 9.0 * Param::Vehicle::V2::PLAYER_SIZE) * ADV_CPASSPOWER_Alpha;;
 	return min(ParamManager::Instance()->maxChipDist, dist);
 	// return min(460.0, ADV_CPASSPOWER_Alpha * dist);
 }
@@ -1082,7 +1232,7 @@ CGeoPoint CAdvance::generateNormalPushPoint(const CVisionModule* pVision, const 
 
 	CGeoPoint FinalTarget = CGeoPoint(-999, -999);
 	double Dist = -1e9;
-	for (int step = -5; step <= 5; ++step) {
+	for (int step = -8; step <= 8; ++step) {
 		const CGeoPoint target = me.Pos() + Utils::Polar2Vector(VectorDist, Param::Math::PI / 180 * 5 * step);
 		const double SingleDist = TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), target);
 		if (SingleDist > Dist) FinalTarget = target, Dist = SingleDist;
@@ -1090,7 +1240,7 @@ CGeoPoint CAdvance::generateNormalPushPoint(const CVisionModule* pVision, const 
 	}
 	if (Dist > ThresholdForOpp) {
 		Dist = 1e9;
-		for (int step = -5; step <= 5; ++step) {
+		for (int step = -8; step <= 8; ++step) {
 			const CGeoPoint target = me.Pos() + Utils::Polar2Vector(VectorDist, Param::Math::PI / 180 * 5 * step);
 			if (TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), target) < 60)continue;
 			const double SingleDist = (target - theirCenter).mod();
@@ -1138,19 +1288,13 @@ bool CAdvance::OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber
 bool CAdvance::OppIsFarThanMe(const CVisionModule* pVision, const int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-	const PlayerVisionT& opp2 = pVision->TheirPlayer(Oppfront);
 	const BallVisionT& ball = pVision->Ball();
 	CVector me2Ball = ball.Pos() - me.Pos();
-	CVector Ball2Opp = opp2.Pos() - ball.Pos();
+	CVector Ball2Opp = opp.Pos() - ball.Pos();
 
-	const double threshold = 100;
-	if (!(pVision->TheirPlayer(Oppfront).Valid()))
-		return true;
-	if ((me2Ball.mod() < Ball2Opp.mod() && Ball2Opp.mod() > threshold))
-		return true;
-	if (fabs((me2Ball.dir() - Ball2Opp.dir()) < Param::Math::PI / 3) || Ball2Opp.mod() < threshold * 0.6)
-		return false;
-	return true;
+	const double threshold = 70;
+	if (me2Ball.mod() < Ball2Opp.mod())return true;
+	return false;
 }
 
 double CAdvance::generateOppIsNearThanMeDir(const CVisionModule* pVision, const int vecNumber) {
@@ -1211,7 +1355,6 @@ bool CAdvance::canScore(const CVisionModule* pVision, const int vecNumber, const
 	if (LineIntersection.Intersectant() == 0)return false;
 	CGeoPoint Intersection = LineIntersection.IntersectPoint();
 	if (Goal.IsPointOnLineOnSegment(Intersection) == 0) flag = false;
-	if (Intersection.x() < me.X())return false;
 	/*
 	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("CanScore:" + to_string(flag)).c_str(), COLOR_YELLOW);
 	*/
@@ -1228,110 +1371,69 @@ bool CAdvance::WeNeedBlockTheBall(const CVisionModule* pVision, const int vecNum
 	else return false;
 }
 
-
-int CAdvance::opp_ahead(const CVisionModule* pVision, const int vecNumber) {
-	int cnt = 0;
-	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	double x1 = me.X(), y1 = me.Y();
-	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
-		if (!pVision->TheirPlayer(i).Valid()) continue;
-		auto enemy = pVision->TheirPlayer(i);
-		double x = enemy.X(), y = enemy.Y();
-		if (x > x1 && fabs(y) < Param::Field::PITCH_WIDTH * 4 / 5)
-			cnt++;
-	}
-	return cnt;
-}
-
 bool CAdvance::WeCanAlwaysSetKick(const CVisionModule* pVision, const int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	if (MeIsInWhichArea == CenterArea)
-		if (canScore(pVision, vecNumber, OBSTACLE_RADIUS * 2.5, me.Dir()))
-			return true;
-		else return false;
-	if(MeIsInWhichArea == KICKArea)
-		if (canScore(pVision, vecNumber, OBSTACLE_RADIUS * 0.8, me.Dir()))
-			return true;
-		else return false;
+	if (canScore(pVision, vecNumber, OBSTACLE_RADIUS * 0.5, me.Dir()))
+		return true;
 	return false;
+	
 }
 
-
 int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumber) {
-	// ĞèÒªÍêÈ«ÄÃ×¡Çò
+	// éœ€è¦å®Œå…¨æ‹¿ä½çƒ
 	/*DefenceArea = 0,
 	SideArea,
 	CenterArea
 	CornerArea,
 	KICKArea,
 	CanNOTBreakArea,*/
-	/*Èç¹ûÎÒºÍÇòÃÅÖ®¼äµÄ¾àÀëĞ¡ÓÚKICK_DIST£¬¿¼ÂÇË³ĞòÎª shoot->break->pass */
+	/*å¦‚æœæˆ‘å’Œçƒé—¨ä¹‹é—´çš„è·ç¦»å°äºKICK_DISTï¼Œè€ƒè™‘é¡ºåºä¸º shoot->break->pass */
 	if ((NowIsShoot == 1)) {
 		return KICK;
 	}
 	else if ((NowIsShoot == 2) && MeIsInWhichArea != CanNOTBreakArea) {
 		return BREAKSHOOT;
-	} // ³Ö¾Ã»¯
-
-	else if (Me2OppTooclose(pVision, vecNumber)) {
-		if (MeIsInWhichArea == CornerArea || MeIsInWhichArea == KICKArea)
-			if (tendToShoot(pVision, vecNumber))
-				return KICK;
-			else return BREAKSHOOT;
-		else return BREAKING;
-	}
-	else if (MeIsInWhichArea == ReliefArea) {
-		//return JUSTCHIPPASS;
-		return PUSHOUT;
-	}
-
-	else if (MeIsInWhichArea == DefenceArea) { // ÔÚºó³¡·ÀÊØÇøÓò
-		if (OppIsFarThanMe(pVision, vecNumber))
+	} // æŒä¹…åŒ–
+	else if (MeIsInWhichArea == DefenceArea) { // åœ¨ååœºé˜²å®ˆåŒºåŸŸ
+		if ((!Me2OppTooclose(pVision, vecNumber)) || (!IHaveSupport)) {
+			// æ— äººé˜²å®ˆçŠ¶æ€ æˆ– ä¸å­˜åœ¨æ”¯æ´è½¦
 			return PUSHOUT;
-		return JUSTCHIPPASS;
-	}
-	else if (MeIsInWhichArea == SideArea) { // ÔÚË«±ßÇøÓò
-		if (OppIsFarThanMe(pVision, vecNumber))
-			return PUSHOUT;
-		else if (IHaveSupport) { //pass first
-			return BREAKSHOOT;
 		}
-		//else {
-		//	return PUSHOUT;
-		//}	
+		else { return JUSTCHIPPASS; }// å¦åˆ™å‘å‰æŒ‘ä¼ 
 	}
-	else if (MeIsInWhichArea == CenterArea) { // ÔÚÇ°ÖĞ³¡
+	else if (MeIsInWhichArea == SideArea) {
 		if (tendToShoot(pVision, vecNumber)) {
 			return KICK;
-		}  // Ê×ÏÈÅĞ¶ÏÉäÃÅ
-		else if (!IHaveSupport) {  // ²»´æÔÚÖ§Ô®³µ
+		}  // é¦–å…ˆåˆ¤æ–­å°„é—¨
+		else if (!IHaveSupport) {  // ä¸å­˜åœ¨æ”¯æ´è½¦
 			return PUSHOUT;
 		}
-		else {	// ´æÔÚÖ§Ô®³µ
+		else if (Me2OppTooclose(pVision, vecNumber)) { // å­˜åœ¨é˜²å®ˆ
 			return PASS;
 		}
-	}	
-	else if (MeIsInWhichArea == CornerArea) { //ÔÚ½ÇÇòÇø
-		if (IHaveSupport) { //pass first
-			return PASS;
-		}
-		else {	
-			return BREAKSHOOT;
-		}	
-	}	
-	else if (MeIsInWhichArea == CanNOTBreakArea) {  // ²»ÄÜbreak
-		if (IHaveSupport) { //pass first
-			return PASS;
-		}
-		else {
-			return BREAKSHOOT;
-		}  
-	}	
-	else { // KickÇøÓò
+		else {	// ä¸å­˜åœ¨é˜²å®ˆ
+			return PUSHOUT;
+		}	// åœ¨åŒè¾¹åŒºåŸŸ
+	}
+	else if (MeIsInWhichArea == CenterArea) {
 		if (tendToShoot(pVision, vecNumber)) {
 			return KICK;
-		}  // Ê×ÏÈÅĞ¶ÏÉäÃÅ
-		else if (MeIsInWhichArea != CanNOTBreakArea) {  // ²»´æÔÚÖ§Ô®³µ //
+		}  // é¦–å…ˆåˆ¤æ–­å°„é—¨
+		else if (!IHaveSupport) {  // ä¸å­˜åœ¨æ”¯æ´è½¦
+			return PUSHOUT;
+		}
+		else if (Me2OppTooclose(pVision, vecNumber)) { // å­˜åœ¨é˜²å®ˆ
+			return PASS;
+		}
+		else {	// ä¸å­˜åœ¨é˜²å®ˆ
+			return PUSHOUT;
+		}
+	}	// åœ¨å‰ä¸­åœº
+	else { // CorneråŒºåŸŸ KickåŒºåŸŸ cannotBreakåŒºåŸŸ
+		if (tendToShoot(pVision, vecNumber)) {
+			return KICK;
+		}  // é¦–å…ˆåˆ¤æ–­å°„é—¨
+		else if (MeIsInWhichArea != CanNOTBreakArea) {  // ä¸å­˜åœ¨æ”¯æ´è½¦ //
 			return BREAKSHOOT;
 		}
 		else {
@@ -1347,28 +1449,28 @@ int CAdvance::CanWeUseChaseBecauseOfGetBallV3(const CVisionModule* pVision, cons
 	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
 	const CVector opp2ball = ball.Pos() - opp.Pos();
 	double deltaTheta1 = fabs(Utils::Normalize(ball.Vel().dir() - (ball.Pos() - me.Pos()).dir()));
-	// ÇòËÙ·½ÏòÓëÎÒÃæÏòÇòµÄ·½Ïò¼Ğ½ÇĞ¡ÓÚ20¶È
+	// çƒé€Ÿæ–¹å‘ä¸æˆ‘é¢å‘çƒçš„æ–¹å‘å¤¹è§’å°äº20åº¦
 	double deltaTheta2 = fabs(Utils::Normalize(KickorPassDir - (ball.Pos() - me.Pos()).dir()));
-	// µ±Ç°ÉäÃÅ·½ÏòÓëÎÒÃæÏòÇòµÄ·½Ïò¼Ğ½ÇĞ¡ÓÚ20¶È
+	// å½“å‰å°„é—¨æ–¹å‘ä¸æˆ‘é¢å‘çƒçš„æ–¹å‘å¤¹è§’å°äº20åº¦
 	bool VelModFlag = ball.Vel().mod() < 80;
-	// ÇòËÙĞ¡ÓÚ80
+	// çƒé€Ÿå°äº80
 	bool VelDirFlag = (ball.Vel().mod() < 10) || (deltaTheta1 < 20.0 / 180 * Param::Math::PI);// || deltaTheta1 > 160.0 / 180 * Param::Math::PI);
-	// ÇòËÙĞ¡ÓÚ10 »òÕß ÇòËÙ·½ÏòÓëÎÒÃæÏòÇòµÄ·½Ïò¼Ğ½ÇĞ¡ÓÚ20¶È
+	// çƒé€Ÿå°äº10 æˆ–è€… çƒé€Ÿæ–¹å‘ä¸æˆ‘é¢å‘çƒçš„æ–¹å‘å¤¹è§’å°äº20åº¦
 	bool OppFlag = opp2ball.mod() > 40 || opp2ball.mod() > (me.Pos() - ball.Pos()).mod() * 1.5;
-	// µĞÈË¾àÀëÇò´óÓÚ40 »òÕßµĞÈË¾àÀëÇò±ÈÎÒ¾àÀëÇòµÄ1.5±¶¸ü´ó
+	// æ•Œäººè·ç¦»çƒå¤§äº40 æˆ–è€…æ•Œäººè·ç¦»çƒæ¯”æˆ‘è·ç¦»çƒçš„1.5å€æ›´å¤§
 	bool FinalDirFlag = (deltaTheta2 < 20.0 / 180 * Param::Math::PI);// || deltaTheta2 > 160.0 / 180 * Param::Math::PI);
-	// µ±Ç°ÉäÃÅ·½ÏòÓëÎÒÃæÏòÇòµÄ·½Ïò¼Ğ½ÇĞ¡ÓÚ20¶È
+	// å½“å‰å°„é—¨æ–¹å‘ä¸æˆ‘é¢å‘çƒçš„æ–¹å‘å¤¹è§’å°äº20åº¦
 
 	if ((theirCenter - me.Pos()).mod() < KICK_DIST * 0.65 && VelModFlag && VelDirFlag) return true;
-	// ÇòÃÅÏßÇ°£¬²»ÓÃ¿¼ÂÇopp
+	// çƒé—¨çº¿å‰ï¼Œä¸ç”¨è€ƒè™‘opp
 	return VelModFlag && VelDirFlag && OppFlag && FinalDirFlag;
 }
 CPlayerCommand* CAdvance::execute(const CVisionModule* pVision)
 {
-	if (subTask()) {
+	if( subTask() ){
 		return subTask()->execute(pVision);
 	}
-	if (_directCommand) {
+	if( _directCommand ){
 		return _directCommand;
 	}
 	return 0;

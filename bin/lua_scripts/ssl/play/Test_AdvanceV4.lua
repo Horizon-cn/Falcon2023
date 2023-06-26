@@ -15,9 +15,9 @@ firstState = "advance",
 		end
 	end,
 	Leader = task.advance(),
-    --Crosser = task.rightCenterBack(),
-    --match = ""
-	match    = "[L]"
+	Assister = task.support("Leader", 2),
+	Hawk = task.support("Leader", 0),
+	match    = "[L][AH]"
 },
 
 name = "Test_AdvanceV4",

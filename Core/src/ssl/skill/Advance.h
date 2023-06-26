@@ -36,7 +36,7 @@ private:
         JUSTCHIPPASS,
         BREAKSHOOT,
         PUSHOUT,
-        BREAKPASS,
+        BREAKING,
         BLOCK,
         CHASEKICK,
         CHASEPUSH
@@ -47,7 +47,8 @@ private:
         CornerArea,
         KICKArea,
         CanNOTBreakArea,
-        CenterArea
+        CenterArea,
+        ReliefArea,
     };
     int _lastCycle;
     int _state;
@@ -57,6 +58,8 @@ private:
     int meLoseBall;
 
     int opponentID;
+    int Oppfront;
+
     int NumberOfSupport;/* Gpu??????????????? */
     int NowIsShoot;
     int NumOfOurPlayer;
@@ -70,25 +73,25 @@ private:
     ***********************************************************/
     //advance???? byTYH  2022.10
     double KICK_DIST ;  /*??????????¦¶ ????????????*/
-    int WantToLessShoot ; /*?????????????????????? ?????0 ?????5*/
+    double WantToLessShoot ; /*?????????????????????? ?????0 ?????5*/
     double RELIEF_DIST ;  /*GET?§ß?????????RELIEF?§Ø????*/
     double OPP_HAS_BALL_DIST ; /*?§Ø?§Ù????????????? ???????*/
     double CanPassToWingDist ; /*Advance???????????????????*/
     double CanWingShootDist ; /*??????????????????*/
-    double SHOOT_PRECISION ; /*??????????§³??????????????????? */
+    double PASS_PRECISION ; /*??????????§³??????????????????? */
     double GetBallBias; /*Getball????? ?????????? */
     double BalltoMeVelTime;/*Advance???????????????????Time*/
     double OBSTACLE_RADIUS;
     /*???????????*/
-    int KICKPOWER ;
-    int CHIPPOWER ;
-    int ADV_FPASSPOWER_Alpha;
-    int ADV_CPASSPOWER_Alpha ;
-    int RELIEF_POWER ;
-    int  BACK_POWER ;
+    double KICKPOWER ;
+    double CHIPPOWER ;
+    double ADV_FPASSPOWER_Alpha;
+    double ADV_CPASSPOWER_Alpha ;
+    double RELIEF_POWER ;
+    double  BACK_POWER ;
     int Advance_DEBUG_ENGINE;
     double LARGE_ADJUST_ANGLE;
-    int PUSHPOWER;
+    double PUSHPOWER;
     double tmpDir = 1.57;
     /**********************************************************
     * Description: ??¨°???
@@ -103,7 +106,7 @@ private:
     CGeoPoint theirCenter = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
     CGeoPoint ourGoal = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
 
-
+    int NumOfTheirPlayerfrontMe;
     CGeoPoint SupportPoint[6];
 
     int LastPassPoint = 0; /*????????????*/
@@ -114,6 +117,7 @@ private:
 
     bool IsMeSupport = 0;
     bool IHaveSupport;
+    CGeoPoint ShootPoint, PassPoint;
 
     /**********************************************************
     * Description: ???????????????????¦Ë???§Ø?
@@ -123,6 +127,7 @@ private:
     bool isVisionHasBall(const CVisionModule* pVision, const int vecNumber);
     bool checkOppHasBall(const CVisionModule* pVision);
     int getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
+    int getTheirMostCloseAndFronttoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
     bool checkBallFront(const CVisionModule* pVision, double angle);
     bool IsOurNearHere(const CVisionModule* pVision, const int supportIndex);
     bool IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber);
@@ -139,6 +144,8 @@ private:
     bool JudgePassMeIsBeBlocked(const CVisionModule *pVision, int vecNumber);
     bool AdJudgeBreakCanDo(const CVisionModule *pVision, int vecNumber, CGeoPoint TargetPoint);
     int InWhichArea(const CVisionModule* pVision, int vecNumber);
+
+    bool WeCanAlwaysSetKick(const CVisionModule* pVision, const int vecNumber);
     /**********************************************************
     * Description: ???§Ý??§Ø??????????????????????§Ø?
     * Author: ?????

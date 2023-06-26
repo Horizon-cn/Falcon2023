@@ -13,6 +13,7 @@ class CTaskFactoryV2 {
 public:
 	CPlayerTask* GoPIDCircle(const TaskT& task);
 	CPlayerTask* Break(const TaskT& task);
+	CPlayerTask* lightkick(const TaskT& task);
 	//跑位的Skill. by HXY
 	CPlayerTask* SpeedTest(const TaskT& task);
 	CPlayerTask* GotoPosition(const TaskT& task);
@@ -24,6 +25,8 @@ public:
 	//进攻的Skill. by HXY
 	CPlayerTask* ChaseKickV1(const TaskT& task);
 	CPlayerTask* ChaseKickV2(const TaskT& task);
+	CPlayerTask* ChaseToGetBall(const TaskT& task);
+	
 	CPlayerTask* AdvanceBallV1(const TaskT& task);
 	CPlayerTask* AdvanceBallV2(const TaskT& task);
 	CPlayerTask* AdvanceBallV3(const TaskT& task);
@@ -114,8 +117,8 @@ typedef Falcon::NormalSingleton<CTaskFactoryV2> TaskFactoryV2;
 
 //! 调用skill的接口
 namespace PlayerRole {
-
-	CPlayerTask* makeItBreak(const int num, const bool isPass = false, const CGeoPoint& target = CGeoPoint(0, 0), const bool isPenalty = false, const double shootaccuracy = 0, const bool isSpin = false, const bool isChipKick = false, const double kickPower = 0);
+	CPlayerTask* makeItlightkick(const int num, const double dir = 0);
+	CPlayerTask* makeItBreak(const int num, const bool needkick = true, const bool isPenalty = false, const bool isSpin = false);
 	CPlayerTask* makeItStop(const int num, const int flags = 0);
 	CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const int flags = 0, const int sender = 0);
 	CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotvel, const int flags = 0, const int sender = 0);
@@ -135,6 +138,7 @@ namespace PlayerRole {
 	CPlayerTask* makeItForceStartRush(const int num, double faceDir, int flags = 0);
 	CPlayerTask* makeItChaseKickV1(const int num, double faceDir, int flags = 0);
 	CPlayerTask* makeItChaseKickV2(const int num, double faceDir, int flags = 0, int power = 0);
+	CPlayerTask* makeItChaseToGetBall(const int num, double faceDir, int flags, int isneedkick = 0, int power = 650);
 
 	CPlayerTask* makeItDriftKick(const int num, double faceDir, int flags = 0);
 	CPlayerTask* makeItProtectBall(const int num, int flags = 0);

@@ -77,6 +77,8 @@
 #include "GoTechChalPos.h"
 #include "GotoPositionNew.h"
 #include "GoPIDCircle.h"
+#include "ChaseToGetBall.h"
+#include "lightkick.h"
 
 /************************************************************************/
 /*                      TaskFactoryV2                                    */
@@ -101,6 +103,10 @@ CPlayerTask* CTaskFactoryV2::MakeTask(const TaskT& task)
 
 //working
 //
+CPlayerTask* CTaskFactoryV2::lightkick(const TaskT& task)
+{
+	return MakeTask<Clightkick>(task);
+}
 CPlayerTask* CTaskFactoryV2::Break(const TaskT& task)
 {
 	return MakeTask<CBreak>(task);
@@ -159,6 +165,9 @@ CPlayerTask* CTaskFactoryV2::ChaseKickV1(const TaskT& task) {
 
 CPlayerTask* CTaskFactoryV2::ChaseKickV2(const TaskT& task) {
 	return MakeTask< CChaseKickV2>(task);
+}
+CPlayerTask* CTaskFactoryV2::ChaseToGetBall(const TaskT& task) {
+	return MakeTask< CChaseToGetBall>(task);
 }
 
 CPlayerTask* CTaskFactoryV2::ProtectBall(const TaskT& task) {
@@ -359,15 +368,18 @@ CPlayerTask* CTaskFactoryV2::DribbleTurnKickV2(const TaskT& task) {
 //////////////////////////////////////////////////////////////////////////
 // define the namespace used to provide interface for task calling
 namespace PlayerRole {
-	CPlayerTask* makeItBreak(const int num, const bool isPass, const CGeoPoint& target, const bool isPenalty, const double shootaccuracy, const bool isSpin, const bool isChipKick, const double kickPower)
-	{
+	CPlayerTask* makeItlightkick(const int num, const double dir)
+	{	
 		static TaskT playerTask;
 		playerTask.executor = num;
-		playerTask.player.ispass = isPass;
-		playerTask.player.pos = target;
-		playerTask.player.kickprecision = shootaccuracy;
-		playerTask.player.ischipkick = isChipKick;
-		playerTask.player.kickpower = kickPower;
+		playerTask.player.angle = dir;
+		return TaskFactoryV2::Instance()->lightkick(playerTask);
+	}
+	CPlayerTask* makeItBreak(const int num, const bool needkick,  const bool isPenalty, const bool isSpin)
+	{	// needkick = 1 £ºÄÃÇòÍ»ÆÆ£»target£ºÃ»ÓÃÁË£»
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.needkick = needkick;
 		if (isPenalty)playerTask.player.flag = playerTask.player.flag | PlayerStatus::PENALTY_KICK;
 		if (isSpin)playerTask.player.flag = playerTask.player.flag | PlayerStatus::SPIN;
 
@@ -561,6 +573,17 @@ namespace PlayerRole {
 		playerTask.player.kickpower = power;
 		return TaskFactoryV2::Instance()->ChaseKickV2(playerTask);
 	}
+	CPlayerTask* makeItChaseToGetBall(const int num, double faceDir, int flags, int isneedkick, int power)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.angle = faceDir;
+		playerTask.player.flag = flags;
+		playerTask.player.needkick = isneedkick;
+		playerTask.player.kickpower = power;
+		return TaskFactoryV2::Instance()->ChaseToGetBall(playerTask);
+	}
+
 	CPlayerTask* makeItProtectBall(const int num, const int flags)
 	{
 		static TaskT playerTask;

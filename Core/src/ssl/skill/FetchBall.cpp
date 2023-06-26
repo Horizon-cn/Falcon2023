@@ -28,7 +28,6 @@ namespace {
 		S_GOTOBALL_1, //若球在场内使用该state
 		S_GETBALL,
 		S_TURN,
-		S_END,
 		S_CHECK,
 		S_BACK
 	};
@@ -153,15 +152,6 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		break;
 		//放球结束，后退阶段
 	case S_BACK:
-		if (me.Pos().dist(targetPos) > 40) {
-			new_state = S_END;
-		}
-		else if ((ball.Pos() - targetPos).mod() > 15) {
-			new_state = BEGINNING;
-		}
-		break;
-		//结束状态
-	case S_END:
 		if ((ball.Pos() - targetPos).mod() > 15) {
 			new_state = BEGINNING;
 		}
@@ -191,10 +181,6 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		else if (S_TURN == getState())
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_TURN", COLOR_CYAN);
-		}
-		else if (S_END == getState())
-		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_END", COLOR_CYAN);
 		}
 		else if (S_CHECK == getState())
 		{
@@ -245,21 +231,9 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 
 	}
 	else if (S_BACK == state()) {
-		setSubTask(PlayerRole::makeItRun(vecNumber, -100 * cos(me.Dir()), -100 * sin(me.Dir()), 0.0, flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
+		setSubTask(PlayerRole::makeItGoto(vecNumber,ball.Pos()+ Utils::Polar2Vector(100, Utils::Normalize((me.Pos()-ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
 		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
 	}
-	else if (S_END == state()) {
-		if (ball.Pos().y() >= 0) {
-			setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(70, Utils::Normalize(ball2ourGoal.dir() + Param::Math::PI * 120 / 180)), me2ball.dir(), CVector(0, 0), 0, flags | PlayerStatus::NOT_DODGE_PENALTY));
-		}
-		else {
-			setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(70, Utils::Normalize(ball2ourGoal.dir() - Param::Math::PI * 120 / 180)), me2ball.dir(), CVector(0, 0), 0, flags | PlayerStatus::NOT_DODGE_PENALTY));
-		}
-
-		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
-
-	}
-
 	_lastCycle = pVision->Cycle();
 	return CStatedTask::plan(pVision);
 
