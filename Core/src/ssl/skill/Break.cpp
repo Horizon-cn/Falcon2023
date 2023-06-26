@@ -22,8 +22,8 @@
 #include <iomanip>
 #include <iostream>
 
-#define OURPLAYER_NUM	8
-#define THEIRPLAYER_NUM 8
+#define OURPLAYER_NUM	11
+#define THEIRPLAYER_NUM 11
 #define BALL_NUM		1
 
 #ifdef ENABLE_CUDA
@@ -119,9 +119,9 @@ CBreak::CBreak() {
     DRIBBLE_DIST = 80;
     safeMode = false;
 
-  
+
     lastFrameposition = CGeoPoint(-9999, -9999);
-    
+
     running_index = 0;
 
 
@@ -155,7 +155,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     bool shootGoal = task().player.needkick; // Utils::InTheirPenaltyArea(passTarget, 0); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
 
     if (shootGoal) {
-        float corrected_parameter = fabs(me.VelY()) * 0.2 + 5;
+        float corrected_parameter = (fabs(me.VelY()) * 0.2 + 5 > 20) ? 20 : fabs(me.VelY()) * 0.2 + 5;
         CGeoPoint TargetUp = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + 5 + corrected_parameter);
         CGeoPoint TargetDown = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 - 5 - corrected_parameter);
         passTarget = TargetUp;
@@ -290,10 +290,10 @@ void CBreak::plan(const CVisionModule* pVision) {
         GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000 * 10, finalDir), COLOR_RED);
         GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000 * 10, me.Dir()), COLOR_BLUE);
     }
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("Canshoot:" + to_string(canShoot)).c_str(), COLOR_YELLOW);
+    bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("Canshoot:" + to_string(dirok)).c_str(), COLOR_YELLOW);
     auto vel_vertical_target = std::sin(me.Vel().dir() - me2target.dir()) * me.Vel().mod();
 
-    bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
 
     DribbleStatus::Instance()->setDribbleCommand(vecNumber, 3);
 
@@ -407,32 +407,6 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
 
             if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / fabs((Opp2Projection - Param::Vehicle::V2::PLAYER_SIZE))) > (nearEnemyThreshold)))) {
 
-                
-                canShoot = false;
-                needBreakThrough = true;
-                break;
-            }
-        }
-        bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
-        double finalDir = me2target.dir();
-        //if (canShoot)
-        if(task().player.needkick && dirok)
-        {
-            return test_point;
-        }
-        
-        else if(task().player.needkick)  // 需要进行射门
-        {
-            //std::cout << "============break calc with gpu===============" << std::endl;
-            // 使用GPU
-            int _palyer_pos_num = 6;
-            int pos_num = 2 + 1 + 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
-            int pos_size = pos_num * sizeof(float);
-            int target_point_num = 10;
-            float target_step = Param::Field::GOAL_WIDTH / (target_point_num - 1);
-            CGeoPoint target_point = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
-            int target_size = 2 * target_point_num * sizeof(float);
-            int results_size = 3 * target_point_num * sizeof(float);
 
             canShoot = false;
             needBreakThrough = true;
@@ -456,7 +430,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         int pos_num = 2 + 1 + 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
         int pos_size = pos_num * sizeof(float);
         int target_point_num = 15;
-        float corrected_parameter = fabs(me.VelY()) * 0.2 + 5;
+        float corrected_parameter = (fabs(me.VelY()) * 0.2 + 5 > 20) ? 20 : fabs(me.VelY()) * 0.2 + 5;
         float target_step = (Param::Field::GOAL_WIDTH - 2 * corrected_parameter) / (target_point_num - 1);
         CGeoPoint target_point = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + corrected_parameter);
         int target_size = 2 * target_point_num * sizeof(float);
@@ -657,17 +631,15 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
 
     bool flag = true;
     double x1 = me.X(), y1 = me.Y(), theta = dir;
-    float corrected_parameter = fabs(me.VelY()) * 0.2;
+    float corrected_parameter = fabs(me.VelY()) * 0.05;
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("theta:" + to_string(theta)).c_str(), COLOR_YELLOW);
     if ((theta >= -Param::Math::PI && theta <= -Param::Math::PI / 2) || ((theta <= Param::Math::PI && theta >= Param::Math::PI / 2))) {
         flag = false;
-        return flag;
     }
     if (Param::Field::MAX_PLAYER == 0)
     {
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
-        if (fabs(projection) > (Param::Field::GOAL_WIDTH) / 2) {
-        if (fabs(projection) + corrected_parameter > (Param::Field::GOAL_WIDTH - 10) / 2) {
+        if (fabs(projection) + 2 + corrected_parameter > (Param::Field::GOAL_WIDTH - 10) / 2) {
             flag = false;
         }
     }
@@ -677,10 +649,12 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         double x = enemy.X(), y = enemy.Y();
         double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
-        
-        if (r < radius || fabs(projection) + 5 > (Param::Field::GOAL_WIDTH ) / 2 ) {
-
-        if (r < radius || fabs(projection) + 2 >(Param::Field::GOAL_WIDTH - 10) / 2) {
+        if (r < radius)
+        {
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -500), ("r:" + to_string(r)).c_str(), COLOR_YELLOW);
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -525), ("radius:" + to_string(radius)).c_str(), COLOR_YELLOW);
+        }
+        if (r < radius || fabs(projection) + 2 + corrected_parameter>(Param::Field::GOAL_WIDTH - 10) / 2) {
             flag = false;
             break;
         }
