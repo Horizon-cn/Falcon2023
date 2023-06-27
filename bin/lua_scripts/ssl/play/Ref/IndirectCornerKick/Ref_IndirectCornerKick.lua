@@ -2,16 +2,12 @@ local WAIT_BALL_POS   = function ()
   return ball.pos() + Utils.Polar2Vector(50, ball.syntY(0.5 * math.pi))
 end
 
-local point1=ball.antiYPos(CGeoPoint(200,130))
-local point2=ball.syntYPos(CGeoPoint(190,-60))
---local point3=ball.antiYPos(CGeoPoint())
---local point4=ball.antiYPos(CGeoPoint())
---local point5=ball.antiYPos(CGeoPoint())
-local FRONT_POS1 = ball.antiYPos(CGeoPoint:new_local(320, 200))
-local FRONT_POS2 = ball.antiYPos(CGeoPoint:new_local(0, -200))
-local FRONT_POS3 = ball.antiYPos(CGeoPoint:new_local(300, -200))
-local FRONT_POS4 = ball.antiYPos(CGeoPoint:new_local(0,0))
-local FRONT_POS5 = ball.antiYPos(CGeoPoint:new_local(200,-100))
+local FRONT_POS1=CGeoPoint(200,180)
+local FRONT_POS2=CGeoPoint(160,-60)
+local FRONT_POS3=CGeoPoint(160,60)
+local passPos=CGeoPoint(270,70)
+local blockPos1=CGeoPoint(340,-50)
+local blockPos2=CGeoPoint(340,0)
 
 gPlayTable.CreatePlay{
 
@@ -25,13 +21,9 @@ gPlayTable.CreatePlay{
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
     Leader   = task.goCmuRush(FRONT_POS1,_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.goCmuRush(FRONT_POS5,_,_,flag.allow_dss + flag.dodge_ball),
-    Special  = task.goCmuRush(FRONT_POS2,_,_,flag.allow_dss + flag.dodge_ball),
-    Defender = task.goCmuRush(FRONT_POS4,_,_,flag.allow_dss + flag.dodge_ball),
-    Breaker  = task.multiBack(2,1),
-    Crosser  = task.multiBack(2,2),
-    Goalie   = task.goalieNew(),
-    match = "[A][S][D][C][B][LM]"
+    Middle   = task.goCmuRush(blockPos1,_,_,flag.allow_dss + flag.dodge_ball),
+    Special  = task.goCmuRush(blockPos2,_,_,flag.allow_dss + flag.dodge_ball),
+    match = "[A][L][M][S]"
   },
 
   ["toBall"] = {
@@ -40,15 +32,11 @@ gPlayTable.CreatePlay{
         return "kickBall"
       end
     end,
-    Assister = task.staticGetBall(point1),
+    Assister = task.staticGetBall(passPos),
     Leader   = task.goCmuRush(FRONT_POS1,_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.goCmuRush(ball.pos(),player.toBallDir("Middle"),_,flag.allow_dss + flag.dodge_ball),
-    Special  = task.goCmuRush(FRONT_POS2,_,_,flag.allow_dss + flag.dodge_ball),
-    Defender = task.goCmuRush(FRONT_POS4,_,_,flag.allow_dss + flag.dodge_ball),
-    Breaker  = task.multiBack(2,1),
-    Crosser  = task.multiBack(2,2),
-    Goalie   = task.goalieNew(),
-    match = "[A][S][D][C][B][LM]"
+    Middle   = task.goCmuRush(blockPos1,_,_,flag.allow_dss + flag.dodge_ball),
+    Special  = task.goCmuRush(blockPos2,_,_,flag.allow_dss + flag.dodge_ball),
+    match = "[A][L][M][S]"
   },
 
   ["kickBall"] = {
@@ -57,15 +45,11 @@ gPlayTable.CreatePlay{
         return "receiveBall"
       end
     end,
-    Assister = task.chipPass(point1, 350),
-    Leader   = task.goCmuRush(point1,player.toBallDir("Special"),_,flag.allow_dss),
-    Middle   = task.goCmuRush(ball.pos(),player.toBallDir("Middle"),_,flag.allow_dss + flag.dodge_ball),
-    Special  = task.goCmuRush(FRONT_POS2,_,_,flag.allow_dss + flag.dodge_ball),
-    Defender = task.goCmuRush(FRONT_POS4,_,_,flag.allow_dss + flag.dodge_ball),
-    Breaker  = task.multiBack(2,1),
-    Crosser  = task.multiBack(2,2),
-    Goalie   = task.goalieNew(),
-    match = "[A][S][D][C][B][LM]"
+    Assister = task.chipPass(passPos, 250),
+    Leader   = task.goCmuRush(passPos,player.toPlayerDir("Assister"),_,flag.allow_dss),
+    Middle   = task.goCmuRush(blockPos1,_,_,flag.allow_dss + flag.dodge_ball),
+    Special  = task.goCmuRush(blockPos2,_,_,flag.allow_dss + flag.dodge_ball),
+    match = "[A][L][M][S]"
   },
 
   ["receiveBall"] = {
@@ -75,68 +59,23 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.markingFront("Second"),
-    Leader   = task.receivePass(ball.pos(),point1),
-    --Middle   = task.goCmuRush(ball.pos(),player.toBallDir("Middle"),_,flag.allow_dss + flag.dodge_ball),
-    Middle=task.stop(),
-    Special  = task.goCmuRush(point2,_,_,flag.allow_dss + flag.dodge_ball),
-    Defender = task.goCmuRush(FRONT_POS4,_,_,flag.allow_dss + flag.dodge_ball),
-    Breaker  = task.multiBack(2,1),
-    Crosser  = task.multiBack(2,2),
-    Goalie   = task.goalieNew(),
-    match = "[S][A][D][C][B][LM]"
-  },
-
-  ["pass"]={
-    switch = function()
-      if bufcnt(player.kickBall("Leader"),3,1800) then
-        return "receive"
-      end
-    end,
-    Assister = task.markingFront("Second"),
-    Leader   = task.chipPass(point2,200),
-    --Middle   = task.goCmuRush(ball.pos(),player.toBallDir("Middle"),_,flag.allow_dss + flag.dodge_ball),
-    Middle=task.stop(),
-    Special  = task.goCmuRush(point2,_,_,flag.allow_dss + flag.dodge_ball),
-    Defender = task.goCmuRush(FRONT_POS4,_,_,flag.allow_dss + flag.dodge_ball),
-    Breaker  = task.multiBack(2,1),
-    Crosser  = task.multiBack(2,2),
-    Goalie   = task.goalieNew(),
-    match = "[S][A][D][C][B][LM]"
-  },
-
-  ["receive"]={
-    switch=function()
-      if bufcnt(ball.toPlayerHeadDist("Special") < 5,"fast",180) then
-        return "shootBall"
-      end
-    end,
-    Assister = task.markingFront("Second"),
-    Leader   = task.markingFront("Third"),
-    --Middle   = task.goCmuRush(ball.pos(),player.toBallDir("Middle"),_,flag.allow_dss + flag.dodge_ball),
-    Middle=task.stop(),
-    Special  = task.receive(ball.pos(),point2),
-    Defender = task.goCmuRush(FRONT_POS4,_,_,flag.allow_dss + flag.dodge_ball),
-    Breaker  = task.multiBack(2,1),
-    Crosser  = task.multiBack(2,2),
-    Goalie   = task.goalieNew(),
-    match = "[S][A][D][C][B][LM]"
+    Leader   = task.receivePass(ball.pos(),passPos),
+    Middle   = task.goCmuRush(blockPos1,_,_,flag.allow_dss + flag.dodge_ball),
+    Special  = task.goCmuRush(blockPos2,_,_,flag.allow_dss + flag.dodge_ball),
+    match = "[A][L][M][S]"
   },
 
   ["shootBall"]={
     switch=function()
-      if(bufcnt(palyer.kickBall("Special"),3,1800)) then
+      if(bufcnt(player.kickBall("Leader"),3,1800)) then
         return "exit"
       end
     end,
     Assister = task.markingFront("Second"),
-    Leader   = task.markingFront("Third"),
-    Middle   = task.stop(),
-    Special  = task.chaseNew(),
-    Defender = task.stop(),
-    Breaker  = task.multiBack(2,1),
-    Crosser  = task.multiBack(2,2),
-    Goalie   = task.goalieNew(),
-    match = "[S][A][D][C][B][LM]"
+    Leader   = task.advance(),
+    Middle   = task.protectBall(),
+    Special  = task.goCmuRush(blockPos1,_,_,flag.allow_dss + flag.dodge_ball),
+    match = "[A][L][M][S]"
   },
   name = "Ref_IndirectCornerKick",
   applicable = {

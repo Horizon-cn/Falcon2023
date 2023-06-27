@@ -9,7 +9,9 @@ local KICK_POS   = function ()
 end
 
 local KICK_DIR  = ball.antiYDir(1.57)
-local FRONT_POS1=CGeoPoint()
+local FRONT_POS1=CGeoPoint(200,180)
+local FRONT_POS2=CGeoPoint(160,-60)
+local FRONT_POS3=CGeoPoint(160,60)
 local ACC=500;
 
 gPlayTable.CreatePlay{
@@ -32,7 +34,7 @@ firstState = "start",
 name = "Ref_Stop4CornerKick",
 applicable = {
 	exp = "a",
-	a = true
+	a = trued
 },
 attribute = "attack",
 timeout = 99999

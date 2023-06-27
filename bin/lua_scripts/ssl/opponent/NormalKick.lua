@@ -1,7 +1,7 @@
 gOppoConfig = {
   ----------------------play---------------------------------------------------------------
 
-	IndirectCornerKick  = {"Ref_IndirectCornerPush_normal"},--80 --"Ref_CornerPush"
+	IndirectCornerKick  = {"Ref_IndirectCornerKick"},--80 --"Ref_CornerPush"
 
 	DirectCornerKick  = {"Ref_DirectCornerPush_normal"},--80 --"Ref_CornerPush"
 
