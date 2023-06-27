@@ -26,11 +26,12 @@ namespace {
 
 		S_GOTOBALL = 1,//若球在场外使用该state开始
 		S_GOTOBALL_1, //若球在场内使用该state
-		S_BACK,
-		S_WAIT,
 		S_GETBALL,
+		S_BACK,
+		S_CHECK1,
+		S_WAIT,
 		S_TURN,
-		S_CHECK,
+		S_CHECK2,
 		S_END
 	};
 	bool VERBOSE = true; //
@@ -69,7 +70,8 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	//double adjustPre				= task().player.speed_x;
 	double adjustPre = 0.2;
 	double faceDir = Utils::Normalize((ball.Pos() - me.Pos()).dir());
-	double S_GOTOBALL_getball_dir = Utils::Normalize((ball.Pos() - targetPos).dir());//场外拿球小车朝向
+	CGeoPoint CentrePoint= CGeoPoint(0, 0);
+	double S_GOTOBALL_getball_dir = Utils::Normalize((ball.Pos() - CentrePoint).dir());//场外拿球小车朝向
 	double ball2barget = Utils::Normalize((ball.Pos() - targetPos).dir());
 	double finalDir = task().player.angle;
 	const double exit_speed = 50;                    //exit speed
@@ -136,15 +138,30 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 
 	case S_BACK:
 		if(!isBallOutside) {
+			new_state = S_CHECK1;
+			cnt = 0;
+		}
+		else if (me2ball.mod() > 20) {
+			if (++cnt >= 50) {
+				new_state = BEGINNING;
+				cnt = 0;
+			}
+		}
+		else {
+			cnt = 0;
+		}
+		break;
+	case S_CHECK1:
+		if (cnt >= WAIT_BUFFER) {
 			new_state = S_WAIT;
 			cnt = 0;
 		}
 		cnt++;
 		break;
-
+		
 	case S_WAIT:
-		if ((ball.Pos() - me.Pos()).mod() > 20) {
-			new_state = S_TURN;
+		if ((ball.Pos() - me.Pos()).mod() > 50) {
+			new_state = S_GOTOBALL_1;
 			cnt = 0;
 		}
 		cnt++;
@@ -152,7 +169,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		//吸球行进
 	case S_TURN:
 		if ((ball.Pos() - targetPos).mod() < 13) {
-			new_state = S_CHECK;
+			new_state = S_CHECK2;
 			cnt = 0;
 		}
 		else if (me2ball.mod() > 20) {
@@ -166,7 +183,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		}
 		break;
 		//判断是否放球到正确位置
-	case S_CHECK:
+	case S_CHECK2:
 		if (cnt >= WAIT_BUFFER) {
 			new_state = S_END;
 			cnt = 0;
@@ -201,26 +218,31 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GETBALL", COLOR_CYAN);
 		}
-		else if (S_TURN == getState())
-		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_TURN", COLOR_CYAN);
-		}
-		else if (S_CHECK == getState())
-		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_CHECK", COLOR_CYAN);
-		}
-		else if (S_END == getState())
-		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_END", COLOR_CYAN);
-		}
 		else if (S_BACK == getState())
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_BACK", COLOR_CYAN);
+		}
+		else if (S_CHECK1 == getState())
+		{
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_CHECK1", COLOR_CYAN);
 		}
 		else if (S_WAIT == getState())
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_WAIT", COLOR_CYAN);
 		}
+		else if (S_TURN == getState())
+		{
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_TURN", COLOR_CYAN);
+		}
+		else if (S_CHECK2 == getState())
+		{
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_CHECK2", COLOR_CYAN);
+		}
+		else if (S_END == getState())
+		{
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_END", COLOR_CYAN);
+		}
+		
 	}
 
 	setState(new_state);
@@ -237,17 +259,14 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DODGE_BALL | PlayerStatus::NOT_DODGE_PENALTY, stopDist));
 	}
 	else if (S_GETBALL == state()) {
-		setSubTask(PlayerRole::makeItSlowGetBall(vecNumber, faceDir, flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
+		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
 	}
-	else if (S_WAIT == state()) {
-		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
-		setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(30, Utils::Normalize((me.Pos() - ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
-	}
+	
 	else if (S_BACK == state()) {
 		TaskT playerTask;
 		playerTask.executor = vecNumber;
-		playerTask.player.pos = ball.Pos() + Utils::Polar2Vector(50,(targetPos-ball.Pos()).dir());
-		playerTask.player.angle = (ball.Pos()-targetPos).dir();
+		playerTask.player.pos = ball.Pos() + Utils::Polar2Vector(60,(CentrePoint-ball.Pos()).dir());
+		playerTask.player.angle = (ball.Pos()-CentrePoint).dir();
 		playerTask.player.vel = CVector(0, 0);
 		playerTask.player.rotvel = 0.0;
 		playerTask.player.flag = PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS | PlayerStatus::NOT_DODGE_PENALTY;
@@ -257,6 +276,17 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		playerTask.player.max_deceleration = paramManager->PlACEBALL_DECELERATION;
 		playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
 		setSubTask(TaskFactoryV2::Instance()->GotoPosition(playerTask));
+	}
+	else if (S_CHECK1 == state()) {
+		if (cnt >= WAIT_BUFFER / 20)
+			DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
+
+		setSubTask(PlayerRole::makeItRun(vecNumber, 0.0, 0.0, 0.0, flags | PlayerStatus::NOT_DODGE_PENALTY));
+	}
+
+	else if (S_WAIT == state()) {
+		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
+		setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(60, Utils::Normalize((me.Pos() - ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
 	}
 	else if (S_TURN == state()) {//TODO：吸球后退
 		TaskT playerTask;
@@ -273,7 +303,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
 		setSubTask(TaskFactoryV2::Instance()->GotoPosition(playerTask));
 	}
-	else if (S_CHECK == state()) {
+	else if (S_CHECK2 == state()) {
 		if (cnt >= WAIT_BUFFER / 20)
 			DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
 
