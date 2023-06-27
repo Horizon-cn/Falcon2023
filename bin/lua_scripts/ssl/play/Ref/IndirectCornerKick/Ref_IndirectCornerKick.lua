@@ -2,10 +2,10 @@ local WAIT_BALL_POS   = function ()
   return ball.pos() + Utils.Polar2Vector(50, ball.syntY(0.5 * math.pi))
 end
 
-local FRONT_POS1=CGeoPoint(200,180)
-local FRONT_POS2=CGeoPoint(160,-60)
-local FRONT_POS3=CGeoPoint(160,60)
-local passPos=CGeoPoint(270,70)
+local FRONT_POS1=ball.antiYPos(CGeoPoint(200,180))
+local FRONT_POS2=ball.antiYPos(CGeoPoint(160,-60))
+local FRONT_POS3=ball.antiYPos(CGeoPoint(160,60))
+local passPos=ball.antiYPos(CGeoPoint(270,70))
 local blockPos1=CGeoPoint(340,-50)
 local blockPos2=CGeoPoint(340,0)
 
@@ -21,9 +21,13 @@ gPlayTable.CreatePlay{
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
     Leader   = task.goCmuRush(FRONT_POS1,_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.goCmuRush(blockPos1,_,_,flag.allow_dss + flag.dodge_ball),
-    Special  = task.goCmuRush(blockPos2,_,_,flag.allow_dss + flag.dodge_ball),
-    match = "[A][L][M][S]"
+    Middle   = task.goCmuRush(ball.pos(),_,_,flag.allow_dss + flag.dodge_ball),
+    Special  = task.protectBall(),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
+    Crosser  = task.defendHead(),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][S][M]"
   },
 
   ["toBall"] = {
@@ -33,10 +37,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.staticGetBall(passPos),
-    Leader   = task.goCmuRush(FRONT_POS1,_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.goCmuRush(blockPos1,_,_,flag.allow_dss + flag.dodge_ball),
-    Special  = task.goCmuRush(blockPos2,_,_,flag.allow_dss + flag.dodge_ball),
-    match = "[A][L][M][S]"
+    Leader   = task.goCmuRush(passPos,_,_,flag.allow_dss + flag.dodge_ball),
+    Middle   = task.markingFront("Second"),
+    Special  = task.protectBall(),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
+    Crosser  = task.defendHead(),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][S][M]"
   },
 
   ["kickBall"] = {
@@ -47,9 +55,13 @@ gPlayTable.CreatePlay{
     end,
     Assister = task.chipPass(passPos, 250),
     Leader   = task.goCmuRush(passPos,player.toPlayerDir("Assister"),_,flag.allow_dss),
-    Middle   = task.goCmuRush(blockPos1,_,_,flag.allow_dss + flag.dodge_ball),
-    Special  = task.goCmuRush(blockPos2,_,_,flag.allow_dss + flag.dodge_ball),
-    match = "[A][L][M][S]"
+    Middle   = task.markingFront("second"),
+    Special  = task.protectBall(),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
+    Crosser  = task.defendHead(),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][S][M]"
   },
 
   ["receiveBall"] = {
@@ -60,9 +72,13 @@ gPlayTable.CreatePlay{
     end,
     Assister = task.markingFront("Second"),
     Leader   = task.receivePass(ball.pos(),passPos),
-    Middle   = task.goCmuRush(blockPos1,_,_,flag.allow_dss + flag.dodge_ball),
-    Special  = task.goCmuRush(blockPos2,_,_,flag.allow_dss + flag.dodge_ball),
-    match = "[A][L][M][S]"
+    Middle   = task.markingFront("Third"),
+    Special  = task.protectBall(),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
+    Crosser  = task.defendHead(),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][S][M]"
   },
 
   ["shootBall"]={
@@ -73,9 +89,13 @@ gPlayTable.CreatePlay{
     end,
     Assister = task.markingFront("Second"),
     Leader   = task.advance(),
-    Middle   = task.protectBall(),
-    Special  = task.goCmuRush(blockPos1,_,_,flag.allow_dss + flag.dodge_ball),
-    match = "[A][L][M][S]"
+    Middle   = task.markingFront("Third"),
+    Special  = task.protectBall(),
+    Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
+    Crosser  = task.defendHead(),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][S][M]"
   },
   name = "Ref_IndirectCornerKick",
   applicable = {

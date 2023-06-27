@@ -9,9 +9,9 @@ local KICK_POS   = function ()
 end
 
 local KICK_DIR  = ball.antiYDir(1.57)
-local FRONT_POS1=CGeoPoint(200,180)
-local FRONT_POS2=CGeoPoint(160,-60)
-local FRONT_POS3=CGeoPoint(160,60)
+local FRONT_POS1=ball.antiYPos(CGeoPoint(200,180))
+local FRONT_POS2=ball.antiYPos(CGeoPoint(160,-60))
+local FRONT_POS3=ball.antiYPos(CGeoPoint(160,60))
 local ACC=500;
 
 gPlayTable.CreatePlay{
@@ -28,7 +28,11 @@ firstState = "start",
 	Leader   = task.goCmuRush(FRONT_POS1, _, ACC, STOP_DSS),
 	Middle   = task.goCmuRush(FRONT_POS2, _, ACC, STOP_DSS),
 	Special  = task.goCmuRush(FRONT_POS3, _, ACC, STOP_DSS),
-	match    = "[A][L][M][S]"
+	Defender = task.multiBack(2,1),
+    Breaker  = task.multiBack(2,2),
+    Crosser  = task.defendHead(),
+    Goalie   = task.goalieNew(),
+	match    = "[D][B][A][C][L][S][M]"
 },
 
 name = "Ref_Stop4CornerKick",
