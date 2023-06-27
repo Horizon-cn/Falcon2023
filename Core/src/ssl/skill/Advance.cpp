@@ -99,6 +99,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 	
 	if (WeCanAlwaysSetKick(pVision, _executor))
 		KickStatus::Instance()->setKick(_executor, KICKPOWER);
+	else KickStatus::Instance()->setBothKick(_executor, 0, 0);
 
 	NumberOfSupport = min(6, AREANUM);/*暂时只考虑对面半场六个*/
 	for (int i = 0; i < NumberOfSupport; ++i)
@@ -1138,6 +1139,7 @@ int CAdvance::opp_ahead(const CVisionModule* pVision, const int vecNumber) {
 }
 
 bool CAdvance::WeCanAlwaysSetKick(const CVisionModule* pVision, const int vecNumber) {
+	if (_state == BREAKSHOOT) return false;
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	if (MeIsInWhichArea == CenterArea)
 		if (canScore(pVision, vecNumber, OBSTACLE_RADIUS * 2.5, me.Dir()))
@@ -1178,7 +1180,7 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 		//return JUSTCHIPPASS;
 		return JUSTCHIPPASS;
 	}
-
+	
 	else if (MeIsInWhichArea == DefenceArea) { // 在后场防守区域
 		if (IHaveSupport)
 			return PASS;
@@ -1207,7 +1209,10 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 		}
 	}	
 	else if (MeIsInWhichArea == CornerArea) { //在角球区
-		if (IHaveSupport) { //pass first
+		if (tendToShoot(pVision, vecNumber)) {
+			return KICK;
+		}
+		else if (IHaveSupport) { //pass first
 			return PASS;
 		}
 		else {	
@@ -1215,6 +1220,9 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 		}	
 	}	
 	else if (MeIsInWhichArea == CanNOTBreakArea) {  // 不能break
+		if (tendToShoot(pVision, vecNumber)) {
+			return KICK;
+		}
 		if (IHaveSupport) { //pass first
 			return PASS;
 		}

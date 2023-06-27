@@ -14,7 +14,7 @@ firstState = "PureDefence",
 			return "PureDefence";
 		end
 	end,
-	Leader = task.advance(),
+	Leader = task.advanceV4(),
 	Middle = task.support("Leader",2),
 	Assister = task.singleBack(),
     Special = task.rightBack(),
