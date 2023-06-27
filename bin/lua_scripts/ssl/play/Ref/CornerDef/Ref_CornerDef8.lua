@@ -8,13 +8,13 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-  Leader = task.defendMiddle(),
+  Leader = task.multiBack(1,3),
   Assister = task.defendHead(),
   Special = task.markingFront("First"),
   Breaker = task.markingFront("Second"),
   Crosser = task.markingFront("Third"),
-  Middle = task.leftBack(),
-  Defender = task.rightBack(),
+  Middle = task.multiBack(2,3),
+  Defender = task.multiBack(3,3),
   Goalie = task.goalieNew(),
   match    = "[MD][AL][SBC]"
 },

@@ -53,7 +53,7 @@ gPlayTable.CreatePlay{
         return "receiveBall"
       end
     end,
-    Assister = task.chipPass(passPos, 250),
+    Assister = task.chipPass(passPos, 350),
     Leader   = task.goCmuRush(passPos,player.toPlayerDir("Assister"),_,flag.allow_dss),
     Middle   = task.markingFront("second"),
     Special  = task.protectBall(),
