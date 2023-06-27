@@ -3,9 +3,9 @@ local WAIT_BALL_POS   = function ()
 end
 
 --【接球点】可根据实车情况进行调整
-local RECEIVE_POS = ball.antiYPos(CGeoPoint:new_local(30, 100))
+local RECEIVE_POS = ball.antiYPos(CGeoPoint:new_local(320, 120))
 --【传球力度】可根据实车情况进行调整
-local kickPower = 350
+local kickPower = 400
 
 gPlayTable.CreatePlay{
 

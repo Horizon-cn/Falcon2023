@@ -26,10 +26,12 @@ namespace {
 
 		S_GOTOBALL = 1,//若球在场外使用该state开始
 		S_GOTOBALL_1, //若球在场内使用该state
+		S_BACK,
+		S_WAIT,
 		S_GETBALL,
 		S_TURN,
 		S_CHECK,
-		S_BACK
+		S_END
 	};
 	bool VERBOSE = true; //
 	const int dribblePower = 3; //吸球力度
@@ -67,7 +69,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	//double adjustPre				= task().player.speed_x;
 	double adjustPre = 0.2;
 	double faceDir = Utils::Normalize((ball.Pos() - me.Pos()).dir());
-	double S_GOTOBALL_getball_dir = Utils::Normalize((ball.Pos() - me.Pos()).dir() + (Param::Math::PI) / 4);//场外拿球小车朝向
+	double S_GOTOBALL_getball_dir = Utils::Normalize((ball.Pos() - targetPos).dir());//场外拿球小车朝向
 	double ball2barget = Utils::Normalize((ball.Pos() - targetPos).dir());
 	double finalDir = task().player.angle;
 	const double exit_speed = 50;                    //exit speed
@@ -79,6 +81,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	CVector target2ball = ball.Pos() - target;
 	CVector ball2ourGoal = ball.Pos() - ourGoal;
 	CVector ourGoal2ball = ourGoal - ball.Pos();
+	bool isBallOutside = abs(ball.Pos().y()) >= (Param::Field::PITCH_WIDTH / 2 - 30) || (abs(ball.Pos().x())) >= (Param::Field::PITCH_LENGTH / 2 - 30);
 
 	//开场时球的位置
 	bool BallisOutside = std::abs(ball.Pos().y()) >= Param::Field::PITCH_WIDTH / 2 ? true : false;
@@ -95,13 +98,13 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	switch (state()) {
 		//初始阶段
 	case BEGINNING:
-		if (std::abs(ball.Pos().y()) >= (Param::Field::PITCH_WIDTH / 2 - 30)) new_state = S_GOTOBALL;
+		if (isBallOutside) new_state = S_GOTOBALL;
 		else new_state = S_GOTOBALL_1;
 		break;
 
 		//场内拿球
 	case S_GOTOBALL_1:
-		if (std::abs(ball.Pos().y()) >= (Param::Field::PITCH_WIDTH / 2 - 30)) new_state = S_GOTOBALL;
+		if (isBallOutside) new_state = S_GOTOBALL;
 		else if ((me.Pos() - ball.Pos()).mod() < 20 && std::abs((me.Pos() - ball.Pos()).dir() - (ball.Pos() - targetPos).dir()) < 0.5) {
 			new_state = S_GETBALL;
 			//new_state = S_GOTOBALL;
@@ -120,12 +123,32 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	case S_GETBALL:
 		//判断是否拿到球
 		if (possession >= 0.75) {
-			new_state = S_TURN;
+			if (isBallOutside) {
+				new_state = S_BACK;
+			}
+			else {
+				new_state = S_TURN;
+			}
 			cnt = 0;
 		}
 		cnt++;
 		break;
 
+	case S_BACK:
+		if(!isBallOutside) {
+			new_state = S_WAIT;
+			cnt = 0;
+		}
+		cnt++;
+		break;
+
+	case S_WAIT:
+		if ((ball.Pos() - me.Pos()).mod() > 20) {
+			new_state = S_TURN;
+			cnt = 0;
+		}
+		cnt++;
+		break;
 		//吸球行进
 	case S_TURN:
 		if ((ball.Pos() - targetPos).mod() < 13) {
@@ -145,13 +168,13 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		//判断是否放球到正确位置
 	case S_CHECK:
 		if (cnt >= WAIT_BUFFER) {
-			new_state = S_BACK;
+			new_state = S_END;
 			cnt = 0;
 		}
 		cnt++;
 		break;
 		//放球结束，后退阶段
-	case S_BACK:
+	case S_END:
 		if ((ball.Pos() - targetPos).mod() > 15) {
 			new_state = BEGINNING;
 		}
@@ -186,9 +209,17 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_CHECK", COLOR_CYAN);
 		}
+		else if (S_END == getState())
+		{
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_END", COLOR_CYAN);
+		}
 		else if (S_BACK == getState())
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_BACK", COLOR_CYAN);
+		}
+		else if (S_WAIT == getState())
+		{
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_WAIT", COLOR_CYAN);
 		}
 	}
 
@@ -200,13 +231,32 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	/***************************************************/
 
 	if (S_GOTOBALL == state()) {
-		setSubTask(PlayerRole::makeItSlowGetBall(vecNumber, S_GOTOBALL_getball_dir, PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS | PlayerStatus::NOT_DODGE_PENALTY));
+		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, S_GOTOBALL_getball_dir, CVector(0, 0), flags | PlayerStatus::DODGE_BALL | PlayerStatus::NOT_DODGE_PENALTY, stopDist));
 	}
 	else if (S_GOTOBALL_1 == state()) {
 		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DODGE_BALL | PlayerStatus::NOT_DODGE_PENALTY, stopDist));
 	}
 	else if (S_GETBALL == state()) {
 		setSubTask(PlayerRole::makeItSlowGetBall(vecNumber, faceDir, flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
+	}
+	else if (S_WAIT == state()) {
+		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
+		setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(30, Utils::Normalize((me.Pos() - ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
+	}
+	else if (S_BACK == state()) {
+		TaskT playerTask;
+		playerTask.executor = vecNumber;
+		playerTask.player.pos = ball.Pos() + Utils::Polar2Vector(50,(targetPos-ball.Pos()).dir());
+		playerTask.player.angle = (ball.Pos()-targetPos).dir();
+		playerTask.player.vel = CVector(0, 0);
+		playerTask.player.rotvel = 0.0;
+		playerTask.player.flag = PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS | PlayerStatus::NOT_DODGE_PENALTY;
+		playerTask.player.max_speed = paramManager->PlACEBALL_SPEED;
+		playerTask.player.max_rot_speed = paramManager->PlACEBALL_ROT_SPEED;
+		playerTask.player.max_acceleration = paramManager->PlACEBALL_ACCELERATION;
+		playerTask.player.max_deceleration = paramManager->PlACEBALL_DECELERATION;
+		playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
+		setSubTask(TaskFactoryV2::Instance()->GotoPosition(playerTask));
 	}
 	else if (S_TURN == state()) {//TODO：吸球后退
 		TaskT playerTask;
@@ -230,8 +280,8 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		setSubTask(PlayerRole::makeItRun(vecNumber, 0.0, 0.0, 0.0, flags | PlayerStatus::NOT_DODGE_PENALTY));
 
 	}
-	else if (S_BACK == state()) {
-		setSubTask(PlayerRole::makeItGoto(vecNumber,ball.Pos()+ Utils::Polar2Vector(100, Utils::Normalize((me.Pos()-ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
+	else if (S_END == state()) {
+		setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(100, Utils::Normalize((me.Pos() - ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
 		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
 	}
 	_lastCycle = pVision->Cycle();
