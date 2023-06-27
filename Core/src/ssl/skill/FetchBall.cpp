@@ -231,7 +231,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	/***************************************************/
 
 	if (S_GOTOBALL == state()) {
-		setSubTask(PlayerRole::makeItSlowGetBall(vecNumber, S_GOTOBALL_getball_dir, flags | PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS | PlayerStatus::NOT_DODGE_PENALTY));
+		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, S_GOTOBALL_getball_dir, CVector(0, 0), flags | PlayerStatus::DODGE_BALL | PlayerStatus::NOT_DODGE_PENALTY, stopDist));
 	}
 	else if (S_GOTOBALL_1 == state()) {
 		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DODGE_BALL | PlayerStatus::NOT_DODGE_PENALTY, stopDist));
