@@ -10,7 +10,7 @@ gPlayTable.CreatePlay{
     end,
   Leader = task.rightBack(),
   Middle = task.leftBack(),
-  Defender = task.defendKick(),
+  Defender = task.defendHead(),
   Special = task.defendHead(),
   Assister = task.marking("First"),
   Breaker =task.marking("Second"),

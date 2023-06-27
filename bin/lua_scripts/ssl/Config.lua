@@ -1,14 +1,14 @@
-IS_TEST_MODE = false
+IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 USE_SWITCH = false
-OPPONENT_NAME = "NormalKick"--"Avoidfoul" PureDefence6 PureDefence8 NormalKick
+OPPONENT_NAME = "PureDefence8"--"Avoidfoul" PureDefence6 PureDefence8 NormalKick
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_AdvanceV4" --"Test_AdvanceV4"  --"NormalPlayPureDefence" --"Test_Run6" --"Test_play6" --"Test_Run"
+		return "NormalPlayPureDefence8" --"Test_AdvanceV4"  --"NormalPlayPureDefence" --"Test_Run6" --"Test_play6" --"Test_Run"
 		-- Test_Run6 测testrun
 		-- Test_play6ForTest测三车进攻
 	else
