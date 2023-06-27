@@ -22,8 +22,8 @@
 #include <iomanip>
 #include <iostream>
 
-#define OURPLAYER_NUM	11
-#define THEIRPLAYER_NUM 11
+#define OURPLAYER_NUM	16
+#define THEIRPLAYER_NUM 16
 #define BALL_NUM		1
 
 #ifdef ENABLE_CUDA
@@ -680,13 +680,15 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         if (!pVision->TheirPlayer(i).Valid()) continue;
         auto enemy = pVision->TheirPlayer(i);
         double x = enemy.X(), y = enemy.Y();
-        double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
+        if (x < me.X()) continue;
+        CGeoLine my_direction(me.Pos(), theta);
+        CGeoPoint projection_point = my_direction.projection(enemy.Pos());
+        //double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
+        double r = projection_point.dist(enemy.Pos());
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
-        if (r < radius)
-        {
-            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -500), ("r:" + to_string(r)).c_str(), COLOR_YELLOW);
-            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -525), ("radius:" + to_string(radius)).c_str(), COLOR_YELLOW);
-        }
+
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -500), ("r:" + to_string(r)).c_str(), COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -475), ("radius:" + to_string(radius)).c_str(), COLOR_YELLOW);
         if (r < radius || fabs(projection) + 2 + corrected_parameter>(Param::Field::GOAL_WIDTH - 10) / 2) {
             flag = false;
             break;
