@@ -398,9 +398,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         //float nearEnemyThreshold = task().player.ispass ? 2 : 15 * Param::Math::PI / 180.0;
         float nearEnemyThreshold = task().player.needkick ? 5.5 : 3.5;
 
-        /*cout << "test_seg.IsPointOnLineOnSegment(projection)__" << ' ' << test_seg.IsPointOnLineOnSegment(projection) << endl;
-        cout << "projection_dist__" << ' ' << projection_dist << endl;
-        cout << "to_projection_dist__" << ' ' << to_projection_dist << endl;*/
+
         //if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist/to_projection_dist) < (15*Param::Math::PI/180.0))||(to_projection_dist<15&&projection_dist<15))) {
         //if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / to_projection_dist) < (nearEnemyThreshold))  )) {
         /*if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {*/

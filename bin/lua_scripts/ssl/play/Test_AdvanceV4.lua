@@ -15,8 +15,9 @@ firstState = "advance",
 		end
 	end,
 	Leader = task.advance(),
-	Assister = task.support("Leader", 1);
-	match    = "[L][A]"
+	Assister = task.support("Leader", 0);
+	Hawk = task.protectBall(),
+	match    = "[L][AW]"
 },
 
 name = "Test_AdvanceV4",

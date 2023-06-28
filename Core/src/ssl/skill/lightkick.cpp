@@ -33,8 +33,6 @@ void Clightkick::plan(const CVisionModule* pVision)
     const double StopDist = task().player.rotvel;
 
     TaskT lightkick(task());
-    //lightkick.player.max_rot_acceleration = 40;
-    //lightkick.player.max_deceleration = 40;
     
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -350), "lightkick", COLOR_WHITE);
     

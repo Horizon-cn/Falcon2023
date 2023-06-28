@@ -59,7 +59,6 @@ private:
     int NumberOfSupport;/* Gpu??????????????? */
     int NowIsShoot;
     int NumOfOurPlayer;
-
     int MeIsInWhichArea;
     /**********************************************************
     * Description: ?????б? ???????ini??????????????
@@ -112,6 +111,7 @@ private:
 
     bool IHaveSupport = false;
     int TheBestSupportNumber = 1;
+    bool isBallVeryNearTheOpp;
 
     CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
 
@@ -168,6 +168,10 @@ private:
     double generateOppIsNearThanMeDir(const CVisionModule* pVision, const int vecNumber);
     double generateOppIsFarThanMeDir(const CVisionModule* pVision, const int vecNumber);
     bool OppIsFarThanMe(const CVisionModule* pVision, const int vecNumber);
+
+    bool isBallVeryNearTheOppAndIMustGET(const CVisionModule* pVision);
+
+
 /**********************************************************
     * Description: ?????????????о??????
     * Author: ?????

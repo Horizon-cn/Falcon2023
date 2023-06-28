@@ -1,6 +1,5 @@
 #ifndef _GLOBAL_H_
 #define _GLOBAL_H_
-
 #include "Vision/VisionModule.h"
 #include "WorldModel/DribbleStatus.h"
 #include "WorldModel/KickStatus.h"
@@ -50,3 +49,4 @@ extern CSupportPos2022* supportPos2022;
 extern CRobotSensor* robotSensor;
 void initializeSingleton();
 #endif
+//#define cout cout<<__FILE__<<__LINE__
