@@ -178,6 +178,7 @@ private:
     * Created Date: 2022/10/10
 ***********************************************************/
 
+    double GenerateShootDir(const CVisionModule* pVision, int vecNumber);
     CGeoPoint GenerateBreakShootPoint(const CVisionModule* pVision, int vecNumber);
     CGeoPoint GenerateBreakPassPoint(const CVisionModule* pVision, int vecNumber);
     double TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint);

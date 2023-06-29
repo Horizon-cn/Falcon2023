@@ -87,7 +87,7 @@ CGetBallV5::CGetBallV5()
 void CGetBallV5::plan(const CVisionModule* pVision)
 {
 
-    double slowfactor = 0.5;
+    double slowfactor = 1.0;// 0.5;
     ball2myheadLimit = HEAD_LIMIT;
     // 内部状态进行重置
     if (pVision->Cycle() - _lastCycle > Param::Vision::FRAME_RATE * 0.1) {
@@ -188,12 +188,18 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -225), "I get the ball", COLOR_YELLOW);
             getball_task.player.pos = me.Pos() + Utils::Polar2Vector(maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
             getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
+
+            getball_task.player.max_acceleration = getball_task.player.max_deceleration = 600;
+            getball_task.player.max_rot_acceleration = 20;
+            getball_task.player.max_deceleration = 20;
+
         }
         else { 
             //我没拿到球，我需要绕前去抢球
             if (fabs((ball.Pos() - opp.Pos()).theta(ourGoal - ball.Pos())) < Param::Math::PI * 90 / 180) {
                 // 背身角度小于90度，拿球 绕到前面去抢球
-                if (fabs(Utils::Normalize((me.Dir() - (opp.Pos() - ball.Pos()).dir())) < Param::Math::PI * 18 / 180)) {
+                if (fabs(Utils::Normalize((me.Dir() - (opp.Pos() - ball.Pos()).dir())) < Param::Math::PI * 22 / 180)) {
+                //if(TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), ball.Pos()) > 1.5 * Param::Vehicle::V2::PLAYER_SIZE){
                     //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
                     // 如果我和他正对着，我就上前去吸
                     getball_task.player.pos = ball.Pos();// +Utils::Polar2Vector(minGetBallDist, Utils::Normalize((ball.Pos() - opp.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
@@ -222,10 +228,16 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             getball_task.player.pos = GenerateLargeAnglePoint(pVision, finalDir, 0);
         // 此时需要进一步调整角度，生成拿球点
 
+
+        getball_task.player.max_rot_acceleration = 7.0 * slowfactor;
+        getball_task.player.max_deceleration = 7.0 * slowfactor;
+
+
+        /*
         if (fabs(me.Dir() - finalDir) > Param::Math::PI * 90 / 180) {
-            getball_task.player.max_acceleration = getball_task.player.max_deceleration = 650;
-            getball_task.player.max_rot_acceleration = 16 * slowfactor;
-            getball_task.player.max_deceleration = 16 * slowfactor;
+            getball_task.player.max_acceleration = getball_task.player.max_deceleration = 600;
+            getball_task.player.max_rot_acceleration = 9 * slowfactor;
+            getball_task.player.max_deceleration = 9 * slowfactor;
         }
         // 误差90+，高速转动
         else if (fabs(me.Dir() - finalDir) < Param::Math::PI * 20 / 180) {
@@ -233,6 +245,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             getball_task.player.max_rot_acceleration = 7 * slowfactor;
             getball_task.player.max_deceleration = 7 * slowfactor;
         }
+        */
         // 误差小于20，不需要高速转动，降低速度
 
         getball_task.player.angle = finalDir;
@@ -277,14 +290,14 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                 getball_task.player.pos = expectedGetPos;
                 getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
 
-                if(ball2meDist < 75)getball_task.player.needdribble = IS_DRIBBLE;
+                if(ball2meDist < 85)getball_task.player.needdribble = IS_DRIBBLE;
             }
         }
         else if (IsMedium) {
             // 中速状态下，可以从前面去拿球
             CGeoPoint expectedGetPos = Ball_Predict_Pos(pVision);
             // 球速预测点
-            if ((ball.Pos() - me.Pos()).mod() < 350 && IsBehind && (NotDanger(pVision, _executor))){// && (!HaveBeenBlockPoint(pVision, _executor, ball.Pos())) && (NotDanger(pVision, _executor))) {
+            if ((ball.Pos() - me.Pos()).mod() < 350 && IsBehind && (NotDanger(pVision, _executor) == 1)){// && (!HaveBeenBlockPoint(pVision, _executor, ball.Pos())) && (NotDanger(pVision, _executor))) {
                 // 在球身后，且前面没有人当住我，需要追球
                 //CGeoLine ballMoveingLine(ball.Pos(), ball.Vel().dir());
                 //CGeoPoint projMe = ballMoveingLine.projection(me.Pos());
@@ -312,7 +325,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                 CGeoLine ballMoveingLine(ball.Pos(), ball.Vel().dir());
                 CGeoPoint projMe = ballMoveingLine.projection(me.Pos());
                 bool IsMyPosIsOK = (fabs(Utils::Normalize((me.Pos() - ball.Pos()).dir() - ball.Vel().dir())) < Param::Math::PI * 30 / 180);
-                bool IsMyDirIsOK = (fabs(Utils::Normalize((ball.Pos() - me.Pos()).dir() - me.Dir())) < Param::Math::PI * 3 / 180);
+                bool IsMyDirIsOK = (fabs(Utils::Normalize((ball.Pos() - me.Pos()).dir() - me.Dir())) < Param::Math::PI * 5 / 180);
 
                 if (IsMyPosIsOK && IsMyDirIsOK) {
                     // 已经对准
@@ -332,7 +345,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                     getball_task.player.pos = expectedGetPos;
                     getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
 
-                    if (ball2meDist < 50)getball_task.player.needdribble = IS_DRIBBLE;
+                    if (ball2meDist < 60)getball_task.player.needdribble = IS_DRIBBLE;
                 }
 
             }
@@ -358,8 +371,13 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                 getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
             }
 
-            if (ball2meDist < 30)getball_task.player.needdribble = IS_DRIBBLE;
+            if (ball2meDist < 50)getball_task.player.needdribble = IS_DRIBBLE;
         }
+        /*
+        getball_task.player.max_rot_acceleration = 3.0 * slowfactor;
+        getball_task.player.max_deceleration = 3.0 * slowfactor;
+        */
+        
         if (fabs(me.Dir() - ThisCaseFinalDir) > Param::Math::PI * 215 / 180) {
             getball_task.player.max_rot_acceleration = 16 * slowfactor;
             getball_task.player.max_deceleration = 16 * slowfactor;
@@ -376,18 +394,27 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             getball_task.player.max_rot_acceleration = 7 * slowfactor;
             getball_task.player.max_deceleration = 7 * slowfactor;
         }
-
+        
     }
     else { // 静态状态下，没有人干扰我
-        if (OppIsFarThanMe(pVision, _executor) && fabs(Utils::Normalize((ball.Pos() - me.Pos()).dir() - finalDir)) > Param::Math::PI / 4) {
+        
+        if (false && OppIsFarThanMe(pVision, _executor) && fabs(Utils::Normalize((ball.Pos() - me.Pos()).dir() - finalDir)) > Param::Math::PI / 2) {
             getball_task.player.pos = GenerateLargeAnglePoint(pVision, finalDir, false);
-            getball_task.player.angle = finalDir;
+            getball_task.player.angle = (ball.Pos() - me.Pos()).dir();;
+            getball_task.player.needdribble = 0;
             // 转身拿球
         }
         else {
             double ThisCaseFinalDir = (ball.Pos() - me.Pos()).dir();
             getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
             getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
+
+            /*
+            getball_task.player.max_rot_acceleration = 3.0 * slowfactor;
+            getball_task.player.max_deceleration = 3.0 * slowfactor;
+
+            */
+            
             if (fabs(me.Dir() - ThisCaseFinalDir) > Param::Math::PI * 215 / 180) {
                 getball_task.player.max_rot_acceleration = 16 * slowfactor;
                 getball_task.player.max_deceleration = 16 * slowfactor;
@@ -397,12 +424,12 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                 getball_task.player.max_deceleration = 12 * slowfactor;
             }
             else if (fabs(me.Dir() - ThisCaseFinalDir) < Param::Math::PI * 10 / 180) {
-                getball_task.player.max_rot_acceleration = 5 * slowfactor;
-                getball_task.player.max_deceleration = 5 * slowfactor;
+                getball_task.player.max_rot_acceleration = 6 * slowfactor;
+                getball_task.player.max_deceleration = 6 * slowfactor;
             }
+            
+            if (ball2meDist < 30)getball_task.player.needdribble = IS_DRIBBLE;
         }
-
-        if (ball2meDist < 30)getball_task.player.needdribble = IS_DRIBBLE;
     }
     // 调用底层控制
     CTRL_METHOD mode = task().player.specified_ctrl_method;
@@ -732,7 +759,7 @@ CGeoPoint CGetBallV5::GenerateLargeAnglePoint(const CVisionModule* pVision, doub
     if (BallStatus::Instance()->getBallPossession(true, robotNum) > 0.3) {
         getBallDist = (ball.Pos() - me.Pos()).mod();
     }
-
+    
     CGeoPoint target = ball.Pos() + Utils::Polar2Vector(getBallDist, theta_Dir);
     if (ball.Vel().mod() < 25) {
         CGeoLine JudgeLine1 = CGeoLine(ball.Pos(), finalDir);
