@@ -14,9 +14,9 @@ firstState = "advance",
 			return "advance";
 		end
 	end,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 2),
-	Hawk = task.support("Leader", 0),
+	Leader = task.stop(),
+	Assister = task.stop(),
+	Hawk = task.stop(),
 	match    = "[L][AH]"
 },
 

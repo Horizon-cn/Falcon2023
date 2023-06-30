@@ -1,4 +1,4 @@
-IS_TEST_MODE = false
+IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 USE_SWITCH = false
@@ -8,11 +8,11 @@ USE_AUTO_REFEREE = false
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "NormalPlayPureDefence8" --"Test_AdvanceV4"  --"NormalPlayPureDefence" --"Test_Run6" --"Test_play6" --"Test_Run"
+		return "Ref_StopV2_normal" --"Test_AdvanceV4"  --"NormalPlayPureDefence" --"Test_Run6" --"Test_play6" --"Test_Run"
 		-- Test_Run6 测testrun
 		-- Test_play6ForTest测三车进攻
 	else
-		return "Test_AdvanceV4" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "Ref_StopV2_normal" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -134,6 +134,8 @@ gRefPlayTable = {
 	"Ref/MiddleKick/Ref_MiddleKickV1",
 	"Ref/MiddleKick/Ref_MiddleKickV5",
 	"Ref/MiddleKick/Ref_MiddleKickV2",
+	"Ref/DirectMiddleKick/Ref_DirectMiddlePush_normal",
+	"Ref/IndirectMiddleKick/Ref_IndirectMiddlePush_normal_chip",
 
 	--后场进攻
 	"Ref/IndirectBackKick/Ref_IndirectBackPush",

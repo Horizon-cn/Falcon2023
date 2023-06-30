@@ -69,17 +69,21 @@ elseif OPPONENT_NAME == "NormalKick" then
     if ourDirectKick then
         if ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
             gCurrentPlay = "Ref_Stop4CornerKick"
-        elseif ball.refPosX() > 0 and math.abs(ball.refPosY()) < 220 then
+        elseif ball.refPosX() > 100 then
             gCurrentPlay = "Ref_Stop4FrontKick"
-        elseif ball.refPosX() < 0 then
+        elseif ball.refPosX()>-100 then
+            gCurrentPlay = "Ref_Stop4MiddleKick"
+        else
             gCurrentPlay = "Ref_Stop4BackKick"
         end
     elseif ourIndirectKick then
         if ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
             gCurrentPlay = "Ref_Stop4CornerKick"
-        elseif ball.refPosX() > 0 and math.abs(ball.refPosY()) < 220 then
+        elseif ball.refPosX() > 100 then
             gCurrentPlay = "Ref_Stop4FrontKick"
-        elseif ball.refPosX() < 0 then
+        elseif ball.refPosX()>-100 then
+            gCurrentPlay = "Ref_Stop4MiddleKick"
+        else
             gCurrentPlay = "Ref_Stop4BackKick"
         end
     elseif theirDirectKick then
