@@ -416,11 +416,15 @@ CPlayerTask* CGoalie2022::penaltyTask(const CVisionModule* pVision)
 	double random_step = (random_end - random_start) / double(random_num - 1);
 	double random_current = random_start - random_step;
 
+	double move_x = moveLine.point1().x();
+	if (!pVision->gameState().gameOn()) // 点球规则
+		move_x = -Param::Field::PITCH_LENGTH / 2;
+
 	vector<CGeoPoint> random_points(random_num);
 	generate(random_points.begin(), random_points.end(), //generate points between [begin,end]
 		[&]() {
 		random_current += random_step;
-		return CGeoPoint(-Param::Field::PITCH_LENGTH / 2, random_current * Param::Field::GOAL_WIDTH); });
+		return CGeoPoint(move_x, random_current * Param::Field::GOAL_WIDTH); });
 	if (goalie_debug)
 		for (auto& p : random_points)
 			GDebugEngine::Instance()->gui_debug_x(p, COLOR_GREEN);
@@ -428,7 +432,7 @@ CPlayerTask* CGoalie2022::penaltyTask(const CVisionModule* pVision)
 	vector<int> weight_vector;
 	weight_vector.reserve(random_num);
 	for (auto& p : random_points)
-		weight_vector.push_back(100000 / sqrt(defCenter.dist(p)) / std::log10(30 + p.dist(goalCenter)));
+		weight_vector.push_back(100000 / sqrt(defCenter.dist(p)) / std::log10(30 + p.dist(CGeoPoint(move_x,0))));
 	discrete_distribution<int> weight(weight_vector.begin(), weight_vector.end());
 	//固定间隔帧数进行随机生成
 	static int generate_index = weight(generator);
@@ -466,14 +470,7 @@ CPlayerTask* CGoalie2022::penaltyTask(const CVisionModule* pVision)
 	if (penalty_status == PENALTY_TRICK_START)
 		finalPos = trickPoint;
 
-	double dir;
-	const BallVisionT& ball = pVision->Ball();
-	//if (ball.Valid()) {
-	//	dir = CVector(ball.Pos() - me.Pos()).dir();
-	//} else {
-	//	dir = CVector(me.Pos() - goalCenter).dir();
-	//}
-	dir = 0;
+	double dir=0;
 
 	int flag = task().player.flag;
 	flag |= PlayerStatus::QUICKLY;
