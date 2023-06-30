@@ -141,26 +141,34 @@ void CGetBallV5::plan(const CVisionModule* pVision)
     int haveset = 0;
     if (DEBUG_ENGINE) {
         CVector self2ball = ball.Pos() - me.Pos();
-
+        CVector me2Opp = opp.Pos() - me.Pos();
         char have[100];
         char deltaBall[100];
         char deltaTheta[100];
         char velmsg[100];
+        char OppDist[100];
+        char OppDirDiff[100];
         //sprintf(getBallDistdebugmsg, "%f", getBallDist);
         sprintf(have, "%f", BallStatus::Instance()->getBallPossession(true, _executor));
         sprintf(deltaBall, "%f", self2ball.mod());
         sprintf(deltaTheta, "%f", Utils::Normalize(self2ball.dir() - me.Dir()) * 180 / Param::Math::PI);
         sprintf(velmsg, "%f", ball.Vel().mod());
+        sprintf(OppDist, "%f", me2Opp.mod());
+        sprintf(OppDirDiff, "%f", fabs(self2ball.dir() - me2Opp.dir()) * 180 / Param::Math::PI);
 
-        //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -350), getBallDistdebugmsg, COLOR_YELLOW);
+
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), have, COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), deltaTheta, COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -200), deltaBall, COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -150), velmsg, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -100), OppDist, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -50), OppDirDiff, COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -300), "IsMeHaveBall", COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -250), "Delta Theta", COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -200), "Delta Mod", COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -150), "Ball Vel", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -100), "Opp Dist", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -50), "Opp DirDiff", COLOR_YELLOW);
 
     }
     if (BallStatus::Instance()->getBallPossession(true, _executor) <= 0.3)
@@ -196,9 +204,10 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         }
         else { 
             //我没拿到球，我需要绕前去抢球
-            if (fabs((ball.Pos() - opp.Pos()).theta(ourGoal - ball.Pos())) < Param::Math::PI * 90 / 180) {
+            if (fabs((ball.Pos() - opp.Pos()).theta(ourGoal - ball.Pos())) < Param::Math::PI * 100 / 180) {
                 // 背身角度小于90度，拿球 绕到前面去抢球
-                if (fabs(Utils::Normalize((me.Dir() - (opp.Pos() - ball.Pos()).dir())) < Param::Math::PI * 22 / 180)) {
+
+                if (fabs(Utils::Normalize(((ball.Pos() - me.Pos()).dir() - (opp.Pos() - ball.Pos()).dir()))) < Param::Math::PI * 55 / 180) {
                 //if(TheMinDistBetweenTheOppAndTheLine(pVision, me.Pos(), ball.Pos()) > 1.5 * Param::Vehicle::V2::PLAYER_SIZE){
                     //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
                     // 如果我和他正对着，我就上前去吸
@@ -213,7 +222,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             }
             else {
                 // 背身角度大于100度，拿球 进行卡位
-                getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + newVehicleBuffer + Param::Field::BALL_SIZE + StopDist + GETBALL_BIAS, Utils::Normalize((ball.Pos() - opp.Pos()).dir()));
+                getball_task.player.pos = opp.Pos() + Utils::Polar2Vector(20, Utils::Normalize((ourGoal - opp.Pos()).dir()));
                 getball_task.player.angle = (ball.Pos() - me.Pos()).dir();
             }
         }
