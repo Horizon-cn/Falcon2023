@@ -375,11 +375,12 @@ namespace PlayerRole {
 		playerTask.player.angle = dir;
 		return TaskFactoryV2::Instance()->lightkick(playerTask);
 	}
-	CPlayerTask* makeItBreak(const int num, const bool needkick,  const bool isPenalty, const bool isSpin)
+	CPlayerTask* makeItBreak(const int num, const double dir, const bool needkick,  const bool isPenalty, const bool isSpin)
 	{	// needkick = 1 £∫ƒ√«ÚÕª∆∆£ªtarget£∫√ª”√¡À£ª
 		static TaskT playerTask;
 		playerTask.executor = num;
 		playerTask.player.needkick = needkick;
+		playerTask.player.rotdir = dir;
 		if (isPenalty)playerTask.player.flag = playerTask.player.flag | PlayerStatus::PENALTY_KICK;
 		if (isSpin)playerTask.player.flag = playerTask.player.flag | PlayerStatus::SPIN;
 

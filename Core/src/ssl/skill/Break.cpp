@@ -218,8 +218,10 @@ void CBreak::plan(const CVisionModule* pVision) {
 
     TaskT grabTask(task());
 
-
-    grabTask.player.angle = finalDir;
+    if (task().player.needkick)
+        grabTask.player.angle = finalDir;
+    else
+        grabTask.player.angle = task().player.rotdir;
 
 
     //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);

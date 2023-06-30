@@ -37,8 +37,8 @@ function normal()
 	end
 end
 
--- ´¿±Õ°üº¯Êý£¬Õâ¸öº¯ÊýÖ»ÊÇÓÃÔÚ¿ªÉäÃÅµÄÌõ¼þÖÐ
--- role1 Îª½ÓÇò³µ
+-- ï¿½ï¿½ï¿½Õ°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ï¿½Åµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+-- role1 Îªï¿½ï¿½ï¿½ï¿½
 function toPlayer(role1)
 	return function(role2)
 		local dist = player.toPlayerDist(role1, role2)

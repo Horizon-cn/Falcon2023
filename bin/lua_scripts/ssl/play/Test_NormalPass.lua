@@ -59,6 +59,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 2),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 
@@ -67,6 +68,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 2),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 
@@ -75,6 +77,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 5),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 
@@ -83,6 +86,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 3),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 
@@ -91,6 +95,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 2),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 
@@ -99,6 +104,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 0),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 
@@ -108,6 +114,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 3),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 
@@ -116,6 +123,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 2),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 ["MiddleMiddleBack"] = {
@@ -123,6 +131,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 2),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 ["RightMiddleBack"] = {
@@ -130,6 +139,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 0),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 
@@ -138,6 +148,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 2),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 ["MiddleBack"] = {
@@ -145,6 +156,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 2),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 ["RightBack"] = {
@@ -152,6 +164,7 @@ firstState = "LeftFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader", 0),
 	Hawk = task.protectBall(),
+	Goalie = task.goalieNew(),
     match = "[L][AH]"
 },
 name = "Test_NormalPass",

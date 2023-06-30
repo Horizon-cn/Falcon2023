@@ -59,6 +59,8 @@ private:
 	double OPP_HAS_BALL_DIST = 12;
 	int last_Dir;
 	int Oppfront;
+
+	CVector me2ball;// = ball.Pos() - me.Pos();
 };
 
 #endif //_GET_BALL_V4_H__

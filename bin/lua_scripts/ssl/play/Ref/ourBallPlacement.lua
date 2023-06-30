@@ -13,7 +13,7 @@
 -- 	gCurrentPlay = "Ref_OurBallPlaceV2"
 -- end
 
-
+print(vision:next_gameState():get())
 gCurrentPlay = "Ref_OurBallPlaceV2"
 	--gCurrentPlay = "Ref_BallPassandPlace"
 

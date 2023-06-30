@@ -194,6 +194,7 @@ private:
     int opp_ahead(const CVisionModule* pVision, const int vecNumber);
     int GenerateNextState(const CVisionModule* pVision, const int vecNumber);
     int CanWeUseChaseBecauseOfGetBallV3(const CVisionModule* pVision, const int vecNumber);
+    double generateBreakingDir(const CVisionModule* pVision, const int vecNumber);
 protected:
 
     CPlayerCommand* _directCommand;
