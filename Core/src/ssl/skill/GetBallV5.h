@@ -4,7 +4,7 @@
 
 /**********************************************************
 * Skill: GetBallV5
-* Description:ÄÃÇòµÚ5°æ£¬ÊÊÓÃÓÚÐ¡×ì°Íµ×ÅÌ
+* Description:ÄÃÇòµÚ5°æ£¬by TanYuhong 23.5
 ***********************************************************/
 
 class CGetBallV5 :public CStatedTask {
@@ -34,6 +34,11 @@ protected:
 	double TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint);
 
 	bool NotDanger(const CVisionModule* pVision, const int _executor);
+
+	bool OppIsFarThanMe(const CVisionModule* pVision, const int vecNumber);
+
+	int getTheirMostCloseAndFronttoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
+
 private:
 	enum {
 		BEGIN = 0,
@@ -53,6 +58,7 @@ private:
 	double GetBall_Precision_alpha = 3.0;
 	double OPP_HAS_BALL_DIST = 12;
 	int last_Dir;
+	int Oppfront;
 };
 
 #endif //_GET_BALL_V4_H__

@@ -155,8 +155,10 @@ void CBreak::plan(const CVisionModule* pVision) {
     bool shootGoal = task().player.needkick; // Utils::InTheirPenaltyArea(passTarget, 0); // 不在门里，是传球 // Utils::InTheirPenaltyArea(passTarget, 0);
 
     if (shootGoal) {
-        CGeoPoint TargetUp = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + 5);
-        CGeoPoint TargetDown = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 - 5);
+        float corrected_parameter = (fabs(me.VelY()) * 0.2 + 5 > 20) ? 20 : fabs(me.VelY()) * 0.2 + 5;
+        CGeoPoint TargetUp = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + 5 + corrected_parameter);
+        CGeoPoint TargetDown = CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2 - 5 - corrected_parameter);
+        passTarget = TargetUp;
         double thetaUp = (TargetUp - ball.Pos()).dir();
         double thetaDown = (TargetDown - ball.Pos()).dir();
         if (me.Dir() < thetaUp) passTarget = TargetDown;
@@ -288,9 +290,10 @@ void CBreak::plan(const CVisionModule* pVision) {
         GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000 * 10, finalDir), COLOR_RED);
         GDebugEngine::Instance()->gui_debug_line(me.Pos(), me.Pos() + Utils::Polar2Vector(1000 * 10, me.Dir()), COLOR_BLUE);
     }
+    bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("Canshoot:" + to_string(dirok)).c_str(), COLOR_YELLOW);
     auto vel_vertical_target = std::sin(me.Vel().dir() - me2target.dir()) * me.Vel().mod();
 
-    bool dirok = canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir());
 
     DribbleStatus::Instance()->setDribbleCommand(vecNumber, 3);
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -425), ("Canscore:" + to_string(dirok)).c_str(), COLOR_YELLOW);
@@ -395,9 +398,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         //float nearEnemyThreshold = task().player.ispass ? 2 : 15 * Param::Math::PI / 180.0;
         float nearEnemyThreshold = task().player.needkick ? 5.5 : 3.5;
 
-        /*cout << "test_seg.IsPointOnLineOnSegment(projection)__" << ' ' << test_seg.IsPointOnLineOnSegment(projection) << endl;
-        cout << "projection_dist__" << ' ' << projection_dist << endl;
-        cout << "to_projection_dist__" << ' ' << to_projection_dist << endl;*/
+
         //if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist/to_projection_dist) < (15*Param::Math::PI/180.0))||(to_projection_dist<15&&projection_dist<15))) {
         //if ((test_seg.IsPointOnLineOnSegment(projection) && ((projection_dist / to_projection_dist) < (nearEnemyThreshold))  )) {
         /*if ((test_seg.IsPointOnLineOnSegment(projection) && projection_dist< Param::Vehicle::V2::PLAYER_SIZE)) {*/
@@ -428,16 +429,17 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         int pos_num = 2 + 1 + 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
         int pos_size = pos_num * sizeof(float);
         int target_point_num = 15;
-        float target_step = (Param::Field::GOAL_WIDTH - 20) / (target_point_num - 1);
-        CGeoPoint target_point = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + 10);
+        float corrected_parameter = (fabs(me.VelY()) * 0.2 + 5 > 20) ? 20 : fabs(me.VelY()) * 0.2 + 5;
+        float target_step = (Param::Field::GOAL_WIDTH - 2 * corrected_parameter) / (target_point_num - 1);
+        CGeoPoint target_point = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + corrected_parameter);
         int target_size = 2 * target_point_num * sizeof(float);
         int results_size = 3 * target_point_num * sizeof(float);
 
 
-        float* pos_info = (float*)malloc(pos_size); // 用于存储计算后的结果
-        float* target_info = (float*)malloc(target_size);
-        float* results = (float*)malloc(results_size);
-        float* vis_points = (float*)malloc(3 * (ANGEL_MOD * 2 - 1) * (MOD_NUM - 1) * sizeof(float));
+            float* pos_info = (float*)malloc(pos_size); // 用于存储计算后的结果
+            float* target_info = (float*)malloc(target_size);
+            float* results = (float*)malloc(results_size);
+            float* vis_points = (float*)malloc(3 * (ANGEL_MOD * 2 - 1) * (MOD_NUM - 1) * sizeof(float));
 
         if (pos_info == nullptr || target_info == nullptr || results == nullptr) {
             return test_point;
@@ -561,7 +563,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         if (best_point == CGeoPoint(0, 0) || best_point == me.Pos())
             return best_point = me.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER, Utils::Normalize(me.Dir()));
 
-
+        /*
         if (abs(best_point.y()) > Param::Field::PENALTY_AREA_WIDTH / 2 + 30 || abs(best_point.x()) < (Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30)) {
             if (abs(best_point.y()) > Param::Field::PENALTY_AREA_WIDTH / 2 + 30)
                 best_point.setY((Param::Field::PENALTY_AREA_WIDTH / 2 + 30));
@@ -570,7 +572,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         }
         if ((best_point - dribblePoint).mod() > DRIBBLE_DIST) {  // dribblePoint是中心点还是当前点？？？？
             best_point = makeInCircle(best_point, dribblePoint, DRIBBLE_DIST);
-        }
+        }*/
 
         GDebugEngine::Instance()->gui_debug_x(best_point, COLOR_ORANGE);
         return best_point;
@@ -593,9 +595,9 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         }
         int x_min = max((int)(me.X() - DRIBBLE_DIST) + 1, -(int)(Param::Field::PITCH_LENGTH / 2)), x_max = min((int)(me.X() + DRIBBLE_DIST) - 1, (int)(Param::Field::PITCH_LENGTH / 2));
         int y_min = max((int)(me.Y() - DRIBBLE_DIST) + 1, -(int)(Param::Field::PITCH_WIDTH / 2)), y_max = min((int)(me.Y() + DRIBBLE_DIST) - 1, (int)(Param::Field::PITCH_WIDTH / 2));
-        double dist_score_dribble, to_goal_score_dribble, final_score = 10000000, total_score;
-        double para_dist, para_goal;
-        if (dist >= 80 || pVision->TheirPlayer(num).X() < me.X())
+        double dist_score_dribble, to_goal_score_dribble, final_score = 10000000, y_score, total_score;
+        double para_dist, para_goal, para_y = 0.4;
+        if (dist >= 80 || pVision->TheirPlayer(num).X() < me.X() || me.Pos().dist(dribblePoint) > DRIBBLE_DIST - 20)
             para_dist = -0.2, para_goal = 1.2;
         else
             para_dist = -1.5, para_goal = 0.3;
@@ -605,16 +607,18 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             {
                 CGeoPoint now_point = CGeoPoint(x_test, y_test);
                 dist_score_dribble = 0;
+                y_score = 0;
                 for (int player_num = 0; player_num < Param::Field::MAX_PLAYER; player_num++) {
                     if (pVision->TheirPlayer(player_num).Valid()) {
                         if (pVision->TheirPlayer(player_num).Pos().dist(now_point) < 160) {
-                            dist_score_dribble = dist_score_dribble + CVector(pVision->TheirPlayer(player_num).Pos() - now_point).mod();
+                            dist_score_dribble = max(dist_score_dribble, CVector(pVision->TheirPlayer(player_num).Pos() - now_point).mod());
+                            y_score = max(fabs(me.Y() - pVision->TheirPlayer(player_num).Y()), y_score);
                         }
                     }
                 }
                 CGeoPoint goal_point = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
                 to_goal_score_dribble = CVector(now_point - goal_point).mod();
-                total_score = para_dist * dist_score_dribble + para_goal * to_goal_score_dribble;
+                total_score = para_dist * dist_score_dribble + para_goal * to_goal_score_dribble + para_y * y_score;
                 if (final_score > total_score)
                 {
                     best_point = now_point;
@@ -660,15 +664,15 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
 
     bool flag = true;
     double x1 = me.X(), y1 = me.Y(), theta = dir;
+    float corrected_parameter = fabs(me.VelY()) * 0.05;
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("theta:" + to_string(theta)).c_str(), COLOR_YELLOW);
     if ((theta >= -Param::Math::PI && theta <= -Param::Math::PI / 2) || ((theta <= Param::Math::PI && theta >= Param::Math::PI / 2))) {
         flag = false;
-        return flag;
     }
     if (Param::Field::MAX_PLAYER == 0)
     {
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
-        if (fabs(projection) > (Param::Field::GOAL_WIDTH - 10) / 2) {
+        if (fabs(projection) + 2 + corrected_parameter > (Param::Field::GOAL_WIDTH - 10) / 2) {
             flag = false;
         }
     }
@@ -676,10 +680,22 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         if (!pVision->TheirPlayer(i).Valid()) continue;
         auto enemy = pVision->TheirPlayer(i);
         double x = enemy.X(), y = enemy.Y();
-        double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
+        if (x < me.X()) continue;
+        CGeoLine my_direction(me.Pos(), theta);
+        CGeoPoint projection_point = my_direction.projection(enemy.Pos());
+        //double r = fabs(y - y1 - tan(theta) * x + tan(theta) * x1) / sqrt(1 + tan(theta) * tan(theta));
+        double r = projection_point.dist(enemy.Pos());
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
-
-        if (r < radius || fabs(projection) + 5 >(Param::Field::GOAL_WIDTH - 10) / 2) {
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -500), ("r:" + to_string(r)).c_str(), COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -475), ("radius:" + to_string(radius)).c_str(), COLOR_YELLOW);
+        //changed 6.29
+        if (pVision->TheirPlayer(i).Vel().mod() < 50) {
+            if (r < radius - 4 || fabs(projection) + 2 + corrected_parameter>(Param::Field::GOAL_WIDTH - 10) / 2) {
+                flag = false;
+                break;
+            }
+        }
+        else if (r < radius || fabs(projection) + 2 + corrected_parameter>(Param::Field::GOAL_WIDTH - 10) / 2) {
             flag = false;
             break;
         }

@@ -26,7 +26,7 @@ gSwitchNum = {
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
 	["Kicker"]   = {14},
-	["Goalie"]   = {0},
+	["Goalie"]   = {11},
 	["Tier"]	 = {13},
 	["Receiver"] = {12}
 }

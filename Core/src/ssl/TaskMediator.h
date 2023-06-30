@@ -280,7 +280,6 @@ public:
     int getNextAdvancer() {
         if (BallStatus::Instance()->IsBallKickedOut(_advancer.num)) {
             nextAdvancer = nextAdvancer_store;
-            std::cout << nextAdvancer << std::endl;
         }
         return nextAdvancer;
     }
