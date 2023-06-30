@@ -33,7 +33,7 @@ firstState = "start",
     Crosser  = task.defendHead(),
     Goalie   = task.goalieNew(),
   --match    = "[D][B][A][C][L][S][M]"
-  match    = "[A][L][S][M]"
+  match    = "[A][S][M][L]"
 },
 
 name = "Ref_Stop4FrontKick",

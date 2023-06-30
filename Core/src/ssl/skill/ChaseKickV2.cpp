@@ -265,8 +265,6 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 	bool isReached;	//车是否赶到球的左边或者右边
 	bool notReached;
 	int  isLeft = -1; //需要赶到的方向
-	//cout<<ballVelDir<<endl;
-	//cout<<isLeft<<endl;
 	if (sin(ballVelDir)*Param::Field::PITCH_LENGTH / 2 < ball.Pos().x()*sin(ballVelDir) - ball.Pos().y()*cos(ballVelDir)){
 		isLeft = 1;
 	}
@@ -537,7 +535,6 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 		//speedUpDistanceY应该收敛的，随车球y值的差值越来越小，影响拉开角度距离（球车横向距离）的最大因素；
 		//speedUpDistanceX则影响球车纵向距离，和球速方向相关，大角度时应为负值。
 		//speedUpVel设置为球速方便后面跟球，
-		//cout<<"speed Up"<<endl;
 		if (testOn){
 			GDebugEngine::Instance()->gui_debug_msg(real_predict_ballPos, "SPEED_UP");
 			GDebugEngine::Instance()->gui_debug_x(real_predict_ballPos, COLOR_CYAN);
