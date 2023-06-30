@@ -57,15 +57,18 @@ void CDefenceInfoNew::updateBallChaserList(const CVisionModule* pVision)
 	_lastChaserPotientialList = _chaserPotientialList;
 	_chaserPotientialList.clear();
 	//加权计算追球潜力，越小越容易拿球
-	for (int num = 0; num < Param::Field::MAX_PLAYER; num++)
-		_chaserPotientialList.push_back(ballChaserAttributeSet::Instance()->evaluate(pVision, num));
+	if (pVision->Ball().Valid()) {
+		for (int num = 0; num < Param::Field::MAX_PLAYER; num++)
+			_chaserPotientialList.push_back(ballChaserAttributeSet::Instance()->evaluate(pVision, num));
+	} else {
+		_chaserPotientialList = _lastChaserPotientialList;
+	}
 	//持球者直接覆盖计算结果为最优
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 		if (BallStatus::Instance()->getBallPossession(false, i) > 0.5)
 			_chaserPotientialList[i] = 0;
 	//门将不应太容易成为最优
-	//_chaserPotientialList[pVision->TheirGoalie()] *= 1.5;
-	//_chaserPotientialList[pVision->TheirGoalie()] += 0.2;
+	_chaserPotientialList[pVision->TheirGoalie()] *= 1.5;
 	//与上一帧加权
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 		_chaserPotientialList[i] = _chaserPotientialList[i] * 0.75 + _lastChaserPotientialList[i] * 0.25;
@@ -85,8 +88,12 @@ void CDefenceInfoNew::updateBallReceiverList(const CVisionModule* pVision)
 	_lastReceiverPotientialList = _receiverPotientialList;
 	_receiverPotientialList.clear();
 	//加权计算接球潜力，越小越容易作为接球者被传球
-	for (int num = 0; num < Param::Field::MAX_PLAYER; num++)
-		_receiverPotientialList.push_back(ballReceiverAttributeSet::Instance()->evaluate(pVision, num, false));
+	if (pVision->Ball().Valid()) {
+		for (int num = 0; num < Param::Field::MAX_PLAYER; num++)
+			_receiverPotientialList.push_back(ballReceiverAttributeSet::Instance()->evaluate(pVision, num, false));
+	} else {
+		_receiverPotientialList = _lastReceiverPotientialList;
+	}
 	//ballChaser不能是Receiver
 	_receiverPotientialList[_ballChaserList[0]] = 10000;
 	//门将不应太容易成为最优
@@ -136,7 +143,7 @@ void CDefenceInfoNew::checkProtect(const CVisionModule* pVision)
 			{
 				_kicker -= Param::Field::MAX_PLAYER;
 				matchProtecter(pVision);
-				GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(150, 200), ("match:" + to_string(_protecter)).c_str());
+				//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(150, 200), ("match:" + to_string(_protecter)).c_str());
 				if (_protecter != -1)
 				{
 					isNeedProtect = true;
@@ -250,7 +257,6 @@ void CDefenceInfoNew::updateSteady()
 	_ballReceiverSteadyList = _ballReceiverList;
 
 	//目前使用接口的地方不判断是否存在，故需要保底，而已保证steady不为空，故令其等于steady
-	//能不能直接等于steady（旧的？）想想
 	if (_ballChaserList.empty())
 		_ballChaserList = _ballChaserSteadyList;
 	if (_ballReceiverList.empty())
@@ -278,7 +284,7 @@ void CDefenceInfoNew::updateSteady()
 		for (int i = 0; i < _lastMarkerAmount; i++)
 			if (toMarkPotientialList[i] > 1.3 * _receiverPotientialList[_ballReceiverList[i]])
 			{
-				_ballReceiverChanged = true; //qDebug() << "big:" << toMarkPotientialList[i] << "small:" << _receiverPotientialList[_ballReceiverList[i]];
+				_ballReceiverChanged = true;
 			}
 	}
 	if (_ballReceiverChanged)
