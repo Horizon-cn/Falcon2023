@@ -97,8 +97,8 @@ CGoalie2022::Tevaluate CGoalie2022::evaluate(const CVisionModule* pVision)
 	const PlayerVisionT& enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	const BallVisionT& ball = pVision->Ball();
 
-	if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") {
-		DEBUG_EVALUATE("evaluate: game stop");
+	if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop" || vision->gameState().ballPlacement()) {
+		DEBUG_EVALUATE("evaluate: stop");
 		return NORMAL;
 	} else if (!ball.Valid()) {
 		DEBUG_EVALUATE("evaluate: invalid ball");
