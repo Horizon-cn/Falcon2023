@@ -1,7 +1,8 @@
 function ReceivePass(task)
 	local mdir
 	local mflag = task.flag or 0
-
+	local mmatch_p = task.match_p
+	
 	execute = function(runner)
 		if type(task.dir) == "function" then
 			mdir = task.dir(runner)
@@ -12,7 +13,14 @@ function ReceivePass(task)
 	end
 
 	matchPos = function()
-		return pos.playerBest()
+		if mmatch_p then
+			if type(mmatch_p) == "function" then
+				mmatch_p= mmatch_p()
+			end
+			return mmatch_p
+		else
+			return pos.playerBest()
+		end
 	end
 
 	return execute, matchPos

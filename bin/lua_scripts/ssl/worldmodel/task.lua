@@ -143,7 +143,7 @@ function chipPass(p, c, f, anti)
 		idir = ball.toPlayerHeadDir(p)
 	elseif type(p) == "function" then
 		if f == nil or f == true then
-			idir = p
+			idir = player.toPointDir(p)
 		elseif anti == false then 
 			idir = function (role)
 				return (p() - player.pos(role)):dir()
@@ -420,8 +420,8 @@ function dribbleTurnShootV2(d,precision,mode,power)
 	return {mexe, mpos}
 end
 
-function receive(p)
-	local idir
+function receive(p,match_p)
+	local idir,imatch_p
 	if type(p) == "string" then
 		idir = player.toPlayerHeadDir(p)
 	elseif type(p) == "function" then
@@ -430,7 +430,14 @@ function receive(p)
 		idir = player.toPointDir(p)
 	end
 
-	local mexe, mpos = ReceivePass{dir = idir}
+	-- if type(match_p) == "function" then
+	-- 	imatch_p = match_p()
+	-- else
+	-- 	imatch_p = match_p
+	-- end
+	imatch_p=match_p
+
+	local mexe, mpos = ReceivePass{dir = idir,match_p=imatch_p}
 	return {mexe, mpos}
 end
 
@@ -1089,6 +1096,10 @@ function markingFront(p)
 	return {mexe, mpos}
 end
 
+function markingFrontAvoidBall(p,f)
+	local mexe, mpos = Marking{pri = p, front = true, flag=bit:_or(flag.allow_dss,flag.dodge_ball)}
+	return {mexe, mpos}
+end
 -- function markingFront(p)
 -- 	return marking(p)
 -- end
@@ -1167,7 +1178,7 @@ end
 -- f为传入的flag
 function staticGetBall(p, anti, f)
 	-- local mexe, mpos = StaticGetBall{ pos = pos.backBall(p), dir = dir.backBall(p)}
-	local mexe, mpos = StaticGetBall{ pos = ball.backPos(p, _, _, anti), dir = ball.backDir(p, anti), flag = f}
+	local mexe, mpos = StaticGetBall{ dir = ball.backDir(p, anti), flag = f}
 	return {mexe, mpos}
 end
 

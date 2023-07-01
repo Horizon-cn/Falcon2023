@@ -1,11 +1,17 @@
 gOppoConfig = {
   ----------------------play---------------------------------------------------------------
 
-	CornerKick  = {"Ref_CornerPush_normal"},--80 --"Ref_CornerPush"
-	
-	FrontKick   = {"Ref_FrontPush_normal"},--610 --"Ref_FrontPush"
+	IndirectCornerKick  = {"Ref_IndirectCornerPush_normal_chip"},--80 --"Ref_CornerPush"
 
-	BackKick    = {"Ref_BackPush_normal"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
+	DirectCornerKick  = {"Ref_DirectCornerPush_normal"},--80 --"Ref_CornerPush"
+
+	IndirectFrontKick   = {"Ref_IndirectFrontPush_normal_chip"},--610 --"Ref_FrontPush"--对面
+
+	DirectFrontKick   = {"Ref_DirectFrontPush_normal"},--610 --"Ref_FrontPush"--对面
+
+	IndirectBackKick    = {"Ref_IndirectBackKick"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
+
+	DirectBackKick    = {"Ref_DirectBackKick"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
 -------------------------------Def---------------------------------------------------
 
 	CornerDef   = "Ref_CornerDef_normal", -- 可能要用v4，防头球

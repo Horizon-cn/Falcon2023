@@ -404,7 +404,7 @@ void CVisionModule::UpdateRefereeMsg()
 		if(_gameState.theirIndirectKick()){
 			_refereeMsg = "theirIndirectKick";
 		} else if (_gameState.theirDirectKick()){
-			_refereeMsg = "theirIndirectKick";
+			_refereeMsg = "theirDirectKick";
 		} else if (_gameState.theirKickoff()){
 			_refereeMsg = "theirKickOff";
 		} else if (_gameState.theirPenaltyKick()){
@@ -428,7 +428,7 @@ void CVisionModule::UpdateRefereeMsg()
 		} else if(_gameState.ourIndirectKick()){
 			_refereeMsg = "ourIndirectKick";
 		} else if(_gameState.ourDirectKick()){
-			_refereeMsg = "ourIndirectKick";
+			_refereeMsg = "ourDirectKick";
 		}
 	} else if (_gameState.ourBallPlacement()) {
 			_refereeMsg = "ourBallPlacement";

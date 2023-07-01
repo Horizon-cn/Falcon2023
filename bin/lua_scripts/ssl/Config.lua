@@ -2,17 +2,17 @@ IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 USE_SWITCH = false
-OPPONENT_NAME = "other"--"Avoidfoul" PureDefence6 PureDefence8 NormalKick
+OPPONENT_NAME = "PureDefence8"--"Avoidfoul" PureDefence6 PureDefence8 NormalKick
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_NormalPass" --"Test_AdvanceV4"  --"NormalPlayPureDefence" --"Test_Run6" --"Test_play6" --"Test_Run"
+		return "NormalPlayPureDefence8" --"Test_AdvanceV4"  --"NormalPlayPureDefence" --"Test_Run6" --"Test_play6" --"Test_Run"
 		-- Test_Run6 测testrun
 		-- Test_play6ForTest测三车进攻
 	else
-		return "Test_NormalPass" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "Test_Goalie" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
 end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
 gNormalPlay = "NormalPlayDefend"
@@ -35,6 +35,12 @@ gRoleFixNum = {
 -- 在考虑智能性时用table来进行配置，用于OurIndirectKick
 gOurIndirectTable = {
 	-- 在OurIndirectKick控制脚本中可以进行改变的值
+	-- 上一次定位球的Cycle
+	lastRefCycle = 0
+}
+
+gOurDirectTable = {
+	-- 在OurDirectKick控制脚本中可以进行改变的值
 	-- 上一次定位球的Cycle
 	lastRefCycle = 0
 }
@@ -111,27 +117,17 @@ gRefPlayTable = {
 
 
 	--角球进攻
-	"Ref/CornerKick/Ref_CornerKickV1",
-	"Ref/CornerKick/Ref_CornerKickV6",
-	"Ref/CornerKick/Ref_CornerKickV8",
-	"Ref/CornerKick/Ref_CornerKickV80",
-	"Ref/CornerKick/Ref_CornerKickV30",
-	"Ref/CornerKick/Ref_CornerKickV201",
-	"Ref/CornerKick/Ref_CornerKickV202",
-	"Ref/CornerKick/Ref_CornerKickV300",
-	"Ref/CornerKick/Ref_CornerKickV2",
-	"Ref/CornerKick/Ref_CornerPush",
-	"Ref/CornerKick/Ref_CornerPush8",
-	"Ref/CornerKick/Ref_CornerPush_normal",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush8",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal_chip",
+	"Ref/DirectCornerKick/Ref_DirectCornerPush_normal",
 	--前场进攻
-	"Ref/FrontKick/Ref_FrontKickV23",
-	"Ref/FrontKick/Ref_FrontKickV41",
-	"Ref/FrontKick/Ref_FrontKickV2",
-	"Ref/FrontKick/Ref_FrontKickV61",
-	"Ref/FrontKick/Ref_FrontKickV610",
-	"Ref/FrontKick/Ref_FrontPush",
-	"Ref/FrontKick/Ref_FrontPush8",
-	"Ref/FrontKick/Ref_FrontPush_normal",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush8",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush_normal",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush_normal_chip",
+	"Ref/DirectFrontKick/Ref_DirectFrontPush_normal",
 
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKickV1",
@@ -139,15 +135,16 @@ gRefPlayTable = {
 	"Ref/MiddleKick/Ref_MiddleKickV2",
 
 	--后场进攻
-	"Ref/BackKick/Ref_BackKickV1",
-	"Ref/BackKick/Ref_ImmortalKickV1",
-	"Ref/BackKick/Ref_BackKickV2",
-	"Ref/BackKick/Ref_ImmortalKickV61",
-	"Ref/BackKick/Ref_ImmortalKickV610",
-	"Ref/BackKick/Ref_BackPush",
-	"Ref/BackKick/Ref_BackPush8",
-	"Ref/BackKick/Ref_BackPush_normal",
-	
+	"Ref/IndirectBackKick/Ref_IndirectBackPush",
+	"Ref/IndirectBackKick/Ref_IndirectBackPush8",
+	"Ref/IndirectBackKick/Ref_IndirectBackPush_normal",
+	"Ref/IndirectBackKick/Ref_IndirectBackPush_normal_chip",
+	"Ref/DirectBackKick/Ref_DirectBackPush_normal",
+	"Ref/BackKick/Ref_BackKickV3",
+	"Ref/IndirectBackKick/Ref_IndirectBackKick",
+	"Ref/DirectBackKick/DirectBackKick",
+	"Ref/DirectBackKick/Ref_DirectBackKick",
+
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
 	"Ref/KickOffDef/Ref_KickOffDefV23",
