@@ -43,7 +43,12 @@ void Clightkick::plan(const CVisionModule* pVision)
             lightkick.player.angle = finalDir;
         else 
             lightkick.player.angle = (ball.Pos() - me.Pos()).dir();
-        KickStatus::Instance()->setKick(runner, 120);
+
+        if(lightkick.player.kickpower != 0)
+            KickStatus::Instance()->setKick(runner, 120);
+        else
+            KickStatus::Instance()->setKick(runner, lightkick.player.kickpower);
+        
         lightkick.player.needdribble = 0;
         setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(lightkick));
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(320, -350), "pushkick", COLOR_WHITE);

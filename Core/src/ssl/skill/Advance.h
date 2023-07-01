@@ -163,7 +163,6 @@ private:
     bool checkTheyCanShoot(const CVisionModule* pVision, int vecNumber);
 
     bool WeNeedBlockTheBall(const CVisionModule* pVision, const int vecNumber);
-    bool OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber);
 
     double generateOppIsNearThanMeDir(const CVisionModule* pVision, const int vecNumber);
     double generateOppIsFarThanMeDir(const CVisionModule* pVision, const int vecNumber);

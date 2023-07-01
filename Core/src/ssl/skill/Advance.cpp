@@ -453,7 +453,10 @@ void CAdvance::plan(const CVisionModule* pVision)
 		
 		PassPoint = generateNormalPushPoint(pVision, _executor);// : PassPoint;
 		KickorPassDir = (PassPoint - me.Pos()).dir();
-		setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
+		if(OppIsFarThanMe(pVision, _executor))
+			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
+		else
+			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir, 200.0));
 		break;
 
 	case CHASEKICK:
@@ -991,19 +994,6 @@ double CAdvance::generateGetballDir(const CVisionModule* pVision, const int vecN
 int CAdvance::GenerateStateOfFoulTrouble(const CVisionModule* pVision, const int vecNumber) {
 	if (tendToShoot(pVision, vecNumber)) return KICK;
 	else return KICK;
-}
-
-
-bool CAdvance::OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber) {
-	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-	const BallVisionT& ball = pVision->Ball();
-	CVector me2Ball = ball.Pos() - me.Pos();
-	CVector Ball2Opp = opp.Pos() - ball.Pos();
-
-	const double threshold = 70;
-	if (checkOppHasBall(pVision))return true;
-	return false;
 }
 
 bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber) { //ÊÇ·ñÌ«½üÁË
