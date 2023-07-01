@@ -317,6 +317,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 	***********************************************************/
 	bool isChipKick = 0;
 	double kickPower = 0;
+
+	double ThePower = 0;
 	if (_state != KICK && _state != BREAKSHOOT) {
 		NowIsShoot = 0;
 	}
@@ -415,13 +417,14 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (IHaveSupport) {
 			PassPoint = SupportPoint[TheBestSupportNumber];
 			KickorPassDir = (PassPoint - me.Pos()).dir();
+			double ThePower = GetCPassPower(me.Pos(), PassPoint);
 		}
 		else {
 			PassPoint = theirCenter;
 			KickorPassDir = (PassPoint - me.Pos()).dir();
+			double ThePower = GetCPassPower(me.Pos(), PassPoint) * 0.8;
 		}
 		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
-			double ThePower = GetCPassPower(me.Pos(), PassPoint);
 			setSubTask(PlayerRole::makeItJustKick(_executor, 1, ThePower));
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "JUSTCHIP isDirOK", COLOR_ORANGE);
 			TaskMediator::Instance()->setAdvancerPassTo(PassPoint, NumberOfSupport);

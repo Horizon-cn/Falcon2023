@@ -20,7 +20,7 @@ namespace {
 	// ????????????
 	CGeoPoint LEFTBACK_CRITICAL_POINT = CGeoPoint(-(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE), -Param::Field::PITCH_WIDTH / 2);
 	CGeoPoint RIGHTBACK_CRITICAL_POINT = CGeoPoint(-(Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - Param::Vehicle::V2::PLAYER_SIZE), Param::Field::PITCH_WIDTH / 2);
-	bool DEBUG_GUARD_POS = true;
+	bool DEBUG_GUARD_POS = false;
 	const double VALID_THRESHOLD = 500;
 
 	bool CheckBackPos = true;

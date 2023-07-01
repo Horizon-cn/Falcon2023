@@ -44,7 +44,7 @@ void Clightkick::plan(const CVisionModule* pVision)
         else 
             lightkick.player.angle = (ball.Pos() - me.Pos()).dir();
 
-        if(lightkick.player.kickpower != 0)
+        if(lightkick.player.kickpower == 0)
             KickStatus::Instance()->setKick(runner, 120);
         else
             KickStatus::Instance()->setKick(runner, lightkick.player.kickpower);

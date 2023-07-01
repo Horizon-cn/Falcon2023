@@ -257,14 +257,14 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         
         if (fabs(me.Dir() - finalDir) > Param::Math::PI * 90 / 180) {
             getball_task.player.max_acceleration = getball_task.player.max_deceleration = 600;
-            getball_task.player.max_rot_acceleration = 9 * slowfactor;
-            getball_task.player.max_deceleration = 9 * slowfactor;
+            getball_task.player.max_rot_acceleration = 20 * slowfactor;
+            getball_task.player.max_deceleration = 20 * slowfactor;
         }
         // 误差90+，高速转动
         else if (fabs(me.Dir() - finalDir) < Param::Math::PI * 20 / 180) {
             getball_task.player.max_acceleration = getball_task.player.max_deceleration = 300;
-            getball_task.player.max_rot_acceleration = 7 * slowfactor;
-            getball_task.player.max_deceleration = 7 * slowfactor;
+            getball_task.player.max_rot_acceleration = 15 * slowfactor;
+            getball_task.player.max_deceleration = 15 * slowfactor;
         }
         
         // 误差小于20，不需要高速转动，降低速度
@@ -400,20 +400,20 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         */
         
         if (fabs(Utils::Normalize(me.Dir() - ThisCaseFinalDir)) > Param::Math::PI * 215 / 180) {
+            getball_task.player.max_rot_acceleration = 20 * slowfactor;
+            getball_task.player.max_deceleration = 20 * slowfactor;
+        }
+        else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) > Param::Math::PI * 135 / 180) {
             getball_task.player.max_rot_acceleration = 16 * slowfactor;
             getball_task.player.max_deceleration = 16 * slowfactor;
         }
-        else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) > Param::Math::PI * 135 / 180) {
-            getball_task.player.max_rot_acceleration = 12 * slowfactor;
-            getball_task.player.max_deceleration = 12 * slowfactor;
-        }
         else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) > Param::Math::PI * 20 / 180 && ball2meDist < 12) {
-            getball_task.player.max_rot_acceleration = 10 * slowfactor;
-            getball_task.player.max_deceleration = 10 * slowfactor;
+            getball_task.player.max_rot_acceleration = 16 * slowfactor;
+            getball_task.player.max_deceleration = 16 * slowfactor;
         }
         else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) < Param::Math::PI * 20 / 180) {
-            getball_task.player.max_rot_acceleration = 7 * slowfactor;
-            getball_task.player.max_deceleration = 7 * slowfactor;
+            getball_task.player.max_rot_acceleration = 16 * slowfactor;
+            getball_task.player.max_deceleration = 16 * slowfactor;
         }
         
     }
@@ -441,12 +441,12 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                 getball_task.player.max_deceleration = 16 * slowfactor;
             }
             else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) > Param::Math::PI * 135 / 180) {
-                getball_task.player.max_rot_acceleration = 12 * slowfactor;
-                getball_task.player.max_deceleration = 12 * slowfactor;
+                getball_task.player.max_rot_acceleration = 16 * slowfactor;
+                getball_task.player.max_deceleration = 16 * slowfactor;
             }
             else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) < Param::Math::PI * 10 / 180) {
-                getball_task.player.max_rot_acceleration = 6 * slowfactor;
-                getball_task.player.max_deceleration = 6 * slowfactor;
+                getball_task.player.max_rot_acceleration = 16 * slowfactor;
+                getball_task.player.max_deceleration = 16 * slowfactor;
             }
             
             if (ball2meDist < 30)getball_task.player.needdribble = IS_DRIBBLE;
