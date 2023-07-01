@@ -8,15 +8,16 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-  Leader = task.rightBack(),
-  Middle = task.leftBack(),
-  Defender = task.defendKick(),
-  Special = task.defendHead(),
-  Assister = task.marking("First"),
-  Breaker =task.marking("Second"),
-  Crosser = task.marking("Third"),
-  Goalie = task.goalieNew(),
-  match    = "[LM][DS][ABC]"
+     --MultiDefend_8
+    Leader   = task.defendKick(),
+    Assister = task.defendHead(),
+    Special  = task.markingFront("First"),
+    Breaker  = task.markingFront("Second"),
+    Crosser  = task.multiBack(3,1),
+    Middle   = task.multiBack(3,2),
+    Defender = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[CM][L][D][S][A][B]"
 },
   name = "Ref_BackDef_normal",
   applicable = {

@@ -82,32 +82,20 @@ elseif OPPONENT_NAME == "NormalKick" then
         elseif ball.refPosX() < 0 then
             gCurrentPlay = "Ref_Stop4BackKick"
         end
-    elseif theirDirectKick then
-        if ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
-            gCurrentPlay = "Ref_Stop4CornerDef"
-        elseif ball.refPosX() > 0 and math.abs(ball.refPosY()) < 220 then
-            gCurrentPlay = "Ref_FrontDef_normal"
-        elseif ball.refPosX() < 0 then
-            gCurrentPlay = "Ref_BackDef_normal"
-        elseif ball.refPosX() < -(param.pitchLength/2 - param.penaltyDepth - 100) and -(param.pitchLength/2 - param.penaltyDepth)<= ball.refPosX() and math.abs(ball.refPosY()) < param.penaltyWidth/2 + 100 then
-            gCurrentPlay = "Ref_StopV3_normal"
+    elseif theirDirectKick or theirIndirectKick then
+        if ball.refPosX() < -200 and (ball.refPosY() < -220 or ball.refPosY() > 220 ) then
+            gCurrentPlay = "Ref_Stop4CornerDef_play8"
+        elseif ball.refPosX() < -200 and (ball.refPosY() > -220 and ball.refPosY() < 220 ) then
+            gCurrentPlay = "Ref_Stop4BackDef_play8" 
+        elseif ball.refPosX() >-200 and ball.refPosX() < 200 then
+            gCurrentPlay = "Ref_Stop4MiddleDef_play8"
+        elseif ball.refPosX() > 200 then
+            gCurrentPlay = "Ref_Stop4FrontDef_play8" --Ref_StopV3_normal
         else
-            gCurrentPlay = "Ref_StopV2_normal"
+            gCurrentPlay = "Ref_Stop4BackDef_play8" --改一改，改成防守
         end
-    elseif theirIndirectKick then
-        if ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
-            gCurrentPlay = "Ref_Stop4CornerDef"
-        elseif ball.refPosX() > 0 and math.abs(ball.refPosY()) < 220 then
-            gCurrentPlay = "Ref_FrontDef_normal"
-        elseif ball.refPosX() < 0 then
-            gCurrentPlay = "Ref_BackDef_normal"
-        elseif ball.refPosX() < -(param.pitchLength/2 - param.penaltyDepth - 100) and -(param.pitchLength/2 - param.penaltyDepth)<= ball.refPosX() and math.abs(ball.refPosY()) < param.penaltyWidth/2 + 100 then
-            gCurrentPlay = "Ref_StopV3_normal"
-        else
-            gCurrentPlay = "Ref_StopV2_normal"
-        end
-    else
-        gCurrentPlay = "Ref_StopV2_normal"
+    else --考慮Kick Off Stop4KickOff
+        gCurrentPlay = "Ref_StopV2_normal" --不用改
     end
 else
     if ball.refPosX() < -360 and math.abs(ball.refPosY()) > 200 then
@@ -120,5 +108,6 @@ else
         gCurrentPlay = "Ref_StopV2V8"
     end
 end
+
 -- 避免犯规：过于接近球
 -- gCurrentPlay = "Ref_StopBack"
