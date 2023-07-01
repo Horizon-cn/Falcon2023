@@ -2,7 +2,7 @@ IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 USE_SWITCH = false
-OPPONENT_NAME = "PureDefence8"--"Avoidfoul" PureDefence6 PureDefence8 NormalKick
+OPPONENT_NAME = "NormalKick"--"Avoidfoul" PureDefence6 PureDefence8 NormalKick
 USE_AUTO_REFEREE = false
 
 gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
@@ -122,6 +122,7 @@ gRefPlayTable = {
 	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal",
 	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal_chip",
 	"Ref/DirectCornerKick/Ref_DirectCornerPush_normal",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerKick",
 	--前场进攻
 	"Ref/IndirectFrontKick/Ref_IndirectFrontPush",
 	"Ref/IndirectFrontKick/Ref_IndirectFrontPush8",
@@ -133,6 +134,8 @@ gRefPlayTable = {
 	"Ref/MiddleKick/Ref_MiddleKickV1",
 	"Ref/MiddleKick/Ref_MiddleKickV5",
 	"Ref/MiddleKick/Ref_MiddleKickV2",
+	"Ref/DirectMiddleKick/Ref_DirectMiddlePush_normal",
+	"Ref/IndirectMiddleKick/Ref_IndirectMiddlePush_normal_chip",
 
 	--后场进攻
 	"Ref/IndirectBackKick/Ref_IndirectBackPush",
