@@ -136,11 +136,11 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		break;
 
 	case S_BACK:
-		if(!isBallOutside && possession >= 0.9) {
+		if(!isBallOutside) {
 			new_state = S_CHECK1;
 			cnt = 0;
 		}
-		else if (me2ball.mod() > 20 && possession < 0.1) {
+		else if (me2ball.mod() > 20) {
 			if (++cnt >= 50) {
 				new_state = BEGINNING;
 				cnt = 0;
@@ -167,11 +167,11 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		break;
 		//吸球行进
 	case S_TURN:
-		if ((ball.Pos() - targetPos).mod() < 13 && possession > 0.9) {
+		if ((ball.Pos() - targetPos).mod() < 5) {
 			new_state = S_CHECK2;
 			cnt = 0;
 		}
-		else if (me2ball.mod() > 20&&possession<0.1) {
+		else if (me2ball.mod() > 20) {
 			if (++cnt >= 50) {
 				new_state = BEGINNING;
 				cnt = 0;
