@@ -11,6 +11,10 @@ gTestPlay = function ()
 		return "NormalPlayPureDefence8" --"Test_AdvanceV4"  --"NormalPlayPureDefence" --"Test_Run6" --"Test_play6" --"Test_Run"
 		-- Test_Run6 测testrun
 		-- Test_play6ForTest测三车进攻
+		--犯规多的时候用"Test_play8_ManyFoul"
+		--犯规少的时候用"Test_play8_NotFoul"
+		--AutoChange用"Test_play8_AUTO"
+
 	else
 		return "Test_Goalie" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
 	end
@@ -213,6 +217,14 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_StopV3",
 	"Ref/GameStop/Ref_Stop4CornerDef",
 	"Ref/GameStop/Ref_Stop4CornerKick",
+
+	--8车Stop
+	"Ref/GameStop/Ref_Stop4CornerDef_play8",
+	"Ref/GameStop/Ref_Stop4BackDef_play8",
+	"Ref/GameStop/Ref_Stop4MiddleDef_play8",
+	"Ref/GameStop/Ref_Stop4FrontDef_play8",
+
+	
 	"Ref/GameStop/Ref_Stop4CornerKick6",
 	"Ref/GameStop/Ref_Stop4SideLine",
 	"Ref/GameStop/Ref_Stop4FrontKick",
@@ -287,6 +299,9 @@ gTestPlayTable = {
 	"Test_play6ForTest",
 	"Test_DSS",
 	"Test_Run6",
+	"Test_play8_AUTO",
+	"Test_play8_ManyFoul",
+	"Test_play8_NotFoul",
 	"Test_play3",
 	"Test_NormalPass"
 }

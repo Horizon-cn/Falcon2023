@@ -10,17 +10,17 @@ gPlayTable.CreatePlay{
     end,
     --MiddleDefendBalance_8
     --三個在前
-    Leader = task.markingFront("First"),
-    Assister = task.markingFront("Third"),
-    Middle = task.defendKick(),
-    Special = task.markingFront("Second"),
+    Leader = task.defendKick(),
+    Assister = task.support("Leader",0),
+    Middle = task.markingFront("Second"),
+    Special = task.markingFront("First"),
     Defender = task.multiBack(3,1),
     Crosser  = task.multiBack(3,2), 
     Breaker  = task.multiBack(3,3),
     Goalie = task.goalieNew(),
-    match = "[DC][LS][B][M][A]"
+    match = "[L][DCB][M][SA]"
 },
-  name = "Ref_MiddleDef_normal",
+  name = "Ref_Stop4MiddleDef_play8",
   applicable = {
     exp = "a",
     a = true

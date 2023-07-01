@@ -25,7 +25,7 @@ gOppoConfig = {
 	KickOff		= "Ref_KickOff_normal",
 	KickOffDef  = "Ref_KickOffDef_normal",
 	
-	NorPlay     = "NormalPlay"
+	NorPlay     = "Test_play8_NotFoul"
 }
 
 

@@ -376,6 +376,9 @@ firstState = "start",
     end
   end,
 
+--standFunc有bug
+--standFunc有bug
+--standFunc有bug
   Assister = task.goCmuRush(standFunc(1), dir.playerToBall, ACC, STOP_DSS),
   Special  = task.goCmuRush(standFunc(2), dir.playerToBall, ACC, STOP_DSS),
   Leader   = task.goCmuRush(standFunc(3), dir.playerToBall, ACC, STOP_DSS),
@@ -383,6 +386,9 @@ firstState = "start",
   Middle   = task.goCmuRush(standFunc(5), dir.playerToBall, ACC, STOP_DSS),
 	Breaker  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
   Crosser  = task.goCmuRush(standFunc(7), dir.playerToBall, ACC, STOP_DSS),
+--standFunc有bug
+--standFunc有bug
+--standFunc有bug
   -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
   -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
   Goalie   = task.goalieNew(),
