@@ -37,8 +37,8 @@ function normal()
 	end
 end
 
--- ���հ��������������ֻ�����ڿ����ŵ�������
--- role1 Ϊ����
+-- 纯闭包函数，这个函数只是用在开射门的条件中
+-- role1 为接球车
 function toPlayer(role1)
 	return function(role2)
 		local dist = player.toPlayerDist(role1, role2)

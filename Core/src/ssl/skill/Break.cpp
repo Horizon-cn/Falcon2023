@@ -503,7 +503,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             CGeoPoint now_place = CGeoPoint(target_info[2 * i], target_info[2 * i + 1]);
             for (int player_num = 0; player_num < Param::Field::MAX_PLAYER; player_num++) {
                 if (pVision->TheirPlayer(player_num).Valid()) {
-                    if (pVision->TheirPlayer(player_num).Pos().dist(now_place) < OBSTACLE_RADIUS) {
+                    if (pVision->TheirPlayer(player_num).Pos().dist(now_place) < OBSTACLE_RADIUS && i) {
                         target_info[2 * i] = target_info[2 * (i - 1)];
                         target_info[2 * i + 1] = target_info[2 * (i - 1) + 1];
 

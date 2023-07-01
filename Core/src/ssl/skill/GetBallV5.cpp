@@ -149,6 +149,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         char velmsg[100];
         char OppDist[100];
         char OppDirDiff[100];
+        char MeRotVel[100];
         //sprintf(getBallDistdebugmsg, "%f", getBallDist);
         sprintf(have, "%f", BallStatus::Instance()->getBallPossession(true, _executor));
         sprintf(deltaBall, "%f", me2ball.mod());
@@ -156,20 +157,22 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         sprintf(velmsg, "%f", ball.Vel().mod());
         sprintf(OppDist, "%f", me2Opp.mod());
         sprintf(OppDirDiff, "%f", fabs(me2ball.dir() - me2Opp.dir()) * 180 / Param::Math::PI);
-
+        sprintf(MeRotVel, "%f", me.RotVel());
 
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), have, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), deltaTheta, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -200), deltaBall, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -150), velmsg, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -100), OppDist, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -50), OppDirDiff, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -275), deltaTheta, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), deltaBall, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -225), velmsg, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -200), OppDist, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -175), OppDirDiff, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -150), MeRotVel, COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -300), "IsMeHaveBall", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -250), "Delta Theta", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -200), "Delta Mod", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -150), "Ball Vel", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -100), "Opp Dist", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -50), "Opp DirDiff", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -275), "Delta Theta", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -250), "Delta Mod", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -225), "Ball Vel", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -200), "Opp Dist", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -175), "OppDir Diff", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -150), "Me RotVel", COLOR_YELLOW);
 
     }
     if (BallStatus::Instance()->getBallPossession(true, _executor) <= 0.3)
@@ -404,7 +407,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             getball_task.player.max_rot_acceleration = 12 * slowfactor;
             getball_task.player.max_deceleration = 12 * slowfactor;
         }
-        else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) > Param::Math::PI * 30 / 180 && ball2meDist < 12) {
+        else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) > Param::Math::PI * 20 / 180 && ball2meDist < 12) {
             getball_task.player.max_rot_acceleration = 10 * slowfactor;
             getball_task.player.max_deceleration = 10 * slowfactor;
         }
@@ -616,81 +619,6 @@ CGeoPoint CGetBallV5::Ball_Predict_Pos(const CVisionModule* pVision)//返回最�
     return point;
 }
 
-bool CGetBallV5::LARGECanToROTATE(const CVisionModule* pVision, const double finalDir)
-{
-
-    return 0;
-}
-bool CGetBallV5::WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir)
-{
-    const BallVisionT& ball = pVision->Ball();
-    const int robotNum = task().executor;
-    const PlayerVisionT& me = pVision->OurPlayer(robotNum);
-    const CVector self2ball = me2ball;
-    double ball2meDist = self2ball.mod();
-    if (ball.Vel().mod() > 70 || ball2meDist > 30)
-        return 1;
-    return 0;
-}
-bool CGetBallV5::MustUseLargeToAdjust(const CVisionModule* pVision, const int _executor, const double finalDir){
-    const BallVisionT& ball = pVision->Ball();
-    const PlayerVisionT& me = pVision->OurPlayer(_executor);
-    if (fabs(Utils::Normalize(finalDir - me.Dir())) > Param::Math::PI * LARGE_ADJUST_ANGLE / 180.0) return 1;
-    else return 0;
-}
-
-bool CGetBallV5::ROTATECanToDIRECT(const CVisionModule* pVision, double finalDir){
-
-    double Precision = Param::Math::PI * GetBall_Precision_alpha / 180;
-    //double offset = 0.05;
-
-    const BallVisionT& ball = pVision->Ball();
-    const PlayerVisionT& me = pVision->OurPlayer(task().executor);
-    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-    double myDir = me.Dir();
-    CVector opp2ball = ball.Pos() - opp.Pos();
-    CVector ball2goal = theirCenter - ball.Pos();
-    //if (!ShootOrPass) ShootPrecision = ShootPrecision * 0.8;
-    //if (myDir - targetDir > 0)targetDir -= offset;
-    //else targetDir += offset;
-    
-    finalDir = me2ball.dir();
-
-    if (fabs(finalDir - last_final_dir) > 4.0 * Precision) {
-
-        last_final_dir = finalDir;
-    }
-    if (fabs(finalDir - me.Dir()) < Precision) {
-        return true;
-
-    }
-    else return false;
-
-
-    if (Me2OppTooclose(pVision, task().executor)) {
-        if (fabs(myDir - finalDir) < 1.5 * Precision) {
-            last_dir_deviation = 100;
-            return true;
-        }
-    }
-    if (fabs(myDir - finalDir) > 1.5 * Precision) {
-        last_dir_deviation = myDir - finalDir;
-        return false;
-    }
-    else if ((fabs(myDir - finalDir) > fabs(last_dir_deviation) || (myDir - finalDir) * last_dir_deviation <= 0)) {
-        if (fabs(myDir - finalDir) < 1.25 * Precision) {
-            last_dir_deviation = 100;
-            return true;
-        }
-    }
-    else if (fabs(myDir - finalDir) < Precision) {
-        last_dir_deviation = 100;
-        return true;
-    }
-    last_dir_deviation = myDir - finalDir;
-    return false;
-}
-
 int CGetBallV5::getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos) {
     double dist = 1000;
     int num = 0;
@@ -890,38 +818,4 @@ int CGetBallV5::getTheirMostCloseAndFronttoPosPlayerNum(const CVisionModule* pVi
         }
     }
     return num;
-}
-/*
-bool CGetBallV5::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber) {
-    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-    const BallVisionT& ball = pVision->Ball();
-    CVector me2Ball = me2ball;
-    CVector me2Opp = opp.Pos() - me.Pos();
-    const double threshold = 70;
-    if ((abs(me2Ball.mod()) < threshold && abs(me2Opp.mod()) < threshold * 1.5) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 3)) {
-        return true;
-    }
-    return false;
-}
-*/
-bool CGetBallV5::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber) { //是否太近了
-    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
-    const BallVisionT& ball = pVision->Ball();
-    CVector me2Ball = me2ball;
-    CVector me2Opp = opp.Pos() - me.Pos();
-    char me2opp[100];
-    sprintf(me2opp, "%f", me2Opp.mod());
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), me2opp, COLOR_YELLOW);
-    if (fabs(me2Opp.mod()) <= 50 && opp.X() > me.X() && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 2.7)) {
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(450, 450), "TOO CLOSE with ball", COLOR_ORANGE);
-        return true;
-    }
-
-    if ((fabs(me2Ball.mod()) * 1.5 > fabs(me2Opp.mod()) && (me2Ball.dir() - me2Opp.dir() < Param::Math::PI / 3))) {
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(450, 450), "TOO CLOSE with ball", COLOR_ORANGE);
-        return true;
-    }
-    return false;
 }

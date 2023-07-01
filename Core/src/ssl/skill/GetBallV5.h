@@ -20,13 +20,10 @@ protected:
 	CGeoPoint PredictForBall(int frame, const CVisionModule* pVision);
 	CGeoPoint GeneratePoint(const CVisionModule* pVision, double finalDir, const bool debug);
 	bool JudgeLargeBack(const CVisionModule* pVision, CGeoPoint target);
-	bool LARGECanToROTATE(const CVisionModule* pVision, const double finalDir);
-	bool ROTATECanToDIRECT(const CVisionModule* pVision, double finalDir);
-	bool WeMustReturnLARGE(const CVisionModule* pVision, const double finalDir);
-	bool MustUseLargeToAdjust(const CVisionModule* pVision, const int _executor, const double finalDir);
+
 	int getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
 	bool OppIsNearThanMe(const CVisionModule* pVision, const int vecNumber);
-	bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
+
 	CGeoPoint GenerateLargeAnglePoint(const CVisionModule* pVision, double finalDir, const bool debug);
 	bool HaveBeenBlockPoint(const CVisionModule* pVision, const int vecNumber, const CGeoPoint Target);
 	bool checkOppHasBall(const CVisionModule* pVision);

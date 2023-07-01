@@ -34,8 +34,8 @@ private:
         PUSHOUT,
         BREAKING,
         BLOCK,
-        CHASEKICK,
-        CHASEPUSH
+        CHASEKICK//,
+        //CHASEPUSH
     };
     enum {
         DefenceArea = 0,
