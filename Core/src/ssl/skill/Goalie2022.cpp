@@ -211,7 +211,6 @@ CPlayerTask* CGoalie2022::normalTask(const CVisionModule* pVision)
 {
 	int robotNum = task().executor;
 
-	//CGeoPoint DefPoint = DefPos2015::Instance()->getDefPos2015(pVision).getGoaliePos();
 	CGeoPoint DefPoint;
 	const BallVisionT& ball = pVision->Ball();
 	const PlayerVisionT& enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
@@ -222,10 +221,8 @@ CPlayerTask* CGoalie2022::normalTask(const CVisionModule* pVision)
 		DefPoint = goalCenter;
 	else
 		DefPoint = intersect.IntersectPoint();
-	double limit_y = Param::Field::GOAL_WIDTH / 2.0 - 5.0;
-	if (fabs(DefPoint.y()) > limit_y)
-		DefPoint.setY(DefPoint.y() / fabs(DefPoint.y()) * limit_y);
-
+	if (isPosInCornerShootArea(defenceTarget)) //封死近角
+		DefPoint = syntYPos(defenceTarget,CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Vehicle::V2::PLAYER_SIZE, Param::Field::GOAL_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE));
 	double dir;
 	const PlayerVisionT& me = pVision->OurPlayer(robotNum);
 	if (ball.Valid()) {
@@ -289,7 +286,7 @@ CPlayerTask* CGoalie2022::supportTask(const CVisionModule* pVision)
 		int flag = task().player.flag;
 		flag |= PlayerStatus::QUICKLY;
 		flag |= PlayerStatus::DRIBBLING;
-		return PlayerRole::makeItNoneTrajGetBall(robotNum, dir, CVector(0, 0), flag);
+		return PlayerRole::makeItNoneTrajGetBallForStatic(robotNum, dir, CVector(0, 0), flag);
 	}
 	//临时解决方案结束
 
@@ -432,7 +429,7 @@ CPlayerTask* CGoalie2022::penaltyTask(const CVisionModule* pVision)
 	vector<int> weight_vector;
 	weight_vector.reserve(random_num);
 	for (auto& p : random_points)
-		weight_vector.push_back(100000 / sqrt(defCenter.dist(p)) / std::log10(30 + p.dist(CGeoPoint(move_x,0))));
+		weight_vector.push_back(100000 / sqrt(defCenter.dist(p)) / std::log10(30 + p.dist(CGeoPoint(move_x, 0))));
 	discrete_distribution<int> weight(weight_vector.begin(), weight_vector.end());
 	//固定间隔帧数进行随机生成
 	static int generate_index = weight(generator);
@@ -470,7 +467,7 @@ CPlayerTask* CGoalie2022::penaltyTask(const CVisionModule* pVision)
 	if (penalty_status == PENALTY_TRICK_START)
 		finalPos = trickPoint;
 
-	double dir=0;
+	double dir = 0;
 
 	int flag = task().player.flag;
 	flag |= PlayerStatus::QUICKLY;
@@ -581,4 +578,23 @@ double CGoalie2022::CalClearBallDir(const CVisionModule* pVision)
 
 	GDebugEngine::Instance()->gui_debug_line(ball.Pos(), ball.Pos() + Utils::Polar2Vector(600, clearBallDir), COLOR_BLUE);
 	return clearBallDir;
+}
+
+CGeoPoint CGoalie2022::syntYPos(CGeoPoint reference, CGeoPoint target)
+{
+	int sign = (reference.y() > 0) - (reference.y() < 0);
+	return CGeoPoint(target.x(),sign*target.y());
+}
+
+bool CGoalie2022::isPosInCornerShootArea(CGeoPoint pos)
+{
+	CGeoPoint penaltyLeftCorner(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH, -Param::Field::PENALTY_AREA_WIDTH / 2);
+	CGeoPoint penaltyRightCorner(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH, Param::Field::PENALTY_AREA_WIDTH / 2);
+	CGeoPoint leftGoalPost(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
+	CGeoPoint rightGoalPost(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
+	double angle_pos2leftGoalPost = (pos - leftGoalPost).dir();
+	double angle_penaltyRightCorner2leftGoalPost = (penaltyRightCorner - leftGoalPost).dir();
+	double angle_pos2rightGoalPost = (pos - rightGoalPost).dir();
+	double angle_penaltyLeftCorner2rightGoalPost = (penaltyLeftCorner - rightGoalPost).dir();
+	return (angle_pos2leftGoalPost>angle_penaltyRightCorner2leftGoalPost) || (angle_pos2rightGoalPost<angle_penaltyLeftCorner2rightGoalPost);
 }

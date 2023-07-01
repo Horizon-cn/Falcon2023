@@ -138,7 +138,7 @@ CGeoPoint CGuardPos::chooseTargetPos()
 	const PlayerVisionT enemy = vision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
 	CGeoPoint defendTarget;
 	if (Ball.Valid()) {
-		if (Ball.Pos().dist(enemy.Pos()) < dangerDist && GOAL_MIDDLE.dist(enemy.Pos())) { //敌方离球门很近，看敌方会更准
+		if (Ball.Pos().dist(enemy.Pos()) < dangerDist && GOAL_MIDDLE.dist(enemy.Pos()) < 300) { //敌方离球门很近，看敌方会更准
 			defendTarget = enemy.Pos();
 		} else {
 			defendTarget = Ball.Pos();
