@@ -140,7 +140,11 @@ gRefPlayTable = {
 	"Ref/IndirectBackKick/Ref_IndirectBackPush_normal",
 	"Ref/IndirectBackKick/Ref_IndirectBackPush_normal_chip",
 	"Ref/DirectBackKick/Ref_DirectBackPush_normal",
-	
+	"Ref/BackKick/Ref_BackKickV3",
+	"Ref/IndirectBackKick/Ref_IndirectBackKick",
+	"Ref/DirectBackKick/DirectBackKick",
+	"Ref/DirectBackKick/Ref_DirectBackKick",
+
 	--开球防守
 	"Ref/KickOffDef/Ref_KickOffDefV1",
 	"Ref/KickOffDef/Ref_KickOffDefV23",
