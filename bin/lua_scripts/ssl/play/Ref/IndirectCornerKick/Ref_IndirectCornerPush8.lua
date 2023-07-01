@@ -3,7 +3,19 @@ local WAIT_BALL_POS = function(anti)
     return ball.pos() + Utils.Polar2Vector(50, anti * math.pi)
   end
 end
-local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(300, 50))
+local SHOOT_POS = ball.syntYPos(CGeoPoint:new_local(520, 50))
+local function def_chipPower()
+  if math.abs(ball.posY()) > 300 then 
+    return 350
+  elseif math.abs(ball.posY())> 285 then
+    return 220
+  elseif math.abs(ball.posY()) > 270 then 
+    return 200
+  else 
+    return 20
+  end
+end
+
 gPlayTable.CreatePlay{
 
   firstState = "start",
@@ -22,7 +34,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match = "[A][SDBC][LM]"
+    match = "[D][A][SBC][LM]"
   },
 
   ["toBall"] = {
@@ -39,7 +51,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match = "[A][SDBC][LM]"
+    match = "[D][A][SBC][LM]"
   },
 
   ["leaveBall"] = {
@@ -48,7 +60,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.justKick(),
+    Assister = task.chipPass(SHOOT_POS,def_chipPower()),
     Leader   = task.marking("First"),
     Middle   = task.marking("Second"),
     Special  = task.multiBack(4,1),
@@ -56,7 +68,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match = "[A][SDBC][LM]"
+    match = "[D][A][SBC][LM]"
   },
 
   name = "Ref_IndirectCornerPush8",

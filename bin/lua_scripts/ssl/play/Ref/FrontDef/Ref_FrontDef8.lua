@@ -9,6 +9,9 @@ local DEF_POS2 = ball.syntYPos(CGeoPoint:new_local(DEFX, DEFY + 3 * param.player
 local DEF_POS3 = ball.antiYPos(CGeoPoint:new_local(DEFX, DEFY))
 
 local ACC = 300
+local WAIT_BALL_POS   = function ()
+  return ball.pos() + Utils.Polar2Vector(50, ball.syntY(0.5 * math.pi))
+end
 gPlayTable.CreatePlay{
 
   firstState = "start",
@@ -25,9 +28,9 @@ gPlayTable.CreatePlay{
   Special = task.multiBack(4,4),
   Assister = task.marking("First"),
   Breaker = task.marking("Second"),
-  Crosser = task.marking("Third"),
+  Crosser = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
   Goalie = task.goalieNew(),
-  match    = "[MDLS][ABC]"
+  match    = "[M][C][DLS][AB]"
 },
   name = "Ref_FrontDef8",
   applicable = {
