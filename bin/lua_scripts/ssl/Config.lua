@@ -135,11 +135,9 @@ gRefPlayTable = {
 	"Ref/DirectFrontKick/Ref_DirectFrontPush_normal",
 
 	--中场进攻
-	"Ref/MiddleKick/Ref_MiddleKickV1",
-	"Ref/MiddleKick/Ref_MiddleKickV5",
-	"Ref/MiddleKick/Ref_MiddleKickV2",
-	"Ref/DirectMiddleKick/Ref_DirectMiddlePush_normal",
-	"Ref/IndirectMiddleKick/Ref_IndirectMiddlePush_normal_chip",
+	"Ref/IndirectMiddleKick/Ref_IndirectMiddleKick_normal_middle",
+	"Ref/IndirectMiddleKick/Ref_IndirectMiddleKick_normal_edge",
+
 
 	--后场进攻
 	"Ref/IndirectBackKick/Ref_IndirectBackPush",
@@ -237,10 +235,13 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref0_Stop4CornerKick",
 
 	
+	
 	"Ref/GameStop/Ref_StopV2V8",
 	"Ref/GameStop/Ref_StopV3V8",
 	"Ref/GameStop/Ref_Stop4CornerDefV8",
 	"Ref/GameStop/Ref_Stop4CornerKickV8",
+	"Ref/GameStop/Ref_StopCornerDefPureDefence",
+
 
 	"Ref/GameStop/Ref1_StopV2",
 	"Ref/GameStop/Ref1_StopV3",

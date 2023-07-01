@@ -3,7 +3,8 @@ local WAIT_BALL_POS = function(anti)
     return ball.pos() + Utils.Polar2Vector(50, anti * math.pi)
   end
 end
-local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(300, 50))
+local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(0, 50))
+local kickPower = 300
 
 gPlayTable.CreatePlay{
 
@@ -45,11 +46,11 @@ gPlayTable.CreatePlay{
 
   ["leaveBall"] = {
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) > 50, "fast", 180) then
+      if bufcnt(player.kickBall("Assister") or  player.toPointDist("Assister", ball.pos()) >50, "fast", 180) then
         return "exit"
       end
     end,
-    Assister = task.justKick(),
+    Assister = task.chipPass(SHOOT_POS,kickPower),
     --Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
     Middle   = task.markingFront("First"),
     Leader   = task.markingFront("Second"),

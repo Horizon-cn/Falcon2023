@@ -1,5 +1,5 @@
-if type(gOppoConfig.IndirectFrontKick) == "function" then
-	gCurrentPlay = cond.getOpponentScript("Ref_IndirectMiddleKickV", gOppoConfig.IndirectMiddleKick(), 11)
+if type(gOppoConfig.MiddleKick) == "function" then
+	gCurrentPlay = cond.getOpponentScript("Ref_IndirectMiddleKick_normal_middle", gOppoConfig.MiddleKick(), 4)
 else
-	gCurrentPlay = cond.getOpponentScript("Ref_IndirectMiddleKickV", gOppoConfig.IndirectMiddleKick, 11)
+	gCurrentPlay = cond.getOpponentScript("Ref_MiddleKickV", gOppoConfig.MiddleKick, 4)
 end
