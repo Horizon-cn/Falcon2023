@@ -136,7 +136,6 @@ void CDefenceInfoNew::checkProtect(const CVisionModule* pVision)
 			{
 				_kicker -= Param::Field::MAX_PLAYER;
 				matchProtecter(pVision);
-				cout << "match: " << _protecter << endl;
 				GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(150, 200), ("match:" + to_string(_protecter)).c_str());
 				if (_protecter != -1)
 				{
@@ -148,7 +147,6 @@ void CDefenceInfoNew::checkProtect(const CVisionModule* pVision)
 	if (isNeedProtect)
 	{
 		//对应protect车成为我们的advance
-		cout << "protect force match!" << endl;
 		TaskMediator::Instance()->setAdvancerPassTo(pVision->OurPlayer(_protecter).Pos());
 	}
 }

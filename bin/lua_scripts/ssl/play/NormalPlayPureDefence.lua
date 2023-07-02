@@ -14,14 +14,14 @@ firstState = "PureDefence",
 			return "PureDefence";
 		end
 	end,
-	Leader = task.advance(),
+	Leader = task.advanceV4(),
 	Middle = task.support("Leader",2),
 	Assister = task.singleBack(),
     Special = task.rightBack(),
 
 	--Assister = task.leftBack(),
     --Middle = task.rightBack(),
-	Defender = task.goMWPassPos("Leader"),
+	Defender = task.support("Leader",1),
 	Goalie = task.goalieNew(),
     match = "[L][M][A][S][D]"
 },

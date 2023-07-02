@@ -148,7 +148,7 @@ public:
         _multiBack[num].num = true;
         _multiBack[num].lastCycle = vision->Cycle();
     }
-
+    /*因为0车默认一定是守门员，因此这里如果没被调用 or 丢失视觉可以直接用0号？*/
     int supporter(const int index) {
         if (vision->Cycle() - _supporter[index].lastCycle > 5) // 包含一段时间没被调用和丢失视觉的情况
             _supporter[index].num = 0;
@@ -280,7 +280,6 @@ public:
     int getNextAdvancer() {
         if (BallStatus::Instance()->IsBallKickedOut(_advancer.num)) {
             nextAdvancer = nextAdvancer_store;
-            std::cout << nextAdvancer << std::endl;
         }
         return nextAdvancer;
     }

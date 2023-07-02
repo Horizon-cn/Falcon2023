@@ -502,8 +502,6 @@ void CChaseToGetBall::plan(const CVisionModule* pVision)
 	TaskT chase_kick_task(task());
 	double gokickFactor = 1.0;
 	double myVelSpeedRelative2Final = me.Vel().mod()*cos(Utils::Normalize(me.Vel().dir() - finalKickDir));
-	//cout<<"meballdist"<<ball.Pos().x()-me.Pos().x()<<endl;
-	//if (verBos) cout << "chaseState:" << state() << endl;
 
 
 	if (dist2ball < 50)
@@ -930,7 +928,6 @@ void CChaseToGetBall::plan(const CVisionModule* pVision)
 			//setSubTask(TaskFactoryV2::Instance()->GotoPosition(chase_kick_task));
 			chase_kick_task.player.needdribble = 1;
 			setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(chase_kick_task));
-			//if (verBos) cout << "angle " << chase_kick_task.player.angle << endl;
 		}
 	}
 
