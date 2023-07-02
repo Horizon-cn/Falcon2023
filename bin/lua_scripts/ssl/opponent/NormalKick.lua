@@ -8,12 +8,8 @@ gOppoConfig = {
 	IndirectFrontKick   = {"Ref_IndirectFrontPush_normal_chip"},--610 --"Ref_FrontPush"--对面
 
 	DirectFrontKick   = {"Ref_DirectFrontPush_normal"},--610 --"Ref_FrontPush"--对面
-	
-	IndirectMiddleKick   = {"Ref_IndirectMiddlePush_normal_chip"},
 
-	DirectMiddleKick   = {"Ref_DirectMiddlePush_normal"},
-
-	MiddleKick    = {"Ref_MiddleKick_normal_middle"},
+	MiddleKick    = {"Ref_IndirectMiddleKick_normal"},
 
 	DirectBackKick    = {"Ref_DirectBackKick"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
 	

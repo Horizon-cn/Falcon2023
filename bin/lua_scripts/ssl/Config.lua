@@ -1,4 +1,4 @@
-IS_TEST_MODE = true
+IS_TEST_MODE = false
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 USE_SWITCH = false
@@ -135,8 +135,7 @@ gRefPlayTable = {
 	"Ref/DirectFrontKick/Ref_DirectFrontPush_normal",
 
 	--中场进攻
-	"Ref/IndirectMiddleKick/Ref_IndirectMiddleKick_normal_middle",
-	"Ref/IndirectMiddleKick/Ref_IndirectMiddleKick_normal_edge",
+	"Ref/IndirectMiddleKick/Ref_IndirectMiddleKick_normal",
 
 
 	--后场进攻
