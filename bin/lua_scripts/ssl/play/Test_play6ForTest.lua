@@ -5,191 +5,158 @@ local FLAG = ALL_AVOID + flag.dribbling
 local distThreshold = 50
 local TargetPos1  = CGeoPoint:new_local(280,200)
 
-local Xfront = 200
-local Xmid = -100
-local Xback = -250
+local One = 200
+local Two = 280
 
-local Lside = -150
-local Rside = 150
+-- -200 200 
+--   |   |   120
+--   |   |  -120
 
 local SwitchBallArea = function()
-	if ball.posX() > Xfront and ball.posY() < Rside and ball.posY() > Lside then
-		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
-		if ballStatus == "OurBall" then
-			return "CF"..ballStatus
-		else 
-			return "CF"
-		end
-	elseif ball.posX() > Xfront then
-		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
-		if ballStatus == "OurBall" then
-			return "SW"..ballStatus
-		else 
-			return "SW"
-		end
-
-	elseif ball.posX() > Xmid and ball.posY() > Lside and ball.posY() < Rside then
-		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
-		if ballStatus == "OurBall" then
-			return "CM"..ballStatus
-		else 
-			return "CM"
-		end
-	elseif ball.posX() > Xmid then
-		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
-		if ballStatus == "OurBall" then
-			return "SM"..ballStatus
-		else 
-			return "SM"
-		end
-
-	elseif ball.posX() > Xback and ball.posY() > Lside and ball.posY() < Rside then
-		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
-		if ballStatus == "OurBall" then
-			return "CDM"..ballStatus
-		else 
-			return "CDM"
-		end
-	elseif ball.posX() > Xback then
-		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
-		if ballStatus == "OurBall" then
-			return "SDM"..ballStatus
-		else 
-			return "SDM"
-		end
-
-	elseif ball.posY() > Lside and ball.posY() < Rside then
-			return "CB"
-	else
-			return "SB"
+	if ball.posX() > 0  then
+			return "Front"
+	elseif ball.posX() < 0 then
+			return "Back"
 	end
 end
-
--- Leader + Assister 
--- Middle
--- Goalie + Special + Defender
+local TEST = function()
+	return "Front"
+end
+-- Leader + Assister + Powerhouse
+-- Special + Defender
+-- Goalie + Middle + Hawk
 gPlayTable.CreatePlay{
 
-firstState = "CM",
+firstState = "Front",
 
---front
-["SW"] = {
+["Front"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 0),
+	--Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADC]"
 },
 
-["SWOurBall"] = {
+["Back"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 1),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	--Crosser = task.sifeBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADH]"
 },
 
-["CF"] = {
+["RightFront"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.markingFront(),--task.support("Leader", 2),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADHC]"
 },
 
-["CFOurBall"] = {
+["LeftMiddleFront"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 2),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADHC]"
 },
 
--- mid
-["SM"] = {
+["MiddleMiddleFront"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 0),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADHC]"
 },
 
-["SMOurBall"] = {
+
+["RightMiddleFront"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 0),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADHC]"
 },
 
-["CM"] = {
+["LeftMiddleBack"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 4),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADHC]"
 },
-
-["CMOurBall"] = {
+["MiddleMiddleBack"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 4),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADHC]"
 },
-
---middldDefence
-
-["CDM"] = {
+["RightMiddleBack"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 4),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADHC]"
 },
 
-["CDMOurBall"] = {
+["LeftBack"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 4),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADHC]"
 },
-
-["SDM"] = {
+["MiddleBack"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 4),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADHC]"
 },
-
-["SDMOurBall"] = {
-    switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
-},
-
---back
-["SB"] = {
+["RightBack"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
+	Assister = task.support("Leader", 4),
+	Hawk = task.protectBall(),
+	Defender = task.multiBack(1, 1),
+	Crosser = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][ADHC]"
 },
-
-["CB"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.support("Leader",1),
-    match = "[L][AM]"
-},
-
-
 name = "Test_play6ForTest",
 applicable ={
 	exp = "a",

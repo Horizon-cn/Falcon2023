@@ -116,7 +116,7 @@ CBreak::CBreak() {
     MAX_ROT_VEL = paramManager->BREAK_ROT_VEL;
 
     CHECK_OBSTCLE_DIST = 1000;
-    DRIBBLE_DIST = 80;
+    DRIBBLE_DIST = 70.0;
     safeMode = false;
 
 
@@ -692,7 +692,7 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -475), ("radius:" + to_string(radius)).c_str(), COLOR_YELLOW);
         //changed 6.29
         if (pVision->TheirPlayer(i).Vel().mod() < 50) {
-            if (r < radius - 4 || fabs(projection) + 2 + corrected_parameter>(Param::Field::GOAL_WIDTH - 10) / 2) {
+            if (r < radius  || fabs(projection) + 2 + corrected_parameter>(Param::Field::GOAL_WIDTH - 10) / 2) {
                 flag = false;
                 break;
             }

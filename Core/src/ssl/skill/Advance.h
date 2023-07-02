@@ -112,7 +112,7 @@ private:
     bool IHaveSupport = false;
     int TheBestSupportNumber = 1;
     bool isBallVeryNearTheOpp;
-
+    
     CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
 
     /**********************************************************

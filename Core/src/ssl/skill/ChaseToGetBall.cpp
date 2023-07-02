@@ -306,7 +306,7 @@ void CChaseToGetBall::plan(const CVisionModule* pVision)
 	bool needGetBall = !is_fast_ball&&dist2ball<350||bigAngle;   //IMTODO
 	
 	//if (!task().player.needkick) needGetBall = 1; // update
-	needGetBall = 0;
+//	needGetBall = 1;
 
 	bool isCrossBall = fabs(ballVelDir)>Param::Math::PI * 75 / 180 && fabs(ballVelDir) < Param::Math::PI * 115 / 180;         //判断是否为横向来球 TODO
 	bool isVerticalBall = fabs(ballVelDir)<Param::Math::PI * 25 / 180 || fabs(ballVelDir) > Param::Math::PI * 155 / 180;
@@ -798,12 +798,13 @@ void CChaseToGetBall::plan(const CVisionModule* pVision)
 			GDebugEngine::Instance()->gui_debug_x(real_predict_ballPos, COLOR_CYAN);
 			//cout << "Getball" << endl;
 		}	
-
-		chase_kick_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + 0.6 /*newVehicleBuffer*/ + Param::Field::BALL_SIZE - 2.5 /*GETBALL_BIAS*/, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
+		/*
+		chase_kick_task.player.pos = ball.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + 0.6 /*newVehicleBuffer + Param::Field::BALL_SIZE - 2.5 /*GETBALL_BIAS, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
 		chase_kick_task.player.angle = (ball.Pos() - me.Pos()).dir();
 		chase_kick_task.player.needdribble = 1;
 		setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(chase_kick_task));
-		//setSubTask(PlayerRole::makeItNoneTrajGetBallV3(task().executor, finalKickDir, CVector(0, 0), task().player.flag, -2));
+		*/
+		setSubTask(PlayerRole::makeItNoneTrajGetBallV3(task().executor, finalKickDir, CVector(0, 0), task().player.flag, -2));
 		/* update */
 		break;
 	case SPEED_DOWN:

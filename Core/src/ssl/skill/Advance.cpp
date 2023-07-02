@@ -149,7 +149,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 	***********************************************************/
 	Advance_DEBUG_ENGINE = 1;
 	MeIsInWhichArea = InWhichArea(pVision, _executor);
-
+	
 	switch (_state) {
 	case BEGIN:
 		_state = GET;
@@ -245,7 +245,11 @@ void CAdvance::plan(const CVisionModule* pVision)
 			_state = GET;
 			break;
 		}
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
+		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.9) {
+			_state = BREAKSHOOT;
+			break;
+		}
+		else if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 			_state = CHASEKICK;
 			break;
 		}
@@ -438,11 +442,29 @@ void CAdvance::plan(const CVisionModule* pVision)
 			}
 			else
 			{
-				PassPoint = generateNormalPushPoint(pVision, _executor);// : PassPoint;
-				KickorPassDir = (PassPoint - me.Pos()).dir();
-				if (OppIsFarThanMe(pVision, _executor))
+				bool flag = true;
+				for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+					if (!pVision->TheirPlayer(i).Valid()) continue;
+					auto enemy = pVision->TheirPlayer(i);
+					double x = enemy.X(), y = enemy.Y();
+					double x1 = me.X(), y1 = me.Y(), theta = me.Dir();
+					if (x < me.X() || enemy.Pos().dist(me.Pos())>200) continue;
+					CGeoLine my_direction(me.Pos(), theta);
+					CGeoPoint projection_point = my_direction.projection(enemy.Pos());
+					double r = projection_point.dist(enemy.Pos());
+					double me2prodist = projection_point.dist(me.Pos());
+					if (!((r > 40 || me2prodist > 150) && me.Dir() <= Param::Math::PI / 3 && me.Dir() >= -Param::Math::PI / 3 && fabs(me.Y()) < Param::Field::PITCH_WIDTH * 2 / 3))
+						flag = false;
+				}
+				if (me2BestOppDist > 80)
 				{
+					PassPoint = generateNormalPushPoint(pVision, _executor);// : PassPoint;
+					KickorPassDir = (PassPoint - me.Pos()).dir();
 					setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
+				}
+				else if (flag)
+				{
+					setSubTask(PlayerRole::makeItlightkick(_executor, me.Dir()));
 					if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS__PUSH", COLOR_YELLOW);
 				}
 				else
@@ -467,9 +489,6 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "CHASEKICK", COLOR_YELLOW);
 		KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHASEKICK", COLOR_ORANGE);
-		if (WeCanAlwaysSetKick(pVision, _executor))
-			KickStatus::Instance()->setKick(_executor, KICKPOWER);
-		else KickStatus::Instance()->setKick(_executor, 0);
 		setSubTask(PlayerRole::makeItChaseKickV2(_executor, KickorPassDir, ShootNotNeedDribble));
 		break;
 		/*
