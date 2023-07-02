@@ -1,5 +1,5 @@
 if OPPONENT_NAME == "NormalKick" then
-	if ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
+	if ball.refPosX() > 480 and math.abs(ball.refPosY()) > 300 then
 	    dofile("../lua_scripts/ssl/play/Ref/DirectCornerKick/DirectCornerKick.lua")
 	elseif ball.refPosX() > 100 then
 	    dofile("../lua_scripts/ssl/play/Ref/DirectFrontKick/DirectFrontKick.lua")
@@ -9,7 +9,7 @@ if OPPONENT_NAME == "NormalKick" then
 	    dofile("../lua_scripts/ssl/play/Ref/BackKick/BackKick.lua")
 	end
 else
-	if ball.refPosX() > 360 and math.abs(ball.refPosY()) > 220 then
+	if ball.refPosX() > 480 and math.abs(ball.refPosY()) > 300 then
 		dofile("../lua_scripts/ssl/play/Ref/DirectCornerKick/DirectCornerKick.lua")
 	elseif ball.refPosX()>0 then
 		dofile("../lua_scripts/ssl/play/Ref/DirectFrontKick/DirectFrontKick.lua")
