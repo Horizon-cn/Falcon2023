@@ -237,36 +237,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		break;
 	case BREAKING:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push Breaking", COLOR_YELLOW);
-		if (isOppHasBall || isBallVeryNearTheOpp) {
-			_state = GET;
-			break;
-		}
-		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
-			_state = GenerateNextState(pVision, _executor);
-			if (_state == KICK) NowIsShoot = 1;
-			else if (_state == BREAKSHOOT)NowIsShoot = 2;
-			else if (OppIsFarThanMe(pVision, _executor) || Me2OppTooclose(pVision, _executor)) {
-				_state = _state; // 远或近：尊重决策
-			}
-			else if(_state != JUSTCHIPPASS){
-				_state = PUSHOUT; // 否则就一路狂带球
-			}
-			break;
-		}
-		else {
-			_state = GenerateNextState(pVision, _executor);
-			if (CanWeUseChaseBecauseOfGetBallV3(pVision, _executor)) {
-				if (_state == KICK) {
-					_state = CHASEKICK;
-					break;
-				}
-			}
-			else if (!Me2OppTooclose(pVision, _executor)) {
-				_state = PUSHOUT; break;
-			}
-			_state = GET;
-			break;
-		}
+		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		break;
 	case CHASEKICK:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHASEKICK", COLOR_YELLOW);
@@ -302,8 +273,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 		//_state = PUSHOUT;
 		//_state = GET;
-		_state = BREAKSHOOT;
-		//_state = PUSHOUT;
+		//_state = BREAKSHOOT;
+		_state = BREAKING;
 	}
 	else _state = GET;
 	*/
@@ -388,7 +359,6 @@ void CAdvance::plan(const CVisionModule* pVision)
 		KickorPassDir = (PassPoint - me.Pos()).dir();
 
 		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
-			double ThePower = 0;
 			bool IsFlatKick = toChipOrToFlat(pVision, _executor, PassPoint);
 			if (IsFlatKick) {
 				ThePower = GetFPassPower(me.Pos(), PassPoint);
@@ -411,15 +381,16 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case JUSTCHIPPASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "JUSTCHIP", COLOR_YELLOW);
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
+
 		if (IHaveSupport) {
 			PassPoint = SupportPoint[TheBestSupportNumber];
 			KickorPassDir = (PassPoint - me.Pos()).dir();
-			double ThePower = GetCPassPower(me.Pos(), PassPoint);
+			ThePower = GetCPassPower(me.Pos(), PassPoint);
 		}
 		else {
 			PassPoint = theirCenter;
 			KickorPassDir = (PassPoint - me.Pos()).dir();
-			double ThePower = GetCPassPower(me.Pos(), PassPoint) * 0.8;
+			ThePower = GetCPassPower(me.Pos(), PassPoint) * 0.8;
 		}
 		if (isDirOK(pVision, _executor, KickorPassDir, 0)) {
 			setSubTask(PlayerRole::makeItJustKick(_executor, 1, ThePower));
@@ -444,7 +415,43 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case BREAKING:
 	{
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS", COLOR_YELLOW);
-		setSubTask(PlayerRole::makeItBreak(_executor, false, false, false, generateBreakingDir(pVision, _executor)));
+		KickorPassDir = GenerateShootDir(pVision, _executor);
+		if (isDirOK(pVision, _executor, KickorPassDir, 1)) {  //能射门了
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS__KICK", COLOR_YELLOW);
+			setSubTask(PlayerRole::makeItJustKick(_executor, 0, KICKPOWER));
+		}
+		else
+		{
+			if (IHaveSupport) {
+				PassPoint = SupportPoint[TheBestSupportNumber];
+				KickorPassDir = (PassPoint - me.Pos()).dir();
+				ThePower = GetCPassPower(me.Pos(), PassPoint);
+			}
+			else {
+				PassPoint = theirCenter;
+				KickorPassDir = (PassPoint - me.Pos()).dir();
+				ThePower = GetCPassPower(me.Pos(), PassPoint) * 0.8;
+			}
+			if (isDirOK(pVision, _executor, KickorPassDir, 0)) {   //如果能传球
+				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS__PASS", COLOR_YELLOW);
+				setSubTask(PlayerRole::makeItJustKick(_executor, 1, ThePower));
+				TaskMediator::Instance()->setAdvancerPassTo(PassPoint, NumberOfSupport);
+			}
+			else
+			{
+				PassPoint = generateNormalPushPoint(pVision, _executor);// : PassPoint;
+				KickorPassDir = (PassPoint - me.Pos()).dir();
+				if (OppIsFarThanMe(pVision, _executor))
+				{
+					setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
+					if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS__PUSH", COLOR_YELLOW);
+				}
+				else
+					setSubTask(PlayerRole::makeItBreak(_executor, false, false, false, generateBreakingDir(pVision, _executor)));
+			}
+		}
+		
+		
 		break;
 	}
 
