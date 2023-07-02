@@ -1,3 +1,7 @@
+local WAIT_BALL_POS = function ()
+  return ball.pos() + Utils.Polar2Vector(-50, ball.syntY(0.2 * math.pi))
+end
+
 gPlayTable.CreatePlay{
 
   firstState = "start",
@@ -8,13 +12,13 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-  Leader = task.rightBack(),
-  Middle = task.leftBack(),
-  Defender = task.defendHead(),
-  Special = task.defendHead(),
-  Assister = task.marking("First"),
-  Breaker =task.marking("Second"),
-  Crosser = task.marking("Third"),
+  Leader = task.multiBack(3,1),
+  Middle = task.multiBack(3,2),
+  Defender = task.multiBack(3,3),
+  Special = task.sideBack(),
+  Assister = task.markingFront("First"),
+  Breaker =task.markingFront("Second"),
+  Crosser = task.task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
   Goalie = task.goalieNew(),
   match    = "[LM][DS][ABC]"
 },

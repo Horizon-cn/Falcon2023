@@ -176,23 +176,23 @@ firstState = "start",
 
 ["start"] = {
   switch = function()
-    return "start"
-    -- gBallPosXInStop = ball.posX()
-    -- gBallPosYInStop = ball.posY()
-    -- if cond.isGameOn() then
-    --   return "exit"
-    -- elseif ball.posX() > -8 and ball.posX() < 8 and ball.posY() > -8 and ball.posY() < 8 then
-    --   return "kickof"
-    -- elseif ball.toOurGoalPostDistSum() < PENALTY_THRESHOLD_DIST then
-    -- --elseif ball.toOurGoalDist() < PENALTY_THRESHOLD_DIST then
-    --   return "standByPenalty"
-    -- elseif ball.posY() > MIDDLE_THRESHOLD_Y or ball.posY() < -MIDDLE_THRESHOLD_Y then
-    --   return "standByLine"
-    -- elseif ball.posY() < MIDDLE_THRESHOLD_Y and ball.posY() > -MIDDLE_THRESHOLD_Y then
-    --   return "standInMiddle"
-    -- else
-    --   return "exit"
-    -- end
+    -- return "start"
+    gBallPosXInStop = ball.posX()
+    gBallPosYInStop = ball.posY()
+    if cond.isGameOn() then
+      return "exit"
+    elseif ball.posX() > -8 and ball.posX() < 8 and ball.posY() > -8 and ball.posY() < 8 then
+      return "kickof"
+    elseif ball.toOurGoalPostDistSum() < PENALTY_THRESHOLD_DIST then
+    --elseif ball.toOurGoalDist() < PENALTY_THRESHOLD_DIST then
+      return "standByPenalty"
+    elseif ball.posY() > MIDDLE_THRESHOLD_Y or ball.posY() < -MIDDLE_THRESHOLD_Y then
+      return "standByLine"
+    elseif ball.posY() < MIDDLE_THRESHOLD_Y and ball.posY() > -MIDDLE_THRESHOLD_Y then
+      return "standInMiddle"
+    else
+      return "exit"
+    end
   end,
 
   Assister = task.stop(),
