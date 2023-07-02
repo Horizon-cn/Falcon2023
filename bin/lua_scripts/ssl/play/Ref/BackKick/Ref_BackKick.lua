@@ -1,6 +1,6 @@
 local FreeKick_ImmortalStart_Pos = function ()
 	local pos
-	local ball2goal = CVector:new_local(CGeoPoint:new_local(450, 0) - ball.pos())
+	local ball2goal = CVector:new_local(CGeoPoint:new_local(450/1200*param.pitchLength,0/900*param.pitchWidth) - ball.pos())
 	pos = ball.pos() + Utils.Polar2Vector(80, ball2goal:dir())
 	local tempPos = ball.pos()+ Utils.Polar2Vector(80, ball2goal:dir())
 	for i = 1, 6 do
@@ -33,86 +33,86 @@ end
 
 local Farpos = function()
 	if  ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 then
-		return ball.refSyntYPos(CGeoPoint:new_local(-130,275))()
+		return ball.refSyntYPos(CGeoPoint:new_local(-130/1200*param.pitchLength,275/900*param.pitchWidth))()
 	else
-		return ball.refAntiYPos(CGeoPoint:new_local(-130,275))()
+		return ball.refAntiYPos(CGeoPoint:new_local(-130/1200*param.pitchLength,275/900*param.pitchWidth))()
 	end
 end
 
 local Nearpos = function()
 	if  ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 then
-		return ball.refSyntYPos(CGeoPoint:new_local(-60,110))()
+		return ball.refSyntYPos(CGeoPoint:new_local(-60/1200*param.pitchLength,110/900*param.pitchWidth))()
 	else
-		return ball.refAntiYPos(CGeoPoint:new_local(-60,110))()
+		return ball.refAntiYPos(CGeoPoint:new_local(-60/1200*param.pitchLength,110/900*param.pitchWidth))()
 	end
 end
 
 local Shootingpos = function()
 	if  ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 then
-		return ball.refSyntYPos(CGeoPoint:new_local(500,212))()
+		return ball.refSyntYPos(CGeoPoint:new_local(500/1200*param.pitchLength,212/900*param.pitchWidth))()
 	else
-		return ball.refAntiYPos(CGeoPoint:new_local(500,212))()
+		return ball.refAntiYPos(CGeoPoint:new_local(500/1200*param.pitchLength,212/900*param.pitchWidth))()
 	end
 end
 
 local chippos = function()
 	if  ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 then
 		print(1111111)
-		return ball.refAntiYPos(CGeoPoint:new_local(0,300))()
+		return ball.refAntiYPos(CGeoPoint:new_local(0/1200*param.pitchLength,300/900*param.pitchWidth))()
 	else
 		print(222222222)
-		return  ball.refSyntYPos(CGeoPoint:new_local(0,300))()
+		return  ball.refSyntYPos(CGeoPoint:new_local(0/1200*param.pitchLength,300/900*param.pitchWidth))()
 	end
 end
 
 local helppos = function()
 	if  ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 then
-		return ball.refAntiYPos(CGeoPoint:new_local(-270,390))()
+		return ball.refAntiYPos(CGeoPoint:new_local(-270/1200*param.pitchLength,390/900*param.pitchWidth))()
 	else
-		return ball.refSyntYPos(CGeoPoint:new_local(-270,390))()
+		return ball.refSyntYPos(CGeoPoint:new_local(-270/1200*param.pitchLength,390/900*param.pitchWidth))()
 	end
 end
 
 local assipos = function()
 	if  ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 then
-		return ball.refAntiYPos(CGeoPoint:new_local(95,190))()
+		return ball.refAntiYPos(CGeoPoint:new_local(95/1200*param.pitchLength,190/900*param.pitchWidth))()
 	else
-		return ball.refSyntYPos(CGeoPoint:new_local(95,190))()
+		return ball.refSyntYPos(CGeoPoint:new_local(95/1200*param.pitchLength,190/900*param.pitchWidth))()
 	end
 end
 
 local getpos  = function()
 	if  ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 then
-		return ball.refAntiYPos(CGeoPoint:new_local(125,340))()
+		return ball.refAntiYPos(CGeoPoint:new_local(125/1200*param.pitchLength,340/900*param.pitchWidth))()
 	else
-		return ball.refSyntYPos(CGeoPoint:new_local(125,340))()
+		return ball.refSyntYPos(CGeoPoint:new_local(125/1200*param.pitchLength,340/900*param.pitchWidth))()
 	end
 end
 
 local Blockpos = function()
 	if ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 then
-		return ball.refSyntYPos(CGeoPoint:new_local(90,-310))()
+		return ball.refSyntYPos(CGeoPoint:new_local(90/1200*param.pitchLength,-310/900*param.pitchWidth))()
 	else
-		return ball.refAntiYPos(CGeoPoint:new_local(90,-310))()
+		return ball.refAntiYPos(CGeoPoint:new_local(90/1200*param.pitchLength,-310/900*param.pitchWidth))()
 	end
 end
 
 -- if(ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 ) then
--- 	 Farpos = ball.refSyntYPos(CGeoPoint:new_local(-130,275))
--- 	 Nearpos = ball.refSyntYPos(CGeoPoint:new_local(-60,110))
--- 	 Shootingpos = ball.refSyntYPos(CGeoPoint:new_local(500,212))
--- 	 chippos = ball.refAntiYPos(CGeoPoint:new_local(0,300))
--- 	 helppos = ball.refAntiYPos(CGeoPoint:new_local(-270,390))
--- 	 assipos = ball.refAntiYPos(CGeoPoint:new_local(95,190))
--- 	 getpos = ball.refAntiPos(CGeoPoint:new_local(125,340))
+-- 	 Farpos = ball.refSyntYPos(CGeoPoint:new_local(-130/1200*param.pitchLength,275/900*param.pitchWidth))
+-- 	 Nearpos = ball.refSyntYPos(CGeoPoint:new_local(-60/1200*param.pitchLength,110/900*param.pitchWidth))
+-- 	 Shootingpos = ball.refSyntYPos(CGeoPoint:new_local(500/1200*param.pitchLength,212/900*param.pitchWidth))
+-- 	 chippos = ball.refAntiYPos(CGeoPoint:new_local(0/1200*param.pitchLength,300/900*param.pitchWidth))
+-- 	 helppos = ball.refAntiYPos(CGeoPoint:new_local(-270/1200*param.pitchLength,390/900*param.pitchWidth))
+-- 	 assipos = ball.refAntiYPos(CGeoPoint:new_local(95/1200*param.pitchLength,190/900*param.pitchWidth))
+-- 	 getpos = ball.refAntiPos(CGeoPoint:new_local(125/1200*param.pitchLength,340/900*param.pitchWidth))
 -- else
--- 	 Farpos = ball.refAntiYPos(CGeoPoint:new_local(-130,275))
--- 	 Nearpos = ball.refAntiYPos(CGeoPoint:new_local(-60,110))
--- 	 Shootingpos = ball.refAntiYPos(CGeoPoint:new_local(500,212))
--- 	 chippos = ball.refSyntYPos(CGeoPoint:new_local(0,300))
--- 	 helppos = ball.refSyntYPos(CGeoPoint:new_local(-270,390))
--- 	 assipos = ball.refSyntYPos(CGeoPoint:new_local(95,190))
--- 	 getpos = ball.refSyntYPos(CGeoPoint:new_local(125,340))
+-- 	 Farpos = ball.refAntiYPos(CGeoPoint:new_local(-130/1200*param.pitchLength,275/900*param.pitchWidth))
+-- 	 Nearpos = ball.refAntiYPos(CGeoPoint:new_local(-60/1200*param.pitchLength,110/900*param.pitchWidth))
+-- 	 Shootingpos = ball.refAntiYPos(CGeoPoint:new_local(500/1200*param.pitchLength,212/900*param.pitchWidth))
+-- 	 chippos = ball.refSyntYPos(CGeoPoint:new_local(0/1200*param.pitchLength,300/900*param.pitchWidth))
+-- 	 helppos = ball.refSyntYPos(CGeoPoint:new_local(-270/1200*param.pitchLength,390/900*param.pitchWidth))
+-- 	 assipos = ball.refSyntYPos(CGeoPoint:new_local(95/1200*param.pitchLength,190/900*param.pitchWidth))
+-- 	 getpos = ball.refSyntYPos(CGeoPoint:new_local(125/1200*param.pitchLength,340/900*param.pitchWidth))
 -- end
 local FREEKICKPOS
 local FIELDROBOTPOS
@@ -195,7 +195,7 @@ firstState = "startball",
 			return "exit"
 		end
 	end,
-	Assister = task.chipPass(CGeoPoint:new_local(450,0),450),
+	Assister = task.chipPass(CGeoPoint:new_local(450/1200*param.pitchLength,0/900*param.pitchWidth),450),
 	Breaker = task.goCmuRush(getpos),
 	Leader   = task.singleBack(),
 	Special  = task.goCmuRush(Blockpos),

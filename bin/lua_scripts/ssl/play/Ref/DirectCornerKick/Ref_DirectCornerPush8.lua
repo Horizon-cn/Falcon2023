@@ -3,7 +3,7 @@ local WAIT_BALL_POS = function(anti)
     return ball.pos() + Utils.Polar2Vector(50, anti * math.pi)
   end
 end
-local SHOOT_POS = ball.syntYPos(CGeoPoint:new_local(520, 50))
+local SHOOT_POS = ball.syntYPos(CGeoPoint:new_local(520/1200*param.pitchLength,50/900*param.pitchWidth))
 local function def_chipPower()
   if math.abs(ball.posY()) > 300 then 
     return 350

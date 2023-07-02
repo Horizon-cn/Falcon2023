@@ -4,40 +4,40 @@ end
 
 local RECEIVE_POS = function()
   if math.abs(ball.posY()) < 250 then
-    return ball.syntYPos(CGeoPoint:new_local(550, 120))()
+    return ball.syntYPos(CGeoPoint:new_local(550/1200*param.pitchLength,120/900*param.pitchWidth))()
   else
-    return ball.syntYPos(CGeoPoint:new_local(560, 0))()
+    return ball.syntYPos(CGeoPoint:new_local(560/1200*param.pitchLength,0/900*param.pitchWidth))()
   end
 end
 local BLOCK_POS = function()
   if math.abs(ball.posY()) < 250 then
-    return ball.syntYPos(CGeoPoint:new_local(ball.posX(),350))()
+    return ball.syntYPos(CGeoPoint:new_local(ball.posX(),350/900*param.pitchWidth))()
   else
-    return ball.syntYPos(CGeoPoint:new_local(ball.posX(),200))()
+    return ball.syntYPos(CGeoPoint:new_local(ball.posX(),200/900*param.pitchWidth))()
   end
 end
 local BARYCENTER = function()
   if math.abs(ball.posY()) < 250 then
-    return ball.syntYPos(CGeoPoint:new_local((550+ball.posX())/2,235))()
+    return ball.syntYPos(CGeoPoint:new_local((550+ball.posX())/2/1200*param.pitchLength,235/900*param.pitchWidth))()
   else
-    return ball.syntYPos(CGeoPoint:new_local((560+ball.posX())/2,250))() 
+    return ball.syntYPos(CGeoPoint:new_local((560+ball.posX())/2/1200*param.pitchLength,250/900*param.pitchWidth))() 
   end
 end
 local BLOCK_POS2 = function()
-  return ball.syntYPos(CGeoPoint:new_local(430, 0))()
+  return ball.syntYPos(CGeoPoint:new_local(430/1200*param.pitchLength,0/900*param.pitchWidth))()
 end
 local RECEIVE_POS2 = function()
   if math.abs(ball.posY()) < 250 then
-    return ball.syntYPos(CGeoPoint:new_local(250, 60))()
+    return ball.syntYPos(CGeoPoint:new_local(250/1200*param.pitchLength,60/900*param.pitchWidth))()
   else
-    return ball.syntYPos(CGeoPoint:new_local(170, 80))()
+    return ball.syntYPos(CGeoPoint:new_local(170/1200*param.pitchLength,80/900*param.pitchWidth))()
   end
 end
 local SHOOT_POS = function()
   if math.abs(ball.posY()) < 250 then
-    return ball.syntYPos(CGeoPoint:new_local(510, 70))()
+    return ball.syntYPos(CGeoPoint:new_local(510/1200*param.pitchLength,70/900*param.pitchWidth))()
   else
-    return ball.syntYPos(CGeoPoint:new_local(490, 80))()
+    return ball.syntYPos(CGeoPoint:new_local(490/1200*param.pitchLength,80/900*param.pitchWidth))()
   end
 end
 local KICK_POWER=function()

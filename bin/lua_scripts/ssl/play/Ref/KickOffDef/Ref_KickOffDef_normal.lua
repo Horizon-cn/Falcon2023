@@ -5,9 +5,9 @@
 -- 		return CGeoPoint:new_local(x,y)
 -- 	end
 -- end
-local UpPoint = CGeoPoint:new_local(-224,-140)
-local MiddlePoint = CGeoPoint:new_local(-66,0)
-local BelowPoint = CGeoPoint:new_local(-224,140)
+local UpPoint = CGeoPoint:new_local(-224/1200*param.pitchLength,-140/900*param.pitchWidth)
+local MiddlePoint = CGeoPoint:new_local(-66/1200*param.pitchLength,0/900*param.pitchWidth)
+local BelowPoint = CGeoPoint:new_local(-224/1200*param.pitchLength,140/900*param.pitchWidth)
 gPlayTable.CreatePlay{
 firstState = "start",
 

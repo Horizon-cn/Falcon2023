@@ -3,7 +3,7 @@ local WAIT_BALL_POS = function(anti)
     return ball.pos() + Utils.Polar2Vector(50, anti * math.pi)
   end
 end
-local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(0, 50))
+local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(0/1200*param.pitchLength,50/900*param.pitchWidth))
 local kickPower = 300
 
 gPlayTable.CreatePlay{

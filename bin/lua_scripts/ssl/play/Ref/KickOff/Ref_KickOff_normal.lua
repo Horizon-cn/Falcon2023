@@ -1,16 +1,16 @@
 --[[-- 直接传球
 -- 在改一下V1
 
-local CHIP_POS = CGeoPoint:new_local(200, 200)
+local CHIP_POS = CGeoPoint:new_local(200/1200*param.pitchLength,200/900*param.pitchWidth)
 
-local ASSISTER_POS_1 = CGeoPoint:new_local(-15, 230)
-local ASSISTER_POS_2 = CGeoPoint:new_local(-60, 60)
+local ASSISTER_POS_1 = CGeoPoint:new_local(-15/1200*param.pitchLength,230/900*param.pitchWidth)
+local ASSISTER_POS_2 = CGeoPoint:new_local(-60/1200*param.pitchLength,60/900*param.pitchWidth)
 
-local SPECIAL_POS_1  = CGeoPoint:new_local(-15, -230)
-local SPECIAL_POS_2  = CGeoPoint:new_local(200, -60)
+local SPECIAL_POS_1  = CGeoPoint:new_local(-15/1200*param.pitchLength,-230/900*param.pitchWidth)
+local SPECIAL_POS_2  = CGeoPoint:new_local(200/1200*param.pitchLength,-60/900*param.pitchWidth)
 
-local MIDDLE_POS_1   = CGeoPoint:new_local(-220, 250)
-local MIDDLE_POS_2   = CGeoPoint:new_local(-5, 250)
+local MIDDLE_POS_1   = CGeoPoint:new_local(-220/1200*param.pitchLength,250/900*param.pitchWidth)
+local MIDDLE_POS_2   = CGeoPoint:new_local(-5/1200*param.pitchLength,250/900*param.pitchWidth)
 
 
 gPlayTable.CreatePlay{
@@ -69,7 +69,7 @@ firstState = "start",
       return "exit"
     end
   end,
-  Leader   = task.goCmuRush(CGeoPoint:new_local(200,20)),
+  Leader   = task.goCmuRush(CGeoPoint:new_local(200/1200*param.pitchLength,20/900*param.pitchWidth)),
   Special  = task.goCmuRush(SPECIAL_POS_2),
   Middle   = task.defendMiddle(),
   Defender = task.rightBack(),
@@ -89,20 +89,20 @@ attribute = "attack",
 timeout = 99999
 }
 --]]
-local LEFT_POS = CGeoPoint:new_local(200, -165)
-local LEFT_POS_2 = CGeoPoint:new_local(300, -165)
+local LEFT_POS = CGeoPoint:new_local(200/1200*param.pitchLength,-165/900*param.pitchWidth)
+local LEFT_POS_2 = CGeoPoint:new_local(300/1200*param.pitchLength,-165/900*param.pitchWidth)
 
-local START_POS = CGeoPoint:new_local(27, 18)
-local START_POS_1 = CGeoPoint:new_local(9, 6)
-local RECEIVE_POS_1 = CGeoPoint:new_local(-110, -70)
-local RECEIVE_POS_2 = CGeoPoint:new_local(-110, 70)
+local START_POS = CGeoPoint:new_local(27/1200*param.pitchLength,18/900*param.pitchWidth)
+local START_POS_1 = CGeoPoint:new_local(9/1200*param.pitchLength,6/900*param.pitchWidth)
+local RECEIVE_POS_1 = CGeoPoint:new_local(-110/1200*param.pitchLength,-70/900*param.pitchWidth)
+local RECEIVE_POS_2 = CGeoPoint:new_local(-110/1200*param.pitchLength,70/900*param.pitchWidth)
 
-local RIGHT_POS_1  = CGeoPoint:new_local(-20, 80)
-local RIGHT_POS_2  = CGeoPoint:new_local(155, 80)
-local outside = CGeoPoint:new_local(-50,300)
+local RIGHT_POS_1  = CGeoPoint:new_local(-20/1200*param.pitchLength,80/900*param.pitchWidth)
+local RIGHT_POS_2  = CGeoPoint:new_local(155/1200*param.pitchLength,80/900*param.pitchWidth)
+local outside = CGeoPoint:new_local(-50/1200*param.pitchLength,300/900*param.pitchWidth)
 
 local GetBallPos = pos.passForTouch(RECEIVE_POS_1)
-local GetBallPos1 = CGeoPoint:new_local(-110, 70)
+local GetBallPos1 = CGeoPoint:new_local(-110/1200*param.pitchLength,70/900*param.pitchWidth)
 
 local getKickerNum = function()
     return "Leader"

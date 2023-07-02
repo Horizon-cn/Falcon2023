@@ -9,9 +9,9 @@ local WAIT_BALL_POS   = function ()
 end
 
 local KICK_DIR  = ball.antiYDir(1.57)
-local FRONT_POS1= ball.antiYPos(CGeoPoint:new_local(350,-150))
-local FRONT_POS2= ball.antiYPos(CGeoPoint:new_local(260,0))
-local FRONT_POS3= ball.antiYPos(CGeoPoint:new_local(370,210))
+local FRONT_POS1= ball.antiYPos(CGeoPoint:new_local(350/1200*param.pitchLength,-150/900*param.pitchWidth))
+local FRONT_POS2= ball.antiYPos(CGeoPoint:new_local(260/1200*param.pitchLength,0/900*param.pitchWidth))
+local FRONT_POS3= ball.antiYPos(CGeoPoint:new_local(370/1200*param.pitchLength,210/900*param.pitchWidth))
 local ACC=500;
 
 gPlayTable.CreatePlay{

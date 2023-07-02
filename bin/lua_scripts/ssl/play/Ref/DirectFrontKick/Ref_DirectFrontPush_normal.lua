@@ -3,21 +3,21 @@ local WAIT_BALL_POS   = function ()
 end
 
 --【接球点】可根据实车情况进行调整
-local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(380,150))
+local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(380/1200*param.pitchLength,150/900*param.pitchWidth))
 
-local FRONT_POS1= ball.antiYPos(CGeoPoint:new_local(350,-150))
-local FRONT_POS2= ball.antiYPos(CGeoPoint:new_local(200,-100))
-local FRONT_POS3= ball.antiYPos(CGeoPoint:new_local(370,210))
+local FRONT_POS1= ball.antiYPos(CGeoPoint:new_local(350/1200*param.pitchLength,-150/900*param.pitchWidth))
+local FRONT_POS2= ball.antiYPos(CGeoPoint:new_local(200/1200*param.pitchLength,-100/900*param.pitchWidth))
+local FRONT_POS3= ball.antiYPos(CGeoPoint:new_local(370/1200*param.pitchLength,210/900*param.pitchWidth))
 
-local TargetPos1= ball.antiYPos(CGeoPoint:new_local(410,-100))
-local TargetPos2= ball.antiYPos(CGeoPoint:new_local(250,0))
-local TargetPos3= ball.antiYPos(CGeoPoint:new_local(380,150))
+local TargetPos1= ball.antiYPos(CGeoPoint:new_local(410/1200*param.pitchLength,-100/900*param.pitchWidth))
+local TargetPos2= ball.antiYPos(CGeoPoint:new_local(250/1200*param.pitchLength,0/900*param.pitchWidth))
+local TargetPos3= ball.antiYPos(CGeoPoint:new_local(380/1200*param.pitchLength,150/900*param.pitchWidth))
 
 local RECEIVE_POS = function()
   return SHOOT_POS() + Utils.Polar2Vector(20,ball.toPointDir(SHOOT_POS())())
 end
 
-local BlockPos=ball.antiYPos(CGeoPoint:new_local(430,-100))
+local BlockPos=ball.antiYPos(CGeoPoint:new_local(430/1200*param.pitchLength,-100/900*param.pitchWidth))
 --【传球力度】可根据实车情况进行调整
 local KICK_POWER=function()
   return 13.6*math.sqrt(ball.toPointDist(SHOOT_POS()))

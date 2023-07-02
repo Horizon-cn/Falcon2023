@@ -12,8 +12,8 @@ gPlayTable.CreatePlay{
   Hawk = task.multiBack(3,1),
   Middle = task.multiBack(3,2),
   Special = task.goMWPassPos("Leader"),
-  Assister = task.goCmuRush(CGeoPoint:new_local(-460, 0)),
-  Powerhouse = task.goCmuRush(CGeoPoint:new_local(-460, 140)),
+  Assister = task.goCmuRush(CGeoPoint:new_local(-460/1200*param.pitchLength,0/900*param.pitchWidth)),
+  Powerhouse = task.goCmuRush(CGeoPoint:new_local(-460/1200*param.pitchLength,140/900*param.pitchWidth)),
   Defender = task.multiBack(3,3),
   Goalie = task.goalieNew(),
   match    = "[L][HM][SAPD]"

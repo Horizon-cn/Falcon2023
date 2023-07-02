@@ -138,9 +138,9 @@ end
 
 local SIDE_POS, MIDDLE_POS, INTER_POS, SIDE2_POS, INTER2_POS = pos.refStopAroundBall()
 
-local KICKOF_POS_1 = CGeoPoint:new_local(-20, 80)
-local KICKOF_POS_2 = CGeoPoint:new_local(-70, 0)
-local KICKOF_POS_3 = CGeoPoint:new_local(-20, -80)
+local KICKOF_POS_1 = CGeoPoint:new_local(-20/1200*param.pitchLength,80/900*param.pitchWidth)
+local KICKOF_POS_2 = CGeoPoint:new_local(-70/1200*param.pitchLength,0/900*param.pitchWidth)
+local KICKOF_POS_3 = CGeoPoint:new_local(-20/1200*param.pitchLength,-80/900*param.pitchWidth)
 
 local STOP_FLAG = flag.dodge_ball
 local STOP_DSS = bit:_or(STOP_FLAG, flag.allow_dss)
@@ -148,8 +148,8 @@ local STOP_DSS = bit:_or(STOP_FLAG, flag.allow_dss)
 local gBallPosXInStop = 0
 local gBallPosYInStop = 0
 
-local OTHER_SIDE_POS1 = ball.antiYPos(CGeoPoint:new_local(-100,120))
-local OTHER_SIDE_POS2 = ball.antiYPos(CGeoPoint:new_local(-100,-120))
+local OTHER_SIDE_POS1 = ball.antiYPos(CGeoPoint:new_local(-100/1200*param.pitchLength,120/900*param.pitchWidth))
+local OTHER_SIDE_POS2 = ball.antiYPos(CGeoPoint:new_local(-100/1200*param.pitchLength,-120/900*param.pitchWidth))
 
 local OTHER_SIDE_POS = function()
   local factor = 1
@@ -468,15 +468,15 @@ firstState = "start",
     end
   end,
 
-  Assister = task.goCmuRush(ball.refAntiYPos(CGeoPoint:new_local(-140,-120)), dir.playerToBall, ACC, STOP_DSS),
-  Special  = task.goCmuRush(ball.refAntiYPos(CGeoPoint:new_local(-140, 120)), dir.playerToBall, ACC, STOP_DSS),
-  Leader   = task.goCmuRush(CGeoPoint:new_local(-120, 0), dir.playerToBall, ACC, STOP_DSS),
-  Defender = task.goCmuRush(CGeoPoint:new_local(-290, -130), dir.playerToBall, ACC, STOP_DSS),
-  Middle   = task.goCmuRush(CGeoPoint:new_local(-290, 130), dir.playerToBall, ACC, STOP_DSS),
-	Breaker  = task.goCmuRush(CGeoPoint:new_local(-290, 160), dir.playerToBall, ACC, STOP_DSS),
-  Crosser  = task.goCmuRush(CGeoPoint:new_local(-290, 190), dir.playerToBall, ACC, STOP_DSS),
-  --Fronter  = task.goCmuRush(CGeoPoint:new_local(-290,260),dir.playerToBall,ACC,STOP_DSS),
-  --Center   = task.goCmuRush(CGeoPoint:new_local(-290,-260),dir.playerToBall,ACC,STOP_DSS),
+  Assister = task.goCmuRush(ball.refAntiYPos(CGeoPoint:new_local(-140/1200*param.pitchLength,-120/900*param.pitchWidth)), dir.playerToBall, ACC, STOP_DSS),
+  Special  = task.goCmuRush(ball.refAntiYPos(CGeoPoint:new_local(-140/1200*param.pitchLength,120/900*param.pitchWidth)), dir.playerToBall, ACC, STOP_DSS),
+  Leader   = task.goCmuRush(CGeoPoint:new_local(-120/1200*param.pitchLength,0/900*param.pitchWidth), dir.playerToBall, ACC, STOP_DSS),
+  Defender = task.goCmuRush(CGeoPoint:new_local(-290/1200*param.pitchLength,-130/900*param.pitchWidth), dir.playerToBall, ACC, STOP_DSS),
+  Middle   = task.goCmuRush(CGeoPoint:new_local(-290/1200*param.pitchLength,130/900*param.pitchWidth), dir.playerToBall, ACC, STOP_DSS),
+	Breaker  = task.goCmuRush(CGeoPoint:new_local(-290/1200*param.pitchLength,160/900*param.pitchWidth), dir.playerToBall, ACC, STOP_DSS),
+  Crosser  = task.goCmuRush(CGeoPoint:new_local(-290/1200*param.pitchLength,190/900*param.pitchWidth), dir.playerToBall, ACC, STOP_DSS),
+  --Fronter  = task.goCmuRush(CGeoPoint:new_local(-290/1200*param.pitchLength,260/900*param.pitchWidth),dir.playerToBall,ACC,STOP_DSS),
+  --Center   = task.goCmuRush(CGeoPoint:new_local(-290/1200*param.pitchLength,-260/900*param.pitchWidth),dir.playerToBall,ACC,STOP_DSS),
   Goalie   = task.goalieNew(),
   match    = "[AMDLSBC]"
 },

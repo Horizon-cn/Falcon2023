@@ -7,8 +7,8 @@ end
 --local GET_BALL=function ()
  -- return task.getBall()
 --end
-local PointA = CGeoPoint:new_local(0, -150)
-local PointB = CGeoPoint:new_local(0, 150)
+local PointA = CGeoPoint:new_local(0/1200*param.pitchLength,-150/900*param.pitchWidth)
+local PointB = CGeoPoint:new_local(0/1200*param.pitchLength,150/900*param.pitchWidth)
 gPlayTable.CreatePlay{
 
 firstState = "start",
