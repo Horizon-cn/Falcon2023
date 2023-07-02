@@ -135,7 +135,7 @@ firstState = "startball",
 		if bufcnt(player.toTargetDist("Breaker") < 30, "fast") then
 			return "changepos"
 		elseif bufcnt(true, 300) then
-			return "exit"
+			return "Shootball"
 		end
 	end,
 	Assister = task.staticGetBall(chippos,false),
@@ -154,7 +154,7 @@ firstState = "startball",
 		if bufcnt(player.toTargetDist("Crosser") < 30 and player.toTargetDist("Defender") < 30,"fast") then
 			return "chipball"
 		elseif bufcnt(true, 225) then
-			return "exit"
+			return "Shootball"
 		end
 	end,
 	Assister = task.staticGetBall(chippos,false),
@@ -170,8 +170,7 @@ firstState = "startball",
 
 ["chipball"] = {
     switch = function ()
-		if bufcnt(player.kickBall("Assister") or
-				  player.toBallDist("Assister") > 20, "normal") then
+		if bufcnt(player.kickBall("Assister") , "normal") then
 			return "exit"
 		elseif  bufcnt(true,75) then
 			return "exit"
@@ -188,6 +187,24 @@ firstState = "startball",
 	match    = "{ALS}[C][DM][B]"
 },
 
+["Shootball"] = {
+    switch = function ()
+		if bufcnt(player.kickBall("Assister") , "normal") then
+			return "exit"
+		elseif  bufcnt(true,75) then
+			return "exit"
+		end
+	end,
+	Assister = task.chipPass(CGeoPoint:new_local(450,0),450),
+	Breaker = task.goCmuRush(getpos),
+	Leader   = task.singleBack(),
+	Special  = task.goCmuRush(Blockpos),
+	Defender = task.leftBack(),
+	Crosser	 = task.goCmuRush(assipos),
+	Middle   = task.rightBack(),
+	Goalie   = task.goalie(),
+	match    = "{ALS}[C][DM][B]"
+},
 
 
 name = "Ref_IndirectBackKick",
