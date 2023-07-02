@@ -185,15 +185,12 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push KICK", COLOR_YELLOW);
 		if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) _state = GET;
 		//  这个状态跳转有点问题
-		else if ((!isDirOK(pVision, _executor, KickorPassDir, 1)) && (fabs(Utils::Normalize((me.Dir() - KickorPassDir))) < 1.5 * Param::Math::PI || Me2OppTooclose(pVision, _executor))) {
+		else if ((!isDirOK(pVision, _executor, KickorPassDir, 1)) && fabs(Utils::Normalize((me.Dir() - KickorPassDir))) < Param::Math::PI * 1.5 / 180) {
 			if (MeIsInWhichArea != CenterArea) {
 				_state = BREAKSHOOT;
 				NowIsShoot = 2;
 			}
-			else {
-				_state = PUSHOUT;
-				NowIsShoot = 0;
-			}
+			else _state = BREAKING, NowIsShoot = 0;
 		}
 		break;
 	case PASS:
@@ -459,7 +456,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if(OppIsFarThanMe(pVision, _executor))
 			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
 		else
-			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir, 200.0));
+			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir, 240.0));
 		break;
 
 	case CHASEKICK:
