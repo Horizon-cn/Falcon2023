@@ -11,10 +11,6 @@
 * Created Date: 2022/10/10
 ***********************************************************/
 
-struct PassDirOrPos {
-    double dir;
-    CGeoPoint pos;
-};
 
 class CAdvance : public  CStatedTask{
 
@@ -36,8 +32,10 @@ private:
         JUSTCHIPPASS,
         BREAKSHOOT,
         PUSHOUT,
-        BREAKPASS,
-        BLOCK
+        BREAKING,
+        BLOCK,
+        CHASEKICK,
+        CHASEPUSH
     };
     enum {
         DefenceArea = 0,
@@ -45,7 +43,8 @@ private:
         CornerArea,
         KICKArea,
         CanNOTBreakArea,
-        CenterArea
+        CenterArea,
+        ReliefArea,
     };
     int _lastCycle;
     int _state;
@@ -55,10 +54,11 @@ private:
     int meLoseBall;
 
     int opponentID;
+    int Oppfront;
+
     int NumberOfSupport;/* Gpu??????????????? */
     int NowIsShoot;
     int NumOfOurPlayer;
-
     int MeIsInWhichArea;
     /**********************************************************
     * Description: ?????б? ???????ini??????????????
@@ -68,25 +68,25 @@ private:
     ***********************************************************/
     //advance???? byTYH  2022.10
     double KICK_DIST ;  /*??????????Χ ????????????*/
-    int WantToLessShoot ; /*?????????????????????? ?????0 ?????5*/
+    double WantToLessShoot ; /*?????????????????????? ?????0 ?????5*/
     double RELIEF_DIST ;  /*GET?н?????????RELIEF?ж????*/
     double OPP_HAS_BALL_DIST ; /*?ж?з????????????? ???????*/
     double CanPassToWingDist ; /*Advance???????????????????*/
     double CanWingShootDist ; /*??????????????????*/
-    double SHOOT_PRECISION ; /*??????????С??????????????????? */
+    double PASS_PRECISION ; /*??????????С??????????????????? */
     double GetBallBias; /*Getball????? ?????????? */
     double BalltoMeVelTime;/*Advance???????????????????Time*/
     double OBSTACLE_RADIUS;
     /*???????????*/
-    int KICKPOWER ;
-    int CHIPPOWER ;
-    int ADV_FPASSPOWER_Alpha;
-    int ADV_CPASSPOWER_Alpha ;
-    int RELIEF_POWER ;
-    int  BACK_POWER ;
+    double KICKPOWER ;
+    double CHIPPOWER ;
+    double ADV_FPASSPOWER_Alpha;
+    double ADV_CPASSPOWER_Alpha ;
+    double RELIEF_POWER ;
+    double  BACK_POWER ;
     int Advance_DEBUG_ENGINE;
     double LARGE_ADJUST_ANGLE;
-    int PUSHPOWER;
+    double PUSHPOWER;
     double tmpDir = 1.57;
     /**********************************************************
     * Description: ??ò???
@@ -101,16 +101,19 @@ private:
     CGeoPoint theirCenter = CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0);
     CGeoPoint ourGoal = CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0);
 
-
+    int NumOfTheirPlayerfrontMe;
     CGeoPoint SupportPoint[6];
 
     int LastPassPoint = 0; /*????????????*/
     double last_dir_deviation = 100;
     double last_target_dir = 0; /*isDirOk???????*/
     double KickorPassDir = 0;/*?????????????? ??????????????? ???п????????????*/
-    double LastPassDirToJudge = 0;
 
-    bool IsMeSupport = 0;
+    bool IHaveSupport = false;
+    int TheBestSupportNumber = 1;
+    bool isBallVeryNearTheOpp;
+
+    CGeoPoint ShootPoint, PassPoint;/*传球与射门的方向 应该用一个变量表示 具有可持续化的作用*/
 
     /**********************************************************
     * Description: ???????????????????λ???ж?
@@ -120,22 +123,27 @@ private:
     bool isVisionHasBall(const CVisionModule* pVision, const int vecNumber);
     bool checkOppHasBall(const CVisionModule* pVision);
     int getTheirMostClosetoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
+    int getTheirMostCloseAndFronttoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
     bool checkBallFront(const CVisionModule* pVision, double angle);
-    bool IsOurNearHere(const CVisionModule* pVision, const int supportIndex);
-    bool IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber);
+    bool IsOurNearHere(const CVisionModule* pVision, const int supportIndex, const int vecNumber);
+    //bool IsOurNearHere(const CVisionModule* pVision, CGeoPoint checkPoint, const int vecNumber);
 
+    bool isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int IsShoot);
     bool Me2OppTooclose(const CVisionModule* pVision, const int vecNumber);
     bool isPassBalltoMe(const CVisionModule* pVision, int vecNumber);
-    bool isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int ShootOrPass);
-    
+    /*
     bool isInBreakArea(const CVisionModule* pVision, int vecNumber);
     bool isInTheCornerArea(const CVisionModule* pVision, int vecNumber);
     bool MeIsInTheSide(const CVisionModule* pVision, int vecNumber);
     
     bool JudgeIsMeSupport(const CVisionModule* pVision, int vecNumber);
     bool JudgePassMeIsBeBlocked(const CVisionModule *pVision, int vecNumber);
+    
     bool AdJudgeBreakCanDo(const CVisionModule *pVision, int vecNumber, CGeoPoint TargetPoint);
+    */
     int InWhichArea(const CVisionModule* pVision, int vecNumber);
+
+    bool WeCanAlwaysSetKick(const CVisionModule* pVision, const int vecNumber);
     /**********************************************************
     * Description: ???л??ж??????????????????????ж?
     * Author: ?????
@@ -160,14 +168,17 @@ private:
     double generateOppIsNearThanMeDir(const CVisionModule* pVision, const int vecNumber);
     double generateOppIsFarThanMeDir(const CVisionModule* pVision, const int vecNumber);
     bool OppIsFarThanMe(const CVisionModule* pVision, const int vecNumber);
+
+    bool isBallVeryNearTheOppAndIMustGET(const CVisionModule* pVision);
+
+
 /**********************************************************
     * Description: ?????????????о??????
     * Author: ?????
     * Created Date: 2022/10/10
 ***********************************************************/
 
-    PassDirOrPos PassDirInside(const CVisionModule* pVision, int vecNumber);
-    double PassDir(const CVisionModule* pVision, int vecNumber);
+    double GenerateShootDir(const CVisionModule* pVision, int vecNumber);
     CGeoPoint GenerateBreakShootPoint(const CVisionModule* pVision, int vecNumber);
     CGeoPoint GenerateBreakPassPoint(const CVisionModule* pVision, int vecNumber);
     double TheMinDistBetweenTheOppAndTheLine(const CVisionModule* pVision, CGeoPoint startPoint, CGeoPoint targetPoint);
@@ -180,6 +191,9 @@ private:
     int GenerateStateOfFoulTrouble(const CVisionModule* pVision, const int vecNumber);
 
     bool canScore(const CVisionModule* pVision, const int vecNumber, const double radius, const double dir);
+    int opp_ahead(const CVisionModule* pVision, const int vecNumber);
+    int GenerateNextState(const CVisionModule* pVision, const int vecNumber);
+    int CanWeUseChaseBecauseOfGetBallV3(const CVisionModule* pVision, const int vecNumber);
 protected:
 
     CPlayerCommand* _directCommand;

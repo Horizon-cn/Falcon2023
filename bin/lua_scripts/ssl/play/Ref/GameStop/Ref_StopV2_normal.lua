@@ -176,6 +176,7 @@ firstState = "start",
 
 ["start"] = {
   switch = function()
+    -- return "start"
     gBallPosXInStop = ball.posX()
     gBallPosYInStop = ball.posY()
     if cond.isGameOn() then

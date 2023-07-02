@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <utility>
+#include <GDebugEngine.h>
 #include "AttributeNew.h"
 
 //抽象属性集，加权得到分数，权重自动从参数管理器获取
@@ -19,14 +20,18 @@ public:
 		}
 	}
 
-	double evaluate(const CVisionModule* pVision, int num)
+	double evaluate(const CVisionModule* pVision, int num, bool draw_debug = false)
 	{
 		double score = 0;
+		string deb;
 		for (auto& attributePair : _attributePairList)
 		{
 			attributePair.second->evaluate(pVision, num);
 			score += attributePair.first * attributePair.second->getValue();
+			deb = deb + to_string(100 * int(attributePair.first * attributePair.second->getValue())) + "#";
 		}
+		if (draw_debug && pVision->TheirPlayer(num).Valid())
+			GDebugEngine::Instance()->gui_debug_msg(pVision->TheirPlayer(num).Pos() + Utils::Polar2Vector(40, Param::Math::PI / 4), deb.c_str());
 		return score;
 	}
 protected:

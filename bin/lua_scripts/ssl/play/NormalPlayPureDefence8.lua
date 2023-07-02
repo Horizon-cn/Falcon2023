@@ -1,6 +1,7 @@
 local ALL_AVOID = flag.dodge_ball + flag.avoid_stop_ball_circle + flag.avoid_shoot_line
 local ALL_NOT_AVOID = flag.not_avoid_their_vehicle + flag.not_avoid_our_vehicle + flag.not_dodge_penalty
 local FLAG = ALL_AVOID + flag.dribbling
+local RECEIVE_POS = ball.syntYPos(CGeoPoint:new_local(100, 100))
 
 local distThreshold = 50
 local TargetPos1  = CGeoPoint:new_local(280,200)
@@ -16,11 +17,11 @@ firstState = "PureDefence",
 	end,
 	Leader   = task.marking("First"),
 	Assister = task.marking("Second"),
-    Middle   = task.marking("Third"),
+    Middle   = task.multiBack(4,4),
     Special  = task.advance(),
-	Defender = task.multiBack(3,1),
-	Breaker  = task.multiBack(3,2),
-	Crosser  = task.multiBack(3,3),
+	Defender = task.multiBack(4,1),
+	Breaker  = task.multiBack(4,2),
+	Crosser  = task.multiBack(4,3),
 	Goalie   = task.goalieNew(),
     match = "[S][DBC][LMA]"
 },

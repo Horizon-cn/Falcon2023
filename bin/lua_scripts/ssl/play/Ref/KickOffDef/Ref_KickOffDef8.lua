@@ -6,7 +6,7 @@ local function KICKOFF_DEF_POS(str)
 	end
 end
 
-local guardpoint = CGeoPoint:new_local(-100,0)
+local guardpoint = CGeoPoint:new_local(100,0)
 gPlayTable.CreatePlay{
 firstState = "start",
 

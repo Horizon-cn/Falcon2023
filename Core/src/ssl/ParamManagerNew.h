@@ -171,7 +171,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(BREAK_OBSTACLE_RADIUS, "BREAK/OBSTACLE_RADIUS", 5);
 
 
-
+            loadParam(SHOOT_PRECISION, "PenaltyKicker/SHOOT_PRECISION", 7);
 
             loadParam(KICK_DIST, "Advance/KICK_DIST", 400);
             loadParam(WantToLessShoot, "Advance/WantToLessShoot", 3);
@@ -179,10 +179,10 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(OPP_HAS_BALL_DIST, "Advance/OPP_HAS_BALL_DIST", 30);
             loadParam(CanPassToWingDist, "Advance/CanPassToWingDist", 600);
             loadParam(CanWingShootDist, "Advance/CanWingShootDist", 500);
-            loadParam(SHOOT_PRECISION, "Advance/SHOOT_PRECISION", 7);
+            loadParam(PASS_PRECISION, "Advance/PASS_PRECISION", 7);
             loadParam(AdGetBallBias, "Advance/AdGetBallBias", 0);
             loadParam(BalltoMeVelTime, "Advance/BalltoMeVelTime", 1.0);
-            loadParam(KICKPOWER, "Advance/KICKPOWER", 700);
+            loadParam(KICKPOWER, "Advance/KICKPOWER", 650);
             loadParam(CHIPPOWER, "Advance/CHIPPOWER", 240);
             loadParam(ADV_FPASSPOWER, "Advance/ADV_FPASSPOWER", 2);
             loadParam(ADV_CPASSPOWER, "Advance/ADV_CPASSPOWER", 1);
@@ -369,6 +369,8 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double BREAK_ROT_ACC;
         double BREAK_OBSTACLE_RADIUS;
 
+        double SHOOT_PRECISION; // penalty 参数
+
         //advance参数 byTYH  2022.10
         double KICK_DIST;  /*射门允许范围 越高越容易射门*/
         int WantToLessShoot ; /*射门倾向，越低越容易射门 最低为0 最高为5*/
@@ -376,7 +378,7 @@ class CParamManagerSkill : public Falcon::ParamManager {
         double OPP_HAS_BALL_DIST; /*判断敌方是否有球的距离 需要调整*/
         double CanPassToWingDist; /*Advance能够传给边锋的临界距离*/
         double CanWingShootDist; /*边锋能够射门的临界距离*/
-        double SHOOT_PRECISION;	/*允许射门最小精度角分母，越大越慢越精确 最低为7最高17*/
+        double PASS_PRECISION;	/*允许射门最小精度角分母，越大越慢越精确 最低为7最高17*/
         double AdGetBallBias;  /*Getball的偏移量*/
         double BalltoMeVelTime;/*Advance传球给我主动去接的临界时间*/
         bool WEAK_OPP;

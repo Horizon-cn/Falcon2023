@@ -3,14 +3,26 @@ local WAIT_BALL_POS = function(anti)
     return ball.pos() + Utils.Polar2Vector(50, anti * math.pi)
   end
 end
+local SHOOT_POS = ball.syntYPos(CGeoPoint:new_local(520, 50))
+local function def_chipPower()
+  if math.abs(ball.posY()) > 300 then 
+    return 350
+  elseif math.abs(ball.posY())> 285 then
+    return 220
+  elseif math.abs(ball.posY()) > 270 then 
+    return 200
+  else 
+    return 20
+  end
+end
 
 gPlayTable.CreatePlay{
 
   firstState = "start",
 
   ["start"] = {
-    switch = function ()
-      if bufcnt(player.toTargetDist("Assister") and player.toTargetDist("Middle") < 20 , 10, 180) then
+    switch = function()
+      if bufcnt(player.toTargetDist("Assister") < 20 , 10, 180) then
         return "toBall"
       end
     end,
@@ -22,16 +34,16 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match = "{A}{SDBC}{LM}"
+    match = "[D][A][SBC][LM]"
   },
 
   ["toBall"] = {
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) < 15, 3, 180) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 10, 3, 180) then
         return "leaveBall"
       end
     end,
-    Assister = task.goCmuRush(ball.pos(),_,_,flag.allow_dss),
+    Assister = task.staticGetBall(SHOOT_POS),
     Leader   = task.marking("First"),
     Middle   = task.marking("Second"),
     Special  = task.multiBack(4,1),
@@ -39,16 +51,16 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match = "{A}{SDBC}{LM}"
+    match = "[D][A][SBC][LM]"
   },
 
   ["leaveBall"] = {
     switch = function ()
-      if bufcnt(player.kickBall("Middle"), "fast", 180) then
+      if bufcnt(player.kickBall("Assister"), 3, 180) then
         return "exit"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
+    Assister = task.chipPass(SHOOT_POS,def_chipPower()),
     Leader   = task.marking("First"),
     Middle   = task.marking("Second"),
     Special  = task.multiBack(4,1),
@@ -56,7 +68,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match = "{A}{SDBC}{LM}"
+    match = "[D][A][SBC][LM]"
   },
 
   name = "Ref_IndirectCornerPush8",

@@ -905,7 +905,7 @@ end
 ------------------------------------ 防守相关的skill ------------------------------------------
 
 function protectBall()
-	local mexe, mpos = ProtectBall{pos = pos.protectBall, flag = flag.dodge_ball}
+	local mexe, mpos = ProtectBall{pos = pos.protectBall, flag = flag.dodge_ball ,srole="ballProtecter"}
 	return {mexe, mpos}
 end
 
@@ -1178,7 +1178,7 @@ end
 -- f为传入的flag
 function staticGetBall(p, anti, f)
 	-- local mexe, mpos = StaticGetBall{ pos = pos.backBall(p), dir = dir.backBall(p)}
-	local mexe, mpos = StaticGetBall{ pos = ball.backPos(p, _, _, anti), dir = ball.backDir(p, anti), flag = f}
+	local mexe, mpos = StaticGetBall{ dir = ball.backDir(p, anti), flag = f}
 	return {mexe, mpos}
 end
 

@@ -82,7 +82,7 @@ CAdvanceBallV4::CAdvanceBallV4() {
     KICKPOWER = ParamManager::Instance()->KICKPOWER;
     CHIPPOWER = ParamManager::Instance()->CHIPPOWER;
     DEBUG_ENGINE = ParamManager::Instance()->Advance_DEBUG_ENGINE;
-    SHOOT_PRECISION = ParamManager::Instance()->SHOOT_PRECISION;
+    //SHOOT_PRECISION = ParamManager::Instance()->SHOOT_PRECISION;
     CHIP_ANGLE = ParamManager::Instance()->CHIP_ANGLE;
     FLAT_DIST = ParamManager::Instance()->FLAT_DIST;
     PULL_DIST = ParamManager::Instance()->PULL_DIST;

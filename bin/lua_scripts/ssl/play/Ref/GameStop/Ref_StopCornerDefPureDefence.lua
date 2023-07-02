@@ -1,4 +1,3 @@
-
 gPlayTable.CreatePlay{
 
   firstState = "start",
@@ -9,15 +8,17 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-  Leader = task.defendKick(),
+  Leader = task.multiBack(1,3),
   Assister = task.defendHead(),
   Special = task.markingFront("First"),
-  Middle = task.leftBack(),
-  Defender = task.rightBack(),
+  Breaker = task.markingFront("Second"),
+  Crosser = task.markingFront("Third"),
+  Middle = task.multiBack(2,3),
+  Defender = task.multiBack(3,3),
   Goalie = task.goalieNew(),
-  match    = "[MD][AL][S]"
+  match    = "[MD][AL][SBC]"
 },
-  name = "Ref_CornerDefV2",
+  name = "Ref_StopCornerDefPureDefence",
   applicable = {
     exp = "a",
     a = true

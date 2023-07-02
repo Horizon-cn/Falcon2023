@@ -311,7 +311,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKSHOOT", COLOR_YELLOW);
         KickStatus::Instance()->clearAll();
         ShootPoint = GenerateBreakShootPoint(pVision, _executor);
-        setSubTask(PlayerRole::makeItBreak(_executor, false, ShootPoint, 1));
+        setSubTask(PlayerRole::makeItBreak(_executor, false, 1));
         break;
     case NORMAL_PUSH:
         KickDirection::Instance()->GenerateShootDir(_executor, pVision->OurPlayer(_executor).Pos());

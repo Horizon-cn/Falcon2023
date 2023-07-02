@@ -475,9 +475,101 @@ void compute_motion_1d_test(double x0, double v0, double v1,
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-550, -200), periodmsg, COLOR_YELLOW);
         }
     }
-    //if (pT == MOVE_X)cout << "second" << ' ' << traj_accel << endl;
-    //if(DEBUG_TIME) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-380*10 * isX, -270*10 + (timeItor++) * 20*10), QString("R7").toLatin1(), timeDebugColor);
-    //if (pT == MOVE_X) cout << "Third" << traj_accel << endl;
+
+    /*
+    double TheReturnAcc = traj_accel;
+    /// 上面是TYH的代码，用来算速度
+    
+    /// 下面是HXY的代码，用来算时间
+
+    traj_time = traj_time_acc = traj_time_flat = traj_time_dec = 0;
+
+    double A_MAX_1 = paramManager->A_MAX_1;
+    double V_LIMIT_1 = paramManager->V_LIMIT_1;
+    double PERIOD_V_LIMIT_1 = paramManager->PERIOD_V_LIMIT_1;
+    double V_LIMIT_2 = paramManager->V_LIMIT_2;
+    double PERIOD_V_LIMIT_2 = paramManager->PERIOD_V_LIMIT_2;
+    double A_MAX_2 = paramManager->A_MAX_2;
+    double V_LIMIT_3 = paramManager->V_LIMIT_3;
+    double PERIOD_V_LIMIT_3 = paramManager->PERIOD_V_LIMIT_3;
+    double V_LIMIT_4 = paramManager->V_LIMIT_4;
+    double PERIOD_V_LIMIT_4 = paramManager->PERIOD_V_LIMIT_4;
+    if (pT == MOVE_X)
+    period = PERIOD_MOVE_X;
+    else if (pT == MOVE_Y)
+    period = PERIOD_MOVE_Y;
+    else
+    period = PERIOD_MOVE_ROT;
+
+    if (a_max > A_MAX_1 && pT != MOVE_Y) {
+        if (fabs(v0) > V_LIMIT_1)
+            period = PERIOD_V_LIMIT_1;
+        else if (fabs(v0) > V_LIMIT_2)
+            period = PERIOD_V_LIMIT_2;
+    }
+    else if (a_max > A_MAX_2 && pT != MOVE_Y) {
+        if (fabs(v0) > V_LIMIT_3)
+            period = PERIOD_V_LIMIT_3;
+        else if (fabs(v0) > V_LIMIT_4)
+            period = PERIOD_V_LIMIT_4;
+    }
+    if (v0 * x0 > 0 || (fabs(v0) > fabs(v1) && decel_dist_to_v1 > fabs(x0))) {
+        // 停下后到达的时间 + 停下所用时间
+        double time_to_stop = fabs(v0) / (d_max);                                                       // 停下时间
+        double x_to_stop = v0 * v0 / (2.0 * d_max);                                                   // 停止时运动距离
+        double time_to_accel = fabs(v1) / a_max;
+        double x_to_accel = (v1 * v1) / (2.0 * a_max);
+
+        compute_motion_1d(x0 + copysign(x_to_stop, v0), 0, v1, a_max * a_factor, d_max * a_factor,
+                v_max, a_factor, vel_factor, traj_accel, traj_time, traj_time_acc, traj_time_dec, traj_time_flat, pT, mode);    // 递归运算直到跳出这一条件
+        traj_time += time_to_stop;                                                                    // 加上路径规划时间
+        traj_time_dec += time_to_stop;
+        return;
+    }
+
+    if (accel_dist_to_v1 > fabs(x0) && fabs(v0) < fabs(v1)) {
+        traj_time_acc = (sqrt(2 * a_max * fabs(x0) + v0 * v0) - fabs(v0)) / a_max;
+        traj_time_flat = 0;
+        traj_time_dec = 0;
+    }
+    else if (decel_dist_to_v1 > fabs(x0) && fabs(v0) > fabs(v1)) {
+        traj_time_acc = 0;
+        traj_time_flat = 0;
+        traj_time_dec = (fabs(v0) - sqrt(v0 * v0 - 2 * d_max * fabs(x0))) / d_max;
+    }
+    else {
+        double v_max_dist = (v_max * v_max - v0 * v0) / (2 * a_max) + (v_max * v_max - v1 * v1) / (2 * d_max);
+        if (v_max_dist > fabs(x0)) {
+            double v_m = sqrt((2 * a_max * d_max * fabs(x0) + d_max * v0 * v0 + a_max * v1 * v1) / (a_max + d_max));
+            traj_time_acc = (v_m - fabs(v0)) / a_max;
+            traj_time_flat = 0;
+            traj_time_dec = (v_m - fabs(v1)) / d_max;
+        }
+        else {
+            traj_time_acc = (v_max - fabs(v0)) / a_max;
+            traj_time_flat = (fabs(x0) - v_max_dist) / v_max;
+            traj_time_dec = (v_max - fabs(v1)) / d_max;
+        }
+    }
+    // 分配加速度部分
+
+    if (t_to_v1_at_x0 < period && a_to_v1_at_x0 < a_max) {
+        traj_time += t_to_v1_at_x0;
+        return;
+    }
+
+    if (FRAME_PERIOD * a_max + fabs(v0) > v_max && traj_time_flat > period) {                           // 匀速运动阶段
+        traj_time += traj_time_acc + traj_time_flat + traj_time_dec;
+    }
+    else if (traj_time_acc < vel_factor * period && traj_time_flat < period && traj_time_dec > 0.0) {                                         // 加速接近结束且需减速
+        traj_time += traj_time_acc + traj_time_flat + traj_time_dec;
+    }
+    else {
+        traj_time += traj_time_acc + traj_time_flat + traj_time_dec;
+    }
+
+    traj_accel = TheReturnAcc;
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
