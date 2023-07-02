@@ -135,8 +135,12 @@ gRefPlayTable = {
 	"Ref/DirectFrontKick/Ref_DirectFrontPush_normal",
 
 	--中场进攻
+	"Ref/MiddleKick/Ref_MiddleKickV1",
+	"Ref/MiddleKick/Ref_MiddleKickV5",
+	"Ref/MiddleKick/Ref_MiddleKickV2",
+	"Ref/DirectMiddleKick/Ref_DirectMiddlePush_normal",
+	"Ref/IndirectMiddleKick/Ref_IndirectMiddlePush_normal_chip",
 	"Ref/IndirectMiddleKick/Ref_IndirectMiddleKick_normal",
-
 
 	--后场进攻
 	"Ref/IndirectBackKick/Ref_IndirectBackPush",
