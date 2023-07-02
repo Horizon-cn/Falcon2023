@@ -381,7 +381,6 @@ void CAdvance::plan(const CVisionModule* pVision)
 	case JUSTCHIPPASS:
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "JUSTCHIP", COLOR_YELLOW);
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
-
 		if (IHaveSupport) {
 			PassPoint = SupportPoint[TheBestSupportNumber];
 			KickorPassDir = (PassPoint - me.Pos()).dir();
@@ -450,8 +449,6 @@ void CAdvance::plan(const CVisionModule* pVision)
 					setSubTask(PlayerRole::makeItBreak(_executor, false, false, false, generateBreakingDir(pVision, _executor)));
 			}
 		}
-		
-		
 		break;
 	}
 
