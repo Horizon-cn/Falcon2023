@@ -8,7 +8,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-  Leader = task.defendHead(),
+  Leader = task.sideBack(),
   Hawk = task.multiBack(3,1),
   Middle = task.multiBack(3,2),
   Special = task.goMWPassPos("Leader"),
