@@ -12,6 +12,7 @@
 #include "BestPlayer.h"
 #include "BallSpeedModel.h"
 #include "TaskMediator.h"
+#include "defenceNew/DefenceInfoNew.h"
 
 namespace
 {
@@ -19,6 +20,7 @@ namespace
         Approach_Ball = 1,
         Protect_Ball = 2,
         Defence = 3, 
+        Back = 4,
     };
     bool verBos = false;
     const int State_Counter_Num=3;
@@ -112,10 +114,19 @@ void CProtectBall::plan(const CVisionModule* pVision)
                 new_state = Protect_Ball;
             }
             break;
+        case Back:
+            if (self2OppoDist > 2 * Param::Vehicle::V2::PLAYER_SIZE+3) {
+                if(verBos) cout << "Back-->Defence" << endl;
+                new_state = Defence;
+            }
         case Defence:
             if (oppo2BallDist > 20) {
                 if (verBos) cout << "Defence-->Protect_Ball" << endl;
                 new_state = Protect_Ball;
+            }
+            else if (self2OppoDist <= 2 * Param::Vehicle::V2::PLAYER_SIZE+3) {
+                if (verBos) cout << "Defence-->Back" << endl;
+                new_state = Back;
             }
             else {
                 new_state = Defence;
@@ -202,8 +213,46 @@ void CProtectBall::plan(const CVisionModule* pVision)
             protectTask.player.rotvel=0;
             protectTask.player.max_acceleration=1000;
             protectTask.player.max_deceleration=1000;
+            protectTask.player.flag = flags | PlayerStatus::AVOID_SHOOTLINE;
             setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,200), "Protect Ball");
+        }
+        break;
+    case Back:
+        {
+            CVector vec_1 = (CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0) - predictBallPos) / (CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0) - predictBallPos).mod();
+            CVector vec_2 = oppo2Ball / oppo2Ball.mod();
+            CGeoPoint defencePos = CGeoPoint(0, 0);
+            if (oppo2BallDir > -Param::Math::PI * 2 / 3 && oppo2BallDir < Param::Math::PI * 2 / 3) {
+                defencePos = predictBallPos + Utils::Polar2Vector(75, Utils::Normalize((predictBallPos - CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0)).dir() + Param::Math::PI));
+            }
+            else {
+                defencePos = predictBallPos + Utils::Polar2Vector(75, Utils::Normalize(((vec_1 + vec_2) / 2).dir()));//方向修正
+            }
+
+            CGeoPoint backPos = CGeoPoint(0, 0);
+            double dir = (Utils::Normalize((pVision->TheirPlayer(theirBestPlayer).Pos() - self.Pos()).dir()));
+            CGeoPoint Pos1 = self.Pos() + Utils::Polar2Vector(2 * Param::Vehicle::V2::PLAYER_SIZE + 5, Utils::Normalize(dir - Param::Math::PI / 4));
+            CGeoPoint Pos2 = self.Pos() + Utils::Polar2Vector(2 * Param::Vehicle::V2::PLAYER_SIZE + 5, Utils::Normalize(dir + Param::Math::PI / 4));
+            GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_BLUE); //测试用
+            GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_BLUE); //测试用
+            double Dist1 = (Pos1 - defencePos).mod();
+            double Dist2 = (Pos2 - defencePos).mod();
+            if (Dist1 < Dist2) {
+                backPos = Pos1;
+            }
+            else {
+                backPos = Pos2;
+            }
+            double backDir = Utils::Normalize((defencePos - self.Pos()).dir());
+            protectTask.player.pos = backPos;
+            protectTask.player.angle = backDir;
+            protectTask.player.vel = CVector(0, 0);
+            protectTask.player.rotvel = 0;
+            protectTask.player.max_acceleration = 1000;
+            protectTask.player.max_deceleration = 1000;
+            setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 200), "Back");
         }
         break;
     case Defence:
