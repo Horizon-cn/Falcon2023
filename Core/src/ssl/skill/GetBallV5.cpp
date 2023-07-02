@@ -207,6 +207,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             getball_task.player.max_rot_acceleration = 20;
             getball_task.player.max_deceleration = 20;
             getball_task.player.needdribble = IS_DRIBBLE;
+            getball_task.player.NeedCancelTheObstacleOppID = opponentID; // 几乎取消夺球敌人的避障圈
         }
         else { 
             //我没拿到球，我需要绕前去抢球
@@ -227,12 +228,14 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                 // 敌人背身角度小于100度 或 敌人无法持球
                 if (fabs(Utils::Normalize((me2ball.dir() - (opp.Pos() - ball.Pos()).dir()))) < Param::Math::PI * 55 / 180) {
                     // 我与球夹角与我与敌人夹角小于55如果我和他正对着，我就上前去吸
-                    getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(9.0, me2ball.dir()) ;
+                    getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(5.0, me2ball.dir());
+                    getball_task.player.NeedCancelTheObstacleOppID = opponentID; // 几乎取消夺球敌人的避障圈
                     // 向前顶一下
                 }
                 else {
                     // 夹角过大，需要首先绕前
-                    getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(maxGetBallDist, Utils::Normalize((ball.Pos() - opp.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
+                    getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(minGetBallDist, Utils::Normalize((ball.Pos() - opp.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
+                    // 此处不应该取消避障
                     // 我应该绕道他的前面去
                 }
                 getball_task.player.angle = me2ball.dir();

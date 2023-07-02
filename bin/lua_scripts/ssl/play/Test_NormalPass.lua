@@ -62,7 +62,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 
 ["LeftFrontOurBall"] = {
@@ -73,7 +73,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 
 ["MiddleFront"] = {
@@ -84,7 +84,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 
 ["RightFront"] = {
@@ -95,7 +95,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 
 ["LeftMiddleFront"] = {
@@ -106,7 +106,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 
 ["MiddleMiddleFront"] = {
@@ -117,7 +117,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 
 
@@ -129,7 +129,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 
 ["LeftMiddleBack"] = {
@@ -140,7 +140,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 ["MiddleMiddleBack"] = {
 	switch = SwitchBallArea,
@@ -150,7 +150,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 ["RightMiddleBack"] = {
 	switch = SwitchBallArea,
@@ -160,7 +160,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 
 ["LeftBack"] = {
@@ -171,7 +171,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 ["MiddleBack"] = {
 	switch = SwitchBallArea,
@@ -181,7 +181,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 ["RightBack"] = {
 	switch = SwitchBallArea,
@@ -191,7 +191,7 @@ firstState = "LeftFront",
 	Defender = task.multiBack(1, 1),
 	Crosser = task.rightBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AHDC]"
+    match = "[L][ADHC]"
 },
 name = "Test_NormalPass",
 applicable ={

@@ -460,7 +460,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if(OppIsFarThanMe(pVision, _executor))
 			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
 		else
-			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir, 240.0));
+			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir, 260.0));
 		break;
 
 	case CHASEKICK:

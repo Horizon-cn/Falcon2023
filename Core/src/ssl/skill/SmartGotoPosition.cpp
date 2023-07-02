@@ -244,9 +244,9 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     startNew.pos = myPos;
     int stuckBuffer = 0;
     int stuckTres = 10;
-    while (!validateStartPoint(myPos, avoidLength, isGoalie, obsNew) && stuckBuffer < stuckTres) {
+    while (!validateStartPoint(startNew.pos, avoidLength, isGoalie, obsNew) && stuckBuffer < stuckTres) {
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,0), "I'm stuck");
-        startNew.pos = Utils::MakeOutOfTheirPenaltyArea(myPos, 100);
+        // startNew.pos = Utils::MakeOutOfTheirPenaltyArea(myPos, 100);
         stuckBuffer++; }
 
     // 处理规划终点
@@ -258,7 +258,8 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
     //cout << arrivedDist << ' ' << (lastPoint[vecNumber] - self.Pos()).mod() << endl;
     // 第一种情况：可以直接到目标点
-    if (obsNew.check(startNew.pos, targetNew.pos) || obsNew.check(self.Pos(), targetNew.pos) ||
+
+    if (obsNew.check(myPos, targetNew.pos)||
         self.Pos().dist(finalTargetPos) < Param::Vehicle::V2::PLAYER_SIZE * 2) {
         middlePoint = finalTargetPos;
         nextPoint[vecNumber] = finalTargetPos;
@@ -279,8 +280,8 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 
             // 规划成功的情况则给中间点赋值，一般都是有中间点的
             if (viaPoint[vecNumber].size() > 2) {
-                middlePoint = viaPoint[vecNumber][1].pos;
-                nextPoint[vecNumber] = viaPoint[vecNumber][2].pos;
+                    middlePoint = viaPoint[vecNumber][1].pos;
+                    nextPoint[vecNumber] = viaPoint[vecNumber][2].pos;
             }
     }
 
@@ -292,7 +293,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     
     bool needRush2Ball = Utils::InTheirPenaltyArea(ballPos, 10) && !Utils::InTheirPenaltyArea(ballPos, 0); // 球在禁区外且很靠近禁区，直接冲击
     if (!isGoalie && !(playerFlag & PlayerStatus::NOT_DODGE_PENALTY) && !needRush2Ball) {
-        middlePoint = dealPlanFail(myPos, middlePoint, avoidLength, shrinkTheirPenalty);
+        middlePoint = dealPlanFail(startNew.pos, middlePoint, avoidLength, shrinkTheirPenalty);
         while (Utils::InTheirPenaltyArea(middlePoint, 10)) { // 规划的点会闯入禁区，修正
             middlePoint = middlePoint + Utils::Polar2Vector(1, (middlePoint - CGeoPoint(Param::Field::PITCH_LENGTH / 2, 0)).dir());
         }
@@ -303,7 +304,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     }
 
     newTask.player.pos = middlePoint;
-    //GDebugEngine::Instance()->gui_debug_x(middlePoint, 1);
+    GDebugEngine::Instance()->gui_debug_x(middlePoint, COLOR_CYAN);
     //GDebugEngine::Instance()->gui_debug_x(finalTargetPos, 2);
     
     // 非零速到达中间点，零速只有在可以直接到时才执行
@@ -321,7 +322,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     if (DRAW_TRAJ) {
         GDebugEngine::Instance()->gui_debug_x(myPos, COLOR_PURPLE);
         GDebugEngine::Instance()->gui_debug_arc(self.Pos(), avoidLength, 0, 360, 1);
-        //GDebugEngine::Instance()->gui_debug_x(task().player.pos, COLOR_RED);
+        GDebugEngine::Instance()->gui_debug_x(startNew.pos, COLOR_RED);
         GDebugEngine::Instance()->gui_debug_x(finalTargetPos, COLOR_YELLOW);
     }
     //DRAW_RRT = 1;
@@ -469,7 +470,7 @@ bool CSmartGotoPosition::validateStartPoint(CGeoPoint& startPoint, double avoidL
         if (!obs.obs[i].check(startPoint)) {
 
             if (obs.obs[i].getType() == OBS_CIRCLE_NEW) {
-                adjustVec = adjustVec + Utils::Polar2Vector((avoidLength + obs.obs[i].getRadius() - obs.obs[i].getStart().dist(startPoint)), (startPoint - obs.obs[i].getStart()).dir());
+                adjustVec = adjustVec + Utils::Polar2Vector((avoidLength + obs.obs[i].getRadius() - obs.obs[i].getStart().dist(startPoint) + Param::Vehicle::V2::PLAYER_SIZE), (startPoint - obs.obs[i].getStart()).dir());
             }
             else if (obs.obs[i].getType() == OBS_LONG_CIRCLE_NEW) {
                 CGeoPoint nearPoint = obs.obs[i].getStart().dist(startPoint) > obs.obs[i].getEnd().dist(startPoint) ? obs.obs[i].getEnd() : obs.obs[i].getStart();
@@ -477,6 +478,8 @@ bool CSmartGotoPosition::validateStartPoint(CGeoPoint& startPoint, double avoidL
             }
         }
     }
+
+    startPoint = startPoint + adjustVec;
 
     if (obs.check(startPoint)) {
         return true;//out of obstacle, success

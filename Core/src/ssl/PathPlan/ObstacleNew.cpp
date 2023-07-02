@@ -380,6 +380,8 @@ void ObstaclesNew::addObs(const CVisionModule* pVision, const TaskT& task, bool 
 		(rolenum == TaskMediator::Instance()->sideBack()) ||
 		(rolenum == TaskMediator::Instance()->defendMiddle()) ||
 		(TaskMediator::Instance()->isMultiBack(rolenum));
+	const bool isAdvancer = (rolenum == TaskMediator::Instance()->advancer());
+
 	bool notAvoidOurBack = (isBack && Utils::InOurPenaltyArea(myPos, 40));
 
 	//后卫只有在禁区边界才允许撞车
@@ -586,7 +588,14 @@ void ObstaclesNew::addObs(const CVisionModule* pVision, const TaskT& task, bool 
 //                        GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 10, 0.0, 360.0, COLOR_YELLOW);
 //                    }
                 }
-                addCircle(opp.Pos(), opp.Vel(), tempAvoidDist * 1.25, OBS_CIRCLE_NEW);
+
+				if (isAdvancer) {
+					if (task.player.NeedCancelTheObstacleOppID == i)
+						continue; // 对于advancer而言，getball无需避开该持球车
+					else
+						addCircle(opp.Pos(), opp.Vel(), tempAvoidDist, OBS_CIRCLE_NEW);
+				}
+                else addCircle(opp.Pos(), opp.Vel(), tempAvoidDist * 1.25, OBS_CIRCLE_NEW);
             }
         }
     }
