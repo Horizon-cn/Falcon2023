@@ -8,6 +8,8 @@ local TargetPos3  = CGeoPoint:new_local(50,-70)
 local TargetPos4  = CGeoPoint:new_local(50,0)
 local TargetPos5  = CGeoPoint:new_local(50,70)
 local TargetPos6  = CGeoPoint:new_local(50,140)
+local TargetPos13  = CGeoPoint:new_local(50,210)
+local TargetPos14  = CGeoPoint:new_local(50,280)
 
 local TargetPos7  = CGeoPoint:new_local(310,-220)
 local TargetPos8  = CGeoPoint:new_local(310,-140)
@@ -15,6 +17,8 @@ local TargetPos9  = CGeoPoint:new_local(310,-70)
 local TargetPos10  = CGeoPoint:new_local(310,0)
 local TargetPos11  = CGeoPoint:new_local(310,70)
 local TargetPos12  = CGeoPoint:new_local(310,140)
+local TargetPos15  = CGeoPoint:new_local(310,210)
+local TargetPos16  = CGeoPoint:new_local(310,280)
 
 local DIR1  = 1.57
 local DIR2  = 1.57
@@ -35,7 +39,7 @@ firstState = "run1",
 --front
 ["run1"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Leader") < distThreshold , 150, 1000) then
+		if bufcnt(player.toTargetDist("Leader") < distThreshold , 150, 200) then
 			return "run2";
 		end
 	end,
@@ -45,12 +49,14 @@ firstState = "run1",
     Special = task.goCmuRush(TargetPos4, 0),
 	Defender = task.goCmuRush(TargetPos5, 0),
 	Goalie = task.goCmuRush(TargetPos6, 0),
-    match = "[L][DA][MS]"
+	Engine = task.goCmuRush(TargetPos13, 0),
+	Powerhouse = task.goCmuRush(TargetPos14, 0),
+    match = "[L][DA][MSEP]"
 },
 
 ["run2"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Leader") < distThreshold , 150, 1000) then
+		if bufcnt(player.toTargetDist("Leader") < distThreshold , 150, 200) then
 			return "run1";
 		end
 	end,
@@ -60,7 +66,9 @@ firstState = "run1",
     Special = task.goCmuRush(TargetPos10, 0),
 	Defender = task.goCmuRush(TargetPos11, 0),
 	Goalie = task.goCmuRush(TargetPos12, 0),
-    match = "[L][DA][MS]"
+	Engine = task.goCmuRush(TargetPos15, 0),
+	Powerhouse = task.goCmuRush(TargetPos16, 0),
+    match = "[L][DA][MSEP]"
 },
 
 name = "Test_Run6",

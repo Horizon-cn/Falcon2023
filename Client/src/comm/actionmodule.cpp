@@ -9,7 +9,7 @@ namespace Owl {
     namespace {
         const int TRANSMIT_PACKET_SIZE = 25;
         const int TRANS_FEEDBACK_SIZE = 16; //18; //20;
-        const int ROBOTS_PER_PACKET = 4; //3;
+        const int ROBOTS_PER_PACKET = 4;
         const int MAX_PACKET_NUM = 4;
 
         auto opm = OParamManager::Instance();
@@ -184,7 +184,7 @@ namespace Owl {
                 serial.write(tx.data(), TRANSMIT_PACKET_SIZE);
                 serial.flush();
                 serial.waitForBytesWritten(TRANSMIT_PACKET_SIZE * 8.0 * 1000 / 115200 + 0.6); //ms 延时包括串口传输和发射机发送时间
-                //std::this_thread::sleep_for(std::chrono::milliseconds(4));
+                std::this_thread::sleep_for(std::chrono::milliseconds(4));
             }
             std::fill_n(robotID, PARAM::ROBOTMAXID, PARAM::ROBOTMAXID);
             return true;
