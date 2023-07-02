@@ -5,8 +5,9 @@ local function KICKOFF_DEF_POS(str)
 		return CGeoPoint:new_local(x,y)
 	end
 end
-
-local guardpoint = CGeoPoint:new_local(100,0)
+local WAIT_POS1=CGeoPoint:new_local(-200,100)
+local WAIT_POS2=CGeoPoint:new_local(-200,-100)
+local guardpoint = CGeoPoint:new_local(-20,0)
 gPlayTable.CreatePlay{
 firstState = "start",
 
@@ -21,10 +22,10 @@ firstState = "start",
 	Special  = task.multiBack(6,2),
 	Middle   = task.multiBack(6,3),
 	Defender = task.multiBack(6,4),
-	Breaker  = task.multiBack(6,5),
-	Crosser  = task.multiBack(6,6),
+	Breaker  = task.goCmuRush(WAIT_POS1,_,_,flag.allow_dss + flag.dodge_ball),
+	Crosser  = task.goCmuRush(WAIT_POS2,_,_,flag.allow_dss + flag.dodge_ball),
 	Goalie   = task.goalieNew(),
-	match    = "[L][ADMSBC]"
+	match    = "[L][ADMS][BC]"
 },
 
 

@@ -27,8 +27,8 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
+    Leader   = task.markingFront("First"),
+    Middle   = task.markingFront("Second"),
     Special  = task.multiBack(4,1),
     Defender = task.multiBack(4,2),
     Breaker  = task.multiBack(4,3),
@@ -39,13 +39,13 @@ gPlayTable.CreatePlay{
 
   ["toBall"] = {
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) < 10, 3, 180) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 10, 500) then
         return "leaveBall"
       end
     end,
     Assister = task.staticGetBall(SHOOT_POS),
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
+    Leader   = task.markingFront("First"),
+    Middle   = task.markingFront("Second"),
     Special  = task.multiBack(4,1),
     Defender = task.multiBack(4,2),
     Breaker  = task.multiBack(4,3),
@@ -61,8 +61,8 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.chipPass(SHOOT_POS,def_chipPower()),
-    Leader   = task.marking("First"),
-    Middle   = task.marking("Second"),
+    Leader   = task.markingFront("First"),
+    Middle   = task.markingFront("Second"),
     Special  = task.multiBack(4,1),
     Defender = task.multiBack(4,2),
     Breaker  = task.multiBack(4,3),

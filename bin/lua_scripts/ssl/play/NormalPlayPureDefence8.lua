@@ -16,7 +16,7 @@ firstState = "PureDefence",
 		end
 	end,
 	Leader   = task.marking("First"),
-	Assister = task.marking("Second"),
+	Assister = task.sideBack(),
     Middle   = task.multiBack(4,4),
     Special  = task.advance(),
 	Defender = task.multiBack(4,1),
