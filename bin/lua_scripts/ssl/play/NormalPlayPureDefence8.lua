@@ -15,7 +15,7 @@ firstState = "PureDefence",
 			return "PureDefence";
 		end
 	end,
-	Leader   = task.marking("First"),
+	Leader   = task.markingFront("First"),
 	Assister = task.sideBack(),
     Middle   = task.multiBack(4,4),
     Special  = task.advance(),
