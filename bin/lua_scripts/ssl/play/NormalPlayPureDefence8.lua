@@ -15,13 +15,13 @@ firstState = "PureDefence",
 			return "PureDefence";
 		end
 	end,
-	Leader   = task.marking("First"),
+	Leader   = task.markingFront("First"),
 	Assister = task.sideBack(),
-    Middle   = task.multiBack(4,4),
     Special  = task.advance(),
 	Defender = task.multiBack(4,1),
 	Breaker  = task.multiBack(4,2),
 	Crosser  = task.multiBack(4,3),
+    Middle   = task.multiBack(4,4),
 	Goalie   = task.goalieNew(),
     match = "[S][DBC][LMA]"
 },

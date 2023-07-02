@@ -105,41 +105,29 @@ gRefPlayTable = {
 	"Ref/KickOffDef/Ref_KickOffDef8",
 	"Ref/KickOffDef/Ref_KickOffDef_normal",
 
-	--角球进攻 --todo 简化
-	"Ref/IndirectCornerKick/Ref_IndirectCornerPush",
-	"Ref/IndirectCornerKick/Ref_IndirectCornerPush8",
-	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal",
-	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal_chip",
+	--角球进攻
+	"Ref/DirectCornerKick/Ref_DirectCornerPush8",
 	"Ref/DirectCornerKick/Ref_DirectCornerPush_normal",
-	"Ref/IndirectCornerKick/Ref_IndirectCornerKick",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush8",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal_chip",
 	--前场进攻
-	"Ref/IndirectFrontKick/Ref_IndirectFrontPush",
-	"Ref/IndirectFrontKick/Ref_IndirectFrontPush8",
-	"Ref/IndirectFrontKick/Ref_IndirectFrontPush_normal",
-	"Ref/IndirectFrontKick/Ref_IndirectFrontPush_normal_chip",
+	"Ref/DirectFrontKick/Ref_DirectFrontPush8",
 	"Ref/DirectFrontKick/Ref_DirectFrontPush_normal",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush8",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush_normal_chip",
 	--中场进攻
-	"Ref/MiddleKick/Ref_IndirectMiddlePush_normal_chip",
 	"Ref/MiddleKick/Ref_MiddleKick_normal",
 	--后场进攻
 	"Ref/BackKick/Ref_BackPush8",
 	"Ref/BackKick/Ref_BackKick",
 
-	--角球防守 --todo 简化
+	--角球防守
 	"Ref/CornerDef/Ref_CornerDef8",
 	"Ref/CornerDef/Ref_CornerDef_normal",
 	--中场防守
-	"Ref/MiddleDef/Ref_MiddleDefV10",
-	"Ref/MiddleDef/Ref_MiddleDefV11",
-	"Ref/MiddleDef/Ref_MiddleDefV2",
-	"Ref/MiddleDef/Ref_MiddleDefV20",
 	"Ref/MiddleDef/Ref_MiddleDef8",
 	"Ref/MiddleDef/Ref_MiddleDef_normal",
 	--前场防守
-	"Ref/FrontDef/Ref_FrontDefV8",
-	"Ref/FrontDef/Ref_FrontDefV9",
-	"Ref/FrontDef/Ref_FrontDefV2",
-	"Ref/FrontDef/Ref_FrontDefV20",
 	"Ref/FrontDef/Ref_FrontDef8",
 	"Ref/FrontDef/Ref_FrontDef_normal",
 	--后场防守
@@ -156,42 +144,21 @@ gRefPlayTable = {
 	--点球防守
 	"Ref/PenaltyDef/Ref_PenaltyDef8",
 
-	--停止站位 --todo 精简
-	"Ref/GameStop/Ref_Stop4BackKick",
-	"Ref/GameStop/Ref_StopV2",
+	--停止站位
+	"Ref/GameStop/Ref_StopV2_normal",
 	"Ref/GameStop/Ref_StopV3",
-	"Ref/GameStop/Ref_Stop4CornerDef",
+	"Ref/GameStop/Ref_StopV3_normal",
+	--PureDefence8
+	"Ref/GameStop/Ref_StopCornerDefPureDefence",
+	--NormalKick
 	"Ref/GameStop/Ref_Stop4CornerKick",
-	--8车Stop
+	"Ref/GameStop/Ref_Stop4FrontKick",
+	"Ref/GameStop/Ref_Stop4MiddleKick",
+	"Ref/GameStop/Ref_Stop4BackKick",
 	"Ref/GameStop/Ref_Stop4CornerDef_play8",
 	"Ref/GameStop/Ref_Stop4BackDef_play8",
 	"Ref/GameStop/Ref_Stop4MiddleDef_play8",
 	"Ref/GameStop/Ref_Stop4FrontDef_play8",
-
-	"Ref/GameStop/Ref_Stop4CornerKick6",
-	"Ref/GameStop/Ref_Stop4SideLine",
-	"Ref/GameStop/Ref_Stop4FrontKick",
-	"Ref/GameStop/Ref_Stop4MiddleKick",
-	"Ref/GameStop/Ref_Stop4ChaKick",
-
-	"Ref/GameStop/Ref0_StopV2",
-	"Ref/GameStop/Ref0_StopV3",
-	"Ref/GameStop/Ref0_Stop4CornerDef",
-	"Ref/GameStop/Ref0_Stop4CornerKick",
-
-	"Ref/GameStop/Ref_StopV2V8",
-	"Ref/GameStop/Ref_StopV3V8",
-	"Ref/GameStop/Ref_Stop4CornerDefV8",
-	"Ref/GameStop/Ref_Stop4CornerKickV8",
-	"Ref/GameStop/Ref_StopCornerDefPureDefence",
-
-	"Ref/GameStop/Ref_StopV2_normal",
-	"Ref/GameStop/Ref_StopV3_normal",
-	"Ref/GameStop/Ref_Stop4CornerDef_normal",
-	"Ref/GameStop/Ref_Stop4CornerKick_normal",
-
-	"Ref/GameStop/Ref_StopBack",
-
 
 	--强制停止
 	"Ref/Ref_HaltV1",
