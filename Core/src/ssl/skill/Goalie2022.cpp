@@ -361,8 +361,8 @@ CPlayerTask* CGoalie2022::clearBallTask(const CVisionModule* pVision)
 	flag |= PlayerStatus::QUICKLY;
 	flag |= PlayerStatus::DRIBBLING;
 
-	return PlayerRole::makeItGoto(robotNum, ball.Pos(), dir, flag);//todo need test
-	//return PlayerRole::makeItNoneTrajGetBall(robotNum, dir, CVector(0, 0), flag);
+	//return PlayerRole::makeItGoto(robotNum, ball.Pos(), dir, flag);//todo need test
+	return PlayerRole::makeItNoneTrajGetBall(robotNum, dir, CVector(0, 0), flag);
 	//拿到球后通过lua层面检测会自己踢出去
 }
 

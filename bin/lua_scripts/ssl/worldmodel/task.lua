@@ -1071,7 +1071,7 @@ end
 
 function goalieNew(mode)
 	local mexe, mpos = Goalie2022{mode = mode, flag = flag.not_avoid_our_vehicle}
-	return {mexe, mpos, kick.chip, dir.defendBackClear(), pre.fieldDefender(), kp.full(),cp.full(), flag.not_avoid_our_vehicle}
+	return {mexe, mpos, kick.chip, dir.defendBackClear(), pre.fieldDefender(), kp.full(),cp.specified(450), flag.not_avoid_our_vehicle}
 end
 
 function penaltyGoalie()

@@ -309,15 +309,15 @@ firstState = "start",
     end
   end,
 
-  Assister = task.goCmuRush(SIDE_POS, dir.playerToBall, ACC, STOP_DSS),
-  Special  = task.goCmuRush(INTER_POS, dir.playerToBall, ACC, STOP_DSS),
+  Assister = task.defendKick(),--task.goCmuRush(SIDE_POS, dir.playerToBall, ACC, STOP_DSS),
+  Special  = task.markingFront(),--task.goCmuRush(INTER_POS, dir.playerToBall, ACC, STOP_DSS),
   Leader   = task.sideBack(),
-  Defender = task.rightBack(),--task.defendMiddle4Stop(),--TODO
-  Middle   = task.leftBack(),
-	Breaker  = task.multiBack(2,1),
-  Crosser  = task.multiBack(2,2),
+  Defender = task.multiBack(4,3),--task.defendMiddle4Stop(),--TODO
+  Middle   = task.multiBack(4,4),
+	Breaker  = task.multiBack(4,1),
+  Crosser  = task.multiBack(4,2),
   Goalie   = task.goalieNew(),
-  match    = "[DM][BC][L][AS]"
+  match    = "[DM][A][L][BC][S]"
 },
 
 ["standByPenalty"] = {
@@ -379,20 +379,27 @@ firstState = "start",
 --standFunc有bug
 --standFunc有bug
 --standFunc有bug
-  Assister = task.goCmuRush(standFunc(1), dir.playerToBall, ACC, STOP_DSS),
-  Special  = task.goCmuRush(standFunc(2), dir.playerToBall, ACC, STOP_DSS),
-  Leader   = task.goCmuRush(standFunc(3), dir.playerToBall, ACC, STOP_DSS),
-  Defender = task.goCmuRush(standFunc(4), dir.playerToBall, ACC, STOP_DSS),
-  Middle   = task.goCmuRush(standFunc(5), dir.playerToBall, ACC, STOP_DSS),
-	Breaker  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
-  Crosser  = task.goCmuRush(standFunc(7), dir.playerToBall, ACC, STOP_DSS),
+ --  Assister = task.goCmuRush(standFunc(1), dir.playerToBall, ACC, STOP_DSS),
+ --  Special  = task.goCmuRush(standFunc(2), dir.playerToBall, ACC, STOP_DSS),
+ --  Leader   = task.goCmuRush(standFunc(3), dir.playerToBall, ACC, STOP_DSS),
+ --  Defender = task.goCmuRush(standFunc(4), dir.playerToBall, ACC, STOP_DSS),
+ --  Middle   = task.goCmuRush(standFunc(5), dir.playerToBall, ACC, STOP_DSS),
+	-- Breaker  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
+ --  Crosser  = task.goCmuRush(standFunc(7), dir.playerToBall, ACC, STOP_DSS),
+  Assister = task.markingFront(),
+  Special  = task.defendHead(),
+  Leader   = task.multiBack(4,1),
+  Defender = task.multiBack(4,2),
+  Middle   = task.multiBack(4,3),
+  Breaker  = task.multiBack(4,4),
+  Crosser  = task.sideBack(),
 --standFunc有bug
 --standFunc有bug
 --standFunc有bug
   -- Fronter  = task.goCmuRush(standFunc(6), dir.playerToBall, ACC, STOP_DSS),
   -- Center   = task.stop(),--task.goCmuRush(SEVEN_POS, dir.playerToBall, ACC, STOP_DSS),
   Goalie   = task.goalieNew(),
-  match    = "[AMDLSBC]"
+  match    = "[LD][C][MB][S][A]"
 },
 
 ["standByLine"] = {
@@ -441,17 +448,17 @@ firstState = "start",
     end
   end,
 
-  Assister = task.goCmuRush(MIDDLE_POS, dir.playerToBall, ACC, STOP_DSS),
-  Special  = task.sideBack(),
+  Assister = task.sideBack(),--task.goCmuRush(MIDDLE_POS, dir.playerToBall, ACC, STOP_DSS),
+  Special  = task.defendKick(),
   Leader   = task.goCmuRush(OTHER_SIDE_POS, dir.playerToBall, ACC, STOP_DSS),
-  Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
+  Defender  =task.multiBack(4,3),--task.defendMiddle4Stop(),--TODO
   --Center   = task.stop(),
   --Fronter = task.stop(),
-  Middle   = task.leftBack(),
-	Breaker  = task.multiBack(2,1),
-  Crosser  = task.multiBack(2,2),
+  Middle   = task.multiBack(4,4),
+	Breaker  = task.multiBack(4,1),
+  Crosser  = task.multiBack(4,2),
   Goalie   = task.goalieNew(),
-  match    = "[A][DM][BC][L][S]"
+  match    = "[BC][S][A][DM][L]"
 },
 
 ["reDoStop"] = {

@@ -368,18 +368,20 @@ CPlayerTask* CTaskFactoryV2::DribbleTurnKickV2(const TaskT& task) {
 //////////////////////////////////////////////////////////////////////////
 // define the namespace used to provide interface for task calling
 namespace PlayerRole {
-	CPlayerTask* makeItlightkick(const int num, const double dir)
+	CPlayerTask* makeItlightkick(const int num, const double dir, const double power)
 	{	
 		static TaskT playerTask;
 		playerTask.executor = num;
 		playerTask.player.angle = dir;
+		playerTask.player.kickpower = power;
 		return TaskFactoryV2::Instance()->lightkick(playerTask);
 	}
-	CPlayerTask* makeItBreak(const int num, const bool needkick,  const bool isPenalty, const bool isSpin)
+	CPlayerTask* makeItBreak(const int num, const double dir, const bool needkick,  const bool isPenalty, const bool isSpin)
 	{	// needkick = 1 £∫ƒ√«ÚÕª∆∆£ªtarget£∫√ª”√¡À£ª
 		static TaskT playerTask;
 		playerTask.executor = num;
 		playerTask.player.needkick = needkick;
+		playerTask.player.rotdir = dir;
 		if (isPenalty)playerTask.player.flag = playerTask.player.flag | PlayerStatus::PENALTY_KICK;
 		if (isSpin)playerTask.player.flag = playerTask.player.flag | PlayerStatus::SPIN;
 
