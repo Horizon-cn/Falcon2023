@@ -76,7 +76,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
         switch (old_state){
         case BEGINNING:
             {
-            if (oppo2BallDist < 20) {
+            if (oppo2BallDist < 40) {
                 if (verBos) cout << "BEGINNING-->Defence" << endl;
                 new_state = Defence;
             }
@@ -84,7 +84,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
                 if (verBos) cout << "BEGINNING-->Approach_Ball" << endl;
                 new_state = Approach_Ball;
             }
-            else if (oppo2BallDist > 20 && self2predictDist <= 100) {
+            else if (oppo2BallDist > 40 && self2predictDist <= 100) {
                 if (verBos) cout << "BEGINNING-->Protect_Ball" << endl;
                 new_state = Protect_Ball;
             }
@@ -94,7 +94,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
             break;
             }
         case Approach_Ball:
-            if (oppo2BallDist < 20) {
+            if (oppo2BallDist < 40) {
                 if (verBos) cout << "Approach_Ball-->Defence" << endl;
                 new_state = Defence;
             }
@@ -103,7 +103,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
             }
             break;
         case Protect_Ball:
-            if (oppo2BallDist < 20) {
+            if (oppo2BallDist < 40) {
                 if (verBos) cout << "Protect_Ball-->Defence" << endl;
                 new_state = Defence;
             }
@@ -115,16 +115,16 @@ void CProtectBall::plan(const CVisionModule* pVision)
             }
             break;
         case Back:
-            if (self2OppoDist > 2 * Param::Vehicle::V2::PLAYER_SIZE+3) {
+            if (self2OppoDist > 2 * Param::Vehicle::V2::PLAYER_SIZE+5) {
                 if(verBos) cout << "Back-->Defence" << endl;
                 new_state = Defence;
             }
         case Defence:
-            if (oppo2BallDist > 20) {
+            if (oppo2BallDist > 40) {
                 if (verBos) cout << "Defence-->Protect_Ball" << endl;
                 new_state = Protect_Ball;
             }
-            else if (self2OppoDist <= 2 * Param::Vehicle::V2::PLAYER_SIZE+3) {
+            else if (self2OppoDist <= 2 * Param::Vehicle::V2::PLAYER_SIZE+5) {
                 if (verBos) cout << "Defence-->Back" << endl;
                 new_state = Back;
             }
@@ -155,9 +155,9 @@ void CProtectBall::plan(const CVisionModule* pVision)
         {
             CGeoPoint approachBallPos;
             double dir = Utils::Normalize(advancer2Ball.dir());
-            if (Utils::Normalize(fabs(dir - (self.Pos()-predictBallPos).dir())) <= Param::Math::PI / 6) {
-                CGeoPoint Pos1 = predictBallPos + Utils::Polar2Vector(50, Utils::Normalize((self.Pos() - predictBallPos).dir() - Param::Math::PI / 6));
-                CGeoPoint Pos2 = predictBallPos + Utils::Polar2Vector(50, Utils::Normalize((self.Pos() - predictBallPos).dir() + Param::Math::PI / 6));
+            if (Utils::Normalize(fabs(dir - (self.Pos()-predictBallPos).dir())) <= Param::Math::PI / 4) {
+                CGeoPoint Pos1 = predictBallPos + Utils::Polar2Vector(50, Utils::Normalize((self.Pos() - predictBallPos).dir() - Param::Math::PI / 4));
+                CGeoPoint Pos2 = predictBallPos + Utils::Polar2Vector(50, Utils::Normalize((self.Pos() - predictBallPos).dir() + Param::Math::PI / 4));
                 //GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_BLUE); ≤‚ ‘”√
                 //GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_BLUE); ≤‚ ‘”√
                 double Dist1 = (Pos1 - self.Pos()).mod();
@@ -187,11 +187,19 @@ void CProtectBall::plan(const CVisionModule* pVision)
  
     case Protect_Ball:
         {
+            
             CGeoPoint protectBallPos; 
             double dir = Utils::Normalize(advancer2oppo.dir());
-            if (Utils::Normalize(fabs(dir - advancer2Ball.dir())) <= Param::Math::PI / 6) {
-                CGeoPoint Pos1 = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2Ball.dir() - Param::Math::PI / 6));
-                CGeoPoint Pos2 = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2Ball.dir() + Param::Math::PI / 6));
+            double dist=0;
+            if (advancer2oppo.mod() / 2 > 40) {
+                dist=advancer2oppo.mod() / 2;
+            }
+            else {
+                dist = 40;
+            }
+            if (Utils::Normalize(fabs(dir - advancer2Ball.dir())) <= Param::Math::PI / 4) {
+                CGeoPoint Pos1 = predictBallPos + Utils::Polar2Vector(dist, Utils::Normalize(advancer2Ball.dir() - Param::Math::PI / 4));
+                CGeoPoint Pos2 = predictBallPos + Utils::Polar2Vector(dist, Utils::Normalize(advancer2Ball.dir() + Param::Math::PI / 4));
                 //GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_GREEN); ≤‚ ‘”√
                 //GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_GREEN); ≤‚ ‘”√
                 double Dist1 = (Pos1 - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
@@ -204,7 +212,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
                 }
             }
             else {
-                protectBallPos = predictBallPos + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2oppo.dir()));
+                protectBallPos = predictBallPos + Utils::Polar2Vector(dist, Utils::Normalize(advancer2oppo.dir()));
             }
             double protectBallDir = (Utils::Normalize((predictBallPos - pVision->TheirPlayer(theirBestPlayer).Pos()).dir()) + Utils::Normalize((predictBallPos - self.Pos()).dir())) / 2;
             protectTask.player.pos= protectBallPos;
@@ -232,8 +240,8 @@ void CProtectBall::plan(const CVisionModule* pVision)
 
             CGeoPoint backPos = CGeoPoint(0, 0);
             double dir = (Utils::Normalize((pVision->TheirPlayer(theirBestPlayer).Pos() - self.Pos()).dir()));
-            CGeoPoint Pos1 = self.Pos() + Utils::Polar2Vector(2 * Param::Vehicle::V2::PLAYER_SIZE + 5, Utils::Normalize(dir - Param::Math::PI / 4));
-            CGeoPoint Pos2 = self.Pos() + Utils::Polar2Vector(2 * Param::Vehicle::V2::PLAYER_SIZE + 5, Utils::Normalize(dir + Param::Math::PI / 4));
+            CGeoPoint Pos1 = self.Pos() + Utils::Polar2Vector(2 * Param::Vehicle::V2::PLAYER_SIZE + 7, Utils::Normalize(dir - Param::Math::PI / 4));
+            CGeoPoint Pos2 = self.Pos() + Utils::Polar2Vector(2 * Param::Vehicle::V2::PLAYER_SIZE + 7, Utils::Normalize(dir + Param::Math::PI / 4));
             GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_BLUE); //≤‚ ‘”√
             GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_BLUE); //≤‚ ‘”√
             double Dist1 = (Pos1 - defencePos).mod();
