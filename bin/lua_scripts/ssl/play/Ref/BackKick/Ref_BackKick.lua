@@ -207,7 +207,7 @@ firstState = "startball",
 },
 
 
-name = "Ref_IndirectBackKick",
+name = "Ref_BackKick",
 applicable ={
 	exp = "a",
 	a   = true

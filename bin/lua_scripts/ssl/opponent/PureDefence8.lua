@@ -5,13 +5,11 @@ gOppoConfig = {
 	
 	IndirectFrontKick   = {"Ref_IndirectFrontPush8"},--610 --"Ref_FrontPush"
 
-	IndirectBackKick    = {"Ref_IndirectBackPush8"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
-
 	DirectCornerKick  = {"Ref_IndirectCornerPush8"},--80 --"Ref_IndirectCornerPush"
 	
 	DirectFrontKick   = {"Ref_IndirectFrontPush8"},--610 --"Ref_FrontPush"
-
-	DirectBackKick    = {"Ref_IndirectBackPush8"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
+	
+	BackKick    = {"Ref_BackPush8"}, --"Ref_ImmortalKickV610" --"Ref_BackPush"  --{10, "Ref_ImmortalKickV1"}
 -------------------------------Def---------------------------------------------------
 
 	CornerDef   = "Ref_CornerDef8", -- 可能要用v4，防头球

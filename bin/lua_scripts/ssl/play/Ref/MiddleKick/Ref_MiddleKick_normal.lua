@@ -113,7 +113,7 @@ gPlayTable.CreatePlay{
     match    = "[S][B][C][A][D][L][M]"
   },
 
-  name = "Ref_IndirectMiddleKick_normal",
+  name = "Ref_MiddleKick_normal",
   applicable = {
     exp = "a",
     a   = true
