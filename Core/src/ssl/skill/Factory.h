@@ -117,8 +117,8 @@ typedef Falcon::NormalSingleton<CTaskFactoryV2> TaskFactoryV2;
 
 //! 调用skill的接口
 namespace PlayerRole {
-	CPlayerTask* makeItlightkick(const int num, const double dir = 0);
-	CPlayerTask* makeItBreak(const int num, const bool needkick = true, const bool isPenalty = false, const bool isSpin = false);
+	CPlayerTask* makeItlightkick(const int num, const double dir = 0, const double power = 0);
+	CPlayerTask* makeItBreak(const int num, const double dir, const bool needkick = true, const bool isPenalty = false, const bool isSpin = false);
 	CPlayerTask* makeItStop(const int num, const int flags = 0);
 	CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const int flags = 0, const int sender = 0);
 	CPlayerTask* makeItGoto(const int num, const CGeoPoint& target, const double dir, const CVector& vel, const double rotvel, const int flags = 0, const int sender = 0);
