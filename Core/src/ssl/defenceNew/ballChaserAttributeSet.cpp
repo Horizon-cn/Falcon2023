@@ -53,11 +53,6 @@ EVALUATE_ATTRIBUTE_NEW(Dist2BallProjModified)
 		yDistFactor = 0.1;
 	}
 
-	if (!ball.Valid())
-	{
-		setValue(0);
-		return;
-	}
 	CGeoLine ballVelLine = CGeoLine(ball.Pos(), ball.Vel().dir());
 	CGeoPoint proj = ballVelLine.projection(player.Pos());
 	double dist = player.Pos().dist(proj);
@@ -72,15 +67,13 @@ EVALUATE_ATTRIBUTE_NEW(BallMovingCost)
 	const BallVisionT& ball = pVision->Ball();
 	const PlayerVisionT& player = pVision->TheirPlayer(num);
 
-	if (ball.Valid() && ball.Vel().mod() < 70)
+	if (ball.Vel().mod() < 70)
 	{
 		setValue(0);
 		return;
 	}
 
 	double limited_ball_speed = 800;
-	if (!ball.Valid())
-		limited_ball_speed = 50;
 	CVector playerToBall = ball.Pos() - player.Pos();
 	double angleDiff = ball.Vel().dir() - playerToBall.dir();
 	double velDiff = min(ball.Vel().mod(), limited_ball_speed);

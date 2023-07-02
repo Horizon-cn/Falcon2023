@@ -31,6 +31,10 @@ private:
 	void generateRescuePoint(const CVisionModule* pVision);
 	double CalClearBallDir(const CVisionModule* pVision);
 
+	// SYLG temp 应该移植到公共位置
+	CGeoPoint syntYPos(CGeoPoint reference, CGeoPoint target);
+	bool isPosInCornerShootArea(CGeoPoint pos);
+
 	Tpenalty last_penalty_status;
 };
 

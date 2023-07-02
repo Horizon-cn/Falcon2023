@@ -5,7 +5,4 @@ class CGuardPos
     CGuardPos();
     CGeoPoint backPos(int guardNum, int index);
     void setBackNum(int realNum, int index);
-    int checkValidNum(int guardNum);
-    bool validBackPos(CGeoPoint backPos, int realNum);
-    int missingBackIndex(int i);
 };
