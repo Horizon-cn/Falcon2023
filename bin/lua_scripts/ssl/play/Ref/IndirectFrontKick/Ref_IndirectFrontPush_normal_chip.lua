@@ -103,7 +103,7 @@ gPlayTable.CreatePlay{
 
 ["shootBall"] = {
     switch = function ()
-      if bufcnt(player.kickBall("Special"), 3, 1500) then--
+      if bufcnt(player.kickBall("Special"), 3, 150) then--
         return "exit"
       end
     end,

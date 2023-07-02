@@ -1,13 +1,27 @@
 local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(50, ball.syntY(0.3 * math.pi))
+  return ball.pos() + Utils.Polar2Vector(50, ball.syntY(0.5 * math.pi))
 end
 
 --【接球点】可根据实车情况进行调整
-local RECEIVE_POS = ball.antiYPos(CGeoPoint:new_local(0, 100))
---【射门点】可根据实车情况进行调整
-local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(300, 200))
+local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(380,150))
+
+local FRONT_POS1= ball.antiYPos(CGeoPoint:new_local(350,-150))
+local FRONT_POS2= ball.antiYPos(CGeoPoint:new_local(200,-100))
+local FRONT_POS3= ball.antiYPos(CGeoPoint:new_local(370,210))
+
+local TargetPos1= ball.antiYPos(CGeoPoint:new_local(410,-100))
+local TargetPos2= ball.antiYPos(CGeoPoint:new_local(250,0))
+local TargetPos3= ball.antiYPos(CGeoPoint:new_local(380,150))
+
+local RECEIVE_POS = function()
+  return SHOOT_POS() + Utils.Polar2Vector(20,ball.toPointDir(SHOOT_POS())())
+end
+
+local BlockPos=ball.antiYPos(CGeoPoint:new_local(430,-100))
 --【传球力度】可根据实车情况进行调整
-local kickPower = 600
+local KICK_POWER=function()
+  return 13.6*math.sqrt(ball.toPointDist(SHOOT_POS()))
+end
 
 gPlayTable.CreatePlay{
 
@@ -15,57 +29,97 @@ gPlayTable.CreatePlay{
 
   ["start"] = {
     switch = function ()
-      if bufcnt(player.toTargetDist("Assister")<20, 10, 180) then
+      if bufcnt(player.toTargetDist("Assister") < 20, 10, 180) then
         return "toBall"
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
-    Special  = task.multiBack(3,1),
-    Defender = task.multiBack(3,2),
-    Breaker  = task.multiBack(3,3),
-    Crosser  = task.defendHead(),
+    Leader   = task.goCmuRush(FRONT_POS1, _, ACC, STOP_DSS),
+    Middle   = task.goCmuRush(FRONT_POS2, _, ACC, STOP_DSS),
+    Special  = task.goCmuRush(FRONT_POS3, _, ACC, STOP_DSS),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match = "[D][A][C][S][B][LM]"
+    match    = "[D][B][A][C][S][L][M]"
+    --match    = "[A][S][L][M]"
   },
 
   ["toBall"] = {
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) < 10, 3, 180) then
-        return "shootBall"
+      --if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 100, 500) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 150, 1000) then
+        return "kickBall"
       end
     end,
     Assister = task.staticGetBall(SHOOT_POS),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
-    Special  = task.multiBack(3,1),
-    Defender = task.multiBack(3,2),
-    Breaker  = task.multiBack(3,3),
-    Crosser  = task.defendHead(),
+    Leader   = task.goCmuRush(BlockPos, _, ACC, STOP_DSS),
+    Middle   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
+    Special  = task.goCmuRush(RECEIVE_POS,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match = "[D][A][C][S][B][LM]"
+    match    = "[D][B][A][C][S][L][M]"
+    --match    = "[A][S][L][M]"
+  },
+
+  ["kickBall"] = {
+    switch = function ()
+      if bufcnt(player.kickBall("Assister"), "fast", 180) then
+        --debugEngine:gui_debug_msg(CGeoPoint(-200,200),tostring(KICK_POWER(SHOOT_POS)))
+        return "receiveBall"
+      end
+    end,
+    Assister = task.chipPass(SHOOT_POS, KICK_POWER),
+    Leader   = task.goCmuRush(BlockPos, _, ACC, STOP_DSS),
+    Middle   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
+    Special  = task.goCmuRush(RECEIVE_POS,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][S][L][M]"
+    --match    = "[A][S][L][M]"
+  },
+
+  ["receiveBall"] = {
+    switch = function ()
+      if bufcnt(ball.toPlayerHeadDist("Middle") < 5, "fast", 180) then--
+        return "shootBall"
+      end
+    end,
+    Assister = task.stop(),
+    Leader   = task.stop(),
+    Middle   = task.protectBall(),
+    Special  = task.advance(),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][S][C][A][L][M]"
+    --match    = "[A][S][L][M]"
   },
 
 ["shootBall"] = {
     switch = function ()
-      if bufcnt(player.kickBall("Special"), 3, 180) then--
+      if bufcnt(player.kickBall("Special"), 3, 150) then--
         return "exit"
       end
     end,
-    Assister = task.chaseNew(),
-    Leader   = task.markingFront("First"),
-    Middle   = task.markingFront("Second"),
-    Special  = task.multiBack(3,1),
-    Defender = task.multiBack(3,2),
-    Breaker  = task.multiBack(3,3),
-    Crosser  = task.defendHead(),
+    Assister = task.stop(),
+    Leader   = task.stop(),
+    Middle   = task.protectBall(),
+    Special  = task.advance(),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match = "[D][A][C][S][B][LM]"
+    match    = "[D][B][S][C][A][L][M]"
+    --match    = "[A][S][L][M]"
   },
 
-
-  name = "Ref_DirectFrontPush_normal",
+  name = "Ref_IndirectFrontPush_normal_chip",
   applicable = {
     exp = "a",
     a   = true
