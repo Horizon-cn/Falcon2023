@@ -1,4 +1,4 @@
-IS_TEST_MODE = false
+IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 
@@ -10,7 +10,7 @@ end
 
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "NormalPlayPureDefence8" -- Test_AdvanceV4 Test_Run6 Test_play6 Test_Run
+		return "Test_Goalie" -- Test_AdvanceV4 Test_Run6 Test_play6 Test_Run
 		--犯规多的时候用"Test_play8_ManyFoul"
 		--犯规少的时候用"Test_play8_NotFoul"
 		--AutoChange用"Test_play8_AUTO"
