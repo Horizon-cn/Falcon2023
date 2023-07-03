@@ -115,7 +115,7 @@ gPlayTable.CreatePlay{
     --match    = "[A][S][L][M]"
   },
 
-  name = "Ref_DirectCornerPush_normal_chip",
+  name = "Ref_DirectCornerPush_normal",
   applicable = {
     exp = "a",
     a   = true
