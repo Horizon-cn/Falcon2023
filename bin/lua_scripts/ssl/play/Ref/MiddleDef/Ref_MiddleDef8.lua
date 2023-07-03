@@ -9,14 +9,14 @@ gPlayTable.CreatePlay{
       end
     end,
   Leader = task.sideBack(),
-  Hawk = task.multiBack(3,1),
-  Middle = task.multiBack(3,2),
-  Special = task.goMWPassPos("Leader"),
-  Assister = task.goCmuRush(CGeoPoint:new_local(-460, 0)),
-  Powerhouse = task.goCmuRush(CGeoPoint:new_local(-460, 140)),
-  Defender = task.multiBack(3,3),
+  Hawk = task.multiBack(4,1),
+  Middle = task.multiBack(4,2),
+  Special = task.multiBack(4,3),
+  Assister = task.markingFront("First"),
+  Powerhouse = task.markingFront("Second"),
+  Defender = task.multiBack(4,4),
   Goalie = task.goalieNew(),
-  match    = "[L][HM][SAPD]"
+  match    = "[HMSD][L][AP]"
 },
   name = "Ref_MiddleDef8",
   applicable = {
