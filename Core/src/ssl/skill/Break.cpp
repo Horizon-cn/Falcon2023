@@ -27,9 +27,9 @@
 #define BALL_NUM		1
 
 #ifdef ENABLE_CUDA
-extern "C" int break_calc_with_gpu(float* target_point_cpu, int target_point_num, float* pos_info_cpu, int pos_info_num, int angle_mod, int dist_mod, float* results, float* vis_points);
+extern "C" int break_calc_with_gpu(float* target_point_cpu, int target_point_num, float* pos_info_cpu, int pos_info_num, int angle_mod, int dist_mod, float* results, float* vis_points, bool isPenalty);
 #else
-int break_calc_with_gpu(float* target_point_cpu, int target_point_num, float* pos_info_cpu, int pos_info_num, int angle_mod, int dist_mod, float* results, float* vis_points) { return 0; }
+int break_calc_with_gpu(float* target_point_cpu, int target_point_num, float* pos_info_cpu, int pos_info_num, int angle_mod, int dist_mod, float* results, float* vis_points, bool isPenalty) { return 0; }
 #endif
 
 std::string date_time(std::time_t posix)
@@ -132,11 +132,14 @@ void CBreak::plan(const CVisionModule* pVision) {
     if ((pVision->Cycle() - _lastCycle > Param::Vision::FRAME_RATE * 0.1)) {
 
         move_point = CGeoPoint(-9999 * 10, -9999 * 10);
-        dribblePoint = pVision->OurPlayer(task().executor).Pos();
+        if(task().player.pos.x() == -1000)
+            dribblePoint = pVision->OurPlayer(task().executor).Pos();
         isDribble = false;
         running_index = 0;
 
     }
+    if (task().player.pos.x() != -1000)
+        dribblePoint = task().player.pos;//pVision->OurPlayer(task().executor).Pos();
     string time1 = stamp();
     //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), ("Dribble Status:" + time1).c_str(), COLOR_YELLOW);
 
@@ -208,7 +211,9 @@ void CBreak::plan(const CVisionModule* pVision) {
     //if (!frared)
     if (BallStatus::Instance()->getBallPossession(true, vecNumber) == 0)
     {
-        dribblePoint = me.Pos();
+        if (task().player.pos.x() == -1000)
+            //dribblePoint = task().player.pos;
+            dribblePoint = me.Pos();
 
     }
     GDebugEngine::Instance()->gui_debug_x(dribblePoint, COLOR_RED);  // 不是这个
@@ -221,8 +226,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     if (task().player.needkick)
         grabTask.player.angle = finalDir;
     else
-        grabTask.player.angle = task().player.rotdir;
-
+        grabTask.player.angle = task().player.angle;
 
     //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
    /*if (pVision->Cycle() % 60 == 0) {
@@ -233,7 +237,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     }*/
     clock_t begin, end;
     begin = clock();
-    CGeoPoint target = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough);
+    CGeoPoint target = calc_point(pVision, vecNumber, passTarget, dribblePoint, isChip, canShoot, needBreakThrough, isPenalty);
     end = clock();
 
     //std::cout << "best break point calc time (GPU): " << double(end - begin) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
@@ -264,9 +268,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     if (isPenalty)
     {
         //cout<<"isPenalty"<<endl;
-        penaltyX = me.Pos().x() + 10.0;
-        penaltyY = move_point.y()/*>0?-DRIBBLE_DIST:DRIBBLE_DIST*/;
-        grabTask.player.pos = CGeoPoint(penaltyX, penaltyY);
+        grabTask.player.pos = target;
         grabTask.player.max_acceleration = MAX_ACC;
         grabTask.player.max_deceleration = MAX_ACC;
         GDebugEngine::Instance()->gui_debug_x(CGeoPoint(penaltyX, penaltyY), COLOR_BLACK);
@@ -355,7 +357,7 @@ CGeoPoint CBreak::makeInCircle(const CGeoPoint& point, const CGeoPoint& center, 
 
 
 
-CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, const CGeoPoint& target, const CGeoPoint& dribblePoint, const bool isChip, bool& canShoot, bool& needBreakThrough) {
+CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, const CGeoPoint& target, const CGeoPoint& dribblePoint, const bool isChip, bool& canShoot, bool& needBreakThrough, bool& isPenalty) {
 
 
 
@@ -422,7 +424,160 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         //cout << "don't score" << endl;
         return test_point;
     }
+    else if (isPenalty)
+    {
+        int _palyer_pos_num = 6;
+        int pos_num = 2 + 1 + 2 + 1 + 2 + 2 + OURPLAYER_NUM * _palyer_pos_num + THEIRPLAYER_NUM * _palyer_pos_num;
+        int pos_size = pos_num * sizeof(float);
+        int target_point_num = 15;
+        float corrected_parameter = (fabs(me.VelY()) * 0.2 + 5 > 20) ? 20 : fabs(me.VelY()) * 0.2 + 5;
+        float target_step = (Param::Field::GOAL_WIDTH - 2 * corrected_parameter) / (target_point_num - 1);
+        CGeoPoint target_point = CGeoPoint(Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2 + corrected_parameter);
+        int target_size = 2 * target_point_num * sizeof(float);
+        int results_size = 3 * target_point_num * sizeof(float);
 
+
+        float* pos_info = (float*)malloc(pos_size); // 用于存储计算后的结果
+        float* target_info = (float*)malloc(target_size);
+        float* results = (float*)malloc(results_size);
+        float* vis_points = (float*)malloc(3 * (ANGEL_MOD * 2 - 1) * (MOD_NUM - 1) * sizeof(float));
+
+        if (pos_info == nullptr || target_info == nullptr || results == nullptr) {
+            return test_point;
+        }
+
+        pos_info[0] = dribblePoint.x();
+        pos_info[1] = dribblePoint.y();
+        pos_info[2] = DRIBBLE_DIST;
+        pos_info[3] = me.Pos().x();
+        pos_info[4] = me.Pos().y();
+        pos_info[5] = me.Dir();
+        pos_info[6] = pVision->Ball().Pos().x();
+        pos_info[7] = pVision->Ball().Pos().y();
+        pos_info[8] = pVision->Ball().VelX();
+        pos_info[9] = pVision->Ball().VelY();
+        // 己方机器人信息
+        int our_start_idx = 10;    // 在数组中开始存储的位置
+        float* our_player_info = pos_info + our_start_idx;
+        for (int i = 0; i < OURPLAYER_NUM; i++) {
+            if (pVision->OurPlayer(i).Valid()) {
+                const PlayerVisionT& ourPlayer = pVision->OurPlayer(i);
+                our_player_info[_palyer_pos_num * i] = 1.0;
+                our_player_info[_palyer_pos_num * i + 1] = ourPlayer.X();
+                our_player_info[_palyer_pos_num * i + 2] = ourPlayer.Y();
+                our_player_info[_palyer_pos_num * i + 3] = ourPlayer.Dir();
+                our_player_info[_palyer_pos_num * i + 4] = ourPlayer.VelX();
+                our_player_info[_palyer_pos_num * i + 5] = ourPlayer.VelY();
+            }
+            else {
+                for (int j = 0; j < _palyer_pos_num; j++) {
+                    our_player_info[_palyer_pos_num * i + j] = 0.0;
+                }
+            }
+        }
+        // 敌方机器人信息
+        int their_start_idx = 10 + _palyer_pos_num * OURPLAYER_NUM; // 在数组中开始存储的位置
+        float* their_player_info = pos_info + their_start_idx;
+        for (int i = 0; i < THEIRPLAYER_NUM; i++) {
+            if (pVision->TheirPlayer(i).Valid()) {
+                const PlayerVisionT& theirPlayer = pVision->TheirPlayer(i);
+                their_player_info[_palyer_pos_num * i] = 1.0;
+                their_player_info[_palyer_pos_num * i + 1] = theirPlayer.X();
+                their_player_info[_palyer_pos_num * i + 2] = theirPlayer.Y();
+                their_player_info[_palyer_pos_num * i + 3] = theirPlayer.Dir();
+                their_player_info[_palyer_pos_num * i + 4] = theirPlayer.VelX();
+                their_player_info[_palyer_pos_num * i + 5] = theirPlayer.VelY();
+            }
+            else {
+                for (int j = 0; j < _palyer_pos_num; j++) {
+                    their_player_info[_palyer_pos_num * i + j] = 0.0;
+                }
+            }
+        }
+
+        // 生成目标点信息：
+        for (int i = 0; i < target_point_num; i++) {
+            target_info[2 * i] = target_point.x();
+            target_info[2 * i + 1] = target_point.y() + i * target_step;
+            CGeoPoint now_place = CGeoPoint(target_info[2 * i], target_info[2 * i + 1]);
+            for (int player_num = 0; player_num < Param::Field::MAX_PLAYER; player_num++) {
+                if (pVision->TheirPlayer(player_num).Valid()) {
+                    if (pVision->TheirPlayer(player_num).Pos().dist(now_place) < OBSTACLE_RADIUS && i) {
+                        target_info[2 * i] = target_info[2 * (i - 1)];
+                        target_info[2 * i + 1] = target_info[2 * (i - 1) + 1];
+
+                    }
+                }
+            }
+        }
+        // 这里会返回值，如果是0则可能GPU计算出现问题，建议切换为CPU去计算
+        break_calc_with_gpu(target_info, target_point_num, pos_info, pos_num, ANGEL_MOD, MOD_NUM, results, vis_points, isPenalty);
+
+        //std::cout << "break start find best point" << std::endl;
+        float best_score = 2147483647;
+        float best_idx = -1;
+        CGeoPoint best_point(250, 0);
+        for (int i = 0; i < target_point_num; i++) {
+            CGeoPoint target_point(target_info[2 * i], target_info[2 * i + 1]);
+            float current_score = results[3 * i];
+            CGeoPoint move_point(results[3 * i + 1], results[3 * i + 2]);
+
+            if (move_point.x() > Param::Field::PITCH_LENGTH / 2) {
+                continue;
+            }
+            // 换成大场之后这个参数要改！！！！！！！！！！！！！！！！！！！！！！！！！
+            // 
+            //std::cout << "i: " << i << " | current score: " << current_score << " | move_point: " << move_point << std::endl;
+            if (best_score > current_score || i == 0) {
+                best_score = current_score;
+                best_point = move_point;
+                best_idx = i;
+            }
+        }
+        //std::cout << "best point: " << best_point << " | best idx: " << best_idx << " | best score: " << best_score << std::endl;
+        if (DEBUG) {
+            for (int i = 0; i < target_point_num; i++) {
+                CGeoPoint target_point(target_info[2 * i], target_info[2 * i + 1]);
+                float current_score = results[3 * i];
+                CGeoPoint move_point(results[3 * i + 1], results[3 * i + 2]);
+                int color = COLOR_YELLOW;
+                if (i == best_idx) {
+                    color = COLOR_GREEN;
+                }
+                GDebugEngine::Instance()->gui_debug_x(target_point, color);
+                GDebugEngine::Instance()->gui_debug_x(move_point, color);
+                GDebugEngine::Instance()->gui_debug_line(target_point, move_point, color);
+            }
+
+        }
+        if (DEBUG) {
+            for (int i = 0; i < (ANGEL_MOD * 2 - 1) * (MOD_NUM - 1); i++) {
+                //CGeoPoint cur_point(vis_points[3 * i + 1], vis_points[3 * i + 2]);
+                //std::cout << vis_points[3 * i] << " ";
+                //GDebugEngine::Instance()->gui_debug_x(cur_point, COLOR_GREEN);
+            }
+
+        }
+        /*best_point.x() / fabs(best_point.x()) *
+        best_point.y() / fabs(best_point.y()) *
+*/
+        //if (best_point == CGeoPoint(0, 0) || best_point == me.Pos())
+            //return best_point = me.Pos() + Utils::Polar2Vector(Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER, Utils::Normalize(me.Dir()));
+
+        /*
+        if (abs(best_point.y()) > Param::Field::PENALTY_AREA_WIDTH / 2 + 30 || abs(best_point.x()) < (Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30)) {
+            if (abs(best_point.y()) > Param::Field::PENALTY_AREA_WIDTH / 2 + 30)
+                best_point.setY((Param::Field::PENALTY_AREA_WIDTH / 2 + 30));
+            if (abs(best_point.x()) < (Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30))
+                best_point.setX((Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30));
+        }
+        if ((best_point - dribblePoint).mod() > DRIBBLE_DIST) {  // dribblePoint是中心点还是当前点？？？？
+            best_point = makeInCircle(best_point, dribblePoint, DRIBBLE_DIST);
+        }*/
+
+        GDebugEngine::Instance()->gui_debug_x(best_point, COLOR_ORANGE);
+        return best_point;
+    }
     else if (task().player.needkick)  // 需要进行射门
     {
         //std::cout << "============break calc with gpu===============" << std::endl;
@@ -512,7 +667,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             }
         }
         // 这里会返回值，如果是0则可能GPU计算出现问题，建议切换为CPU去计算
-        break_calc_with_gpu(target_info, target_point_num, pos_info, pos_num, ANGEL_MOD, MOD_NUM, results, vis_points);
+        break_calc_with_gpu(target_info, target_point_num, pos_info, pos_num, ANGEL_MOD, MOD_NUM, results, vis_points, isPenalty);
 
         //std::cout << "break start find best point" << std::endl;
         float best_score = 2147483647;
@@ -572,16 +727,16 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             if (abs(best_point.x()) < (Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30))
                 best_point.setX((Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30));
         }
-        if ((best_point - dribblePoint).mod() > DRIBBLE_DIST) {  // dribblePoint是中心点还是当前点？？？？
-            best_point = makeInCircle(best_point, dribblePoint, DRIBBLE_DIST);
-        }*/
-
+        
+            }*/
+        if ((best_point - dribblePoint).mod() > DRIBBLE_DIST)   // dribblePoint是中心点还是当前点？？？？
+                    best_point = makeInCircle(best_point, dribblePoint, DRIBBLE_DIST);
         GDebugEngine::Instance()->gui_debug_x(best_point, COLOR_ORANGE);
         return best_point;
     }
 
 
-    else
+    else  //breaking 
     {
         CGeoPoint best_point(250, 0);
         //cout << "calc_here" << endl;
@@ -599,10 +754,13 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
         int y_min = max((int)(me.Y() - DRIBBLE_DIST) + 1, -(int)(Param::Field::PITCH_WIDTH / 2)), y_max = min((int)(me.Y() + DRIBBLE_DIST) - 1, (int)(Param::Field::PITCH_WIDTH / 2));
         double dist_score_dribble, to_goal_score_dribble, final_score = 10000000, y_score, total_score;
         double para_dist, para_goal, para_y = 0.4;
-        if (dist >= 80 || pVision->TheirPlayer(num).X() < me.X() || me.Pos().dist(dribblePoint) > DRIBBLE_DIST - 20)
+        /*
+        if (dist >= 80 || pVision->TheirPlayer(num).X() < me.X())
             para_dist = -0.2, para_goal = 1.2;
         else
             para_dist = -1.5, para_goal = 0.3;
+        */
+        para_dist = -0.2 - dist / 60; para_goal = 1.2 - dist / 80;
         for (int x_test = x_min; x_test <= x_max; x_test += 10)
         {
             for (int y_test = y_min; y_test <= y_max; y_test += 10)
@@ -613,7 +771,7 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
                 for (int player_num = 0; player_num < Param::Field::MAX_PLAYER; player_num++) {
                     if (pVision->TheirPlayer(player_num).Valid()) {
                         if (pVision->TheirPlayer(player_num).Pos().dist(now_point) < 160) {
-                            dist_score_dribble = max(dist_score_dribble, CVector(pVision->TheirPlayer(player_num).Pos() - now_point).mod());
+                            dist_score_dribble = dist_score_dribble + CVector(pVision->TheirPlayer(player_num).Pos() - now_point).mod();
                             y_score = max(fabs(me.Y() - pVision->TheirPlayer(player_num).Y()), y_score);
                         }
                     }

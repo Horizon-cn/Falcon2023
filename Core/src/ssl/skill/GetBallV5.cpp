@@ -163,20 +163,20 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         sprintf(OppDirDiff, "%f", fabs(me2ball.dir() - me2Opp.dir()) * 180 / Param::Math::PI);
         sprintf(MeRotVel, "%f", me.RotVel());
 
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -300), have, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -275), deltaTheta, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -250), deltaBall, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -225), velmsg, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -200), OppDist, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -175), OppDirDiff, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-320, -150), MeRotVel, COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -300), "IsMeHaveBall", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -275), "Delta Theta", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -250), "Delta Mod", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -225), "Ball Vel", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -200), "Opp Dist", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -175), "OppDir Diff", COLOR_YELLOW);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-410, -150), "Me RotVel", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(650, -300), have, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(650, -275), deltaTheta, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(650, -250), deltaBall, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(650, -225), velmsg, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(650, -200), OppDist, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(650, -175), OppDirDiff, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(650, -150), MeRotVel, COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(760, -300), "IsMeHaveBall", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(760, -275), "Delta Theta", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(760, -250), "Delta Mod", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(760, -225), "Ball Vel", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(760, -200), "Opp Dist", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(760, -175), "OppDir Diff", COLOR_YELLOW);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(760, -150), "Me RotVel", COLOR_YELLOW);
 
     }
     if (BallStatus::Instance()->getBallPossession(true, _executor) <= 0.3)

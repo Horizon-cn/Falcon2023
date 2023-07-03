@@ -146,8 +146,6 @@ class CParamManagerSkill : public Falcon::ParamManager {
 
             loadParam(GOALIE_DEBUG, "Goalie/GOALIE_DEBUG", 1);
             loadParam(AGGRESSIVE_GOALIE, "Goalie/AGGRESSIVE_GOALIE", 1);
-            loadParam(SLOW_BALL_SPD, "Goalie/SLOW_BALL_SPD", 25.0);
-            loadParam(KICKPOWER_GOALIE, "Goalie/KICKPOWER_GOALIE", 550);
             loadParam(HAVE_BALL_DIST, "Goalie/HAVE_BALL_DIST", 30);
             loadParam(CLOSE_DIST, "Goalie/CLOSE_DIST", 30);
             loadParam(CHALLENGE_BALL_DIST, "Goalie/CHALLENGE_BALL_DIST", 60);
@@ -345,8 +343,6 @@ class CParamManagerSkill : public Falcon::ParamManager {
         // Goalie2022²ÎÊý by SYLG
         bool GOALIE_DEBUG;
         bool AGGRESSIVE_GOALIE;
-        double SLOW_BALL_SPD;
-        int KICKPOWER_GOALIE;
         double HAVE_BALL_DIST;
         double CLOSE_DIST;
         double CHALLENGE_BALL_DIST;

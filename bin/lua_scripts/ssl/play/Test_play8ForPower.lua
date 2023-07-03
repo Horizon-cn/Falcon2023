@@ -1,15 +1,16 @@
---jlc 2023.7.3 for Test: 6 VS 6
+-- Created By JLC
+-- Very Powerful And Attacking
 
 local ALL_AVOID = flag.dodge_ball + flag.avoid_stop_ball_circle + flag.avoid_shoot_line
 local ALL_NOT_AVOID = flag.not_avoid_their_vehicle + flag.not_avoid_our_vehicle + flag.not_dodge_penalty
 local FLAG = ALL_AVOID + flag.dribbling
 
-local Xfront = 200
-local Xmid = -100
+local Xfront = 300
+local Xmid = 0
 local Xback = -250
 
-local Lside = -100
-local Rside = 100
+local Lside = -150
+local Rside = 150
 
 local SwitchBallArea = function()
 	if ball.posX() > Xfront and ball.posY() < Rside and ball.posY() > Lside then
@@ -76,89 +77,106 @@ firstState = "CM",
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",1),
-    Middle = task.protectBall(), --task.marking("First"),
-    Special = task.singleBack(),
-	Defender = task.defendMiddle(),
+    Middle = task.support("Leader",4), --task.marking("First"),
+    Special = task.markingFront("First"),
+	Defender = task.leftBack(),
+	Breaker = task.rightBack(),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][M][A]"
+    match = "[L][DB][C][S][AM]"
 },
 
 ["SWOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",1),
-    Middle = task.protectBall(), --task.marking("First"),
-    Special = task.singleBack(),
-	Defender = task.defendMiddle(),
+    Middle = task.support("Leader",4), --task.marking("First"),
+    Special = task.markingFront("First"),
+	Defender = task.leftBack(),
+	Breaker = task.rightBack(),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][A][M]"
+	match = "[L][DB][C][AM][S]"
 },
 
 ["CF"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
-    Middle = task.protectBall(), --task.marking("First"),
-    Special = task.singleBack(),
-	Defender = task.defendMiddle(),
+	Assister = task.support("Leader",3),
+    Middle = task.support("Leader",5), --task.marking("First"),
+    Special = task.markingFront("First"),
+	Defender = task.leftBack(),
+	Breaker = task.rightBack(),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][M][A]"
+	match = "[L][DB][C][S][AM]"
+
 },
 
 ["CFOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",0),
-    Middle = task.protectBall(), --task.marking("First"),
-    Special = task.singleBack(),
-	Defender = task.defendMiddle(),
+    Middle = task.support("Leader",2), --task.marking("First"),
+    Special = task.defendMiddle(),
+	Defender = task.leftBack(),
+	Breaker = task.rightBack(),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][M][A]"
+	match = "[L][DB][C][S][AM]"
 },
 
 -- mid
 ["SM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",1),
-    Middle = task.protectBall(), --task.marking("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+	Assister = task.support("Leader",4),
+	Middle = task.markingFront("First"),
+    Special = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker = task.multiBack(3,3),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][M][A]"
+    match = "[L][SDB][C][M][A]"
 },
 
 ["SMOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",1),
-    Middle = task.protectBall(), --task.marking("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+	Assister = task.support("Leader",4),
+	Middle = task.markingFront("First"),
+    Special = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker = task.multiBack(3,3),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][M][A]"
+    match = "[L][SDB][C][A][M]"
 },
 
 ["CM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",1),
-    Middle = task.protectBall(), --task.marking("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+	Middle = task.markingFront("First"),
+    Special = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker = task.multiBack(3,3),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][A][M]"
+    match = "[L][SDB][C][M][A]"
 },
 
 ["CMOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",2),
-    Middle = task.protectBall(), --task.marking("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+	Assister = task.support("Leader",4),
+	Middle = task.markingFront("First"),
+    Special = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker = task.multiBack(3,3),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][A][M]"
+    match = "[L][SDB][C][A][M]"
 },
 
 --middldDefence
@@ -166,72 +184,84 @@ firstState = "CM",
 ["CDM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",1),
-    Middle = task.markingFront("First"), --task.marking("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+	Assister = task.support("Leader",4),
+	Middle = task.markingFront("First"),
+    Special = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker = task.multiBack(3,3),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][A][M]"
+    match = "[L][SDB][C][M][A]"
 },
 
 ["CDMOurBall"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",1),
-    Middle = task.protectBall(), --task.marking("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+	Assister = task.support("Leader",4),
+	Middle = task.markingFront("First"),
+    Special = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker = task.multiBack(3,3),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][A][M]"
+    match = "[L][SDB][C][M][A]"
 },
 
 ["SDM"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",1),
-    Middle = task.markingFront("First"), --task.marking("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+	Assister = task.support("Leader",4),
+	Middle = task.markingFront("First"),
+    Special = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker = task.multiBack(3,3),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][A][M]"
+    match = "[L][SDB][C][M][A]"
 },
 
 ["SDMOurBall"] = {
     switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",1),
-    Middle = task.protectBall(), --task.marking("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+	Assister = task.support("Leader",4),
+	Middle = task.markingFront("First"),
+    Special = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker = task.multiBack(3,3),
+	Crosser = task.protectBall(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][A][M]"
+    match = "[L][SDB][C][M][A]"
 },
 
 --back
 ["SB"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
+	Assister = task.support("Leader",4),
 	Middle = task.markingFront("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+    Special = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker = task.multiBack(3,3),
+	Crosser = task.sideBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][A][M]"
+    match = "[L][SDB][C][M][A]"
 },
 
 ["CB"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",0),
+	Assister = task.support("Leader",5),
 	Middle = task.markingFront("First"),
-    Special = task.leftBack(),
-	Defender = task.rightBack(),
+    Special = task.multiBack(3,1),
+	Defender = task.multiBack(3,2),
+	Breaker = task.multiBack(3,3),
+	Crosser = task.markingFront("Second"),
 	Goalie = task.goalieNew(),
-    match = "[L][DS][A][M]"
+    match = "[L][SDB][M][C][A]"
 },
 
 
-name = "Test_play6",
+name = "Test_play8ForPower",
 applicable ={
 	exp = "a",
 	a = true

@@ -26,18 +26,9 @@ gOppoConfig = {
 	KickOff		= "Ref_KickOff_normal",
 	KickOffDef  = "Ref_KickOffDef_normal",
 	
-	NorPlay     = "Test_play8_AUTO"
+	NorPlay     = "Test_play6"
 	--犯规多的时候用"Test_play8_ManyFoul"
 	--犯规少的时候用"Test_play8_NotFoul"
 	--AutoChange用"Test_play8_AUTO"
-
+	--JLC新写  Test_play8ForPower  打得非常凶
 }
-
-
---     B        -250           M        0   F_A  100  F_B  200  F_C   350
------------------|----------------------|--------|---------|-----------|---------
-
-
-
---                                      0    F_D   125    F_E
-----------------------------------------|-----------|----------------------------

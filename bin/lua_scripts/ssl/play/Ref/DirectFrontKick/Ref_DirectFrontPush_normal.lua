@@ -119,7 +119,7 @@ gPlayTable.CreatePlay{
     -- match    = "[A][S][L][M]"
   },
 
-  name = "Ref_DirectFrontPush_normal_chip",
+  name = "Ref_DirectFrontPush_normal",
   applicable = {
     exp = "a",
     a   = true
