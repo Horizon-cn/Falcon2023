@@ -140,7 +140,9 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     const bool isAdvancer = (vecNumber != 0 && vecNumber == TaskMediator::Instance()->advancer());
 
     // 判断为，判断需要躲避的指定区域，包括圆圈和放球椭圆
-    bool avoidBallCircle = (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") || (playerFlag & PlayerStatus::AVOID_STOP_BALL_CIRCLE);
+    bool avoidBallCircle = (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") || (playerFlag & PlayerStatus::AVOID_STOP_BALL_CIRCLE) || (WorldModel::Instance()->CurrentRefereeMsg() == "theirKickOff");
+    // 此处新增kickoff，我们也需要修正我们的目标点， By TYH
+
     bool avoidOurBallPlacementArea = (WorldModel::Instance()->CurrentRefereeMsg() == "ourBallPlacement");
     bool avoidTheirBallPlacementArea = (WorldModel::Instance()->CurrentRefereeMsg() == "theirBallPlacement");
     bool shrinkTheirPenalty = Utils::InTheirPenaltyArea(finalTargetPos, 40) || Utils::InTheirPenaltyArea(myPos, 40);

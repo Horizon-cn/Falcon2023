@@ -33,11 +33,11 @@ firstState = "Front",
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader", 0),
-	--Hawk = task.protectBall(),
+	Hawk = task.protectBall(),
 	Defender = task.multiBack(1, 1),
 	Crosser = task.sideBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][ADC]"
+    match = "[L][ADCH]"
 },
 
 ["Back"] = {
@@ -46,9 +46,9 @@ firstState = "Front",
 	Assister = task.support("Leader", 1),
 	Hawk = task.protectBall(),
 	Defender = task.multiBack(1, 1),
-	--Crosser = task.sifeBack(),
+	Crosser = task.sideBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][ADH]"
+    match = "[L][ADHC]"
 },
 
 ["RightFront"] = {

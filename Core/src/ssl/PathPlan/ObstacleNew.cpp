@@ -16,7 +16,7 @@ namespace {
 	const double LOWER_BOUND_AVOID_SPEED = 50;
 	const double UPPER_BOUND_AVOID_SPEED = 250;
 	double FREE_KICK_BUF = 32;
-	double stopBallAvoidDist = 60;
+	double stopBallAvoidDist = 56.5;
 
 	inline float minObs(float a, float b) {
 		if (a < b) return a;
@@ -607,11 +607,18 @@ void ObstaclesNew::addObs(const CVisionModule* pVision, const TaskT& task, bool 
     }
 
     // 设置Stop时的障碍
+	//cout << WorldModel::Instance()->CurrentRefereeMsg() << endl;
+
+	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 200), WorldModel::Instance()->CurrentRefereeMsg().c_str());
     if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop" || (flags & PlayerStatus::AVOID_STOP_BALL_CIRCLE)) {
         const BallVisionT& ball = pVision->Ball();
         addCircle(ball.Pos(), CVector(0.0f, 0.0f), stopBallAvoidDist, OBS_CIRCLE_NEW);
     }
-
+	if (WorldModel::Instance()->CurrentRefereeMsg() == "theirKickOff") {
+		const BallVisionT& ball = pVision->Ball();
+		addCircle(ball.Pos(), CVector(0.0f, 0.0f), stopBallAvoidDist, OBS_CIRCLE_NEW);
+	}
+	// Modified by TYH, 新增敌人kickoff我们需要躲避球圈。
     if (drawObs) drawObstacles();
 }
 
