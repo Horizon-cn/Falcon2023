@@ -49,7 +49,7 @@ elseif OPPONENT_NAME == "NormalKick" then
             gCurrentPlay = "Ref_Stop4BackDef_play8"
         end
     else
-        gCurrentPlay = "Ref_StopV2_normal"
+        gCurrentPlay = "Ref_StopV2_Play8"
     end
 else
     gCurrentPlay = "Ref_StopV2_normal"
