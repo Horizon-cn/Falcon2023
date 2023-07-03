@@ -74,12 +74,12 @@ firstState = "startball",
 	Defender = task.goCmuRush(Nearpos),
 	Crosser	 = task.goCmuRush(helppos),
 	Goalie   = task.goalie(),
-	match    = "{A}[LM][BD][CS]"
+	match    = "[A][LM][BD][CS]"
 },
 
 ["changepos"] = {
 	switch = function ()
-		if bufcnt(player.toTargetDist("Crosser") < 30 and player.toTargetDist("Defender") < 30,"fast") then
+		if bufcnt(player.toTargetDist("Special") < 30 or player.toTargetDist("Leader") < 30,"fast") then
 			return "chipball"
 		elseif bufcnt(true, 225) then
 			return "Shootball"
@@ -93,7 +93,7 @@ firstState = "startball",
 	Crosser	 = task.goCmuRush(Nearpos),
 	Leader   = task.goCmuRush(helppos),
 	Goalie   = task.goalie(),
-	match    = "{LMB}{A}[SD][C]"
+	match    = "[MB][A][L][S][SC]"
 },
 
 ["chipball"] = {
@@ -112,7 +112,7 @@ firstState = "startball",
 	Crosser	 = task.goCmuRush(assipos),
 	Middle   = task.multiBack(3,3),
 	Goalie   = task.goalie(),
-	match    = "{ALS}[C][DM][B]"
+	match    = "[ALS][C][DM][B]"
 },
 
 ["Shootball"] = {
@@ -131,10 +131,10 @@ firstState = "startball",
 	Crosser	 = task.goCmuRush(assipos),
 	Middle   = task.multiBack(3,3),
 	Goalie   = task.goalie(),
-	match    = "{ALS}[C][DM][B]"
+	match    = "[ALS][C][DM][B]"
 },
 
-name = "Ref_IndirectBackKick",
+name = "Ref_BackKick",
 applicable ={
 	exp = "a",
 	a   = true
