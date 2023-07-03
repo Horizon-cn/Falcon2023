@@ -57,10 +57,8 @@ end
 
 local chippos = function()
 	if  ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 then
-		print(1111111)
 		return ball.refAntiYPos(CGeoPoint:new_local(0/1200*param.pitchLength,300/900*param.pitchWidth))()
 	else
-		print(222222222)
 		return  ball.refSyntYPos(CGeoPoint:new_local(0/1200*param.pitchLength,300/900*param.pitchWidth))()
 	end
 end

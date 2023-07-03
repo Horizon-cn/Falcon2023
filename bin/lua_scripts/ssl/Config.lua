@@ -3,9 +3,9 @@ IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 
 if not IS_YELLOW then
-	OPPONENT_NAME = "PureDefence8"-- PureDefence8 NormalKick
+	OPPONENT_NAME = "NormalKick"-- PureDefence8 NormalKick
 else
-	OPPONENT_NAME = "NormalKick"
+	OPPONENT_NAME = "PureDefence8"
 end
 
 gTestPlay = function ()
@@ -195,7 +195,6 @@ gTestPlayTable = {
 	"Test_AvoidFoulDefend",
 	"Test_NormalMiddleDefend",
 	"Test_Circle",
-	"Test_play6",
 	"NormalPlay",
 	"NormalPlayPureDefence8",
 	"Test_defend6",
@@ -206,5 +205,6 @@ gTestPlayTable = {
 	"Test_play8_ManyFoul",
 	"Test_play8_NotFoul",
 	"Test_play3",
-	"Test_NormalPass"
+	"Test_NormalPass",
+	"Test_play8ForPower"
 }
