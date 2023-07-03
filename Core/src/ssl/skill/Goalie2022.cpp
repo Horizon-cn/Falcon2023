@@ -415,8 +415,8 @@ CPlayerTask* CGoalie2022::penaltyTask(const CVisionModule* pVision)
 	double random_current = random_start - random_step;
 
 	double move_x = moveLine.point1().x();
-	if (!pVision->gameState().gameOn()) // 点球规则
-		move_x = -Param::Field::PITCH_LENGTH / 2;
+	//if (!pVision->gameState().gameOn()) // 点球规则
+	//	move_x = -Param::Field::PITCH_LENGTH / 2;
 
 	vector<CGeoPoint> random_points(random_num);
 	generate(random_points.begin(), random_points.end(), //generate points between [begin,end]

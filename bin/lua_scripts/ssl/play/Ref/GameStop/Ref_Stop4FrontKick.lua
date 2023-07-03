@@ -5,7 +5,7 @@
 local STOP_FLAG  = bit:_or(flag.slowly, flag.dodge_ball)
 local STOP_DSS   = bit:_or(flag.dodge_ball, flag.allow_dss)
 local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(50, ball.syntY(0.5 * math.pi))
+  return ball.pos() + Utils.Polar2Vector(60, ball.syntY(0.5 * math.pi))
 end
 
 local KICK_DIR  = ball.antiYDir(1.57)
