@@ -158,8 +158,8 @@ void CProtectBall::plan(const CVisionModule* pVision)
             if (Utils::Normalize(fabs(dir - (self.Pos()-predictBallPos).dir())) <= Param::Math::PI / 4) {
                 CGeoPoint Pos1 = predictBallPos + Utils::Polar2Vector(50, Utils::Normalize((self.Pos() - predictBallPos).dir() - Param::Math::PI / 4));
                 CGeoPoint Pos2 = predictBallPos + Utils::Polar2Vector(50, Utils::Normalize((self.Pos() - predictBallPos).dir() + Param::Math::PI / 4));
-                //GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_BLUE); ≤‚ ‘”√
-                //GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_BLUE); ≤‚ ‘”√
+                //GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_BLUE); //≤‚ ‘”√
+                //GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_BLUE); //≤‚ ‘”√
                 double Dist1 = (Pos1 - self.Pos()).mod();
                 double Dist2 = (Pos2 - self.Pos()).mod();
                 if (Dist1 < Dist2) {
@@ -200,8 +200,8 @@ void CProtectBall::plan(const CVisionModule* pVision)
             if (Utils::Normalize(fabs(dir - advancer2Ball.dir())) <= Param::Math::PI / 4) {
                 CGeoPoint Pos1 = predictBallPos + Utils::Polar2Vector(dist, Utils::Normalize(advancer2Ball.dir() - Param::Math::PI / 4));
                 CGeoPoint Pos2 = predictBallPos + Utils::Polar2Vector(dist, Utils::Normalize(advancer2Ball.dir() + Param::Math::PI / 4));
-                //GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_GREEN); ≤‚ ‘”√
-                //GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_GREEN); ≤‚ ‘”√
+                //GDebugEngine::Instance()->gui_debug_x(Pos1, COLOR_GREEN); //≤‚ ‘”√
+                //GDebugEngine::Instance()->gui_debug_x(Pos2, COLOR_GREEN); //≤‚ ‘”√
                 double Dist1 = (Pos1 - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
                 double Dist2 = (Pos2 - pVision->TheirPlayer(theirBestPlayer).Pos()).mod();
                 if (Dist1 < Dist2) {
@@ -221,7 +221,6 @@ void CProtectBall::plan(const CVisionModule* pVision)
             protectTask.player.rotvel=0;
             protectTask.player.max_acceleration=1000;
             protectTask.player.max_deceleration=1000;
-            protectTask.player.flag = flags | PlayerStatus::AVOID_SHOOTLINE;
             setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,200), "Protect Ball");
         }
