@@ -148,6 +148,7 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_StopV2_normal",
 	"Ref/GameStop/Ref_StopV3",
 	"Ref/GameStop/Ref_StopV3_normal",
+	"Ref/GameStop/Ref_StopV2_Play8",
 	--PureDefence8
 	"Ref/GameStop/Ref_StopCornerDefPureDefence",
 	--NormalKick
@@ -159,6 +160,7 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_Stop4BackDef_play8",
 	"Ref/GameStop/Ref_Stop4MiddleDef_play8",
 	"Ref/GameStop/Ref_Stop4FrontDef_play8",
+
 
 	--强制停止
 	"Ref/Ref_HaltV1",
