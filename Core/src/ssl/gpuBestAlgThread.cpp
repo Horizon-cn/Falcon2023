@@ -950,30 +950,34 @@ int CGPUBestAlgThread::getMatrix(const string file_name, int max_row_num, int ma
 
 void CGPUBestAlgThread::sendFieldRectangle() {
 	//区域边界debug信息
-	for (int i = 0; i < AREANUM; i++) {
-		CGeoPoint leftUpPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftUpPos;
-		CGeoPoint rightUpPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightUpPos;
-		CGeoPoint leftDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftDownPos;
-		CGeoPoint rightDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightDownPos;
-		CGeoPoint centerPos = gpuCalcArea::processed_fieldRectangleArray[i].getCenter();
-		
-		GDebugEngine::Instance()->gui_debug_line(leftUpPos, rightUpPos, COLOR_BLACK);
-		GDebugEngine::Instance()->gui_debug_line(rightUpPos, rightDownPos, COLOR_BLACK);
-		GDebugEngine::Instance()->gui_debug_line(rightDownPos, leftDownPos, COLOR_BLACK);
-		GDebugEngine::Instance()->gui_debug_line(leftDownPos, leftUpPos, COLOR_BLACK);
-		GDebugEngine::Instance()->gui_debug_x(_bestSupport[i], COLOR_WHITE);
-		GDebugEngine::Instance()->gui_debug_msg(_bestSupport[i], QString::number(i).toStdString().c_str(), COLOR_BLACK);
-		GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(_pointPotential[i]).toStdString().c_str(), COLOR_BLACK);
-		
+	bool OpenDebug = false;
+	if (OpenDebug) {
+		for (int i = 0; i < AREANUM; i++) {
+			CGeoPoint leftUpPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftUpPos;
+			CGeoPoint rightUpPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightUpPos;
+			CGeoPoint leftDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftDownPos;
+			CGeoPoint rightDownPos = gpuCalcArea::processed_fieldRectangleArray[i]._rightDownPos;
+			CGeoPoint centerPos = gpuCalcArea::processed_fieldRectangleArray[i].getCenter();
+
+			GDebugEngine::Instance()->gui_debug_line(leftUpPos, rightUpPos, COLOR_BLACK);
+			GDebugEngine::Instance()->gui_debug_line(rightUpPos, rightDownPos, COLOR_BLACK);
+			GDebugEngine::Instance()->gui_debug_line(rightDownPos, leftDownPos, COLOR_BLACK);
+			GDebugEngine::Instance()->gui_debug_line(leftDownPos, leftUpPos, COLOR_BLACK);
+			GDebugEngine::Instance()->gui_debug_x(_bestSupport[i], COLOR_WHITE);
+			GDebugEngine::Instance()->gui_debug_msg(_bestSupport[i], QString::number(i).toStdString().c_str(), COLOR_BLACK);
+			GDebugEngine::Instance()->gui_debug_msg(centerPos, QString::number(_pointPotential[i]).toStdString().c_str(), COLOR_BLACK);
+
+		}
+
+		//支撑点顺序debug信息
+
+		//GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], QString::number(cum).toStdString().c_str(), COLOR_BLACK);
+
+		GDebugEngine::Instance()->gui_debug_msg(_bestPoint[0], "000", COLOR_YELLOW);
+		GDebugEngine::Instance()->gui_debug_msg(_bestPoint[1], "111", COLOR_YELLOW);
+		GDebugEngine::Instance()->gui_debug_msg(_bestPoint[2], "222", COLOR_YELLOW);
+		GDebugEngine::Instance()->gui_debug_msg(_bestPoint[3], "333", COLOR_YELLOW);
+		GDebugEngine::Instance()->gui_debug_msg(_bestPoint[4], "444", COLOR_YELLOW);
+		GDebugEngine::Instance()->gui_debug_msg(_bestPoint[5], "555", COLOR_YELLOW);
 	}
-	//支撑点顺序debug信息
-	
-	//GDebugEngine::Instance()->gui_debug_msg(_bestSupport[0], QString::number(cum).toStdString().c_str(), COLOR_BLACK);
-	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[0], "000", COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[1], "111", COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[2], "222", COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[3], "333", COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[4], "444", COLOR_YELLOW);
-	GDebugEngine::Instance()->gui_debug_msg(_bestPoint[5], "555", COLOR_YELLOW);
-	
 }

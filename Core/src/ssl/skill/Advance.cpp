@@ -47,6 +47,9 @@ CAdvance::CAdvance()
 	// GetBallV4
 	LARGE_ADJUST_ANGLE = paramManager->LARGE_ADJUST_ANGLE;
 
+	DribbleForBreak.DribblePoint = CGeoPoint(-999, -999);
+	DribbleForBreak.state = LoseBallForDribble;
+	DribbleForBreak.TheMaxDistBetweenMeAndTheBallFortheLose = 1e9;
 }
 
 
@@ -149,7 +152,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 	***********************************************************/
 	Advance_DEBUG_ENGINE = 1;
 	MeIsInWhichArea = InWhichArea(pVision, _executor);
-	
+
+	UpdateTheDribblePointForbreak(pVision, _executor);
+
 	switch (_state) {
 	case BEGIN:
 		_state = GET;
@@ -272,13 +277,13 @@ void CAdvance::plan(const CVisionModule* pVision)
 		break;
 		*/
 	}
-
 	/*
+	
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 		//_state = PUSHOUT;
 		//_state = GET;
 		//_state = BREAKSHOOT;
-		_state = BREAKING;
+		_state = BREAKSHOOT;
 	}
 	else _state = GET;
 	*/
@@ -412,7 +417,8 @@ void CAdvance::plan(const CVisionModule* pVision)
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
 		ShootPoint = (pVision->Cycle() % 60 == 0) ? GenerateBreakShootPoint(pVision, _executor) : ShootPoint;
 		KickorPassDir = (ShootPoint - me.Pos()).dir();
-		setSubTask(PlayerRole::makeItBreak(_executor, true));
+		//setSubTask(PlayerRole::makeItBreak(_executor, 0.0, true, false, false));
+		setSubTask(PlayerRole::makeItBreak(_executor, 0.0, true, false, false, DribbleForBreak.DribblePoint));
 		break;
 
 	case BREAKING:
@@ -467,8 +473,10 @@ void CAdvance::plan(const CVisionModule* pVision)
 					setSubTask(PlayerRole::makeItlightkick(_executor, me.Dir()));
 					if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS__PUSH", COLOR_YELLOW);
 				}
-				else
-					setSubTask(PlayerRole::makeItBreak(_executor, false, false, false, generateBreakingDir(pVision, _executor)));
+				else {
+					setSubTask(PlayerRole::makeItBreak(_executor, generateBreakingDir(pVision, _executor), false, false, false, DribbleForBreak.DribblePoint));
+					//setSubTask(PlayerRole::makeItBreak(_executor, generateBreakingDir(pVision, _executor), false, false, false));
+				}
 			}
 		}
 		break;
@@ -1028,7 +1036,6 @@ bool CAdvance::Me2OppTooclose(const CVisionModule* pVision, const int vecNumber)
 
 	char me2opp[100];
 	sprintf(me2opp, "%f", me2Opp.mod());
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), me2opp, COLOR_YELLOW);
 	//changed by lsf
 
 	if (me2Opp.mod() <= 40 && opp.X() > me.X() && fabs(Utils::Normalize(me2Ball.dir() - me2Opp.dir())) < Param::Math::PI / 3) {
@@ -1359,6 +1366,41 @@ double CAdvance::generateBreakingDir(const CVisionModule* pVision, const int vec
 		return (theirCenter - me.Pos()).dir();
 	}
 }
+
+void CAdvance::UpdateTheDribblePointForbreak(const CVisionModule* pVision, const int vecNumber) {
+	const BallVisionT& ball = pVision->Ball();
+	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+	
+	if (DribbleForBreak.TheMaxDistBetweenMeAndTheBallFortheLose > 1e4) {
+		DribbleForBreak.TheMaxDistBetweenMeAndTheBallFortheLose = me.Pos().dist(ball.Pos());
+	}// 如果是未初始的Dist，需要直接初始化
+	else {// lose阶段，一直取最大的离球距离
+		DribbleForBreak.TheMaxDistBetweenMeAndTheBallFortheLose = max(me.Pos().dist(ball.Pos()), DribbleForBreak.TheMaxDistBetweenMeAndTheBallFortheLose);
+	}
+
+	if (DribbleForBreak.state == LoseBallForDribble) {// 上一时刻是lose
+		if (BallStatus::Instance()->getBallPossession(true, vecNumber) > 0.3) { // 这一时刻拿到了球
+			DribbleForBreak.state = HaveBallForDribble;
+			if (DribbleForBreak.TheMaxDistBetweenMeAndTheBallFortheLose > 18.0) { // 只有球离开我的距离超过了18，我才会更新我的DribblePoint
+				DribbleForBreak.DribblePoint = me.Pos();
+				DribbleForBreak.TheMaxDistBetweenMeAndTheBallFortheLose = me.Pos().dist(ball.Pos());
+			}
+		}
+		else { // 这一时刻仍然是lose
+			//不做操作
+		}
+	}
+	else {// 上一时刻拿到了球
+		if (BallStatus::Instance()->getBallPossession(true, vecNumber) > 0.3) { // 这一时刻同样拿到了球
+			//不做操作
+		}
+		else { // 这一时刻球丢失了
+			DribbleForBreak.state = LoseBallForDribble;// 更新状态
+			DribbleForBreak.TheMaxDistBetweenMeAndTheBallFortheLose = me.Pos().dist(ball.Pos()); // 重新计数，但是不更新DribblePoint，因为可能重新拿回来
+		}
+	}
+}
+
 CPlayerCommand* CAdvance::execute(const CVisionModule* pVision)
 {
 	if (subTask()) {

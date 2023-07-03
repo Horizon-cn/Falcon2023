@@ -306,7 +306,7 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
     }
 
     newTask.player.pos = middlePoint;
-    GDebugEngine::Instance()->gui_debug_x(middlePoint, COLOR_CYAN);
+    //GDebugEngine::Instance()->gui_debug_x(middlePoint, COLOR_CYAN);
     //GDebugEngine::Instance()->gui_debug_x(finalTargetPos, 2);
     
     // 非零速到达中间点，零速只有在可以直接到时才执行

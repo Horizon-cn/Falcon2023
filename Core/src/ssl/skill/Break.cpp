@@ -132,11 +132,14 @@ void CBreak::plan(const CVisionModule* pVision) {
     if ((pVision->Cycle() - _lastCycle > Param::Vision::FRAME_RATE * 0.1)) {
 
         move_point = CGeoPoint(-9999 * 10, -9999 * 10);
-        dribblePoint = pVision->OurPlayer(task().executor).Pos();
+        if(task().player.pos.x() == -1000)
+            dribblePoint = pVision->OurPlayer(task().executor).Pos();
         isDribble = false;
         running_index = 0;
 
     }
+    if (task().player.pos.x() != -1000)
+        dribblePoint = task().player.pos;//pVision->OurPlayer(task().executor).Pos();
     string time1 = stamp();
     //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), ("Dribble Status:" + time1).c_str(), COLOR_YELLOW);
 
@@ -208,7 +211,9 @@ void CBreak::plan(const CVisionModule* pVision) {
     //if (!frared)
     if (BallStatus::Instance()->getBallPossession(true, vecNumber) == 0)
     {
-        dribblePoint = me.Pos();
+        if (task().player.pos.x() == -1000)
+            //dribblePoint = task().player.pos;
+            dribblePoint = me.Pos();
 
     }
     GDebugEngine::Instance()->gui_debug_x(dribblePoint, COLOR_RED);  // 不是这个
@@ -221,8 +226,7 @@ void CBreak::plan(const CVisionModule* pVision) {
     if (task().player.needkick)
         grabTask.player.angle = finalDir;
     else
-        grabTask.player.angle = task().player.rotdir;
-
+        grabTask.player.angle = task().player.angle;
 
     //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, 0), ("Dribble" + to_string(1)).c_str(), COLOR_YELLOW);
    /*if (pVision->Cycle() % 60 == 0) {
@@ -572,10 +576,10 @@ CGeoPoint CBreak::calc_point(const CVisionModule* pVision, const int vecNumber, 
             if (abs(best_point.x()) < (Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30))
                 best_point.setX((Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - 30));
         }
-        if ((best_point - dribblePoint).mod() > DRIBBLE_DIST) {  // dribblePoint是中心点还是当前点？？？？
-            best_point = makeInCircle(best_point, dribblePoint, DRIBBLE_DIST);
-        }*/
-
+        
+            }*/
+        if ((best_point - dribblePoint).mod() > DRIBBLE_DIST)   // dribblePoint是中心点还是当前点？？？？
+                    best_point = makeInCircle(best_point, dribblePoint, DRIBBLE_DIST);
         GDebugEngine::Instance()->gui_debug_x(best_point, COLOR_ORANGE);
         return best_point;
     }
