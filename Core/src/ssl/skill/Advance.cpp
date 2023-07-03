@@ -167,16 +167,17 @@ void CAdvance::plan(const CVisionModule* pVision)
 		}
 		else if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) 
 			_state = GET;
+		/*
 		else if (NumOfOurPlayer >= 3 && NumOfOurPlayer <= 5)
 		{
 			if (me.X() < 0)
 				_state = JUSTCHIPPASS;
-			else if (me.X() < Param::Field::PITCH_LENGTH / 3)
+			else if (me.X() < Param::Field::PITCH_LENGTH / 6)
 				_state = BREAKING;
 			else
 				_state = BREAKSHOOT;
 			break;
-		}
+		}*/
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 			_state = GenerateNextState(pVision, _executor);
 			break;

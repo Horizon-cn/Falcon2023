@@ -161,7 +161,6 @@ gRefPlayTable = {
 	"Ref/GameStop/Ref_Stop4MiddleDef_play8",
 	"Ref/GameStop/Ref_Stop4FrontDef_play8",
 
-
 	--强制停止
 	"Ref/Ref_HaltV1",
 }
@@ -208,5 +207,6 @@ gTestPlayTable = {
 	"Test_play8_NotFoul",
 	"Test_play3",
 	"Test_NormalPass",
-	"Test_play8ForPower"
+	"Test_play8ForPower",
+	"Test_play6"
 }
