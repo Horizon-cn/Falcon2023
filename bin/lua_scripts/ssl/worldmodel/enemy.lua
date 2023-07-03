@@ -24,6 +24,10 @@ function dir(role)
 	return instance(role):Dir()
 end
 
+function toBallDir(role)
+	return (ball.pos() - pos(role)):dir()
+end
+
 function vel(role)
 	return instance(role):Vel()
 end

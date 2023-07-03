@@ -169,7 +169,7 @@ gBayesPlayTable = {
 }
 
 gTestPlayTable = {
-
+	"Test_RefChallenge",
 	"Test_Run",
 	"Test_BezierRun",
 	"Test_GetBall",

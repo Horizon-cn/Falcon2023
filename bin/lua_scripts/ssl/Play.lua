@@ -38,29 +38,60 @@ function gPlay.Next()
 	end
 end
 
+function split(inputstr, sep)
+	if sep == nil then
+		sep = "%s"
+	end
+	local t={}
+	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+		table.insert(t, str)
+	end
+	return t
+end
+
+function table_length(t)
+  local length=0
+  for k, v in pairs(t) do
+    length=length+1
+  end
+  return length
+end
+
 function gPlayTable.CreatePlay(spec)
+	assert(spec.firstState ~= nil)
 	assert(type(spec.name) == "string")
 	assert(spec.applicable ~= nil)
 	assert(spec.attribute ~= nil)
 	assert(type(spec.timeout) == "number")
-	--print("Init Play: "..spec.name)
 
+	new_spec = {}
+	new_spec.firstState = spec.firstState
+	new_spec.switch = spec.switch
+	new_spec.name = spec.name
+	new_spec.applicable = spec.applicable
+	new_spec.attribute = spec.attribute
+	new_spec.timeout = spec.timeout
+	-- print("init: "..spec.name)
 	for attr, attr_table in pairs(spec) do
-		if type(attr_table) == "table" then
-			if attr_table.match ~= nil then
-				for rolename, task in pairs(attr_table) do
-					if rolename == "match" then
-						-- attr_table.match = DecodeMatchStr(attr_table.match)
-					else
-						--rolename =
+		if attr~="applicable" and type(attr_table) == "table" then
+			assert(attr_table.match ~= nil)
+			new_attr_table = {}
+			for rolename, roletask in pairs(attr_table) do
+				if type(rolename) ~= "function" and rolename ~= "switch" and string.find(rolename,"000") then
+					roles = split(rolename,"000")
+					assert(table_length(roles) == table_length(roletask))
+					for i=1,table_length(roles) do
+						new_attr_table[roles[i]] = roletask[i]
 					end
+				else
+					new_attr_table[rolename] = roletask
 				end
 			end
+			new_spec[attr] = new_attr_table
 		end
 	end
 
-	gPlayTable[spec.name] = spec
-	return spec
+	gPlayTable[new_spec.name] = new_spec
 end
 
 function IsRoleActive(rolename)
@@ -254,8 +285,8 @@ function NeedExit(name)
 	else
 		local curPlay = gPlayTable[name]
 		if gCurrentState == "finish" or
-		    gCurrentState == "exit" or
-		    gTimeCounter > curPlay.timeout or
+			gCurrentState == "exit" or
+			gTimeCounter > curPlay.timeout or
 			vision:Cycle() - gLastCycle > 6 then
 			gTimeCounter = 0
 			return true
