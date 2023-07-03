@@ -221,7 +221,6 @@ void CProtectBall::plan(const CVisionModule* pVision)
             protectTask.player.rotvel=0;
             protectTask.player.max_acceleration=1000;
             protectTask.player.max_deceleration=1000;
-            protectTask.player.flag = flags | PlayerStatus::AVOID_SHOOTLINE;
             setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(protectTask));
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0,200), "Protect Ball");
         }
