@@ -30,7 +30,7 @@ require("bufcnt")
 require("learn")
 require("file")
 require("score")
---require("combo")
+require("combo")
 
 for _, value in ipairs(gSkill) do
 	local filename = "../lua_scripts/ssl/skill/"..value..".lua"
