@@ -381,7 +381,7 @@ namespace PlayerRole {
 		static TaskT playerTask;
 		playerTask.executor = num;
 		playerTask.player.needkick = needkick;
-		playerTask.player.rotdir = dir;
+		playerTask.player.angle = dir;
 		if (isPenalty)playerTask.player.flag = playerTask.player.flag | PlayerStatus::PENALTY_KICK;
 		if (isSpin)playerTask.player.flag = playerTask.player.flag | PlayerStatus::SPIN;
 

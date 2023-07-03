@@ -160,6 +160,18 @@ void CAdvance::plan(const CVisionModule* pVision)
 			_state = GET;
 			break;
 		}
+		else if (BallStatus::Instance()->getBallPossession(true, _executor) == 0 && ball2meDist > 10) 
+			_state = GET;
+		else if (NumOfOurPlayer >= 3 && NumOfOurPlayer <= 5)
+		{
+			if (me.X() < 0)
+				_state = JUSTCHIPPASS;
+			else if (me.X() < Param::Field::PITCH_LENGTH / 3)
+				_state = BREAKING;
+			else
+				_state = BREAKSHOOT;
+			break;
+		}
 		if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 			_state = GenerateNextState(pVision, _executor);
 			break;
@@ -410,9 +422,34 @@ void CAdvance::plan(const CVisionModule* pVision)
 		NowIsShoot = 2;
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKSHOOT", COLOR_YELLOW);
 		//KickStatus::Instance()->setBothKick(_executor, 0, 0);
-		ShootPoint = (pVision->Cycle() % 60 == 0) ? GenerateBreakShootPoint(pVision, _executor) : ShootPoint;
-		KickorPassDir = (ShootPoint - me.Pos()).dir();
-		setSubTask(PlayerRole::makeItBreak(_executor, true));
+		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -420), ("Opp_Ahead:"+ to_string(opp_ahead(pVision, _executor))).c_str(), COLOR_YELLOW);
+		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -440), ("CanSupportKick:" + to_string(CanSupportKick(pVision, _executor))).c_str(), COLOR_YELLOW);
+		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -460), ("ClosetoPosPlayerDist:" + to_string(pVision->TheirPlayer(getTheirMostClosetoPosPlayerNum(pVision, SupportPoint[TheBestSupportNumber])).Pos().dist(SupportPoint[TheBestSupportNumber]))).c_str(), COLOR_YELLOW);
+		if (opp_ahead(pVision, _executor)>=5 && CanSupportKick(pVision, _executor) && pVision->TheirPlayer(getTheirMostClosetoPosPlayerNum(pVision, SupportPoint[TheBestSupportNumber])).Pos().dist(SupportPoint[TheBestSupportNumber]) >= 60)
+		{
+			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS__PASS", COLOR_YELLOW);
+			PassPoint = SupportPoint[TheBestSupportNumber];
+			GDebugEngine::Instance()->gui_debug_x(SupportPoint[TheBestSupportNumber], COLOR_CYAN);
+			KickorPassDir = (PassPoint - me.Pos()).dir();
+			GDebugEngine::Instance()->gui_debug_line(me.Pos(), SupportPoint[TheBestSupportNumber], COLOR_CYAN);
+			if (isDirOK(pVision, _executor, KickorPassDir, 0))
+			{
+				ThePower = GetCPassPower(me.Pos(), PassPoint);
+				setSubTask(PlayerRole::makeItJustKick(_executor, 1, ThePower));
+				TaskMediator::Instance()->setAdvancerPassTo(PassPoint, NumberOfSupport);
+			}
+			else
+			{
+				setSubTask(PlayerRole::makeItBreak(_executor, KickorPassDir, false, false, false));
+			}
+		}
+		else
+		{
+			ShootPoint = (pVision->Cycle() % 60 == 0) ? GenerateBreakShootPoint(pVision, _executor) : ShootPoint;
+			KickorPassDir = (ShootPoint - me.Pos()).dir();
+			setSubTask(PlayerRole::makeItBreak(_executor, true));
+		}
+		
 		break;
 
 	case BREAKING:
@@ -442,15 +479,33 @@ void CAdvance::plan(const CVisionModule* pVision)
 			}
 			else
 			{
-				PassPoint = generateNormalPushPoint(pVision, _executor);// : PassPoint;
-				KickorPassDir = (PassPoint - me.Pos()).dir();
-				if (OppIsFarThanMe(pVision, _executor))
+				bool flag = true;
+				for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+					if (!pVision->TheirPlayer(i).Valid()) continue;
+					auto enemy = pVision->TheirPlayer(i);
+					double x = enemy.X(), y = enemy.Y();
+					double x1 = me.X(), y1 = me.Y(), theta = me.Dir();
+					if (x < me.X() || enemy.Pos().dist(me.Pos())>200) continue;
+					CGeoLine my_direction(me.Pos(), theta);
+					CGeoPoint projection_point = my_direction.projection(enemy.Pos());
+					double r = projection_point.dist(enemy.Pos());
+					double me2prodist = projection_point.dist(me.Pos());
+					if (!((r > 40 || me2prodist > 150) && me.Dir() <= Param::Math::PI / 3 && me.Dir() >= -Param::Math::PI / 3 && fabs(me.Y()) < Param::Field::PITCH_WIDTH * 2 / 3))
+						flag = false;
+				}
+				if (me2BestOppDist > 40)  //80 mayebe too large
 				{
+					PassPoint = generateNormalPushPoint(pVision, _executor);// : PassPoint;
+					KickorPassDir = (PassPoint - me.Pos()).dir();
 					setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
+				}
+				else if (flag)
+				{
+					setSubTask(PlayerRole::makeItlightkick(_executor, me.Dir()));
 					if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS__PUSH", COLOR_YELLOW);
 				}
 				else
-					setSubTask(PlayerRole::makeItBreak(_executor, false, false, false, generateBreakingDir(pVision, _executor)));
+					setSubTask(PlayerRole::makeItBreak(_executor, generateBreakingDir(pVision, _executor), false, false, false));
 			}
 		}
 		
@@ -812,7 +867,7 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 		NearThanMe[i] = (theirCenter.dist(SupportPoint[i]) + supportMustNearerDist < theirCenter.dist(me.Pos()));
 
 		if (isOurNearPointAndFarOfMe[i] && theMinOppDistToThePoint[i] < theMinOppDist_threshold) {
-			if (MeIsInWhichArea == CanNOTBreakArea || MeIsInWhichArea == CornerArea) {
+			if (MeIsInWhichArea == CanNOTBreakArea || MeIsInWhichArea == CornerArea || MeIsInWhichArea == KICKArea) {
 				isCanUse[i] = 1;
 			}
 			else {
