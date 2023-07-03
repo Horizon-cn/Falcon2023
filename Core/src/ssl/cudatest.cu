@@ -844,7 +844,7 @@ extern "C" void calc_with_gpu(float* map_cpu, float* start_pos_cpu, int length, 
 // 依次为：搜索区域圆心、max_drbble_dist、当前球员位置、球员朝向、球的位置、球的速度、我方小车的位置、朝向、速度（首位为是否valid）、敌方小车的位置、朝向、速度（首位为是否valid）
 // 如果修改这部分代码，请仔细阅读赋值及GPU部分代码并与之进行相应的修改
 // 需要注意的部分有CPU空间的申请，对其进行赋值，将其拷贝的GPU上时申请的空间、GPU对该列表信息的解析
-__global__ void break_gpu_calc(float pos_info[], float target_info[], float results[], int angle_mod, int dist_mod, float vis_points[])
+__global__ void break_gpu_calc(float pos_info[], float target_info[], float results[], int angle_mod, int dist_mod, float vis_points[], bool isPenalty)
 {
     extern __shared__  float score_map[];
 
@@ -872,7 +872,15 @@ __global__ void break_gpu_calc(float pos_info[], float target_info[], float resu
     float test_point[2];
     test_point[0] = self_pos[0] + mod * cos(angle);
     test_point[1] = self_pos[1] + mod * sin(angle);
-    
+    if (isPenalty)
+    {
+        if (fabs(dir(self_pos, test_point)) > PI * 5 / 12)
+        {
+            angle = angle * 5 / 12;
+            test_point[0] = self_pos[0] + mod * cos(angle);
+            test_point[1] = self_pos[1] + mod * sin(angle);
+        }
+    }
     // 使其在拉球圆内
     float vec_dist = dist(test_point, dribble_center_point);
     if (vec_dist > max_dribble_dist) {
@@ -1002,7 +1010,7 @@ __global__ void break_gpu_calc(float pos_info[], float target_info[], float resu
 // pos_info_cpu：视觉信息，球和机器人的位置
 // pos_info_num：视觉信息数目
 
-extern "C" int break_calc_with_gpu(float* target_point_cpu, int target_point_num, float* pos_info_cpu, int pos_info_num, int angle_mod, int dist_mod, float* results, float* vis_points_cpu) {
+extern "C" int break_calc_with_gpu(float* target_point_cpu, int target_point_num, float* pos_info_cpu, int pos_info_num, int angle_mod, int dist_mod, float* results, float* vis_points_cpu, bool isPenalty) {
     //clock_t begin, end;
     //begin = clock();
     float* results_gpu, * pos_info_gpu, * target_point_gpu, * vis_points_gpu;
@@ -1048,7 +1056,7 @@ extern "C" int break_calc_with_gpu(float* target_point_cpu, int target_point_num
     dim3 dimBlock((angle_mod * 2 - 1) * (dist_mod - 1));
 
     // 执行kernel
-    break_gpu_calc << <dimGrid, dimBlock, 3 * (angle_mod * 2 - 1)* (dist_mod - 1) * sizeof(float) >> > (pos_info_gpu, target_point_gpu, results_gpu, angle_mod, dist_mod, vis_points_gpu); // 第三个参数指定共享内存大小
+    break_gpu_calc << <dimGrid, dimBlock, 3 * (angle_mod * 2 - 1)* (dist_mod - 1) * sizeof(float) >> > (pos_info_gpu, target_point_gpu, results_gpu, angle_mod, dist_mod, vis_points_gpu, isPenalty); // 第三个参数指定共享内存大小
 
     // 将在GPU端计算好的结果拷贝回CPU端
     cudaMemcpy(results, results_gpu, result_size, cudaMemcpyDeviceToHost);
