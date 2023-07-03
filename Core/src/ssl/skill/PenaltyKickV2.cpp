@@ -33,7 +33,6 @@ CPenaltyKickV2::CPenaltyKickV2()
     SHOOT_PRECISION = paramManager->SHOOT_PRECISION;	/*允许射门最小精度角分母，越大越慢越精确 最低为7最高17*/
     GetBallBias = paramManager->AdGetBallBias;	/*AdvanceGetball的偏差*/
     BalltoMeVel = paramManager->BalltoMeVelTime; /*Advance传球给我主动去接的临界速度*/
-//    shootfarflag = paramManager->penaltykickshootfarflag;/*判断点球是否打远角的参数*/
     /*射门力度参数*/
     KICKPOWER = paramManager->KICKPOWER;
     CHIPPOWER = paramManager->CHIPPOWER; // 暂时不用了
@@ -136,12 +135,12 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -200), to_string(meHasBall).c_str());
         if (meHasBall > 5) {
 
-            if (fabs(opp.VelX()) > 200) {
-                _state = CHIP; break;
+            if (fabs(opp.VelX()) > 200 && opp.X() < 430) {
+                _state = BREAKSHOOT; break;
             }
             if (me2goal.mod() < KICK_DIST) {
                 if (tendToShoot(pVision, _executor)) {
-                    _state = KICK; break;
+                    _state = BREAKSHOOT; break;
                 }
                 else if (Me2OppTooclose(pVision, _executor)) {
                     _state = BREAKSHOOT; break;
@@ -162,14 +161,6 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         }
         else { _state = GET; break; }
 
-    case CHIP: //emergency chip
-        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHIP", COLOR_YELLOW);
-        if (meLoseBall > 15 && ball2meDist > 10) _state = GET;
-        break;
-    case CHIP1: //directintotheirgoal
-        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHIP1", COLOR_YELLOW);
-        if (meLoseBall > 15 && ball2meDist > 10) _state = GET;
-        break;
     case KICK:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push KICK", COLOR_YELLOW);
         if (meLoseBall > 15 && ball2meDist > 10) _state = GET;
@@ -179,36 +170,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push BREAKSHOOT", COLOR_YELLOW);
         if (meLoseBall > 18 && ball2meDist > 10) _state = GET;
         break;
-    case NORMAL_PUSH:
-        normalPushCnt++;
-        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "GETtoNORMALPUSH", COLOR_YELLOW);
-        if (meLoseBall > 10 * 1.25) {
-            if (Advance_DEBUG_ENGINE) { cout << "normalpush --> get" << endl; }
-            _state = GET;
-        }
-        else if (me2goal.mod() < KICK_DIST || Me2OppTooclose(pVision, _executor)) {
-            if (Advance_DEBUG_ENGINE) { cout << "normalpush-> breakshoot" << endl; }
-            if (tendToShoot(pVision, _executor)) {
-                if (isMeHasBall > 5)
-                    _state = KICK;
-                else
-                    _state = GET;
-                break;
-            }
-            else {
-                if (isMeHasBall > 5)
-                    _state = BREAKSHOOT;
-                else
-                    _state = GET;
-                break;
-            }
-        }
-        else if (abs(Utils::Normalize(me.Dir() - me2goal.dir())) < Param::Math::PI / 36) {
-            if (Advance_DEBUG_ENGINE) { cout << "normalpush --> light kick" << endl; }
-            _state = LIGHT_KICK;
-        }
 
-        break;
     case LIGHT_KICK:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 400), "LIGHT KICk", COLOR_YELLOW);
         if (Advance_DEBUG_ENGINE) { cout << "light kick -> lightkick" << endl; }
@@ -294,49 +256,6 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         }
         // }
         break;
-    case CHIP:
-        KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
-        KickStatus::Instance()->clearAll();
-        /*正常KICK阶段  需要区分是否方向已经转向成功  此处尚未完备可能存在BUG*/
-        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Chip", COLOR_ORANGE);
-        if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
-            if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip isDirOK", COLOR_ORANGE);
-            KickStatus::Instance()->setChipKick(_executor, me2goal.mod() - 200);
-        }
-        else {
-            //setSubTask(PlayerRole::makeItGoAndTurnKickV4(_executor, kickDir));
-            DribbleStatus::Instance()->setDribbleCommand(_executor, 1);
-            setSubTask(PlayerRole::makeItSimpleGoto(_executor, me.Pos(), KickorPassDir));
-            KickStatus::Instance()->setChipKick(_executor, me2goal.mod() - 200);
-            // setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
-            if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip is  DirOK after turn ", COLOR_ORANGE);
-        }
-        break;
-    case CHIP1:
-        if (ball.Y() >= 0)KickorPassDir = -Param::Math::PI * 0.08;
-        else KickorPassDir = Param::Math::PI * 0.08;
-        //KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
-        KickStatus::Instance()->clearAll();
-        /*正常KICK阶段  需要区分是否方向已经转向成功  此处尚未完备可能存在BUG*/
-        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "Let Chip1", COLOR_ORANGE);
-        if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
-            if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip isDirOK", COLOR_ORANGE);
-            KickStatus::Instance()->setChipKick(_executor, 50);
-        }
-        else {
-            //setSubTask(PlayerRole::makeItGoAndTurnKickV4(_executor, kickDir));
-            DribbleStatus::Instance()->setDribbleCommand(_executor, 1);
-            setSubTask(PlayerRole::makeItSimpleGoto(_executor, me.Pos(), KickorPassDir));
-            KickStatus::Instance()->setChipKick(_executor, 50);
-            // setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
-            if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip is  DirOK after turn ", COLOR_ORANGE);
-        }
-
-        // setSubTask(PlayerRole::makeItDribbleTurnKickV2(_executor, KickorPassDir, 0.2 * Param::Math::PI *SHOOT_PRECISION, 1, 80, CGeoPoint(0, 0))); //这里最后一个参数没解析 所以我偷懒了
-        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Chip dowm", COLOR_ORANGE);
-
-
-        break;
 
     case BREAKSHOOT:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKSHOOT", COLOR_YELLOW);
@@ -345,14 +264,10 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         setSubTask(PlayerRole::makeItBreak(_executor, 0, true, true, true));
         break;
 
-    case NORMAL_PUSH:
-        KickDirection::Instance()->GenerateShootDir(_executor, pVision->OurPlayer(_executor).Pos());
-        PassPoint = generateNormalPushPoint(pVision, _executor);
-        KickorPassDir = (PassPoint - me.Pos()).dir();
-        setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
-        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Make NormalPush", COLOR_ORANGE);
-        break;
+
     case LIGHT_KICK:
+        if (!shootfarflag)
+        {
             if (pVision->Ball().X() <= 0)
             {
                 KickorPassDir = Param::Math::PI * 0.05;
@@ -392,6 +307,33 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             //else
             //    KickStatus::Instance()->setKick(_executor, 10);
             break;
+        }
+        else
+        {
+            KickStatus::Instance()->clearAll();
+            KickorPassDir = Param::Math::PI * 0.08;
+            DribbleStatus::Instance()->setDribbleCommand(_executor, 1);
+            setSubTask(PlayerRole::makeItSimpleGoto(_executor, me.Pos(), KickorPassDir));
+            if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Try Shoot Far", COLOR_ORANGE);
+            // if (isDirOK(pVision, _executor, KickorPassDir, 1)) {
+             //    if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot Far", COLOR_ORANGE);
+              //   KickStatus::Instance()->setChipKick(_executor, 150);
+            // }
+            if (isDirOK(pVision, _executor, KickorPassDir, 1) && pVision->Ball().X() <= 0) {
+                if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot Far", COLOR_ORANGE);
+                KickStatus::Instance()->setKick(_executor, 230);
+                DribbleStatus::Instance()->setDribbleCommand(_executor, 0);
+            }
+            if (pVision->Ball().X() >= 0) //if(pVision->Ball().X() <= 50)
+            {
+                if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot Near", COLOR_ORANGE);
+                KickStatus::Instance()->setKick(_executor, 110); // kick lightly
+                DribbleStatus::Instance()->setDribbleCommand(_executor, 0);
+            }
+            //else
+            //    KickStatus::Instance()->setKick(_executor, 10);
+            break;
+        }
     }
     _cycle = pVision->Cycle();
     CStatedTask::plan(pVision);
@@ -542,7 +484,7 @@ bool CPenaltyKickV2::Me2OppTooclose(const CVisionModule* pVision, const int vecN
 }
 
 bool CPenaltyKickV2::isDirOK(const CVisionModule* pVision, int vecNumber, double targetDir, int ShootOrPass) {
-    double ShootPrecision = 5.0;
+    double ShootPrecision = 3.5;
     const BallVisionT& ball = pVision->Ball();
     const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
     const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
@@ -785,6 +727,28 @@ CGeoPoint CPenaltyKickV2::generateNormalPushPoint(const CVisionModule* pVision, 
     //GDebugEngine::Instance()->gui_debug_x(FinalTarget, COLOR_BLUE);
     return FinalTarget;
 }
+
+/*bool CPenaltyKickV2::isMePassedOpp(const CVisionModule* pVision, const int vecNumber) {
+    const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+    const PlayerVisionT& opp = pVision->TheirPlayer(opponentID);
+    const BallVisionT& ball = pVision->Ball();
+
+    CVector me2opp = opp.Pos() - me.Pos();
+    CVector opp2Ball = ball.Pos() - opp.Pos();
+    CVector ball2Opp = opp.Pos() - ball.Pos();
+    CVector me2Ball = ball.Pos() - me.Pos();
+    bool meDirControlBall = abs(Utils::Normalize(me2Ball.dir() - me.Dir())) < Param::Math::PI / 4;
+    bool meDistControlBall = me2Ball.mod() < Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER + 10.5;
+    bool mePassOpp_1 = abs(Utils::Normalize(me2Ball.dir() - me2opp.dir())) > Param::Math::PI / 2.5;
+    bool mePassOpp_2 = abs(Utils::Normalize(opp.Dir() - ball2Opp.dir())) < Param::Math::PI / 3.0;
+    if (meDistControlBall && meDistControlBall && (mePassOpp_1 || mePassOpp_2) || me2opp.mod() > 25) {
+        // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), "PASS!!!!!!!!!!!", COLOR_WHITE);
+        return true;
+    }
+    else {
+        return false;
+    }
+}*/
 
 CPlayerCommand* CPenaltyKickV2::execute(const CVisionModule* pVision) {
     if (subTask()) {

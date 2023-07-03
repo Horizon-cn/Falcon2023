@@ -46,6 +46,16 @@ private:
         CenterArea,
         ReliefArea,
     };
+    enum {
+        HaveBallForDribble = 0,
+        LoseBallForDribble,
+    };
+    struct ForBerakDribblePoint {
+        CGeoPoint DribblePoint;
+        double TheMaxDistBetweenMeAndTheBallFortheLose;
+        int state;
+    }DribbleForBreak;
+
     int _lastCycle;
     int _state;
     int _cycle;
@@ -194,6 +204,9 @@ private:
     int GenerateNextState(const CVisionModule* pVision, const int vecNumber);
     int CanWeUseChaseBecauseOfGetBallV3(const CVisionModule* pVision, const int vecNumber);
     double generateBreakingDir(const CVisionModule* pVision, const int vecNumber);
+
+
+    void UpdateTheDribblePointForbreak(const CVisionModule* pVision, const int vecNumber);
 protected:
 
     CPlayerCommand* _directCommand;

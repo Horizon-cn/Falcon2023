@@ -119,7 +119,7 @@ void CGetBallV3::plan(const CVisionModule* pVision)
     double finalDir = task().player.angle;
     double reverse_finalDir = Utils::Normalize(finalDir + Param::Math::PI);
 
-    CGeoPoint LargeAnglePoint = GenerateLargeAnglePoint(pVision, finalDir, 1);
+    CGeoPoint LargeAnglePoint = GenerateLargeAnglePoint(pVision, finalDir, false);
     if (ball.Vel().mod() < 20 && (LargeAnglePoint - me.Pos()).mod() < 5 || (JudgeLargeBack(pVision, LargeAnglePoint) && self2ball.mod() < 30)) {
         //finalDir = me.Dir();// (ball.Pos() - me.Pos()).dir
         finalDir = (ball.Pos() - me.Pos()).dir();;
@@ -202,7 +202,7 @@ void CGetBallV3::plan(const CVisionModule* pVision)
             double vel_dir = me.Vel().dir();
             double vel_dir_diff = abs(vel_dir - (projection_point - me.Pos()).dir());
             BallPosWithVelFactorTmp += (vel_dir_diff - Param::Math::PI / 2) / 8;
-            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), QString("vel dir diff time:%5").arg((vel_dir_diff - Param::Math::PI / 2) / 5).toStdString().c_str());
+            //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), QString("vel dir diff time:%5").arg((vel_dir_diff - Param::Math::PI / 2) / 5).toStdString().c_str());
         }
 
         BallPosWithVelFactorTmp += projection2me_dist / 400;

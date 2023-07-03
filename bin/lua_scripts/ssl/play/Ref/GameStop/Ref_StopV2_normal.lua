@@ -255,10 +255,10 @@ firstState = "start",
   Assister = task.goCmuRush(KICKOF_POS_1, dir.playerToBall, ACC, STOP_DSS),
   Special  = task.goCmuRush(KICKOF_POS_2, dir.playerToBall, ACC, STOP_DSS),
   Leader   = task.goCmuRush(KICKOF_POS_3, dir.playerToBall, ACC, STOP_DSS),
-  Defender = task.rightBack(),--task.defendMiddle4Stop(),--TODO
-  Middle   = task.leftBack(),
-	Breaker  = task.multiBack(2,1),
-  Crosser  = task.multiBack(2,2),
+  Defender = task.multiBack(4,1),--task.defendMiddle4Stop(),--TODO
+  Middle   = task.multiBack(4,2),
+	Breaker  = task.multiBack(4,3),
+  Crosser  = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
   match    = "[DM][BC][ASL]"
 },
