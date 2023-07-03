@@ -1,12 +1,13 @@
-local function KICKOFF_DEF_POS(str)
-	return function()
-		local x, y
-		x, y = CKickOffDefPos(str)
-		return CGeoPoint:new_local(x,y)
-	end
-end
-
-local guardpoint = CGeoPoint:new_local(-100,0)
+-- local function KICKOFF_DEF_POS(str)
+-- 	return function()
+-- 		local x, y
+-- 		x, y = CKickOffDefPos(str)
+-- 		return CGeoPoint:new_local(x,y)
+-- 	end
+-- end
+local UpPoint = CGeoPoint:new_local(-224/1200*param.pitchLength,-140/900*param.pitchWidth)
+local MiddlePoint = CGeoPoint:new_local(-66/1200*param.pitchLength,0/900*param.pitchWidth)
+local BelowPoint = CGeoPoint:new_local(-224/1200*param.pitchLength,140/900*param.pitchWidth)
 gPlayTable.CreatePlay{
 firstState = "start",
 
@@ -16,15 +17,16 @@ firstState = "start",
 			return "exit"
 		end
 	end,
-	Leader   = task.goCmuRush(guardpoint), --task.goSpeciPos(KICKOFF_DEF_POS("left")),
-	Assister = task.multiBack(6,1),
-	Special  = task.multiBack(6,2),
-	Middle   = task.multiBack(6,3),
-	Defender = task.multiBack(6,4),
-	Breaker  = task.multiBack(6,5),
-	Crosser  = task.multiBack(6,6),
+	--三個在圓外，剩下MultiBack
+	Leader   = task.goCmuRush(MiddlePoint), --task.goSpeciPos(KICKOFF_DEF_POS("left")),
+	Assister = task.goCmuRush(BelowPoint),	
+	Special  = task.goCmuRush(UpPoint),
+	Middle   = task.multiBack(4,1),
+	Defender = task.multiBack(4,2),
+	Breaker  = task.multiBack(4,3),
+	Crosser  = task.multiBack(4,4),
 	Goalie   = task.goalieNew(),
-	match    = "[L][ADMSBC]"
+	match    = "[L][MD][AS][BC]"
 },
 
 

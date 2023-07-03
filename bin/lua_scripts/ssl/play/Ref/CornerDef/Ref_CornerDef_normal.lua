@@ -8,7 +8,8 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Leader   = task.defendMiddle(),
+    --MultiDefend_8
+    Leader   = task.defendKick(),
     Assister = task.defendHead(),
     Special  = task.markingFront("First"),
     Breaker  = task.markingFront("Second"),
@@ -16,7 +17,7 @@ gPlayTable.CreatePlay{
     Middle   = task.multiBack(3,2),
     Defender = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[CM][A][S][L][BD]"
+    match    = "[CM][L][S][D][A][B]"
 },
   name = "Ref_CornerDef_normal",
   applicable = {

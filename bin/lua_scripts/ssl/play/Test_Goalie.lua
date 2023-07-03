@@ -8,12 +8,20 @@ firstState = "goalie",
 			return "goalie";
 		end
 	end,
-	Defender = task.multiBack(3,1),
-    Assister = task.multiBack(3,2),
-    Hawk = task.multiBack(3,3),
-    Goalie = task.goalieNew(),
-    match="[ADH]"
-    --match = "[AD]"
+	-- Defender = task.multiBack(3,1),
+ --    Assister = task.multiBack(3,2),
+ --    Hawk = task.multiBack(3,3),
+    Assister = task.stop(),
+  	 Special  = task.stop(),
+    Leader   = task.stop(),
+  -- Fronter  = task.stop(),
+  -- Center   = task.stop(),
+    Defender = task.stop(),
+    Middle   = task.stop(),
+	 Breaker  = task.stop(),
+    Crosser  = task.stop(),
+    Goalie   = task.stop(),
+    match    = "[AMDLSBC]"
 },
 
 name = "Test_Goalie",

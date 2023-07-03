@@ -79,6 +79,7 @@ public:
 
 	// 给Lua的接口
 	int		OurRobotNum();
+	int     TheirRobotNum();
 	int		GetRealNum(int);
 	int		GetTacticNum(int);
 	bool	IsBallKicked(int);

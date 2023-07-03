@@ -1,21 +1,25 @@
 IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
-USE_SWITCH = false
-OPPONENT_NAME = "other"--"Avoidfoul" PureDefence6 PureDefence8 NormalKick
-USE_AUTO_REFEREE = false
 
-gStateFileNameString = string.format(os.date("%Y%m%d%H%M"))
+if not IS_YELLOW then
+	OPPONENT_NAME = "PureDefence8"-- PureDefence8 NormalKick
+else
+	OPPONENT_NAME = "NormalKick"
+end
+
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_play6ForTest" --"Test_AdvanceV4"  --"NormalPlayPureDefence" --"Test_Run6" --"Test_play6" --"Test_Run"
-		-- Test_Run6 测testrun
-		-- Test_play6ForTest测三车进攻
+		return "Test_Goalie" -- Test_AdvanceV4 Test_Run6 Test_play6 Test_Run
+		--犯规多的时候用"Test_play8_ManyFoul"
+		--犯规少的时候用"Test_play8_NotFoul"
+		--AutoChange用"Test_play8_AUTO"
+
 	else
-		return "Test_play6ForTest" --"Test_Defence" --"Test_PassEachOther" --"Test_NormalMiddleDefend"
+		return "Test_Goalie" -- Test_Defence Test_PassEachOther Test_NormalMiddleDefend
 	end
-end --"Test_NormalDefend" --"Test_AvoidFoulDefend" 
-gNormalPlay = "NormalPlayDefend"
+end
+gNormalPlay = "Test_play8_AUTO"
 gSwitchNum = {
 	["normal"]  = 6,
 	["backup"]  = 7,
@@ -29,14 +33,6 @@ gRoleFixNum = {
 	["Goalie"]   = {0},
 	["Tier"]	 = {13},
 	["Receiver"] = {12}
-}
-
--- 用来进行定位球的保持
--- 在考虑智能性时用table来进行配置，用于OurIndirectKick
-gOurIndirectTable = {
-	-- 在OurIndirectKick控制脚本中可以进行改变的值
-	-- 上一次定位球的Cycle
-	lastRefCycle = 0
 }
 
 gSkill = {
@@ -103,146 +99,66 @@ gSkill = {
 
 gRefPlayTable = {
 	--开球进攻
-	"Ref/KickOff/Ref_KickOffV6",
-	"Ref/KickOff/Ref_KickOffV23",
-	"Ref/KickOff/Ref_KickOffV230",
 	"Ref/KickOff/Ref_KickOff8",
 	"Ref/KickOff/Ref_KickOff_normal",
-
-
-	--角球进攻
-	"Ref/CornerKick/Ref_CornerKickV1",
-	"Ref/CornerKick/Ref_CornerKickV6",
-	"Ref/CornerKick/Ref_CornerKickV8",
-	"Ref/CornerKick/Ref_CornerKickV80",
-	"Ref/CornerKick/Ref_CornerKickV30",
-	"Ref/CornerKick/Ref_CornerKickV201",
-	"Ref/CornerKick/Ref_CornerKickV202",
-	"Ref/CornerKick/Ref_CornerKickV300",
-	"Ref/CornerKick/Ref_CornerKickV2",
-	"Ref/CornerKick/Ref_CornerPush",
-	"Ref/CornerKick/Ref_CornerPush8",
-	"Ref/CornerKick/Ref_CornerPush_normal",
-	--前场进攻
-	"Ref/FrontKick/Ref_FrontKickV23",
-	"Ref/FrontKick/Ref_FrontKickV41",
-	"Ref/FrontKick/Ref_FrontKickV2",
-	"Ref/FrontKick/Ref_FrontKickV61",
-	"Ref/FrontKick/Ref_FrontKickV610",
-	"Ref/FrontKick/Ref_FrontPush",
-	"Ref/FrontKick/Ref_FrontPush8",
-	"Ref/FrontKick/Ref_FrontPush_normal",
-
-	--中场进攻
-	"Ref/MiddleKick/Ref_MiddleKickV1",
-	"Ref/MiddleKick/Ref_MiddleKickV5",
-	"Ref/MiddleKick/Ref_MiddleKickV2",
-
-	--后场进攻
-	"Ref/BackKick/Ref_BackKickV1",
-	"Ref/BackKick/Ref_ImmortalKickV1",
-	"Ref/BackKick/Ref_BackKickV2",
-	"Ref/BackKick/Ref_ImmortalKickV61",
-	"Ref/BackKick/Ref_ImmortalKickV610",
-	"Ref/BackKick/Ref_BackPush",
-	"Ref/BackKick/Ref_BackPush8",
-	"Ref/BackKick/Ref_BackPush_normal",
-	
 	--开球防守
-	"Ref/KickOffDef/Ref_KickOffDefV1",
-	"Ref/KickOffDef/Ref_KickOffDefV23",
-	"Ref/KickOffDef/Ref_KickOffDefV230",
 	"Ref/KickOffDef/Ref_KickOffDef8",
 	"Ref/KickOffDef/Ref_KickOffDef_normal",
 
+	--角球进攻
+	"Ref/DirectCornerKick/Ref_DirectCornerPush8",
+	"Ref/DirectCornerKick/Ref_DirectCornerPush_normal",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush8",
+	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal_chip",
+	--前场进攻
+	"Ref/DirectFrontKick/Ref_DirectFrontPush8",
+	"Ref/DirectFrontKick/Ref_DirectFrontPush_normal",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush8",
+	"Ref/IndirectFrontKick/Ref_IndirectFrontPush_normal_chip",
+	--中场进攻
+	"Ref/MiddleKick/Ref_MiddleKick_normal",
+	--后场进攻
+	"Ref/BackKick/Ref_BackPush8",
+	"Ref/BackKick/Ref_BackKick",
+
 	--角球防守
-	"Ref/CornerDef/Ref_CornerDefV5",
-	"Ref/CornerDef/Ref_CornerDefV2",
-	"Ref/CornerDef/Ref_CornerDefV20",
 	"Ref/CornerDef/Ref_CornerDef8",
 	"Ref/CornerDef/Ref_CornerDef_normal",
-
 	--中场防守
-	"Ref/MiddleDef/Ref_MiddleDefV10",
-	"Ref/MiddleDef/Ref_MiddleDefV11",
-	"Ref/MiddleDef/Ref_MiddleDefV2",
-	"Ref/MiddleDef/Ref_MiddleDefV20",
 	"Ref/MiddleDef/Ref_MiddleDef8",
 	"Ref/MiddleDef/Ref_MiddleDef_normal",
-
 	--前场防守
-	"Ref/FrontDef/Ref_FrontDefV8",
-	"Ref/FrontDef/Ref_FrontDefV9",
-	"Ref/FrontDef/Ref_FrontDefV2",
-	"Ref/FrontDef/Ref_FrontDefV20",
 	"Ref/FrontDef/Ref_FrontDef8",
 	"Ref/FrontDef/Ref_FrontDef_normal",
-
 	--后场防守
-	"Ref/BackDef/Ref_BackDefV10",
-	"Ref/BackDef/Ref_BackDefV11",
-	"Ref/BackDef/Ref_BackDefV12",
-	"Ref/BackDef/Ref_BackDefV2",
-	"Ref/BackDef/Ref_BackDefV20",
 	"Ref/BackDef/Ref_BackDef8",
 	"Ref/BackDef/Ref_BackDef_normal",
 
 	--己方放球
 	"Ref/BallPlace/Ref_OurBallPlaceV2",
-
 	--对方放球
 	"Ref/BallPlace/Ref_TheirBallPlace",
 
 	--点球进攻
-	"Ref/PenaltyKick/Ref_PenaltyKickV1",
-	"Ref/PenaltyKick/Ref_PenaltyKickV6",
-	"Ref/PenaltyKick/Ref_PenaltyKickV60",
 	"Ref/PenaltyKick/Ref_PenaltyKick8",
-	"Ref/PenaltyKick/Ref_PenaltyKick_normal",
-
 	--点球防守
-	"Ref/PenaltyDef/Ref_PenaltyDefV1",
-	"Ref/PenaltyDef/Ref_PenaltyDefV6",
-	"Ref/PenaltyDef/Ref_PenaltyDefV60",
 	"Ref/PenaltyDef/Ref_PenaltyDef8",
-	"Ref/PenaltyDef/Ref_PenaltyDef_normal",
 
 	--停止站位
-	"Ref/GameStop/Ref_Stop4BackKick",
-	"Ref/GameStop/Ref_StopV2",
+	"Ref/GameStop/Ref_StopV2_normal",
 	"Ref/GameStop/Ref_StopV3",
-	"Ref/GameStop/Ref_Stop4CornerDef",
+	"Ref/GameStop/Ref_StopV3_normal",
+	--PureDefence8
+	"Ref/GameStop/Ref_StopCornerDefPureDefence",
+	--NormalKick
 	"Ref/GameStop/Ref_Stop4CornerKick",
-	"Ref/GameStop/Ref_Stop4CornerKick6",
-	"Ref/GameStop/Ref_Stop4SideLine",
 	"Ref/GameStop/Ref_Stop4FrontKick",
 	"Ref/GameStop/Ref_Stop4MiddleKick",
-	"Ref/GameStop/Ref_Stop4ChaKick",
-
-	"Ref/GameStop/Ref0_StopV2",
-	"Ref/GameStop/Ref0_StopV3",
-	"Ref/GameStop/Ref0_Stop4CornerDef",
-	"Ref/GameStop/Ref0_Stop4CornerKick",
-
-	
-	"Ref/GameStop/Ref_StopV2V8",
-	"Ref/GameStop/Ref_StopV3V8",
-	"Ref/GameStop/Ref_Stop4CornerDefV8",
-	"Ref/GameStop/Ref_Stop4CornerKickV8",
-
-	"Ref/GameStop/Ref1_StopV2",
-	"Ref/GameStop/Ref1_StopV3",
-	"Ref/GameStop/Ref1_Stop4CornerDef",
-	"Ref/GameStop/Ref1_Stop4CornerKick",
-
-	"Ref/GameStop/Ref_StopV2_normal",
-	"Ref/GameStop/Ref_StopV3_normal",
-	"Ref/GameStop/Ref_Stop4CornerDef_normal",
-	"Ref/GameStop/Ref_Stop4CornerKick_normal",
-
-
-	"Ref/GameStop/Ref_StopBack",
-
+	"Ref/GameStop/Ref_Stop4BackKick",
+	"Ref/GameStop/Ref_Stop4CornerDef_play8",
+	"Ref/GameStop/Ref_Stop4BackDef_play8",
+	"Ref/GameStop/Ref_Stop4MiddleDef_play8",
+	"Ref/GameStop/Ref_Stop4FrontDef_play8",
 
 	--强制停止
 	"Ref/Ref_HaltV1",
@@ -281,12 +197,14 @@ gTestPlayTable = {
 	"Test_Circle",
 	"Test_play6",
 	"NormalPlay",
-	"NormalPlayPureDefence",
 	"NormalPlayPureDefence8",
 	"Test_defend6",
 	"Test_play6ForTest",
 	"Test_DSS",
 	"Test_Run6",
+	"Test_play8_AUTO",
+	"Test_play8_ManyFoul",
+	"Test_play8_NotFoul",
 	"Test_play3",
 	"Test_NormalPass"
 }

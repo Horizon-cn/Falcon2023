@@ -265,7 +265,7 @@ firstState = "start",
   Engine   = task.goLeftSupport(),
   Hawk     = task.goRightSupport(),
   Leader   = task.goCmuRush(OTHER_SIDE_POS, dir.playerToBall, ACC, STOP_DSS),
-  Defender  = task.rightBack(),--task.defendMiddle4Stop(),--TODO
+  Defender  = task.goCmuRush(ball.refSyntYPos(CGeoPoint:new_local(-270/1200*param.pitchLength,210/900*param.pitchWidth))),--task.defendMiddle4Stop(),--TODO
   Middle   = task.leftBack(),
   Goalie   = task.penaltyGoalie(),
   match    = "{DM}{AL}[SEH]"
@@ -278,13 +278,13 @@ firstState = "start",
     end
   end,
 
-  Assister = task.goCmuRush(ball.refAntiYPos(CGeoPoint:new_local(-140,-120)), dir.playerToBall, ACC, STOP_DSS),
-  Special  = task.goCmuRush(ball.refAntiYPos(CGeoPoint:new_local(-140, 120)), dir.playerToBall, ACC, STOP_DSS),
-  Leader   = task.goCmuRush(CGeoPoint:new_local(-120, 0), dir.playerToBall, ACC, STOP_DSS),
-  Defender = task.goCmuRush(CGeoPoint:new_local(-290, -130), dir.playerToBall, ACC, STOP_DSS),
-  Middle   = task.goCmuRush(CGeoPoint:new_local(-290, 130), dir.playerToBall, ACC, STOP_DSS),
-  Engine  = task.goCmuRush(CGeoPoint:new_local(-290,260),dir.playerToBall,ACC,STOP_DSS),
-  Hawk   = task.goCmuRush(CGeoPoint:new_local(-290,-260),dir.playerToBall,ACC,STOP_DSS),
+  Assister = task.goCmuRush(ball.refAntiYPos(CGeoPoint:new_local(-140/1200*param.pitchLength,-120/900*param.pitchWidth)), dir.playerToBall, ACC, STOP_DSS),
+  Special  = task.goCmuRush(ball.refAntiYPos(CGeoPoint:new_local(-140/1200*param.pitchLength,120/900*param.pitchWidth)), dir.playerToBall, ACC, STOP_DSS),
+  Leader   = task.goCmuRush(CGeoPoint:new_local(-120/1200*param.pitchLength,0/900*param.pitchWidth), dir.playerToBall, ACC, STOP_DSS),
+  Defender = task.goCmuRush(CGeoPoint:new_local(-290/1200*param.pitchLength,-130/900*param.pitchWidth), dir.playerToBall, ACC, STOP_DSS),
+  Middle   = task.goCmuRush(CGeoPoint:new_local(-290/1200*param.pitchLength,130/900*param.pitchWidth), dir.playerToBall, ACC, STOP_DSS),
+  Engine  = task.goCmuRush(CGeoPoint:new_local(-290/1200*param.pitchLength,260/900*param.pitchWidth),dir.playerToBall,ACC,STOP_DSS),
+  Hawk   = task.goCmuRush(CGeoPoint:new_local(-290/1200*param.pitchLength,-260/900*param.pitchWidth),dir.playerToBall,ACC,STOP_DSS),
   Goalie   = task.penaltyGoalie(),
   match    = "[AMDLSEH]"
 },

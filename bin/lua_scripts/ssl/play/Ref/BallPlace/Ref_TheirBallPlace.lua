@@ -41,9 +41,9 @@ local leftSide = {
   CGeoPoint:new_local(topX - 100, -sideY)
 }
 
-local PointA = CGeoPoint:new_local(-300, -160)
-local PointB = CGeoPoint:new_local(-300, 160)
-local PointC = CGeoPoint:new_local(-200, 0)
+local PointA = CGeoPoint:new_local(-300/1200*param.pitchLength,-160/900*param.pitchWidth)
+local PointB = CGeoPoint:new_local(-300/1200*param.pitchLength,160/900*param.pitchWidth)
+local PointC = CGeoPoint:new_local(-200/1200*param.pitchLength,0/900*param.pitchWidth)
 
 local standPos = leftTop
 local standFunc = function(num)

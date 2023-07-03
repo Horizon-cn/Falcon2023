@@ -11,6 +11,7 @@ class CWorldModel{
 	const double	self2ballDir				(int current_cycle, int myNum = 0, int enemyNum = 0);
 	const string	CurrentRefereeMsg			();
 	int		OurRobotNum();
+	int		TheirRobotNum();
 	bool	IsBallKicked(int);
 	bool	IsBestPlayerChanged();
 	string	CurrentBayes();

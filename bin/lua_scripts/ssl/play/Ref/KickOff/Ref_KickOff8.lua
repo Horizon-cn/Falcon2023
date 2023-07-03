@@ -1,16 +1,16 @@
 --[[-- 直接传球
 -- 在改一下V1
 
-local CHIP_POS = CGeoPoint:new_local(200, 200)
+local CHIP_POS = CGeoPoint:new_local(200/1200*param.pitchLength,200/900*param.pitchWidth)
 
-local ASSISTER_POS_1 = CGeoPoint:new_local(-15, 230)
-local ASSISTER_POS_2 = CGeoPoint:new_local(-60, 60)
+local ASSISTER_POS_1 = CGeoPoint:new_local(-15/1200*param.pitchLength,230/900*param.pitchWidth)
+local ASSISTER_POS_2 = CGeoPoint:new_local(-60/1200*param.pitchLength,60/900*param.pitchWidth)
 
-local SPECIAL_POS_1  = CGeoPoint:new_local(-15, -230)
-local SPECIAL_POS_2  = CGeoPoint:new_local(200, -60)
+local SPECIAL_POS_1  = CGeoPoint:new_local(-15/1200*param.pitchLength,-230/900*param.pitchWidth)
+local SPECIAL_POS_2  = CGeoPoint:new_local(200/1200*param.pitchLength,-60/900*param.pitchWidth)
 
-local MIDDLE_POS_1   = CGeoPoint:new_local(-220, 250)
-local MIDDLE_POS_2   = CGeoPoint:new_local(-5, 250)
+local MIDDLE_POS_1   = CGeoPoint:new_local(-220/1200*param.pitchLength,250/900*param.pitchWidth)
+local MIDDLE_POS_2   = CGeoPoint:new_local(-5/1200*param.pitchLength,250/900*param.pitchWidth)
 
 
 gPlayTable.CreatePlay{
@@ -69,7 +69,7 @@ firstState = "start",
       return "exit"
     end
   end,
-  Leader   = task.goCmuRush(CGeoPoint:new_local(200,20)),
+  Leader   = task.goCmuRush(CGeoPoint:new_local(200/1200*param.pitchLength,20/900*param.pitchWidth)),
   Special  = task.goCmuRush(SPECIAL_POS_2),
   Middle   = task.defendMiddle(),
   Defender = task.rightBack(),
@@ -89,18 +89,19 @@ attribute = "attack",
 timeout = 99999
 }
 --]]
-local LEFT_POS = CGeoPoint:new_local(200, -165)
-local LEFT_POS_2 = CGeoPoint:new_local(300, -165)
+local LEFT_POS = CGeoPoint:new_local(200/1200*param.pitchLength,-165/900*param.pitchWidth)
+local LEFT_POS_2 = CGeoPoint:new_local(300/1200*param.pitchLength,-165/900*param.pitchWidth)
 
-local START_POS = CGeoPoint:new_local(35, 0)
-local START_POS_1 = CGeoPoint:new_local(20, 0)
-local RECEIVE_POS_1 = CGeoPoint:new_local(-110, -70)
-local RECEIVE_POS_2 = CGeoPoint:new_local(-110, 70)
+local START_POS = CGeoPoint:new_local(-35/1200*param.pitchLength,0/900*param.pitchWidth)
+local START_POS_1 = CGeoPoint:new_local(-20/1200*param.pitchLength,0/900*param.pitchWidth)
+local RECEIVE_POS_1 = CGeoPoint:new_local(-110/1200*param.pitchLength,-70/900*param.pitchWidth)
+local RECEIVE_POS_2 = CGeoPoint:new_local(-110/1200*param.pitchLength,70/900*param.pitchWidth)
+local CHIP_POS = CGeoPoint:new_local(530/1200*param.pitchLength,0/900*param.pitchWidth)
 
-local RIGHT_POS_1  = CGeoPoint:new_local(-20, 80)
-local RIGHT_POS_2  = CGeoPoint:new_local(155, 80)
-local outside = CGeoPoint:new_local(-50,300)
-
+local RIGHT_POS_1  = CGeoPoint:new_local(-20/1200*param.pitchLength,80/900*param.pitchWidth)
+local RIGHT_POS_2  = CGeoPoint:new_local(155/1200*param.pitchLength,80/900*param.pitchWidth)
+local outside = CGeoPoint:new_local(-50/1200*param.pitchLength,300/900*param.pitchWidth)
+local kickPower = 400
 
 gPlayTable.CreatePlay{
 firstState = "start",
@@ -108,27 +109,10 @@ firstState = "start",
 ["start"] = {
   switch = function ()
     if cond.isNormalStart() then
-      return "temp"
-    end
-  end,
-  Leader   = task.goCmuRush(START_POS,-3,_,flag.allow_dss),
-  Assister = task.goCmuRush(RECEIVE_POS_1,-3,_,flag.allow_dss),
-  Special  = task.goCmuRush(RECEIVE_POS_2,-3,_,flag.allow_dss),
-  Middle   = task.multiBack(4,1),
-  Defender = task.multiBack(4,2),
-  Breaker  = task.multiBack(4,3),
-  Crosser  = task.multiBack(4,4),
-  Goalie   = task.goalieNew(),
-  match    = "[L][A][S][MDBC]"
-},
-
-["temp"] = {
-  switch = function ()
-    if bufcnt(player.toTargetDist("Leader")<20 ,50,100) then
       return "kickof"
     end
   end,
-  Leader   = task.goCmuRush(START_POS_1,-3,_,flag.allow_dss),  --staticGetBall(player.toPlayerDir("Assister","Leader")),
+  Leader   = task.goCmuRush(START_POS,_,_,flag.allow_dss),
   Assister = task.goCmuRush(RECEIVE_POS_1,-3,_,flag.allow_dss),
   Special  = task.goCmuRush(RECEIVE_POS_2,-3,_,flag.allow_dss),
   Middle   = task.multiBack(4,1),
@@ -138,7 +122,6 @@ firstState = "start",
   Goalie   = task.goalieNew(),
   match    = "[L][A][S][MDBC]"
 },
-
 
 ["kickof"] = {
     switch = function ()
@@ -147,7 +130,7 @@ firstState = "start",
       return "receive"
     end
   end,
-  Leader   = task.flatPass("Assister"),
+  Leader   = task.chipPass(CHIP_POS,kickPower),
   Assister = task.goCmuRush(RECEIVE_POS_1,-3,_,flag.allow_dss),
   Special  = task.goCmuRush(RECEIVE_POS_2,-3,_,flag.allow_dss),
   Middle   = task.multiBack(4,1),
