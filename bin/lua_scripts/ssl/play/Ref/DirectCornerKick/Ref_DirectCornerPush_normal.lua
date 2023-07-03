@@ -19,7 +19,9 @@ local RECEIVE_POS = function()
   return SHOOT_POS() + Utils.Polar2Vector(20,ball.toPointDir(SHOOT_POS())())
 end
 --【传球力度】可根据实车情况进行调整
-local kickPower = 310
+local KICK_POWER=function()
+  return 13.6*math.sqrt(ball.toPointDist(SHOOT_POS()))
+end
 
 gPlayTable.CreatePlay{
 
@@ -67,7 +69,7 @@ gPlayTable.CreatePlay{
         return "receiveBall"
       end
     end,
-    Assister = task.chipPass(SHOOT_POS, kickPower),
+    Assister = task.chipPass(SHOOT_POS, KICK_POWER),
     Leader   = task.goCmuRush(BlockPos, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Middle   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Special  = task.goCmuRush(RECEIVE_POS,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),

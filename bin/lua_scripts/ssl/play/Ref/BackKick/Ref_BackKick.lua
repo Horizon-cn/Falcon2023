@@ -195,7 +195,8 @@ firstState = "startball",
 			return "exit"
 		end
 	end,
-	Assister = task.chipPass(CGeoPoint:new_local(450/1200*param.pitchLength,0/900*param.pitchWidth),450),
+	Assister = task.chipPass(chippos,400),
+	--Assister = task.chipPass(CGeoPoint:new_local(450/1200*param.pitchLength,0/900*param.pitchWidth),450),
 	Breaker = task.goCmuRush(getpos),
 	Leader   = task.singleBack(),
 	Special  = task.goCmuRush(Blockpos),
