@@ -32,6 +32,18 @@ int CWorldModel::OurRobotNum()
 	return validNum;
 }
 
+int CWorldModel::TheirRobotNum()
+{
+	int validNum = 0;
+	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+		if (_pVision->TheirPlayer(i).Valid()) {
+			validNum++;
+		}
+	}
+	validNum = validNum > Param::Field::MAX_PLAYER ? Param::Field::MAX_PLAYER : validNum;
+	return validNum;
+}
+
 bool CWorldModel::IsBallKicked(int num)
 {
 	KickStatus::Instance()->updateForceClose(this->vision()->Cycle());

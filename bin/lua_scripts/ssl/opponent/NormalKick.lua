@@ -26,5 +26,18 @@ gOppoConfig = {
 	KickOff		= "Ref_KickOff_normal",
 	KickOffDef  = "Ref_KickOffDef_normal",
 	
-	NorPlay     = "Test_play8_NotFoul"
+	NorPlay     = "Test_play8_AUTO"
+	--犯规多的时候用"Test_play8_ManyFoul"
+	--犯规少的时候用"Test_play8_NotFoul"
+	--AutoChange用"Test_play8_AUTO"
+
 }
+
+
+--     B        -250           M        0   F_A  100  F_B  200  F_C   350
+-----------------|----------------------|--------|---------|-----------|---------
+
+
+
+--                                      0    F_D   125    F_E
+----------------------------------------|-----------|----------------------------
