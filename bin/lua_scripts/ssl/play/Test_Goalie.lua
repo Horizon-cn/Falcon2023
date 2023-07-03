@@ -20,7 +20,7 @@ firstState = "goalie",
     Middle   = task.stop(),
 	 Breaker  = task.stop(),
     Crosser  = task.stop(),
-    Goalie   = task.stop(),
+    Goalie   = task.goalieNew(),
     match    = "[AMDLSBC]"
 },
 

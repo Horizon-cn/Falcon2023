@@ -4,7 +4,7 @@ firstState = "init",
 
 ["init"] = {
 	switch = function ()
-		if bufcnt(cond.isNormalStart()) then
+		if bufcnt(cond.isGameOn()) then
 			return "kick"
 		end
 	end,
