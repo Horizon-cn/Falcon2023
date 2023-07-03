@@ -118,7 +118,7 @@ void CBallStatus::computeBallPossession(const CVisionModule* pVision, bool isOur
             isInfraredPossession = true;
         // 综合判断及维持稳定
         int num = id + Param::Field::MAX_PLAYER * (1 - (int)isOurPlayer);
-        if (isVisionPossession && isInfraredPossession)  // Attention!!!!   23.7.1 Modify By Tyh : 必须两者兼有才能判断已经get到球？
+        if (isVisionPossession || isInfraredPossession)  // Attention!!!!   23.7.1 Modify By Tyh : 必须两者兼有才能判断已经get到球？ 打脸了
             ballPossession[num]++;
         else
             ballPossession[num] --;

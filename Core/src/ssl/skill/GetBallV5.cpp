@@ -227,7 +227,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                 // 敌人背身角度小于100度 或 敌人无法持球
                 if (fabs(Utils::Normalize((me2ball.dir() - (opp.Pos() - ball.Pos()).dir()))) < Param::Math::PI * 55 / 180) {
                     // 我与球夹角与我与敌人夹角小于55如果我和他正对着，我就上前去吸
-                    getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(5, me2ball.dir()) ;
+                    getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(9.0, me2ball.dir()) ;
                     // 向前顶一下
                 }
                 else {
@@ -412,8 +412,8 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             getball_task.player.max_deceleration = 16 * slowfactor;
         }
         else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) < Param::Math::PI * 20 / 180) {
-            getball_task.player.max_rot_acceleration = 16 * slowfactor;
-            getball_task.player.max_deceleration = 16 * slowfactor;
+            getball_task.player.max_rot_acceleration = 12.0 * slowfactor;
+            getball_task.player.max_deceleration = 12.0 * slowfactor;
         }
         
     }
@@ -437,16 +437,16 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             */
             
             if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) > Param::Math::PI * 215 / 180) {
-                getball_task.player.max_rot_acceleration = 16 * slowfactor;
-                getball_task.player.max_deceleration = 16 * slowfactor;
+                getball_task.player.max_rot_acceleration = 16.0 * slowfactor;
+                getball_task.player.max_deceleration = 16.0 * slowfactor;
             }
             else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) > Param::Math::PI * 135 / 180) {
-                getball_task.player.max_rot_acceleration = 16 * slowfactor;
-                getball_task.player.max_deceleration = 16 * slowfactor;
+                getball_task.player.max_rot_acceleration = 13.0 * slowfactor;
+                getball_task.player.max_deceleration = 13.0 * slowfactor;
             }
             else if (fabs(Utils::Normalize((me.Dir() - ThisCaseFinalDir))) < Param::Math::PI * 10 / 180) {
-                getball_task.player.max_rot_acceleration = 16 * slowfactor;
-                getball_task.player.max_deceleration = 16 * slowfactor;
+                getball_task.player.max_rot_acceleration = 10.0 * slowfactor;
+                getball_task.player.max_deceleration = 10.0 * slowfactor;
             }
             
             if (ball2meDist < 30)getball_task.player.needdribble = IS_DRIBBLE;

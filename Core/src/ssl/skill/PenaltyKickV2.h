@@ -21,6 +21,7 @@ private:
     enum {
         BEGIN = 0,
         GET,
+        CHASEKICK,
         KICK,
         CHIP,
         CHIP1,
@@ -53,6 +54,7 @@ private:
     double SHOOT_PRECISION; /*ÔÊÐíÉäÃÅ×îÐ¡Ÿ«¶ÈœÇ·ÖÄž£¬ÔœŽóÔœÂýÔœŸ«È· */
     double GetBallBias; /*GetballÆ«ÒÆÁ¿ ÐèÒªŸßÌåÈ¥µ÷ */
     double BalltoMeVel;/*AdvanceŽ«ÇòžøÎÒÖ÷¶¯È¥œÓµÄÁÙœçËÙ¶È*/
+
     /*ÉäÃÅÁŠ¶È²ÎÊý*/
     int KICKPOWER;
     int CHIPPOWER;
