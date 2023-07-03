@@ -1,5 +1,5 @@
 local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(50, ball.syntY(0.5 * math.pi))
+  return ball.pos() + Utils.Polar2Vector(60, ball.syntY(0.5 * math.pi))
 end
 
 --【接球点】可根据实车情况进行调整
