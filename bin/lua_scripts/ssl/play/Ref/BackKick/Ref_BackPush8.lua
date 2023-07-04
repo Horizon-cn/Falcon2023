@@ -3,8 +3,10 @@ local WAIT_BALL_POS = function(anti)
     return ball.pos() + Utils.Polar2Vector(50, anti * math.pi)
   end
 end
-local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(0/1200*param.pitchLength,50/900*param.pitchWidth))
-local kickPower = 300
+local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(0/1200*param.pitchLength,0/900*param.pitchWidth))
+local KICK_POWER=function()
+  return 20*math.sqrt(ball.toPointDist(SHOOT_POS()))
+end
 
 gPlayTable.CreatePlay{
 
@@ -16,7 +18,7 @@ gPlayTable.CreatePlay{
         return "toBall"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
+    Assister = task.goCmuRush(WAIT_BALL_POS(1),player.toPointDir(SHOOT_POS),_,flag.allow_dss + flag.dodge_ball),
     Middle   = task.markingFront("First"),
     Leader   = task.markingFront("Second"),
     Special  = task.multiBack(4,1),
@@ -50,7 +52,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.chipPass(SHOOT_POS,kickPower),
+    Assister = task.chipPass(SHOOT_POS,KICK_POWER),
     --Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
     Middle   = task.markingFront("First"),
     Leader   = task.markingFront("Second"),

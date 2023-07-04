@@ -1,6 +1,7 @@
 local WAIT_BALL_POS = function ()
   return ball.pos() + Utils.Polar2Vector(-50, ball.syntY(0.2 * math.pi))
 end
+local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(0/1200*param.pitchLength,0/900*param.pitchWidth))
 
 gPlayTable.CreatePlay{
 
@@ -14,11 +15,11 @@ gPlayTable.CreatePlay{
     end,
   Leader = task.multiBack(3,1),
   Middle = task.multiBack(3,2),
-  Defender = task.multiBack(3,3),
+  Defender = task.defendKick(),
   Special = task.sideBack(),
   Assister = task.markingFront("First"),
   Breaker =task.markingFront("Second"),
-  Crosser = task.task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
+  Crosser = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(SHOOT_POS),_,flag.allow_dss + flag.dodge_ball),
   Goalie = task.goalieNew(),
   match    = "[LM][DS][ABC]"
 },

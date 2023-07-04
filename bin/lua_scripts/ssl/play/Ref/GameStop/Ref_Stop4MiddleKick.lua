@@ -27,18 +27,22 @@ firstState = "start",
   switch = function()
     if cond.isGameOn() then
       return "exit"
-    end   
+    end
   end,
-  Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
-  Leader   = task.goCmuRush(BARYCENTER, _,_,flag.allow_dss + flag.dodge_ball),
-  Middle   = task.multiBack(3,1),
-  Special  = task.goCmuRush(BLOCK_POS,_,_,flag.allow_dss + flag.dodge_ball),
-  Defender = task.multiBack(3,2),
-    Breaker  = task.multiBack(3,3),
-    Crosser  = task.sideBack(),
-    Goalie   = task.goalieNew(),
+  Assister = task.goCmuRush(WAIT_BALL_POS,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
+  Leader   = task.goCmuRush(BARYCENTER, player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
+  -- Middle   = task.multiBack(3,1),
+  Middle   = task.stop(),
+  Special  = task.goCmuRush(BLOCK_POS,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
+  -- Defender = task.multiBack(3,2),
+  -- Breaker  = task.multiBack(3,3),
+  Defender  = task.stop(),
+  Breaker = task.stop(),
+  Crosser  = task.stop(),
+  -- sideBack(),
+  Goalie   = task.goalieNew(),
   --match    = "[D][B][A][C][L][S][M]"
-  match    = "[A][B][C][S][D][L][M]"
+  match    = "[A][L][S][B][C][D][M]"
 },
 
 name = "Ref_Stop4MiddleKick",
