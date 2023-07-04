@@ -91,7 +91,7 @@ gPlayTable.CreatePlay{
 
   ["kick"]= {
     switch = function()
-      if bufcnt(player.kickBall("Assister"), 3, 180) then
+      if bufcnt(player.kickBall("Assister"), "fast", 180) then
         return "receive"
       end
     end,
