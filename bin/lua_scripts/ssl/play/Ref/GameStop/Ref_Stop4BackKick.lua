@@ -1,3 +1,4 @@
+--无人维护
 local SIDE_POS, MIDDLE_POS, INTER_POS, SIDE2_POS, INTER2_POS = pos.refStopAroundBall()
 
 local STOP_FLAG = flag.dodge_ball

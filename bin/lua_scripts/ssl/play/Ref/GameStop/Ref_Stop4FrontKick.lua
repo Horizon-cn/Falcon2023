@@ -28,12 +28,12 @@ firstState = "start",
   Leader   = task.goCmuRush(FRONT_POS1, _, ACC, STOP_DSS),
   Middle   = task.goCmuRush(FRONT_POS2, _, ACC, STOP_DSS),
   Special  = task.goCmuRush(FRONT_POS3, _, ACC, STOP_DSS),
-  Defender = task.multiBack(3,1),
-  Breaker  = task.multiBack(3,2),
-  Crosser  = task.multiBack(3,3),
-  Goalie   = task.goalieNew(),
-  match    = "[D][B][A][C][S][L][M]"
-  -- match    = "[A][S][L][M]"
+  -- Defender = task.multiBack(3,1),
+  -- Breaker  = task.multiBack(3,2),
+  -- Crosser  = task.multiBack(3,3),
+  -- Goalie   = task.goalieNew(),
+  -- match    = "[D][B][A][C][S][L][M]"
+  match    = "[A][S][L][M]"
 },
 
 name = "Ref_Stop4FrontKick",
