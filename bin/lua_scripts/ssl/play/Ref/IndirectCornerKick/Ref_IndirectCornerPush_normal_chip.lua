@@ -1,5 +1,5 @@
 local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(60, ball.syntY(0.5 * math.pi))
+  return ball.pos() + Utils.Polar2Vector(60, ball.antiY()*math.pi)
 end
 
 --【接球点】可根据实车情况进行调整
@@ -16,11 +16,20 @@ local TargetPos3= ball.antiYPos(CGeoPoint:new_local(380/1200*param.pitchLength,1
 local BlockPos=ball.antiYPos(CGeoPoint:new_local(450/1200*param.pitchLength,-100/900*param.pitchWidth))
 
 local RECEIVE_POS = function()
-  return SHOOT_POS() + Utils.Polar2Vector(20,ball.toPointDir(SHOOT_POS())())
+  return SHOOT_POS() + Utils.Polar2Vector(20,ball.toPointDir(SHOOT_POS())()+ball.antiY()*math.pi/4)
 end
 --【传球力度】可根据实车情况进行调整
 local KICK_POWER=function()
   return 13.6*math.sqrt(ball.toPointDist(SHOOT_POS()))
+end
+local SupportFrontDown = 2 
+local SupportFrontUp = 0
+local DetectBallAreaFront = function() 
+  if ball.posY() < 0  then 
+    return SupportFrontDown
+  else
+    return SupportFrontUp
+  end
 end
 
 gPlayTable.CreatePlay{
@@ -33,88 +42,84 @@ gPlayTable.CreatePlay{
         return "toBall"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(SHOOT_POS),_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.goCmuRush(FRONT_POS1, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Middle   = task.goCmuRush(FRONT_POS2, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Special  = task.goCmuRush(FRONT_POS3, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    -- Defender = task.multiBack(3,1),
-    -- Breaker  = task.multiBack(3,2),
-    -- Crosser  = task.multiBack(3,3),
-    -- Goalie   = task.goalieNew(),
-    -- match    = "[D][B][A][C][S][L][M]"
-    match    = "[A][S][L][M]"
+    Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(SHOOT_POS), ACC, flag.allow_dss + flag.dodge_ball),
+    Leader   = task.goCmuRush(FRONT_POS3, player.toPlayerHeadDir("Assister"), ACC, flag.allow_dss + flag.dodge_ball),
+    Middle   = task.goCmuRush(FRONT_POS1, player.toPlayerHeadDir("Assister"), ACC, flag.allow_dss + flag.dodge_ball),
+    Special  = task.sideBack(),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][M][S]"
   },
 
   ["toBall"] = {
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 70, 500) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 150, 1000) then
         return "kickBall"
       end
     end,
     Assister = task.staticGetBall(SHOOT_POS),
-    Leader   = task.goCmuRush(BlockPos, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Middle   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Special  = task.goCmuRush(RECEIVE_POS,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    -- Defender = task.multiBack(3,1),
-    -- Breaker  = task.multiBack(3,2),
-    -- Crosser  = task.multiBack(3,3),
-    -- Goalie   = task.goalieNew(),
-    -- match    = "[D][B][A][C][S][L][M]"
-    match    = "[A][S][L][M]"
+    Leader   = task.goCmuRush(RECEIVE_POS,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
+    Middle   = task.goCmuRush(BlockPos,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
+    Special  = task.sideBack(),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][M][S]"
   },
 
   ["kickBall"] = {
     switch = function ()
       if bufcnt(player.kickBall("Assister"), "fast", 180) then
+        --debugEngine:gui_debug_msg(CGeoPoint(-200,200),tostring(KICK_POWER(SHOOT_POS)))
         return "receiveBall"
       end
     end,
     Assister = task.chipPass(SHOOT_POS, KICK_POWER),
-    Leader   = task.goCmuRush(BlockPos, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Middle   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Special  = task.goCmuRush(RECEIVE_POS,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    -- Defender = task.multiBack(3,1),
-    -- Breaker  = task.multiBack(3,2),
-    -- Crosser  = task.multiBack(3,3),
-    -- Goalie   = task.goalieNew(),
-    -- match    = "[D][B][A][C][S][L][M]"
-    match    = "[A][S][L][M]"
+    Leader   = task.goCmuRush(RECEIVE_POS,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
+    Middle   = task.goCmuRush(BlockPos,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
+    Special  = task.sideBack(),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][M][S]"
   },
 
   ["receiveBall"] = {
     switch = function ()
-      if bufcnt(ball.toPlayerHeadDist("Special") < 5, "fast", 180) then--
+      if bufcnt(ball.toPlayerHeadDist("Leader") < 5, "fast", 180) then--
         return "shootBall"
       end
     end,
-    Assister = task.goCmuRush(BlockPos, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Leader   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
+    Assister = task.support("Leader",DetectBallAreaFront),
+    Leader   = task.advance(),
     Middle   = task.protectBall(),
-    Special  = task.advance(),
-    -- Defender = task.multiBack(3,1),
-    -- Breaker  = task.multiBack(3,2),
-    -- Crosser  = task.multiBack(3,3),
-    -- Goalie   = task.goalieNew(),
-    -- match    = "[D][B][S][C][A][L][M]"
-    match    = "[A][S][L][M]"
+    Special  = task.sideBack(),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][M][S]"
   },
 
 ["shootBall"] = {
     switch = function ()
-      if bufcnt(player.kickBall("Special"), 3, 150) then--
+      if bufcnt(player.kickBall("Leader"), 3, 150) then--
         return "exit"
       end
     end,
-    Assister = task.goCmuRush(BlockPos, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Leader   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
+    Assister = task.support("Leader",DetectBallAreaFront),
+    Leader   = task.advance(),
     Middle   = task.protectBall(),
-    Special  = task.advance(),
-    -- Defender = task.multiBack(3,1),
-    -- Breaker  = task.multiBack(3,2),
-    -- Crosser  = task.multiBack(3,3),
-    -- Goalie   = task.goalieNew(),
-    -- match    = "[D][B][S][C][A][L][M]"
-    match    = "[A][S][L][M]"
+    Special  = task.sideBack(),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][M][S]"
   },
 
   name = "Ref_IndirectCornerPush_normal_chip",
