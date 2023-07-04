@@ -13,7 +13,13 @@ end
 
 local ACC = 300
 local waitpos = ball.refSyntYPos(CGeoPoint:new_local(-415/1200*param.pitchLength,415/900*param.pitchWidth))
-
+local chippos = function()
+  if  ball.posX() > -265 and ball.posY()<150 and ball.posY()> -150 then
+    return ball.refAntiYPos(CGeoPoint:new_local(0/1200*param.pitchLength,300/900*param.pitchWidth))()
+  else
+    return  ball.refSyntYPos(CGeoPoint:new_local(0/1200*param.pitchLength,300/900*param.pitchWidth))()
+  end
+end
 gPlayTable.CreatePlay {
 
 firstState = "IndirectBackKickStop",
@@ -27,13 +33,13 @@ firstState = "IndirectBackKickStop",
     end
   end,
 
-  Assister = task.goCmuRush(MIDDLE_POS, dir.playerToBall, ACC, STOP_DSS),
-  Special  = task.goCmuRush(INTER_POS, dir.playerToBall, ACC, STOP_DSS),
+  Assister = task.goCmuRush(MIDDLE_POS, player.toPointDir(chippos), ACC, flag.allow_dss + flag.dodge_ball),
+  Special  = task.goCmuRush(INTER_POS, dir.playerToBall, ACC, flag.allow_dss + flag.dodge_ball),
   Engine   = task.multiBack(2,1),
   Hawk     = task.multiBack(2,2),
-  Leader   = task.goCmuRush(OTHER_SIDE_POS, dir.playerToBall, ACC, STOP_DSS),
+  Leader   = task.goCmuRush(OTHER_SIDE_POS, dir.playerToBall, ACC, flag.allow_dss + flag.dodge_ball),
   Defender  = task.goCmuRush(ball.refAntiYPos(CGeoPoint:new_local(-270/1200*param.pitchLength,210/900*param.pitchWidth))),
-  Middle   = task.goCmuRush(waitpos, dir.playerToBall, ACC, STOP_DSS),
+  Middle   = task.goCmuRush(waitpos, dir.playerToBall, ACC, flag.allow_dss + flag.dodge_ball),
   Goalie   = task.goalieNew(),
   match    = "[A][H][E][S][M][DL]"
 },

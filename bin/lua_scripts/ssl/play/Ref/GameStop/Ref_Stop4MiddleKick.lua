@@ -18,6 +18,13 @@ local BARYCENTER = function()
     return ball.syntYPos(CGeoPoint:new_local((560+ball.posX())/2,250))() 
   end
 end
+local RECEIVE_POS2 = function()
+  if math.abs(ball.posY()) < 250 then
+    return ball.syntYPos(CGeoPoint:new_local(250/1200*param.pitchLength,60/900*param.pitchWidth))()
+  else
+    return ball.syntYPos(CGeoPoint:new_local(170/1200*param.pitchLength,80/900*param.pitchWidth))()
+  end
+end
 
 gPlayTable.CreatePlay{
  
@@ -29,7 +36,7 @@ firstState = "start",
       return "exit"
     end
   end,
-  Assister = task.goCmuRush(WAIT_BALL_POS,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
+  Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(RECEIVE_POS2),_,flag.allow_dss + flag.dodge_ball),
   Leader   = task.goCmuRush(BARYCENTER, player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
   -- Middle   = task.multiBack(3,1),
   Middle   = task.stop(),

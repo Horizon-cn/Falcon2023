@@ -54,7 +54,7 @@ gPlayTable.CreatePlay{
         return "move"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
+    Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(RECEIVE_POS2),_,flag.allow_dss + flag.dodge_ball),
     Special  = task.goCmuRush(BLOCK_POS,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
     Leader   = task.goCmuRush(BARYCENTER,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
     Middle   = task.stop(),
