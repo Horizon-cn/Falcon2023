@@ -37,7 +37,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(4,3),
     Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match = "[D][A][SBC][LM]"
+    match = "[A][D][SBC][LM]"
   },
 
   ["toBall"] = {

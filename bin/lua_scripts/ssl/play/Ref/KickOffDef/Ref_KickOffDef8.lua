@@ -7,7 +7,7 @@ local function KICKOFF_DEF_POS(str)
 end
 local WAIT_POS1=CGeoPoint:new_local(-200/1200*param.pitchLength,100/900*param.pitchWidth)
 local WAIT_POS2=CGeoPoint:new_local(-200/1200*param.pitchLength,-100/900*param.pitchWidth)
-local guardpoint = CGeoPoint:new_local(-20/1200*param.pitchLength,0/900*param.pitchWidth)
+local guardpoint = CGeoPoint:new_local(-88/1200*param.pitchLength,0/900*param.pitchWidth)
 gPlayTable.CreatePlay{
 firstState = "start",
 

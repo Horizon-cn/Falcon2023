@@ -16,7 +16,7 @@ local SHOOT_POS = ball.syntYPos(CGeoPoint:new_local(520/1200*param.pitchLength,0
 --   end
 -- end
 local KICK_POWER=function()
-  return 20*math.sqrt(ball.toPointDist(SHOOT_POS()))
+  return 13.6*math.sqrt(ball.toPointDist(SHOOT_POS()))
 end
 
 gPlayTable.CreatePlay{
@@ -42,7 +42,7 @@ gPlayTable.CreatePlay{
 
   ["toBall"] = {
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 100, 500) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 60, 500) then
         return "leaveBall"
       end
     end,

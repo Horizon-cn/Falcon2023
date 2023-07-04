@@ -122,9 +122,10 @@ function passToDir(dir, c)
 	return {mexe, mpos, kick.flat, dir, pre.middle, kp.specified(c), cp.full(), flag.nothing}
 end
 
-function passToPos(p, c)
+function passToPos(p, c, precision)
 	local idir = player.toPointDir(p)
 	local ipower
+	local iprecision
 	if type(c)== "number" and c ~= nil then
 		ipower=kp.specified(c)
 	elseif type(c) == "function" then -- 自定义力度
@@ -132,8 +133,9 @@ function passToPos(p, c)
 	else
 		ipower=kp.toTargetNormalPlay(p)
 	end
+	iprecision = precision or pre.middle
 	local mexe, mpos = ChaseKick{pos = ball.pos, dir = idir}
-	return {mexe, mpos, kick.flat, idir, pre.middle, ipower, cp.full(), flag.nothing}
+	return {mexe, mpos, kick.flat, idir, iprecision, ipower, cp.full(), flag.nothing}
 end
 
 function chipPass(p, c, f, anti)
