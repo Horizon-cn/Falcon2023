@@ -93,7 +93,8 @@ local LEFT_POS = CGeoPoint:new_local(200/1200*param.pitchLength,-165/900*param.p
 local LEFT_POS_2 = CGeoPoint:new_local(300/1200*param.pitchLength,-165/900*param.pitchWidth)
 
 local START_POS = CGeoPoint:new_local(27/1200*param.pitchLength,18/900*param.pitchWidth)
-local START_POS_1 = CGeoPoint:new_local(9/1200*param.pitchLength,6/900*param.pitchWidth)
+local START_POS_1 = CGeoPoint:new_local(18/1200*param.pitchLength,12/900*param.pitchWidth)
+local START_POS_2 = CGeoPoint:new_local(18/1200*param.pitchLength,-12/900*param.pitchWidth)
 local RECEIVE_POS_1 = CGeoPoint:new_local(-110/1200*param.pitchLength,-70/900*param.pitchWidth)
 local RECEIVE_POS_2 = CGeoPoint:new_local(-110/1200*param.pitchLength,70/900*param.pitchWidth)
 
@@ -102,8 +103,9 @@ local RIGHT_POS_2  = CGeoPoint:new_local(155/1200*param.pitchLength,80/900*param
 local outside = CGeoPoint:new_local(-50/1200*param.pitchLength,300/900*param.pitchWidth)
 
 local GetBallPos = pos.passForTouch(RECEIVE_POS_1)
-local GetBallPos1 = CGeoPoint:new_local(-110/1200*param.pitchLength,70/900*param.pitchWidth)
+local GetBallPos1 = CGeoPoint:new_local(-110/1200*param.pitchLength,-70/900*param.pitchWidth)
 
+local tempPos = CGeoPoint:new_local(18/1200*param.pitchLength,-19/900*param.pitchWidth)
 local getKickerNum = function()
     return "Leader"
 end
@@ -112,16 +114,28 @@ local receive_dir = function(num)
   return (player.pos(gRoleNum[getKickerNum()]) - player.pos(num)):dir()
 end
 
+local ChangeLeaderPos = function()
+  if ball.posY() > 0 then 
+    return START_POS_2
+  else
+    return START_POS_1
+  end
+end 
+
 gPlayTable.CreatePlay{
 firstState = "start",
 
 ["start"] = {
   switch = function ()
     if cond.isNormalStart() then
-      return "getball"
+      if ball.posY() > 0 then  
+        return "kickoftoA"
+    else
+        return "temp"
+      end
     end
   end,
-  Leader   = task.goCmuRush(START_POS,math.pi+0.5,_,flag.allow_dss),
+  Leader   = task.goCmuRush(START_POS,-math.pi+0.5,_,flag.allow_dss),
   Assister = task.goCmuRush(RECEIVE_POS_1,receive_dir,_,flag.allow_dss),
   Special  = task.goCmuRush(RECEIVE_POS_2,receive_dir,_,flag.allow_dss),
   Middle   = task.multiBack(4,1),
@@ -135,10 +149,10 @@ firstState = "start",
 ["temp"] = {
   switch = function ()
     if bufcnt(player.toTargetDist("Leader")<20 ,50,100) then
-      return "getball"
+      return "kickoftoS"
     end
   end,
-  Leader   = task.goCmuRush(START_POS_1,math.pi+0.5,_,flag.allow_dss),  --staticGetBall(player.toPlayerDir("Assister","Leader")),
+  Leader   = task.goCmuRush(tempPos,-math.pi+0.5,_,flag.allow_dss),  --staticGetBall(player.toPlayerDir("Assister","Leader")),
   Assister = task.goCmuRush(RECEIVE_POS_1,receive_dir,_,flag.allow_dss),
   Special  = task.goCmuRush(RECEIVE_POS_2,receive_dir,_,flag.allow_dss),
   Middle   = task.multiBack(4,1),
@@ -151,7 +165,7 @@ firstState = "start",
 
 ["getball"] = {
   switch = function ()
-    if bufcnt(player.toTargetDist("Leader")<20 ,50,100)  then
+    if bufcnt(player.toTargetDist("Leader")<20 ,100,200)  then
       if ball.posY() > 0 then  --and ball.posY() < 0
         return "kickoftoA"
     else
@@ -159,7 +173,7 @@ firstState = "start",
       end
     end
   end,
-  Leader   = task.staticGetBall(GetBallPos1), --task.staticGetBall(RECEIVE_POS_1),
+  Leader   = task.staticGetBall(GetBallPos), --task.staticGetBall(RECEIVE_POS_1),
   Assister = task.goCmuRush(RECEIVE_POS_1,receive_dir,_,flag.allow_dss),
   Special  = task.goCmuRush(RECEIVE_POS_2,receive_dir,_,flag.allow_dss),
   Middle   = task.multiBack(4,1),
@@ -175,11 +189,11 @@ firstState = "start",
 ["kickoftoA"] = {
     switch = function ()
     --if bufcnt(player.kickBall("Leader"), "fast", 200) then
-      if bufcnt(player.toBallDist("Leader") > 30) then
-      return "receive"
+      if bufcnt(player.kickBall("Leader")) then
+      return "receiveA"
     end
   end,
-  Leader   = task.passToPos(RECEIVE_POS_1,350),--
+  Leader   = task.passToPos(RECEIVE_POS_1,300,pre.middlehigh),--
   Assister = task.goCmuRush(RECEIVE_POS_1,receive_dir,_,flag.allow_dss),
   Special  = task.goCmuRush(RECEIVE_POS_2,receive_dir,_,flag.allow_dss),
   Middle   = task.multiBack(4,1),
@@ -193,11 +207,11 @@ firstState = "start",
 ["kickoftoS"] = {
     switch = function ()
     --if bufcnt(player.kickBall("Leader"), "fast", 200) then
-      if bufcnt(player.toBallDist("Leader") > 30) then
-      return "receive"
+      if bufcnt(player.kickBall("Leader")) then
+      return "receiveS"
     end
   end,
-  Leader   = task.passToPos(RECEIVE_POS_2,350),--
+  Leader   = task.passToPos(RECEIVE_POS_2,300,pre.middlehigh),--
   Assister = task.goCmuRush(RECEIVE_POS_1,receive_dir,_,flag.allow_dss),
   Special  = task.goCmuRush(RECEIVE_POS_2,receive_dir,_,flag.allow_dss),
   Middle   = task.multiBack(4,1),
@@ -208,21 +222,38 @@ firstState = "start",
   match    = "[L][A][S][MDBC]"
 },
 
-["receive"] = {
+["receiveA"] = {
   switch = function ()
-    if bufcnt(player.toBallDist("Assister") < 20, 20, 150) then
+    if bufcnt(ball.toPlayerHeadDist("Assister") < 20, 50, 150) then
       return "exit"
     end
   end,
-  Leader   = task.multiBack(4,1),
-  Assister = task.receive("Leader"),
-  Special  = task.leftBack(),
-  Middle   = task.rightBack(),
-  Defender = task.multiBack(4,2),
-  Breaker  = task.multiBack(4,3),
-  Crosser  = task.multiBack(4,4),
+  Leader   = task.markingFront("First"),
+  Assister = task.receive("Leader"),--,RECEIVE_POS_1
+  Special  = task.support("Leader",2),
+  Middle   = task.multiBack(3,1),
+  Defender = task.multiBack(3,2),
+  Breaker  = task.multiBack(3,3),
+  Crosser  = task.protectBall(),
   Goalie   = task.goalieNew(),
-  match    = "[A][SM][LDBC]"
+  match    = "[A][S][MD][C][B][L]"
+},
+
+["receiveS"] = {
+  switch = function ()
+    if bufcnt(ball.toPlayerHeadDist("Assister") < 20, 50, 150) then
+      return "exit"
+    end
+  end,
+  Leader   = task.markingFront("First"),
+  Assister = task.support("Leader",2),--,RECEIVE_POS_1
+  Special  = task.receive("Leader"), --receive("Leader")
+  Middle   = task.multiBack(3,1),
+  Defender = task.multiBack(3,2),
+  Breaker  = task.multiBack(3,3),
+  Crosser  = task.protectBall(),
+  Goalie   = task.goalieNew(),
+  match    = "[A][S][MD][C][B][L]"
 },
 
 
