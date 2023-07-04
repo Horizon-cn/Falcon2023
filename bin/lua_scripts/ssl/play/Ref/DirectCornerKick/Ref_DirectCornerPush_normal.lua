@@ -33,16 +33,16 @@ gPlayTable.CreatePlay{
         return "toBall"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.goCmuRush(FRONT_POS1, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Middle   = task.goCmuRush(FRONT_POS2, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Special  = task.goCmuRush(FRONT_POS3, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    -- Defender = task.multiBack(3,1),
-    -- Breaker  = task.multiBack(3,2),
-    -- Crosser  = task.multiBack(3,3),
-    -- Goalie   = task.goalieNew(),
-    -- match    = "[D][B][A][C][S][L][M]"
-    match    = "[A][S][L][M]"
+    Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(SHOOT_POS),_,flag.allow_dss + flag.dodge_ball),
+    Leader   = task.goCmuRush(FRONT_POS1, player.toPlayerHeadDir("Assister"), ACC, flag.allow_dss + flag.dodge_ball),
+    Middle   = task.goCmuRush(FRONT_POS2, player.toPlayerHeadDir("Assister"), ACC, flag.allow_dss + flag.dodge_ball),
+    Special  = task.goCmuRush(FRONT_POS3, player.toPlayerHeadDir("Assister"), ACC, flag.allow_dss + flag.dodge_ball),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][S][L][M]"
+    --match    = "[A][S][L][M]"
   },
 
   ["toBall"] = {
@@ -55,12 +55,12 @@ gPlayTable.CreatePlay{
     Leader   = task.goCmuRush(BlockPos, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Middle   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Special  = task.goCmuRush(RECEIVE_POS,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    -- Defender = task.multiBack(3,1),
-    -- Breaker  = task.multiBack(3,2),
-    -- Crosser  = task.multiBack(3,3),
-    -- Goalie   = task.goalieNew(),
-    -- match    = "[D][B][A][C][S][L][M]"
-    match    = "[A][S][L][M]"
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][S][L][M]"
+    --match    = "[A][S][L][M]"
   },
 
   ["kickBall"] = {
@@ -73,12 +73,12 @@ gPlayTable.CreatePlay{
     Leader   = task.goCmuRush(BlockPos, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Middle   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Special  = task.goCmuRush(RECEIVE_POS,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    -- Defender = task.multiBack(3,1),
-    -- Breaker  = task.multiBack(3,2),
-    -- Crosser  = task.multiBack(3,3),
-    -- Goalie   = task.goalieNew(),
-    -- match    = "[D][B][A][C][S][L][M]"
-    match    = "[A][S][L][M]"
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][S][L][M]"
+    --match    = "[A][S][L][M]"
   },
 
   ["receiveBall"] = {
@@ -91,12 +91,12 @@ gPlayTable.CreatePlay{
     Leader   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Middle   = task.protectBall(),
     Special  = task.advance(),
-    -- Defender = task.multiBack(3,1),
-    -- Breaker  = task.multiBack(3,2),
-    -- Crosser  = task.multiBack(3,3),
-    -- Goalie   = task.goalieNew(),
-    -- match    = "[D][B][S][C][A][L][M]"
-    match    = "[A][S][L][M]"
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][S][C][A][L][M]"
+    --match    = "[A][S][L][M]"
   },
 
 ["shootBall"] = {
@@ -109,12 +109,12 @@ gPlayTable.CreatePlay{
     Leader   = task.goCmuRush(TargetPos2,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Middle   = task.protectBall(),
     Special  = task.advance(),
-    -- Defender = task.multiBack(3,1),
-    -- Breaker  = task.multiBack(3,2),
-    -- Crosser  = task.multiBack(3,3),
-    -- Goalie   = task.goalieNew(),
-    -- match    = "[D][B][S][C][A][L][M]"
-    match    = "[A][S][L][M]"
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][S][C][A][L][M]"
+    --match    = "[A][S][L][M]"
   },
 
   name = "Ref_DirectCornerPush_normal",

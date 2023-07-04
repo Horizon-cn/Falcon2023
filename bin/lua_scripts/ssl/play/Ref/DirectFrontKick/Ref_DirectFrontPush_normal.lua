@@ -4,7 +4,6 @@ end
 
 --【接球点】可根据实车情况进行调整
 local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(380/1200*param.pitchLength,150/900*param.pitchWidth))
-
 local FRONT_POS1= ball.antiYPos(CGeoPoint:new_local(350/1200*param.pitchLength,-150/900*param.pitchWidth))
 local FRONT_POS2= ball.antiYPos(CGeoPoint:new_local(200/1200*param.pitchLength,-100/900*param.pitchWidth))
 local FRONT_POS3= ball.antiYPos(CGeoPoint:new_local(370/1200*param.pitchLength,210/900*param.pitchWidth))
@@ -33,7 +32,7 @@ gPlayTable.CreatePlay{
         return "toBall"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
+    Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(SHOOT_POS),_,flag.allow_dss + flag.dodge_ball),
     Leader   = task.goCmuRush(FRONT_POS1, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Middle   = task.goCmuRush(FRONT_POS2, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Special  = task.goCmuRush(FRONT_POS3, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),

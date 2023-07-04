@@ -3,43 +3,46 @@ local WAIT_BALL_POS = function(anti)
     return ball.pos() + Utils.Polar2Vector(50, anti * math.pi)
   end
 end
-local SHOOT_POS = ball.syntYPos(CGeoPoint:new_local(500/1200*param.pitchLength,-80/900*param.pitchWidth))
-local function def_chipPower()
-  if math.abs(ball.posX()) < 100 then
-    if math.abs(ball.posY()) > 300 then 
-      return 1000
-    elseif math.abs(ball.posY())> 285 then
-      return 1000
-    elseif math.abs(ball.posY()) > 200 then 
-      return 800
-    else
-      return 600
-    end
-  elseif math.abs(ball.posX()) < 200 then
-    if math.abs(ball.posY()) > 300 then 
-      return 600
-    elseif math.abs(ball.posY())> 285 then
-      return 500
-    elseif math.abs(ball.posY()) > 270 then 
-      return 450
-    elseif math.abs(ball.posY()) > 200 then 
-      return 300
-    else
-      return 50
-    end
-  else
-    if math.abs(ball.posY()) > 300 then 
-      return 450
-    elseif math.abs(ball.posY())> 285 then
-      return 370
-    elseif math.abs(ball.posY()) > 270 then 
-      return 330
-    elseif math.abs(ball.posY()) > 200 then 
-      return 250
-    else
-      return 10
-    end
-  end
+local SHOOT_POS = ball.syntYPos(CGeoPoint:new_local(500/1200*param.pitchLength,0/900*param.pitchWidth))
+-- local function def_chipPower()
+--   if math.abs(ball.posX()) < 100 then
+--     if math.abs(ball.posY()) > 300 then 
+--       return 1000
+--     elseif math.abs(ball.posY())> 285 then
+--       return 1000
+--     elseif math.abs(ball.posY()) > 200 then 
+--       return 800
+--     else
+--       return 600
+--     end
+--   elseif math.abs(ball.posX()) < 200 then
+--     if math.abs(ball.posY()) > 300 then 
+--       return 600
+--     elseif math.abs(ball.posY())> 285 then
+--       return 500
+--     elseif math.abs(ball.posY()) > 270 then 
+--       return 450
+--     elseif math.abs(ball.posY()) > 200 then 
+--       return 300
+--     else
+--       return 50
+--     end
+--   else
+--     if math.abs(ball.posY()) > 300 then 
+--       return 450
+--     elseif math.abs(ball.posY())> 285 then
+--       return 370
+--     elseif math.abs(ball.posY()) > 270 then 
+--       return 330
+--     elseif math.abs(ball.posY()) > 200 then 
+--       return 250
+--     else
+--       return 10
+--     end
+--   end
+-- end
+local KICK_POWER=function()
+  return 20*math.sqrt(ball.toPointDist(SHOOT_POS()))
 end
 
 gPlayTable.CreatePlay{
@@ -52,7 +55,7 @@ gPlayTable.CreatePlay{
         return "toBall"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
+    Assister = task.goCmuRush(WAIT_BALL_POS(1),player.toPointDir(SHOOT_POS),_,flag.allow_dss + flag.dodge_ball),
     Middle   = task.markingFront("First"),
     Leader   = task.markingFront("Second"),
     Special  = task.markingFront("Third"),
@@ -65,7 +68,7 @@ gPlayTable.CreatePlay{
 
   ["toBall"] = {
     switch = function ()
-      if bufcnt(player.toPointDist("Assister", ball.pos()) < 5, 3, 180) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 100, 500) then
         return "leaveBall"
       end
     end,
@@ -86,7 +89,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.chipPass(SHOOT_POS,def_chipPower()),
+    Assister = task.chipPass(SHOOT_POS,KICK_POWER),
     --Assister = task.goCmuRush(WAIT_BALL_POS(1),_,_,flag.allow_dss + flag.dodge_ball),
     Middle   = task.markingFront("First"),
     Leader   = task.markingFront("Second"),
