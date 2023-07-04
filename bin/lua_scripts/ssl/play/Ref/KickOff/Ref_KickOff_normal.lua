@@ -141,7 +141,7 @@ firstState = "start",
 
 ["receive1"] = {
   switch = function ()
-    if bufcnt(ball.toPlayerHeadDist("Assister") < 20, 50, 150) then
+    if bufcnt(ball.toPlayerHeadDist("Assister") < 20, 10, 150) then
       return "exit"
     end
   end,
@@ -158,7 +158,7 @@ firstState = "start",
 
 ["receive2"] = {
   switch = function ()
-    if bufcnt(player.toBallDist("Special") < 20, 20, 150) then
+    if bufcnt(player.toBallDist("Special") < 20, 10, 150) then
       return "exit"
     end
   end,
