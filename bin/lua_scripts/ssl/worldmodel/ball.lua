@@ -346,7 +346,11 @@ end
 
 function supportPassPos(num)
 	return function ()
-		local passPos = bestAlg:getBestPointFromArea(num)
+		local areaNum=num
+		if type(areaNum) == "function" then
+			areaNum = areaNum()
+		end
+		local passPos = bestAlg:getBestPointFromArea(areaNum)
 		return passPos
 	end
 end
