@@ -108,6 +108,13 @@ public:
         return _sideBack.num;
     }
 
+    int sideBackUltra() {
+        if (vision->Cycle() - _sideBackUltra.lastCycle > 5) {
+            _sideBackUltra.num = 0;
+        }
+        return _sideBackUltra.num;
+    }
+
     int advancer(){
         if (vision->Cycle() - _advancer.lastCycle> 5){
             _advancer.num = 0;
@@ -134,6 +141,7 @@ public:
                  (vecNumber == singleBack())  ||
                  (vecNumber == defendHead())  ||
                  (vecNumber == sideBack())    ||
+                 (vecNumber == sideBackUltra())||
                  (vecNumber == defendMiddle())));
     }
 
@@ -209,10 +217,10 @@ public:
         } else if ("rightBack" == role){
             _rightBack.num = num;
             _rightBack.lastCycle = vision->Cycle();
-        }else if ("leftCenterBack" == role) {      //???????§Ü????§Ø?
+        }else if ("leftCenterBack" == role) {
             _leftCenterBack.num = num;
             _leftCenterBack.lastCycle = vision->Cycle();
-        }else if ("rightCenterBack" == role) {       //???????§Ü????§Ø?
+        }else if ("rightCenterBack" == role) {
             _rightCenterBack.num = num;
             _rightCenterBack.lastCycle = vision->Cycle();
         }else if ("singleBack" == role){
@@ -227,7 +235,10 @@ public:
         }else if ("sideBack" == role){
             _sideBack.num = num;
             _sideBack.lastCycle = vision->Cycle();
-        }else if ("advancer" == role){
+        } else if ("sideBackUltra" == role) {
+            _sideBackUltra.num = num;
+            _sideBackUltra.lastCycle = vision->Cycle();
+        } else if ("advancer" == role){
             _advancer.num = num;
             _advancer.lastCycle = vision->Cycle();
         } else if ("ballProtecter" == role) {
@@ -301,6 +312,7 @@ private:
     SpecialRole _defendMiddle;
     SpecialRole _defendHead;
     SpecialRole _sideBack;
+    SpecialRole _sideBackUltra;
     SpecialRole _advancer;
     SpecialRole _ballProtecter;
     SpecialRole _multiBack[Param::Field::MAX_PLAYER];

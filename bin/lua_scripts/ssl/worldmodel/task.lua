@@ -999,6 +999,11 @@ function multiBack(guardNum, index, p)
 	return {mexe, mpos, kick.chip, dir.defendBackClear(), pre.fieldDefender(), kp.specified(ipower),cp.specified(ipower), bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
 end
 
+function sideBackUltra()
+	local mexe, mpos = GotoMatchPos{ method = 4, sender = index, srole = "sideBackUltra", acc = 1000, pos = pos.sideBackUltraPos(), dir = dir.backSmartGotoDir, flag = bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
+	return {mexe, mpos, kick.chip, dir.defendBackClear(), pre.fieldDefender(), kp.specified(450),cp.specified(450), bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
+end
+
 function leftBack4Stop()
 	local STOP_FLAG = flag.dodge_ball
 	local STOP_NO_DODGE_SELF = bit:_or(STOP_FLAG, flag.not_avoid_our_vehicle)

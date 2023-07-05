@@ -204,6 +204,12 @@ function multiBackPos(guardNum, index)
 	end
 end
 
+function sideBackUltraPos()
+	return function()
+		return sidePos:ultraPos()
+	end
+end
+
 function leftBackPos()
 	return defPos2015:getDefPos2015(vision):getLeftPos()
 end

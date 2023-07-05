@@ -19,6 +19,7 @@
 #include "PointCalculation/IndirectDefender.h"
 #include "PointCalculation/SupportPos.h"
 #include "PointCalculation/GuardPos.h"
+#include "PointCalculation/SidePos.h"
 #include "ParamManagerNew.h"
 #include "PointCalculation/SupportPos2022.h"
 #include "RobotSensor.h"
@@ -37,6 +38,7 @@ extern CKickDirection* kickDirection;
 extern CGPUBestAlgThread* bestAlg;
 extern CDefPos2015* defPos2015;
 extern CGuardPos* guardPos;
+extern CSidePos* sidePos;
 extern CDefPos2013* defPos2013;
 extern CTandemPos* tandemPos;
 extern CBestPlayer* bestPlayer;
