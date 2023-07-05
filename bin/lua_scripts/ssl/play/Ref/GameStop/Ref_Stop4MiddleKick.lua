@@ -37,7 +37,7 @@ firstState = "start",
     end
   end,
   Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(RECEIVE_POS2),_,flag.allow_dss + flag.dodge_ball),
-  Leader   = task.goCmuRush(BARYCENTER, player.toBallDir,_,flag.allow_dss + flag.dodge_ball),d
+  Leader   = task.goCmuRush(BARYCENTER, player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
   Middle   = task.multiBack(3,1),
   Special  = task.goCmuRush(BLOCK_POS,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
   Defender = task.multiBack(3,2),
@@ -52,7 +52,7 @@ name = "Ref_Stop4MiddleKick",
 applicable = {
   exp = "a",
   a = trued
-},dd
+},
 attribute = "attack",
 timeout = 99999
 }
