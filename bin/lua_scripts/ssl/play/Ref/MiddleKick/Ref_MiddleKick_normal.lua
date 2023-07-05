@@ -105,7 +105,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss + flag.dodge_ball),
+    Assister = task.support("Special",4),
     Special  = task.receive(ball.pos(),RECEIVE_POS2),
     Leader   = task.goCmuRush(BLOCK_POS2,_,_,flag.allow_dss + flag.dodge_ball),
     Middle   = task.multiBack(3,1),
