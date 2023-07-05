@@ -52,7 +52,7 @@ namespace {
 	const double safeVelFactorFront = 1.0;
 	const double safeVelFactorBack = 1.0;
 
-	double stopBallAvoidDist = 50;
+	double stopBallAvoidDist = 70.0;
 	double ballPlacementDist = 50;
 
 	/// related to rrt
@@ -140,23 +140,12 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 	const bool isAdvancer = (vecNumber != 0 && vecNumber == TaskMediator::Instance()->advancer());
 
 	// 判断为，判断需要躲避的指定区域，包括圆圈和放球椭圆
-	//bool avoidBallCircle = (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") || (playerFlag & PlayerStatus::AVOID_STOP_BALL_CIRCLE) || (WorldModel::Instance()->CurrentRefereeMsg() == "theirKickOff");
-	// 没实现：
-	// 我方开球，没normal start，有个小的避球圈
-	// 我方点球，没normal start，避球
-	// 注意！！normal start不等同game on!
-	// 注意！！这个判断代码在ObstacleNew和SmartGotoPosition各有一份，应该同时维护！
-	auto& state = pVision->gameState();
-	bool game_not_on__but_we_can_kick = !state.gameOn() && (state.ourKickoff() || state.ourDirectKick() || state.ourIndirectKick() || state.ourPenaltyKick());
-	bool avoidBallCircle = !state.gameOn() &&
-		((playerFlag & PlayerStatus::AVOID_STOP_BALL_CIRCLE) ||
-			WorldModel::Instance()->CurrentRefereeMsg() == "gameStop" ||
-			state.theirKickoff() ||
-			state.theirDirectKick() ||
-			state.theirIndirectKick() ||
-			state.theirPenaltyKick() ||
-			!game_not_on__but_we_can_kick);
 
+	bool avoidBallCircle = (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") || (playerFlag & PlayerStatus::AVOID_STOP_BALL_CIRCLE) || (WorldModel::Instance()->CurrentRefereeMsg() == "theirKickOff");
+	bool ModifyAvoidBallCircle = (WorldModel::Instance()->CurrentRefereeMsg() == "theirIndirectKick") || (WorldModel::Instance()->CurrentRefereeMsg() == "theirDirectKick") || (WorldModel::Instance()->CurrentRefereeMsg() == "theirKickOff");
+
+	avoidBallCircle = avoidBallCircle || (ModifyAvoidBallCircle && (!pVision->gameState().gameOn()));
+	
 	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500, 200), to_string(state.theirKickoff()).c_str());
 	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-450, 200), to_string(state.theirDirectKick()).c_str());
 	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-400, 200), to_string(state.theirIndirectKick()).c_str());
@@ -437,7 +426,7 @@ PlayerCapabilityT CSmartGotoPosition::setCapability(const CVisionModule* pVision
 
 	// GameStop状态不能超速
 	if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") {
-		capability.maxSpeed = 140;
+		capability.maxSpeed = 120;
 		capability.maxAccel = 200;
 		capability.maxDec = 200;
 	}
@@ -457,7 +446,8 @@ void CSmartGotoPosition::validateFinalTarget(CGeoPoint& finalTarget, const CVisi
 	// 定位球 (FREE_KICK) 的时候需要多避对方禁区20厘米.
 	double theirPenaltyAvoidLength = avoidLength;
 	if (playerFlag & PlayerStatus::FREE_KICK) {
-		theirPenaltyAvoidLength += 20.0;
+		theirPenaltyAvoidLength += 20.0 + 10.0;
+		// update on 23.7.6 防止犯规，多避10厘米
     }
     else if (!shrinkTheirPenalty) {
 		theirPenaltyAvoidLength += Param::Vehicle::V2::PLAYER_SIZE;

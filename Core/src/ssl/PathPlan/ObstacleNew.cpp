@@ -15,8 +15,8 @@ namespace {
 	const double MIN_AVOID_DIST = Param::Vehicle::V2::PLAYER_SIZE + 2.0;
 	const double LOWER_BOUND_AVOID_SPEED = 50;
 	const double UPPER_BOUND_AVOID_SPEED = 250;
-	double FREE_KICK_BUF = 32;
-	double stopBallAvoidDist = 56.5;
+	double FREE_KICK_BUF = 40.0;  // stop和indirect Kick 避禁区
+	double stopBallAvoidDist = 70.0;  // stop 避球圈距离
 
 	inline float minObs(float a, float b) {
 		if (a < b) return a;
@@ -616,16 +616,12 @@ void ObstaclesNew::addObs(const CVisionModule* pVision, const TaskT& task, bool 
 	// 我方点球，没normal start，避球
 	// 注意！！normal start不等同game on!
 	// 注意！！这个判断代码在ObstacleNew和SmartGotoPosition各有一份，应该同时维护！
-	auto& state = pVision->gameState();
-	bool game_not_on__but_we_can_kick = !state.gameOn() && (state.ourKickoff() || state.ourDirectKick() || state.ourIndirectKick() || state.ourPenaltyKick());
-	bool avoidBallCircle = !state.gameOn() &&
-		((flags & PlayerStatus::AVOID_STOP_BALL_CIRCLE) ||
-			WorldModel::Instance()->CurrentRefereeMsg() == "gameStop" ||
-			state.theirKickoff() ||
-			state.theirDirectKick() ||
-			state.theirIndirectKick() ||
-			state.theirPenaltyKick() ||
-			!game_not_on__but_we_can_kick);
+
+	bool avoidBallCircle = (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") || (flags & PlayerStatus::AVOID_STOP_BALL_CIRCLE) || (WorldModel::Instance()->CurrentRefereeMsg() == "theirKickOff");
+	bool ModifyAvoidBallCircle = (WorldModel::Instance()->CurrentRefereeMsg() == "theirIndirectKick") || (WorldModel::Instance()->CurrentRefereeMsg() == "theirDirectKick") || (WorldModel::Instance()->CurrentRefereeMsg() == "theirKickOff");
+
+	avoidBallCircle = avoidBallCircle || (ModifyAvoidBallCircle && (!pVision->gameState().gameOn()));
+
 	if (avoidBallCircle) {
 		const BallVisionT& ball = pVision->Ball();
 		addCircle(ball.Pos(), CVector(0.0f, 0.0f), stopBallAvoidDist, OBS_CIRCLE_NEW);

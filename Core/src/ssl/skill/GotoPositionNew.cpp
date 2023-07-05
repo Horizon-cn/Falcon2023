@@ -31,7 +31,7 @@ namespace {
 	const double SlowFactor = 0.5;
 	const double FastFactor = 1.2;
 
-	double stopBallAvoidDist = 50;
+	double stopBallAvoidDist = 70.0;
 	double ballPlacementDist = 60;
 	double BUFFER = 5.5;
 

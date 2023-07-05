@@ -38,7 +38,7 @@ namespace {
 	double TRANSLATION_SPEED_LIMIT = 200;
 	double TRANSLATION_ROTATE_ACC_LIMIT = 50;
 
-	double stopBallAvoidDist = 50;
+	double stopBallAvoidDist = 70.0;
 	/// 守门员专用
 	double MAX_TRANSLATION_SPEED_GOALIE = 200;
 	double MAX_TRANSLATION_ACC_GOALIE = 200;
@@ -332,7 +332,7 @@ PlayerCapabilityT CGotoPosition::setCapability(const CVisionModule *pVision) {
 	}
 
 	if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop") {
-		capability.maxSpeed = 140;
+		capability.maxSpeed = 120.0;
 	}
 
 	if (WorldModel::Instance()->CurrentRefereeMsg() == "ourBallPlacement")

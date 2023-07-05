@@ -52,7 +52,7 @@ namespace {
 	double TRANSLATION_SPEED_LIMIT = 200;
 	double TRANSLATION_ROTATE_ACC_LIMIT = 50;
 
-	double stopBallAvoidDist = 50;
+	double stopBallAvoidDist = 70.0;
 	/// 守门员专用
 	double MAX_TRANSLATION_SPEED_GOALIE = 200;
 	double MAX_TRANSLATION_ACC_GOALIE = 200;

@@ -53,7 +53,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[D][B][A][L][C][M][S]"
   },
   ["toBall1"] = {
     switch = function ()
@@ -69,7 +69,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[D][B][A][L][C][M][S]"
   },
 
   ["toBall2"] = {
@@ -86,7 +86,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[D][B][A][L][C][M][S]"
   },
 
   ["kickBall"] = {
@@ -104,7 +104,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[D][B][A][L][C][M][S]"
   },
 
   ["receiveBall"] = {
@@ -121,7 +121,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[D][B][A][L][C][M][S]"
   },
 
 ["shootBall"] = {
@@ -138,10 +138,10 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[D][B][A][L][C][M][S]"
   },
 
-  name = "Ref_DirectCornerPush_normal_chip",
+  name = "Ref_DirectCornerPush_normal",
   applicable = {
     exp = "a",
     a   = true
