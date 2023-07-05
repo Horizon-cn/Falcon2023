@@ -16,10 +16,11 @@ CGeoPoint CSidePos::ultraPos()
 	double sidex = -Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH + Param::Vehicle::V2::PLAYER_SIZE;
 	double sidey = Param::Field::PENALTY_AREA_WIDTH / 2 + Param::Vehicle::V2::PLAYER_SIZE;
 	CGeoPoint target = chooseTargetPos();
+	CGeoPoint ultraPos;
 	if (target.y() > Param::Field::PENALTY_AREA_WIDTH / 2) {
-		return CGeoPoint(sidex, -sidey);
+		ultraPos = CGeoPoint(sidex, -sidey);
 	} else if (target.y() < -Param::Field::PENALTY_AREA_WIDTH / 2) {
-		return CGeoPoint(sidex, sidey);
+		ultraPos = CGeoPoint(sidex, sidey);
 	} else {
 		// sidebackµÄÒì²à
 		int y_side = 1;
@@ -29,8 +30,9 @@ CGeoPoint CSidePos::ultraPos()
 				y_side = -1;
 			}
 		}
-		return CGeoPoint(sidex, sidey * y_side);
+		ultraPos = CGeoPoint(sidex, sidey * y_side);
 	}
+	return ultraPos;
 }
 
 CGeoPoint CSidePos::chooseTargetPos()
