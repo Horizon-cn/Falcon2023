@@ -918,6 +918,11 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 			setSubTask(PlayerRole::makeItNoneTrajGetBall(task().executor, finalKickDir, CVector(0, 0), task().player.flag, -2));
 		}
 	}*/
+
+	if (BallStatus::Instance()->getBallPossession(true, robotNum) > 0.3) {
+		setSubTask(PlayerRole::makeItNoneTrajGetBall(robotNum, finalKickDir, CVector(0, 0), 0, 0));
+	}
+
 	CStatedTask::plan(pVision);
 }
 

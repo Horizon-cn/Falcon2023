@@ -1,6 +1,12 @@
+local START_POS = CGeoPoint:new_local(27/1200*param.pitchLength,0)
+local RECEIVE_POS_1 = CGeoPoint:new_local(-110/1200*param.pitchLength,-70/900*param.pitchWidth)
+local RECEIVE_POS_2 = CGeoPoint:new_local(-110/1200*param.pitchLength,70/900*param.pitchWidth)
+
 local SwitchBallArea = function()
   if cond.isGameOn() then
     return "exit"
+  elseif math.abs(ball.posX())<15 and math.abs(ball.posY())<15 then
+    return "kickoff1"
   elseif (ball.posY()<-220 or ball.posY()>220) and ball.posX()<-200 then
     return "StopCornerDef"
   elseif ball.posY()>-220 and ball.posY()<220 and ball.posX()<-200 then
@@ -16,6 +22,19 @@ end
 
 gPlayTable.CreatePlay{
   firstState = "StopBackDef",
+
+  ["kickoff1"]= {
+    switch = SwitchBallArea,
+    Leader   = task.goCmuRush(START_POS,math.pi,_,flag.allow_dss),
+    Assister = task.goCmuRush(RECEIVE_POS_1,receive_dir,_,flag.allow_dss),
+    Special  = task.goCmuRush(RECEIVE_POS_2,receive_dir,_,flag.allow_dss),
+    Middle   = task.multiBack(4,1),
+    Defender = task.multiBack(4,2),
+    Breaker  = task.multiBack(4,3),
+    Crosser  = task.multiBack(4,4),
+    Goalie   = task.goalieNew(),
+    match    = "[L][A][S][MDBC]"
+  },
 
   ["StopCornerDef"]= {
     --MultiDefend
