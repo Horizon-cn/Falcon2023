@@ -5,6 +5,28 @@ local RECEIVE_POS_1 = CGeoPoint:new_local(-110/1200*param.pitchLength,-70/900*pa
 local RECEIVE_POS_2 = CGeoPoint:new_local(-110/1200*param.pitchLength,70/900*param.pitchWidth)
 local GetBallPos = pos.passForTouch(RECEIVE_POS_1)
 
+local DetectTheSupportID = function() 
+    if ball.posX() > 200 and ball.posY() < -120 then  -- 在0号区域
+        return 2  -- 往2号区域打
+    elseif ball.posX() > 200 and ball.posY() < 120 then -- 在1号区域
+        if ball.posX() > 0 then
+            return 2
+        else 
+            return 0
+        end
+    elseif ball.posX() > 200 and ball.posY() >= 120 then -- 在2号区域
+        return 0 -- 往0号打
+    elseif ball.posX() > -200 and ball.posY() < -120 then -- 在3号区域
+        return 0 -- 往0号打
+    elseif ball.posX() > -200 and ball.posY() < 120 then -- 在4号区域
+        return 1 -- 往1号打
+    elseif ball.posX() > -200 and ball.posY() >= 120 then -- 在5号区域
+        return 2 -- 往2号打
+    else
+        return 4 -- 往4号打
+    end
+end
+
 local receive_dir = function(num)
   return (player.pos(gRoleNum["Leader"]) - player.pos(num)):dir()
 end
@@ -98,7 +120,7 @@ firstState = "start",
   Breaker  = task.multiBack(4,3),
   Crosser  = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
-  match    = "[L][A][S][MDBC]"
+  match    = "[L][S][A][MDBC]"
 },
 
 
@@ -136,7 +158,7 @@ firstState = "start",
   Breaker  = task.multiBack(4,3),
   Crosser  = task.multiBack(4,4),
   Goalie   = task.goalieNew(),
-  match    = "[L][A][S][MDBC]"
+  match    = "[L][S][A][MDBC]"
 },
 
 ["receive1"] = {
@@ -145,15 +167,15 @@ firstState = "start",
       return "exit"
     end
   end,
-  Leader   = task.support("Assister",4),
+  Leader   = task.support("Assister",DetectTheSupportID),
   Assister = task.receive("Leader",RECEIVE_POS_1),
-  Special  = task.support("Assister",4),--todo 待定
-  Middle   = task.multiBack(4,1),
-  Defender = task.multiBack(4,2),
-  Breaker  = task.multiBack(4,3),
-  Crosser  = task.multiBack(4,4),
+  Special  = task.protectBall(),  --todo 待定
+  Middle   = task.multiBack(3,1),
+  Defender = task.multiBack(3,2),
+  Breaker  = task.multiBack(3,3),
+  Crosser  = task.markingFront("First"),
   Goalie   = task.goalieNew(),
-  match    = "[A][SL][MDBC]"
+  match    = "[A][L][MD][S][B][C]"
 },
 
 ["receive2"] = {
@@ -162,15 +184,15 @@ firstState = "start",
       return "exit"
     end
   end,
-  Leader   = task.support("Special",4),
-  Assister  = task.support("Special",4),--todo 待定
+  Leader   = task.support("Special",DetectTheSupportID),
+  Assister  = task.protectBall(),  --todo 待定
   Special = task.receive("Leader",RECEIVE_POS_2),
-  Middle   = task.multiBack(4,1),
-  Defender = task.multiBack(4,2),
-  Breaker  = task.multiBack(4,3),
-  Crosser  = task.multiBack(4,4),
+  Middle   = task.multiBack(3,1),
+  Defender = task.multiBack(3,2),
+  Breaker  = task.multiBack(3,3),
+  Crosser  = task.markingFront("First"),
   Goalie   = task.goalieNew(),
-  match    = "[S][AL][MDBC]"
+  match    = "[A][L][MD][S][B][C]"
 },
 
 
