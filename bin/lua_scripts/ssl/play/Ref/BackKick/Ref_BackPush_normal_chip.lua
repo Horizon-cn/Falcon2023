@@ -1,9 +1,9 @@
 local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(60, 0)
+  return ball.pos() + Utils.Polar2Vector(20, -ball.antiY()*math.pi*3/4)
 end
 
 local SHOOT_POS = function()
-  return ball.pos()+Utils.Polar2Vector(400,ball.antiY()*math.pi/6)
+  return ball.pos()+Utils.Polar2Vector(500,ball.antiY()*math.pi/6)
 end
 
 local RECEIVE_POS = function()
@@ -45,8 +45,8 @@ gPlayTable.CreatePlay{
         return "toBall"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(SHOOT_POS()),_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.goCmuRush(RECEIVE_POS, player.toPointDir(SHOOT_POS()), ACC, STOP_DSS),
+    Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(SHOOT_POS),_,flag.allow_dss + flag.dodge_ball),
+    Leader   = task.goCmuRush(RECEIVE_POS, player.toPointDir(SHOOT_POS), ACC, STOP_DSS),
     Middle   = task.goCmuRush(ASSIST_POS, player.toPlayerHeadDir("Leader"), ACC, STOP_DSS),
     Special  = task.sideBack(),
     Defender = task.multiBack(3,1),
@@ -96,7 +96,7 @@ gPlayTable.CreatePlay{
         return "shootBall"
       end
     end,
-    Assister = task.markingFront("First"),
+    Assister = task.support("Leader",4),
     Leader   = task.receive(ball.pos(),RECEIVE_POS),
     Middle   = task.support("Leader",DetectBallAreaFront),
     Special  = task.sideBack(),
@@ -113,7 +113,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.markingFront("First"),
+    Assister = task.support("Leader",4),
     Leader   = task.advance(),
     Middle   = task.support("Leader",DetectBallAreaFront),
     Special  = task.sideBack(),

@@ -1,5 +1,8 @@
-local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(60, ball.antiY()*math.pi)
+local WAIT_BALL_POS1   = function ()
+  return ball.pos() + Utils.Polar2Vector(30, -ball.antiY()*math.pi*3/4)
+end
+local WAIT_BALL_POS2   = function ()
+  return ball.pos() + Utils.Polar2Vector(30, -ball.antiY()*math.pi/4)
 end
 
 --【接球点】可根据实车情况进行调整
@@ -39,10 +42,26 @@ gPlayTable.CreatePlay{
   ["start"] = {
     switch = function ()
       if bufcnt(player.toTargetDist("Assister") < 20, 10, 180) then
-        return "toBall"
+        return "toBall1"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(SHOOT_POS), ACC, flag.allow_dss + flag.dodge_ball),
+    Assister = task.goCmuRush(WAIT_BALL_POS1,player.toPointDir(SHOOT_POS), ACC, flag.allow_dss + flag.dodge_ball),
+    Leader   = task.goCmuRush(FRONT_POS3, player.toPlayerHeadDir("Assister"), ACC, flag.allow_dss + flag.dodge_ball),
+    Middle   = task.goCmuRush(FRONT_POS1, player.toPlayerHeadDir("Assister"), ACC, flag.allow_dss + flag.dodge_ball),
+    Special  = task.sideBack(),
+    Defender = task.multiBack(3,1),
+    Breaker  = task.multiBack(3,2),
+    Crosser  = task.multiBack(3,3),
+    Goalie   = task.goalieNew(),
+    match    = "[D][B][A][C][L][M][S]"
+  },
+  ["toBall1"] = {
+    switch = function ()
+      if bufcnt(player.toTargetDist("Assister") < 20, 10, 180) then
+        return "toBall2"
+      end
+    end,
+    Assister = task.goCmuRush(WAIT_BALL_POS2,player.toPointDir(SHOOT_POS), ACC, flag.allow_dss + flag.dodge_ball),
     Leader   = task.goCmuRush(FRONT_POS3, player.toPlayerHeadDir("Assister"), ACC, flag.allow_dss + flag.dodge_ball),
     Middle   = task.goCmuRush(FRONT_POS1, player.toPlayerHeadDir("Assister"), ACC, flag.allow_dss + flag.dodge_ball),
     Special  = task.sideBack(),
@@ -53,7 +72,7 @@ gPlayTable.CreatePlay{
     match    = "[D][B][A][C][L][M][S]"
   },
 
-  ["toBall"] = {
+  ["toBall2"] = {
     switch = function ()
       if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 150, 1000) then
         return "kickBall"

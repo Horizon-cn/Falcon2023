@@ -16,7 +16,7 @@ local SHOOT_POS = ball.syntYPos(CGeoPoint:new_local(520/1200*param.pitchLength,0
 --   end
 -- end
 local KICK_POWER=function()
-  return 20*math.sqrt(ball.toPointDist(SHOOT_POS()))
+  return 13.6*math.sqrt(ball.toPointDist(SHOOT_POS()))
 end
 
 gPlayTable.CreatePlay{
@@ -32,12 +32,12 @@ gPlayTable.CreatePlay{
     Assister = task.goCmuRush(WAIT_BALL_POS(1),player.toPointDir(SHOOT_POS),_,flag.allow_dss + flag.dodge_ball),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
-    Special  = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Special  = task.multiBack(3,1),
+    Defender = task.multiBack(3,2),
+    Breaker  = task.multiBack(3,3),
+    Crosser  = task.sideBack(),
     Goalie   = task.goalieNew(),
-    match = "[A][D][SBC][LM]"
+    match = "[D][A][SBC][LM]"
   },
 
   ["toBall"] = {
@@ -49,10 +49,10 @@ gPlayTable.CreatePlay{
     Assister = task.staticGetBall(SHOOT_POS),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
-    Special  = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Special  = task.multiBack(3,1),
+    Defender = task.multiBack(3,2),
+    Breaker  = task.multiBack(3,3),
+    Crosser  = task.sideBack(),
     Goalie   = task.goalieNew(),
     match = "[D][A][SBC][LM]"
   },
@@ -66,10 +66,10 @@ gPlayTable.CreatePlay{
     Assister = task.chipPass(SHOOT_POS,KICK_POWER),
     Leader   = task.markingFront("First"),
     Middle   = task.markingFront("Second"),
-    Special  = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Special  = task.multiBack(3,1),
+    Defender = task.multiBack(3,2),
+    Breaker  = task.multiBack(3,3),
+    Crosser  = task.sideBack(),
     Goalie   = task.goalieNew(),
     match = "[D][A][SBC][LM]"
   },
