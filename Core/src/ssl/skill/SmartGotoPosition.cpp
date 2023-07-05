@@ -157,11 +157,11 @@ void CSmartGotoPosition::plan(const CVisionModule* pVision)
 			state.theirPenaltyKick() ||
 			!game_not_on__but_we_can_kick);
 
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500, 200), to_string(state.theirKickoff()).c_str());
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-450, 200), to_string(state.theirDirectKick()).c_str());
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-400, 200), to_string(state.theirIndirectKick()).c_str());
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-350, 200), to_string(state.theirPenaltyKick()).c_str());
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-300, 200), to_string(game_not_on__but_we_can_kick).c_str());
+	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500, 200), to_string(state.theirKickoff()).c_str());
+	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-450, 200), to_string(state.theirDirectKick()).c_str());
+	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-400, 200), to_string(state.theirIndirectKick()).c_str());
+	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-350, 200), to_string(state.theirPenaltyKick()).c_str());
+	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-300, 200), to_string(game_not_on__but_we_can_kick).c_str());
 
 	// 此处新增kickoff，我们也需要修正我们的目标点， By TYH
 
