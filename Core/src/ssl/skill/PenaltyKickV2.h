@@ -23,7 +23,8 @@ private:
         GET,
         KICK,
         BREAKSHOOT,
-        LIGHT_KICK
+        LIGHT_KICK,
+        CHASEKICK
     };
     int _lastCycle;
     int _state;
