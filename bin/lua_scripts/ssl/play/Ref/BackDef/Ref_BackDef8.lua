@@ -13,8 +13,8 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-  Leader = task.multiBack(3,1),
-  Middle = task.multiBack(3,2),
+  Leader = task.multiBack(2,1),
+  Middle = task.multiBack(2,2),
   Defender = task.defendKick(),
   Special = task.sideBack(),
   Assister = task.markingFront("First"),

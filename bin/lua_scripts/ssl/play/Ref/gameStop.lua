@@ -6,9 +6,11 @@ local theirIndirectKick=vision:next_gameState():theirIndirectKick()
 if OPPONENT_NAME == "PureDefence8" then
      if ball.refPosX() < -480/1200*param.pitchLength and math.abs(ball.refPosY()) > 300/900*param.pitchWidth then
             gCurrentPlay = "Ref_CornerDef8"
-        elseif ball.refPosX() > 0 then
+        elseif ball.refPosX() > 100/1200*param.pitchLength then
             gCurrentPlay = "Ref_FrontDef8"
-        elseif ball.refPosX() < 0 then
+        elseif ball.refPosX() >-100/1200*param.pitchLength then
+            gCurrentPlay = "Ref_MiddleDef8"
+        else
             gCurrentPlay = "Ref_BackDef8"
         -- elseif ball.refPosX() < -(param.pitchLength/2 - param.penaltyDepth - 100) and -(param.pitchLength/2 - param.penaltyDepth)<= ball.refPosX() and math.abs(ball.refPosY()) < param.penaltyWidth/2 + 100 then
         --     gCurrentPlay = "Ref_StopV3_normal"
