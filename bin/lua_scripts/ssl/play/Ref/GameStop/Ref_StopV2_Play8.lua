@@ -112,30 +112,29 @@ gPlayTable.CreatePlay{
 },
 
 ["CornerDefendStop"]= {
-    --1defendKick 1or2個multiBack 1個sideBack 1個sideBack_Ultra 1個 
   switch   = SwitchBallArea,
-  Leader   =task.stop(),
-  Assister =task.stop(),
-  Middle   = task.stop(),
-  Special  = task.stop(),
-  Defender = task.stop(),
-  Crosser  = task.stop(),
-  Breaker  = task.stop(),
-  Goalie   = task.stop(),
-  match    = "[LAMSDCB]"
+  Leader   = task.defendMiddle(),
+  Assister = task.markingFront("First"),
+  Middle   = task.sideBack(),
+  Special  = task.support("Leader",DetectTheSupportID), 
+  Defender = task.leftBack(),
+  Crosser  = task.rightBack(),
+  Breaker  = task.sideBackUltra(),
+  Goalie   = task.goalieNew(),
+  match    = "[L][DC][S][M][A][B]"
 },  
 
 ["BackDefendStop"]= {
   switch   = SwitchBallArea,
-  Leader   =task.stop(),
-  Assister =task.stop(),
-  Middle   = task.stop(),
-  Special  = task.stop(),
-  Defender = task.stop(),
-  Crosser  = task.stop(),
-  Breaker  = task.stop(),
-  Goalie   = task.stop(),
-  match    = "[LAMSDCB]"
+  Leader   = task.defendKick(),
+  Assister = task.markingFront("First"),
+  Middle   = task.sideBack(),
+  Special  = task.support("Middle",DetectTheSupportID), 
+  Defender = task.leftBack(),
+  Crosser  = task.rightBack(),
+  Breaker  = task.sideBackUltra(),
+  Goalie   = task.goalieNew(),
+  match    = "[L][DC][S][A][B][M]"
 },  
 
   name = "Ref_StopV2_Play8",

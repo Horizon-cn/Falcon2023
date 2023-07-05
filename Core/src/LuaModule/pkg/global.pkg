@@ -14,6 +14,7 @@ CKickDirection* kickDirection;
 CGPUBestAlgThread* bestAlg;
 CDefPos2015* defPos2015;
 CGuardPos* guardPos;
+CSidePos* sidePos;
 CDefPos2013* defPos2013;
 CTandemPos* tandemPos;
 CBestPlayer* bestPlayer;

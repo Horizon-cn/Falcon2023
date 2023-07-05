@@ -10,6 +10,7 @@ CGPUBestAlgThread* bestAlg;
 CDefPos2015* defPos2015;
 CDefPos2013* defPos2013;
 CGuardPos* guardPos;
+CSidePos* sidePos;
 CIndirectDefender* indirectDefender;
 CTandemPos* tandemPos;
 CBestPlayer* bestPlayer;
@@ -43,6 +44,7 @@ void initializeSingleton()
 	supportPos2022  = SupportPos2022::Instance();
 	defPos2015		= DefPos2015::Instance();
 	guardPos        = GuardPos::Instance();
+	sidePos			= SidePos::Instance();
 	defPos2013		= DefPos2013::Instance();
 	bestPlayer		= BestPlayer::Instance();
 	defenceInfo		= DefenceInfo::Instance();

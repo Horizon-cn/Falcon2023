@@ -1,0 +1,7 @@
+$#include "SidePos.h"
+
+class CSidePos
+{
+    CSidePos();
+    CGeoPoint ultraPos();
+};

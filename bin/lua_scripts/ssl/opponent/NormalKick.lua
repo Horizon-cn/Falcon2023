@@ -32,4 +32,5 @@ gOppoConfig = {
 	--AutoChange用"Test_play8_AUTO"
 	--JLC新写  Test_play8ForPower  打得非常凶
 	--TYH版本：Test_play8_Strong_Tyh
+	--Test_play8_Ning 不要用 有问题
 }
