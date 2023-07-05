@@ -34,10 +34,9 @@ namespace {
 		S_CHECK2,
 		S_END
 	};
-	bool VERBOSE = true; //
-	const int dribblePower = 3; //吸球力度
+	bool VERBOSE = true;
 	const int maxGetBall = 50;
-	const double stopDist = 3;
+	const double stopDist = 0;
 	int GETBALLMAXCNT = 5;
 	int WAIT_BUFFER = 2000;
 
@@ -83,8 +82,8 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	CVector target2ball = ball.Pos() - target;
 	CVector ball2ourGoal = ball.Pos() - ourGoal;
 	CVector ourGoal2ball = ourGoal - ball.Pos();
-	bool isBallOutside = abs(ball.Pos().y()) >= (Param::Field::PITCH_WIDTH / 2 - 30) || (abs(ball.Pos().x())) >= (Param::Field::PITCH_LENGTH / 2 - 30);
-	
+	bool isBallOutside = (abs(ball.Pos().y()) > (Param::Field::PITCH_WIDTH / 2 - 50)) || (abs(ball.Pos().x())) > (Param::Field::PITCH_LENGTH / 2 - 50);
+	bool isMeOutside = (abs(me.Pos().y()) > (Param::Field::PITCH_WIDTH / 2 - 60)) || (abs(me.Pos().x())) > (Param::Field::PITCH_LENGTH / 2 - 60);
 
 
 
@@ -136,7 +135,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		break;
 
 	case S_BACK:
-		if(!isBallOutside) {
+		if(possession>0.9&&(!isBallOutside||!isMeOutside)) {
 			new_state = S_CHECK1;
 			cnt = 0;
 		}
@@ -159,7 +158,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		break;
 		
 	case S_WAIT:
-		if ((ball.Pos() - me.Pos()).mod() > 50) {
+		if ((ball.Pos() - me.Pos()).mod() > 50 && possession < 0.1) {
 			new_state = S_GOTOBALL_1;
 			cnt = 0;
 		}
@@ -167,7 +166,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		break;
 		//吸球行进
 	case S_TURN:
-		if ((ball.Pos() - targetPos).mod() < 5) {
+		if (((ball.Pos() - targetPos).mod() < 5 || (me.Pos() - targetPos).mod() < 15) && possession > 0.9) {
 			new_state = S_CHECK2;
 			cnt = 0;
 		}
@@ -246,7 +245,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	}
 
 	setState(new_state);
-	DribbleStatus::Instance()->setDribbleCommand(vecNumber, dribblePower);
+	DribbleStatus::Instance()->setDribbleCommand(vecNumber, 3);
 
 	/***************************************************/
 	/*执行具体动作 -by lsp*/
