@@ -1,4 +1,4 @@
-IS_TEST_MODE = false
+IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 
