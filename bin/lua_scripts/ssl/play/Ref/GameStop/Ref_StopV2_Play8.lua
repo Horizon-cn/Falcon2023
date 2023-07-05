@@ -5,6 +5,8 @@ local RECEIVE_POS_2 = CGeoPoint:new_local(-110/1200*param.pitchLength,70/900*par
 local SwitchBallArea = function()
   if cond.isGameOn() then
     return "exit"
+  elseif math.abs(ball.posX())<15 and math.abs(ball.posY())<15 then
+    return "kickoff1"
   elseif ball.posX() > 480 and math.abs(ball.posY()) > 300 then --我方CornerKick
     return "CornerKickStop"
   elseif ball.posX() > 100 then --我方FrontKick
@@ -55,6 +57,20 @@ end
 ------------------------
 gPlayTable.CreatePlay{
   firstState = "BackDefendStop",
+
+["kickoff1"]= {
+  switch   = SwitchBallArea,
+  Leader   = task.goCmuRush(START_POS,math.pi,_,flag.allow_dss),
+  Assister = task.goCmuRush(RECEIVE_POS_1,receive_dir,_,flag.allow_dss),
+  Special  = task.goCmuRush(RECEIVE_POS_2,receive_dir,_,flag.allow_dss),
+  Middle   = task.multiBack(4,1),
+  Defender = task.multiBack(4,2),
+  Breaker  = task.multiBack(4,3),
+  Crosser  = task.multiBack(4,4),
+  Goalie   = task.goalieNew(),
+  match    = "[L][A][S][MDBC]"
+},
+
 ["CornerKickStop"]= {
   switch   = SwitchBallArea,
   Assister = task.goCmuRush(WAIT_BALL_POS, KICK_DIR, ACC, STOP_DSS),

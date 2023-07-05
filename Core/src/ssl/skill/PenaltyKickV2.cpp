@@ -293,7 +293,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             KickStatus::Instance()->clearAll();
             if (isDirOK(pVision, _executor, KickorPassDir, 1) && pVision->Ball().X() <= -100)
             {
-                KickStatus::Instance()->setKick(_executor, 250);
+                KickStatus::Instance()->setKick(_executor, 290);
                 DribbleStatus::Instance()->setDribbleCommand(_executor, 0);
                 //if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot FAR", COLOR_ORANGE);
                 GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), " Let Shoot FAR", COLOR_ORANGE);
@@ -301,7 +301,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             if (isDirOK(pVision, _executor, KickorPassDir, 1) && pVision->Ball().X() >= -100 && pVision->Ball().X() <= 100)
                 //if(pVision->Ball().X() <= 50)
             {
-                KickStatus::Instance()->setKick(_executor, 190); // kick lightly
+                KickStatus::Instance()->setKick(_executor, 240); // kick lightly
                 DribbleStatus::Instance()->setDribbleCommand(_executor, 0);
                 // setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), KickorPassDir));
                 //if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot Near", COLOR_ORANGE);
@@ -310,7 +310,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             if (isDirOK(pVision, _executor, KickorPassDir, 1) && pVision->Ball().X() >= 100)
                 //if(pVision->Ball().X() <= 50)
             {
-                KickStatus::Instance()->setKick(_executor, 160); // kick lightly
+                KickStatus::Instance()->setKick(_executor, 190); // kick lightly
                 DribbleStatus::Instance()->setDribbleCommand(_executor, 0);
                 //if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot very Near", COLOR_ORANGE);
                 GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot Near", COLOR_ORANGE);

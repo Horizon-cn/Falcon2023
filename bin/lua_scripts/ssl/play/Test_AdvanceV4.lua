@@ -14,7 +14,7 @@ firstState = "advance",
 			return "advance";
 		end
 	end,
-	Leader = task.chaseNew(),
+	Leader = task.advance(),
 	Assister = task.support("Leader", 0),
 	--Hawk = task.protectBall(),
 	match    = "[L][A]"
