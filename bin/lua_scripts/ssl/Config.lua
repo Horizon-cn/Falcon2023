@@ -120,6 +120,7 @@ gRefPlayTable = {
 	--后场进攻
 	"Ref/BackKick/Ref_BackPush8",
 	"Ref/BackKick/Ref_BackKick",
+	"Ref/BackKick/Ref_BackPush_normal_chip",
 
 	--角球防守
 	"Ref/CornerDef/Ref_CornerDef8",
