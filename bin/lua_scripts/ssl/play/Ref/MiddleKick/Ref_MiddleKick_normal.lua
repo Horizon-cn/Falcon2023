@@ -50,7 +50,7 @@ gPlayTable.CreatePlay{
 
   ["get"] = {
     switch = function()
-      if bufcnt(player.toTargetDist("Special") < 20 or player.toTargetDist("Leader") < 20,"normal",500) then
+      if bufcnt(player.toTargetDist("Special") < 20 or player.toTargetDist("Assister") < 20,"normal",500) then
         return "move"
       end
     end,
@@ -67,7 +67,7 @@ gPlayTable.CreatePlay{
 
   ["move"]= {
     switch = function()
-      if bufcnt(player.toTargetDist("Assister") < 20, 60, 180) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 70, 500) then
         return "kick"
       end
     end,
@@ -101,7 +101,7 @@ gPlayTable.CreatePlay{
 
   ["receive"]= {
     switch = function()
-      if bufcnt(ball.toPlayerHeadDist("Special") < 5, "fast", 180) then
+      if bufcnt(ball.toPlayerHeadDist("Special") < 10, "fast", 180) then
         return "exit"
       end
     end,
@@ -113,7 +113,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[M][A][B][S][D][L][C]"
+    match    = "[M][S][B][L][D][C][A]"
   },
 
   name = "Ref_MiddleKick_normal",
