@@ -950,7 +950,7 @@ int CGPUBestAlgThread::getMatrix(const string file_name, int max_row_num, int ma
 
 void CGPUBestAlgThread::sendFieldRectangle() {
 	//区域边界debug信息
-	bool OpenDebug = false;
+	bool OpenDebug = true;
 	if (OpenDebug) {
 		for (int i = 0; i < AREANUM; i++) {
 			CGeoPoint leftUpPos = gpuCalcArea::processed_fieldRectangleArray[i]._leftUpPos;

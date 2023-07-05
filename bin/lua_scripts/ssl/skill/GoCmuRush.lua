@@ -19,6 +19,12 @@ function GoCmuRush(task)
 	execute = function(runner)
 		if runner >=0 and runner < param.maxPlayer then
 			if mrole ~= "" then
+				if mrole == "support" then
+					if type(task.num) == "function" then
+						task.num =task.num()
+					end
+					mrole = mrole..task.num
+				end
 				CRegisterRole(runner, mrole)
 			end
 		else

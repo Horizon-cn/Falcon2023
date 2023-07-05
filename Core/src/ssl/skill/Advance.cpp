@@ -290,13 +290,13 @@ void CAdvance::plan(const CVisionModule* pVision)
 		break;
 		*/
 	}
-	/*
 	
+	/*
 	if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
 		//_state = PUSHOUT;
 		//_state = GET;
 		//_state = BREAKSHOOT;
-		_state = BREAKSHOOT;
+		_state = JUSTCHIPPASS;
 	}
 	else _state = GET;
 	*/
@@ -528,7 +528,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if(OppIsFarThanMe(pVision, _executor))
 			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
 		else
-			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir, 260.0));
+			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir, 100));
 		break;
 
 	case CHASEKICK:

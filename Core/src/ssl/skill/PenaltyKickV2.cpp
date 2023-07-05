@@ -133,8 +133,8 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
     case GET:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push GET", COLOR_YELLOW);
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -200), to_string(meHasBall).c_str());
-        if (meHasBall > 5) {
-
+        if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3) {
+            
             if (fabs(opp.VelX()) > 200 && opp.X() < 430) {
                 _state = BREAKSHOOT; break;
             }
@@ -171,6 +171,11 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         if (meLoseBall > 18 && ball2meDist > 10) _state = GET;
         break;
 
+    case CHASEKICK:
+        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -400), "Push CHASEKICK", COLOR_YELLOW);
+        if (meLoseBall > 18 && ball2meDist > 10) _state = GET;
+        break;
+
     case LIGHT_KICK:
         if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 400), "LIGHT KICk", COLOR_YELLOW);
         if (Advance_DEBUG_ENGINE) { cout << "light kick -> lightkick" << endl; }
@@ -181,14 +186,14 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         else if (me2goal.mod() < KICK_DIST || Me2OppTooclose(pVision, _executor)) {
             if (Advance_DEBUG_ENGINE) { cout << "light kick -> shoot" << endl; }
             if (tendToShoot(pVision, _executor)) {
-                if (isMeHasBall > 5)
+                if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3)
                     _state = KICK;
                 else
                     _state = GET;
                 break;
             }
             else {
-                if (isMeHasBall > 5)
+                if (BallStatus::Instance()->getBallPossession(true, _executor) > 0.3)
                     _state = BREAKSHOOT;
                 else
                     _state = GET;
@@ -264,6 +269,12 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
         setSubTask(PlayerRole::makeItBreak(_executor, 0, true, true, true));
         break;
 
+    case CHASEKICK:
+        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "CHASEKICK", COLOR_YELLOW);
+        KickorPassDir = KickDirection::Instance()->getPointShootDir(pVision, pVision->OurPlayer(_executor).Pos());
+        if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -400), "CHASEKICK", COLOR_ORANGE);
+        setSubTask(PlayerRole::makeItChaseKickV2(_executor, KickorPassDir, ShootNotNeedDribble));
+        break;
 
     case LIGHT_KICK:
         if (!shootfarflag)
@@ -282,7 +293,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             KickStatus::Instance()->clearAll();
             if (isDirOK(pVision, _executor, KickorPassDir, 1) && pVision->Ball().X() <= -100)
             {
-                KickStatus::Instance()->setKick(_executor, 290);
+                KickStatus::Instance()->setKick(_executor, 250);
                 DribbleStatus::Instance()->setDribbleCommand(_executor, 0);
                 //if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot FAR", COLOR_ORANGE);
                 GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), " Let Shoot FAR", COLOR_ORANGE);
@@ -290,7 +301,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             if (isDirOK(pVision, _executor, KickorPassDir, 1) && pVision->Ball().X() >= -100 && pVision->Ball().X() <= 100)
                 //if(pVision->Ball().X() <= 50)
             {
-                KickStatus::Instance()->setKick(_executor, 210); // kick lightly
+                KickStatus::Instance()->setKick(_executor, 190); // kick lightly
                 DribbleStatus::Instance()->setDribbleCommand(_executor, 0);
                 // setSubTask(PlayerRole::makeItSimpleGoto(_executor, ball.Pos(), KickorPassDir));
                 //if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot Near", COLOR_ORANGE);
@@ -299,7 +310,7 @@ void CPenaltyKickV2::plan(const CVisionModule* pVision)
             if (isDirOK(pVision, _executor, KickorPassDir, 1) && pVision->Ball().X() >= 100)
                 //if(pVision->Ball().X() <= 50)
             {
-                KickStatus::Instance()->setKick(_executor, 180); // kick lightly
+                KickStatus::Instance()->setKick(_executor, 160); // kick lightly
                 DribbleStatus::Instance()->setDribbleCommand(_executor, 0);
                 //if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot very Near", COLOR_ORANGE);
                 GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Let Shoot Near", COLOR_ORANGE);
