@@ -54,15 +54,19 @@ gPlayTable.CreatePlay{
         return "move"
       end
     end,
-    Assister = task.goCmuRush(WAIT_BALL_POS,_,_,flag.allow_dss + flag.dodge_ball),
-    Special  = task.goCmuRush(BLOCK_POS,_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.goCmuRush(BARYCENTER,_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
+    Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(RECEIVE_POS2),_,flag.allow_dss + flag.dodge_ball),
+    Special  = task.goCmuRush(BLOCK_POS,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
+    Leader   = task.goCmuRush(BARYCENTER,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
+    Middle   = task.stop(),
+    Defender = task.stop(),
+    Breaker  = task.stop(),
+    Crosser  = task.stop(),   
+    -- Middle   = task.multiBack(4,1),
+    -- Defender = task.multiBack(4,2),
+    -- Breaker  = task.multiBack(4,3),
+    -- Crosser  = task.multiBack(4,4),
     Goalie   = task.goalieNew(),
-    match    = "[A][B][C][S][D][L][M]"
+    match    = "[A][L][S][B][D][C][M]"
   },
 
   ["move"]= {
@@ -72,29 +76,37 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.staticGetBall(RECEIVE_POS2),
-    Special  = task.goCmuRush(RECEIVE_POS2,_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.goCmuRush(BARYCENTER,_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
-    match    = "[A][B][C][S][D][L][M]"
+    Special  = task.goCmuRush(RECEIVE_POS2,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
+    Leader   = task.goCmuRush(BARYCENTER,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
+    Middle   = task.stop(),
+    Defender = task.stop(),
+    Breaker  = task.stop(),
+    Crosser  = task.stop(),    
+    -- Middle   = task.multiBack(4,1),
+    -- Defender = task.multiBack(4,2),
+    -- Breaker  = task.multiBack(4,3),
+    -- Crosser  = task.multiBack(4,4),
+    match    = "[A][L][S][B][D][C][M]"
   },
 
   ["kick"]= {
     switch = function()
-      if bufcnt(player.kickBall("Assister"), 3, 180) then
+      if bufcnt(player.kickBall("Assister"), "fast", 180) then
         return "receive"
       end
     end,
     Assister = task.chipPass(RECEIVE_POS2,KICK_POWER),
-    Special  = task.goCmuRush(RECEIVE_POS2,_,_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.goCmuRush(BLOCK_POS2,_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
-    match    = "[A][B][C][S][D][L][M]"
+    Special  = task.goCmuRush(RECEIVE_POS2,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
+    Leader   = task.goCmuRush(BLOCK_POS2,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
+    Middle   = task.stop(),
+    Defender = task.stop(),
+    Breaker  = task.stop(),
+    Crosser  = task.stop(),
+    -- Middle   = task.multiBack(4,1),
+    -- Defender = task.multiBack(4,2),
+    -- Breaker  = task.multiBack(4,3),
+    -- Crosser  = task.multiBack(4,4),
+    match    = "[S][L][A][B][D][C][M]"
   },
 
   ["receive"]= {
@@ -106,11 +118,15 @@ gPlayTable.CreatePlay{
     Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss + flag.dodge_ball),
     Special  = task.receive(ball.pos(),RECEIVE_POS2),
     Leader   = task.goCmuRush(BLOCK_POS2,_,_,flag.allow_dss + flag.dodge_ball),
-    Middle   = task.multiBack(4,1),
-    Defender = task.multiBack(4,2),
-    Breaker  = task.multiBack(4,3),
-    Crosser  = task.multiBack(4,4),
-    match    = "[S][B][C][A][D][L][M]"
+    Middle   = task.stop(),
+    Defender = task.stop(),
+    Breaker  = task.stop(),
+    Crosser  = task.stop(),
+    -- Middle   = task.multiBack(4,1),
+    -- Defender = task.multiBack(4,2),
+    -- Breaker  = task.multiBack(4,3),
+    -- Crosser  = task.multiBack(4,4),
+    match    = "[S][L][A][B][D][C][M]"
   },
 
   name = "Ref_MiddleKick_normal",

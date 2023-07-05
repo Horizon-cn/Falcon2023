@@ -9,12 +9,12 @@ gPlayTable.CreatePlay{
       end
     end,
   Leader = task.sideBack(),
-  Hawk = task.multiBack(4,1),
-  Middle = task.multiBack(4,2),
-  Special = task.multiBack(4,3),
+  Hawk = task.multiBack(3,1),
+  Middle = task.multiBack(3,2),
+  Special = task.multiBack(3,3),
   Assister = task.markingFront("First"),
   Powerhouse = task.markingFront("Second"),
-  Defender = task.multiBack(4,4),
+  Defender = task.defendKick(),
   Goalie = task.goalieNew(),
   match    = "[HMSD][L][AP]"
 },

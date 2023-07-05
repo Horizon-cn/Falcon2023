@@ -11,7 +11,7 @@ gOppoConfig = {
 
 	MiddleKick    = {"Ref_MiddleKick_normal"},
 
-	BackKick    = {"Ref_BackKick"},
+	BackKick    = {"Ref_BackPush_normal_chip"},
 	
 -------------------------------Def---------------------------------------------------
 

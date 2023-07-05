@@ -3,9 +3,9 @@ IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 
 if not IS_YELLOW then
-	OPPONENT_NAME = "NormalKick"-- PureDefence8 NormalKick
+	OPPONENT_NAME = "PureDefence8"-- PureDefence8 NormalKick
 else
-	OPPONENT_NAME = "PureDefence8"
+	OPPONENT_NAME = "NormalKick"
 end
 
 gTestPlay = function ()
@@ -29,7 +29,7 @@ gSwitchNum = {
 -- 有0号在场门将就是0号，没有0号在场，看这里设置的号码
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
-	["Kicker"]   = {15},
+	["Kicker"]   = {11},
 	["Goalie"]   = {0},
 	["Tier"]	 = {13},
 	["Receiver"] = {12}
