@@ -2,6 +2,14 @@
 --当6到8辆车时，优先匹配Support，再到Protect，且保证后场时也有4号区域的Support
 --当5辆车时，防守主要匹配三后卫加Protect，有很前场进攻机会时Protect + Support
 --当4辆车时，一定是Advance + 三后卫
+----------------------------------------
+
+--Advance跟support的中场的配合   前场break多人要传球
+--multidefend 6車 放support
+--先marking再sideBack 
+--分三个   1.宁工
+--        2.强队
+--		  3.弱队	
 local AdjustOurRobotNum = world:OurRobotNum()
 local AdjustTheirRobotNum = world:TheirRobotNum()
 local EightRobot = 8
@@ -11,16 +19,27 @@ local FiveRobot = 5
 local FourRobot = 4
 local ThreeRobot = 3
 ---------------------------------------------------
---local SupportUp = 0
---local SupportDown = 2
+local SupportFrontUp = 0
+local SupportFrontDown = 2
+local SupportMiddleUp = 3
+local SupportMiddleDown = 5
 
--- local DetectBallArea = function() --NotYetDone
--- 	if ball.posY() < 0  then 
--- 		return SupportUp
--- 	else
--- 		return SupportDown
--- 	end
--- end
+local DetectBallAreaFront = function() 
+	if ball.posY() < 0  then 
+		return SupportFrontDown
+	else
+		return SupportFrontUp
+	end
+end
+
+local DetectBallAreaMiddle = function() 
+	if ball.posY() < 0  then 
+		return SupportMiddleUp
+	else
+		return SupportMiddleDown
+	end
+end
+
 local DivideArea = function(CornerHasBall,CornerNoBall,BackMiddleHasBall,BackMiddleNoBall,MiddleHasBall,MiddleNoBall,FrontHasBall,FrontNoBall)
 	AdjustOurRobotNum = world:OurRobotNum()
 	AdjustTheirRobotNum = world:TheirRobotNum()
@@ -174,22 +193,14 @@ local SwitchBallArea = function()
 							  "MiddleAttack_OurMore6")
 		--4或以下 VS 4或以下
 		elseif AdjustOurRobotNum <= FourRobot and AdjustTheirRobotNum <= FourRobot then 
-			return DivideArea("PureDefence",
+			return DivideArea("DefendFor-4or3Back",
 							  "PureDefence",
-							  "PureDefence",
-							  "PureDefence",
-							  "PureDefence",
-							  "PureDefence",
-							  "PureDefence",
-							  "PureDefence")
-			-- return DivideArea("HardAttack_Our5", --OurBall
-			-- 				  "MultiDefend_Our5",
-			-- 				  "MiddleAttack_Our5", --OurBall
-			-- 				  "MultiDefend_Our5",
-			-- 				  "MiddleAttack_Our5", --OurBall
-			-- 				  "MiddleDefendBalance_Our5",
-			-- 				  "MultiAttack_Our5", --OurBall
-			-- 				  "MiddleAttack_Our5")
+							  "DefendFor-4or3Back",
+							  "PureDefenceBack",
+							  "AttackFor-4or3MiddleFront",
+							  "DefendFor-4or3",
+							  "AttackFor-4or3MiddleFront",
+							  "AttackFor-4or3MiddleFront")
 		else
 		return DivideArea("HardAttack_OurMore6", --OurBall
 						  "MultiDefend_OurMore6",
@@ -228,7 +239,7 @@ firstState = "MiddleDefendBalance_OurMore6",
 	Crosser  = task.markingFront("First"),
 	Breaker  = task.support("Leader",4),
 	Goalie = task.goalieNew(),
-	match = "[L][AMS][D][C][B]"
+	match = "[L][AMS][C][D][B]"
 },
 
 ["MultiDefend_Our5"] = {
@@ -261,7 +272,7 @@ firstState = "MiddleDefendBalance_OurMore6",
 ["MultiAttack_OurMore6"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",2),
+	Assister = task.support("Leader",DetectBallAreaFront),
     Middle = task.markingFront("First"),
     Breaker  = task.protectBall(),
     Special = task.multiBack(3,1),
@@ -274,7 +285,7 @@ firstState = "MiddleDefendBalance_OurMore6",
 ["MultiAttack_Our5"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",2),
+	Assister = task.support("Leader",DetectBallAreaFront),
     Middle = task.markingFront("First"),
     Breaker  = task.protectBall(),
     Special = task.multiBack(3,1),
@@ -287,7 +298,7 @@ firstState = "MiddleDefendBalance_OurMore6",
 ["MultiAttack_Ourless4"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",2),
+	Assister = task.support("Leader",DetectBallAreaFront),
     Middle = task.markingFront("First"),
     Breaker  = task.protectBall(),
     Special = task.multiBack(3,1),
@@ -301,34 +312,34 @@ firstState = "MiddleDefendBalance_OurMore6",
 ["MiddleDefendBalance_OurMore6"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",2),
+	Assister = task.support("Leader",DetectBallAreaFront),
     Middle = task.protectBall(), 
     Special = task.markingFront("First"),
 	Defender = task.multiBack(3,1),
 	Crosser  = task.multiBack(3,2),	
 	Breaker  = task.multiBack(3,3),
 	Goalie = task.goalieNew(),
-    match = "[L][DCB][A][M][S]"
+    match = "[L][DC][A][B][S][M]"
 },
 
 ["MiddleDefendBalance_Our5"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",2),
+	Assister = task.support("Leader",DetectBallAreaFront),
     Middle = task.protectBall(), 
     Special = task.markingFront("First"),
 	Defender = task.multiBack(3,1),
 	Crosser  = task.multiBack(3,2),	
 	Breaker  = task.multiBack(3,3),
 	Goalie = task.goalieNew(),
-    match = "[L][DCB][M][S][A]"
+    match = "[L][DC][A][B][M][S]"
 },
 
 
 ["MiddleDefendBalance_Ourless4"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",2),
+	Assister = task.support("Leader",DetectBallAreaFront),
     Middle = task.protectBall(), 
     Special = task.markingFront("First"),
 	Defender = task.multiBack(3,1),
@@ -342,33 +353,33 @@ firstState = "MiddleDefendBalance_OurMore6",
 ["MiddleAttack_OurMore6"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",2),
+	Assister = task.support("Leader",DetectBallAreaFront),
     Middle =  task.protectBall(), 
     Special = task.markingFront("First"),
 	Defender = task.multiBack(3,1),
 	Crosser  = task.multiBack(3,2),
 	Breaker  = task.multiBack(3,3),
 	Goalie = task.goalieNew(),
-    match = "[L][DC][M][B][A][S]"
+    match = "[L][DC][A][M][B][S]"
 },
 
 ["MiddleAttack_Our5"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",2),
+	Assister = task.support("Leader",DetectBallAreaFront),
     Middle =  task.protectBall(), 
     Special = task.markingFront("First"),
 	Defender = task.multiBack(3,1),
 	Crosser  = task.multiBack(3,2),
 	Breaker  = task.multiBack(3,3),
 	Goalie = task.goalieNew(),
-    match = "[L][DC][M][A][B][S]"
+    match = "[L][DC][A][M][B][S]"
 },
 
 ["MiddleAttack_Ourless4"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader",2),
+	Assister = task.support("Leader",DetectBallAreaFront),
     Middle =  task.protectBall(), 
     Special = task.markingFront("First"),
 	Defender = task.multiBack(3,1),
@@ -431,6 +442,35 @@ firstState = "MiddleDefendBalance_OurMore6",
 	Breaker  = task.multiBack(3,3),
 	Goalie = task.goalieNew(),
     match = "[L][DCB][A][S][M]"
+},
+------------------------------------------------------------------------
+--以下为针对4车或以下打4车或以下的状态机
+--4車----1Advance 1Back 1 supporter
+--3車----1Advance 1Back
+["DefendFor-4or3Back"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.support("Leader",4), 
+    Middle = task.sideBack(), --task.marking("First"),
+    Special = task.markingFront("First"),
+	Defender = task.multiBack(3,1),
+	Crosser  =  task.multiBack(3,2),
+	Breaker  = task.multiBack(3,3),
+	Goalie = task.goalieNew(),
+    match = "[L][D][A][CB][S][M]"
+},
+
+["AttackFor-4or3MiddleFront"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.support("Leader",DetectBallAreaFront), 
+    Middle = task.sideBack(), --task.marking("First"),
+    Special = task.markingFront("First"),
+	Defender = task.multiBack(3,1),
+	Crosser  =  task.multiBack(3,2),
+	Breaker  = task.multiBack(3,3),
+	Goalie = task.goalieNew(),
+    match = "[L][D][A][CB][S][M]"
 },
 
 name = "Test_play8_AUTO",
