@@ -3,11 +3,11 @@ gOppoConfig = {
 
 	DirectCornerKick  = {"Ref_DirectCornerPush_normal"},
 
-	IndirectCornerKick  = {"Ref_IndirectCornerPush_normal_chip"},
+	-- IndirectCornerKick  = {"Ref_IndirectCornerPush_normal_chip"},
 
 	DirectFrontKick   = {"Ref_DirectFrontPush_normal"},
 
-	IndirectFrontKick   = {"Ref_IndirectFrontPush_normal_chip"},
+	-- IndirectFrontKick   = {"Ref_IndirectFrontPush_normal_chip"},
 
 	MiddleKick    = {"Ref_MiddleKick_normal"},
 

@@ -1,8 +1,10 @@
 if OPPONENT_NAME == "NormalKick" then
 	if ball.refPosX() > 480/1200*param.pitchLength and math.abs(ball.refPosY()) > 300/900*param.pitchWidth then
-	    dofile("../lua_scripts/ssl/play/Ref/IndirectCornerKick/IndirectCornerKick.lua")
+	    dofile("../lua_scripts/ssl/play/Ref/DirectCornerKick/DirectCornerKick.lua")
+	    -- dofile("../lua_scripts/ssl/play/Ref/IndirectCornerKick/IndirectCornerKick.lua")
 	elseif ball.refPosX() > 100/1200*param.pitchLength then
-	    dofile("../lua_scripts/ssl/play/Ref/IndirectFrontKick/IndirectFrontKick.lua")
+	    dofile("../lua_scripts/ssl/play/Ref/DirectFrontKick/DirectFrontKick.lua")
+	    -- dofile("../lua_scripts/ssl/play/Ref/IndirectFrontKick/IndirectFrontKick.lua")
 	elseif ball.refPosX()>-100/1200*param.pitchLength then
 	    dofile("../lua_scripts/ssl/play/Ref/MiddleKick/MiddleKick.lua")
 	else
