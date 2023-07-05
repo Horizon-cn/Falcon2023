@@ -16,7 +16,7 @@ gPlayTable.CreatePlay{
   Middle = task.multiBack(2,3),
   Defender = task.multiBack(3,3),
   Goalie = task.goalieNew(),
-  match    = "[A]" -- for test
+  match    = "[MD][AL][SBC]"
 },
   name = "Ref_CornerDef8",
   applicable = {
