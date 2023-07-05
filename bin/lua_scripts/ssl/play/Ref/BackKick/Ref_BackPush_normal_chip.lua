@@ -3,11 +3,11 @@ local WAIT_BALL_POS   = function ()
 end
 
 local SHOOT_POS = function()
-  return ball.pos()+Utils.Polar2Vector(500,ball.antiY()*math.pi/6)
+  return ball.pos()+Utils.Polar2Vector(400,ball.antiY()*math.pi/6)
 end
 
 local RECEIVE_POS = function()
-  return SHOOT_POS() + Utils.Polar2Vector(20,ball.toPointDir(SHOOT_POS())())
+  return SHOOT_POS() + Utils.Polar2Vector(20,ball.toPointDir(SHOOT_POS())()+math.pi)
 end
 
 local ASSIST_POS = function()
@@ -96,8 +96,8 @@ gPlayTable.CreatePlay{
         return "shootBall"
       end
     end,
-    Assister = task.support("Leader",4),
-    Leader   = task.receive(ball.pos(),RECEIVE_POS),
+    Assister = task.defendMiddle(),
+    Leader   = task.advance(),
     Middle   = task.support("Leader",DetectBallAreaFront),
     Special  = task.sideBack(),
     Defender = task.multiBack(3,1),
@@ -113,7 +113,7 @@ gPlayTable.CreatePlay{
         return "exit"
       end
     end,
-    Assister = task.support("Leader",4),
+    Assister = task.defendMiddle(),
     Leader   = task.advance(),
     Middle   = task.support("Leader",DetectBallAreaFront),
     Special  = task.sideBack(),
