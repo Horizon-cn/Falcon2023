@@ -572,54 +572,70 @@ void ObstaclesNew::addObs(const CVisionModule* pVision, const TaskT& task, bool 
 //                    if (abs(me2opp.dir() - myVel.dir()) < 15.0 / 180.0 * Param::Math::PI && opp.Pos().dist(projection_point) < Param::Vehicle::V2::PLAYER_SIZE + 5 + opp_predict_avoid + me_predict_avoid){
 //                        extra_avoid_dist = me_predict_avoid + opp_predict_avoid;
 //                    }
-                    extra_avoid_dist = me_predict_avoid + opp_predict_avoid;
-                }
-                double tempAvoidDist;
+					extra_avoid_dist = me_predict_avoid + opp_predict_avoid;
+				}
+				double tempAvoidDist;
                 if(oppAvoidDist < MIN_AVOID_DIST){
-                    tempAvoidDist = MIN_AVOID_DIST;
-//                    GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 10, 0.0, 360.0, COLOR_RED);
+					tempAvoidDist = MIN_AVOID_DIST;
+					//                    GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 10, 0.0, 360.0, COLOR_RED);
                 }
                 else{
-                    tempAvoidDist = MIN_AVOID_DIST + 2 * factor * (oppAvoidDist - MIN_AVOID_DIST) + 2 * extra_avoid_dist;
-//                    if (extra_avoid_dist > 0){
-//                        GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 2 * extra_avoid_dist, 0.0, 360.0, COLOR_BLUE);
-//                    }
-//                    else{
-//                        GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 10, 0.0, 360.0, COLOR_YELLOW);
-//                    }
-                }
+					tempAvoidDist = MIN_AVOID_DIST + 2 * factor * (oppAvoidDist - MIN_AVOID_DIST) + 2 * extra_avoid_dist;
+					//                    if (extra_avoid_dist > 0){
+					//                        GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 2 * extra_avoid_dist, 0.0, 360.0, COLOR_BLUE);
+					//                    }
+					//                    else{
+					//                        GDebugEngine::Instance()->gui_debug_arc(myPos + CVector(20, 20), 10, 0.0, 360.0, COLOR_YELLOW);
+					//                    }
+				}
 
 				if (isAdvancer) {
 					if (task.player.NeedCancelTheObstacleOppID == i)
 						continue; // 对于advancer而言，getball无需避开该持球车
 					else
 						addCircle(opp.Pos(), opp.Vel(), tempAvoidDist, OBS_CIRCLE_NEW);
-				}
+			}
                 else addCircle(opp.Pos(), opp.Vel(), tempAvoidDist * 1.25, OBS_CIRCLE_NEW);
-            }
-        }
+		}
+	}
     }
 
-    // 设置球的障碍
-    if (flags & PlayerStatus::DODGE_BALL) {
-        const BallVisionT& ball = pVision->Ball();
-        addCircle(ball.Pos(), ball.Vel(), ballAvoidDist, OBS_CIRCLE_NEW);
-    }
+	// 设置球的障碍
+	if (flags & PlayerStatus::DODGE_BALL) {
+		const BallVisionT& ball = pVision->Ball();
+		addCircle(ball.Pos(), ball.Vel(), ballAvoidDist, OBS_CIRCLE_NEW);
+	}
 
-    // 设置Stop时的障碍
+	// 设置Stop时的障碍
 	//cout << WorldModel::Instance()->CurrentRefereeMsg() << endl;
 
 	//GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 200), WorldModel::Instance()->CurrentRefereeMsg().c_str());
-    if (WorldModel::Instance()->CurrentRefereeMsg() == "gameStop" || (flags & PlayerStatus::AVOID_STOP_BALL_CIRCLE)) {
-        const BallVisionT& ball = pVision->Ball();
-        addCircle(ball.Pos(), CVector(0.0f, 0.0f), stopBallAvoidDist, OBS_CIRCLE_NEW);
-    }
+
+	// 没实现：
+	// 我方开球，没normal start，有个小的避球圈
+	// 我方点球，没normal start，避球
+	// 注意！！normal start不等同game on!
+	// 注意！！这个判断代码在ObstacleNew和SmartGotoPosition各有一份，应该同时维护！
+	auto& state = pVision->gameState();
+	bool game_not_on__but_we_can_kick = !state.gameOn() && (state.ourKickoff() || state.ourDirectKick() || state.ourIndirectKick() || state.ourPenaltyKick());
+	bool avoidBallCircle = !state.gameOn() &&
+		((flags & PlayerStatus::AVOID_STOP_BALL_CIRCLE) ||
+			WorldModel::Instance()->CurrentRefereeMsg() == "gameStop" ||
+			state.theirKickoff() ||
+			state.theirDirectKick() ||
+			state.theirIndirectKick() ||
+			state.theirPenaltyKick() ||
+			!game_not_on__but_we_can_kick);
+	if (avoidBallCircle) {
+		const BallVisionT& ball = pVision->Ball();
+		addCircle(ball.Pos(), CVector(0.0f, 0.0f), stopBallAvoidDist, OBS_CIRCLE_NEW);
+	}
 	if (WorldModel::Instance()->CurrentRefereeMsg() == "theirKickOff") {
 		const BallVisionT& ball = pVision->Ball();
 		addCircle(ball.Pos(), CVector(0.0f, 0.0f), stopBallAvoidDist, OBS_CIRCLE_NEW);
 	}
 	// Modified by TYH, 新增敌人kickoff我们需要躲避球圈。
-    if (drawObs) drawObstacles();
+	if (drawObs) drawObstacles();
 }
 
 void ObstaclesNew::addLongCircle(const CGeoPoint& x0, const CGeoPoint& x1, const CVector& v, double r, int type, bool isDynamic, bool drawObst) {
