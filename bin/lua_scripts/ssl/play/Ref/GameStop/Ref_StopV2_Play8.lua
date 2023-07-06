@@ -55,6 +55,9 @@ local DetectTheSupportID = function()
     end
 end
 ------------------------
+local DefendMiddlePos = CGeoPoint:new_local(-450/1200*param.pitchLength,0)
+------------------------
+
 gPlayTable.CreatePlay{
   firstState = "BackDefendStop",
 
@@ -66,8 +69,8 @@ gPlayTable.CreatePlay{
   Middle   = task.multiBack(4,1),
   Defender = task.multiBack(4,2),
   Breaker  = task.multiBack(4,3),
-  Crosser  = task.multiBack(4,4),
-  Goalie   = task.goalieNew(),
+  Crosser  = task.multiBack(4,4), 
+  Goalie   = task.goalieNew(),  
   match    = "[L][A][S][MDBC]"
 },
 
@@ -100,21 +103,21 @@ gPlayTable.CreatePlay{
 --接Ref_MiddleDef_Normal
 ["MiddleStop"]= {
   switch   = SwitchBallArea,
-  Leader   = task.defendKick(),
-  Assister = task.markingFront("First"),
-  Middle   = task.sideBack(),
-  Special  = task.support("Leader",DetectTheSupportID), 
-  Defender = task.multiBack(3,1),
-  Crosser  = task.multiBack(3,2),
-  Breaker  = task.multiBack(3,3),
-  Goalie   = task.goalieNew(),
+  Leader = task.defendKick(),
+    Assister =task.sideBack(),
+    Middle = task.support("Leader", DetectTheSupportID),
+    Special = task.defendMiddle(),-- sideBackUltra
+    Defender = task.leftBack(), 
+    Crosser  = task.rightBack(), 
+    Breaker  = task.sideBackUltra(),--task.markingFront("First"),
+    Goalie = task.goalieNew(),
   match    = "[L][DC][S][M][B][A]"
 },
 
 ["CornerDefendStop"]= {
   switch   = SwitchBallArea,
   Leader   = task.defendMiddle(),
-  Assister = task.markingFront("First"),
+  Assister = task.goCmuRush(DefendMiddlePos,player.toPointDir(SHOOT_POS),ACC,flag.allow_dss + flag.dodge_ball),
   Middle   = task.sideBack(),
   Special  = task.support("Leader",DetectTheSupportID), 
   Defender = task.leftBack(),
@@ -127,9 +130,9 @@ gPlayTable.CreatePlay{
 ["BackDefendStop"]= {
   switch   = SwitchBallArea,
   Leader   = task.defendKick(),
-  Assister = task.markingFront("First"),
+  Assister = task.multiBack(1,1),
   Middle   = task.sideBack(),
-  Special  = task.support("Middle",DetectTheSupportID), 
+  Special  = task.support("Leader",DetectTheSupportID), 
   Defender = task.leftBack(),
   Crosser  = task.rightBack(),
   Breaker  = task.sideBackUltra(),
