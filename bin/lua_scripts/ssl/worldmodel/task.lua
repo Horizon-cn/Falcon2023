@@ -138,7 +138,7 @@ function passToPos(p, c, precision)
 	return {mexe, mpos, kick.flat, idir, iprecision, ipower, cp.full(), flag.nothing}
 end
 
-function chipPass(p, c, f, anti)
+function chipPass(p, c, f, anti, flags)
 	local idir
 	local ipower
 	if type(p) == "string" then
@@ -184,8 +184,11 @@ function chipPass(p, c, f, anti)
 	else
 		ipower = c
 	end
+
+	local iflag
+	iflag = flags or flag.nothing
 	local mexe, mpos = ChaseKick{pos = ball.pos,dir = idir}
-	return {mexe, mpos, kick.chip, idir, pre.middle, kp.specified(0), ipower, flag.nothing}
+	return {mexe, mpos, kick.chip, idir, pre.middle, kp.specified(0), ipower, iflag}
 end
 
 function flatPass(role, power)

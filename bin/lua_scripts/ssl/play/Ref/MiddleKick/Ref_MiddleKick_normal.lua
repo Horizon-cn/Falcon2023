@@ -50,7 +50,7 @@ gPlayTable.CreatePlay{
 
   ["get"] = {
     switch = function()
-      if bufcnt(player.toTargetDist("Special") < 20 or player.toTargetDist("Leader") < 20,"normal",500) then
+      if bufcnt(player.toTargetDist("Special") < 20 or player.toTargetDist("Assister") < 20,"normal",500) then
         return "move"
       end
     end,
@@ -67,7 +67,7 @@ gPlayTable.CreatePlay{
 
   ["move"]= {
     switch = function()
-      if bufcnt(player.toTargetDist("Assister") < 20, 60, 180) then
+      if bufcnt(player.toPointDist("Assister", ball.pos()) < 20, 70, 500) then
         return "kick"
       end
     end,
@@ -88,7 +88,7 @@ gPlayTable.CreatePlay{
         return "receive"
       end
     end,
-    Assister = task.chipPass(RECEIVE_POS2,KICK_POWER),
+    Assister = task.chipPass(RECEIVE_POS2,KICK_POWER,_,_,flag.force_kick),
     Special  = task.goCmuRush(RECEIVE_POS2,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
     Leader   = task.goCmuRush(BLOCK_POS2,player.toBallDir,_,flag.allow_dss + flag.dodge_ball),
     Middle   = task.multiBack(3,1),
@@ -101,11 +101,11 @@ gPlayTable.CreatePlay{
 
   ["receive"]= {
     switch = function()
-      if bufcnt(ball.toPlayerHeadDist("Special") < 5, "fast", 180) then
+      if bufcnt(ball.toPlayerHeadDist("Special") < 10, "fast", 180) then
         return "exit"
       end
     end,
-    Assister = task.goCmuRush(RECEIVE_POS,_,_,flag.allow_dss + flag.dodge_ball),
+    Assister = task.support("Special",4),
     Special  = task.receive(ball.pos(),RECEIVE_POS2),
     Leader   = task.goCmuRush(BLOCK_POS2,_,_,flag.allow_dss + flag.dodge_ball),
     Middle   = task.multiBack(3,1),
@@ -113,7 +113,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[M][A][B][S][D][L][C]"
+    match    = "[M][S][B][L][D][C][A]"
   },
 
   name = "Ref_MiddleKick_normal",

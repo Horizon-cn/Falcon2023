@@ -96,7 +96,7 @@ gPlayTable.CreatePlay{
         return "receiveBall"
       end
     end,
-    Assister = task.chipPass(SHOOT_POS, KICK_POWER),
+    Assister = task.chipPass(SHOOT_POS, KICK_POWER,_,_,flag.force_kick),
     Leader   = task.goCmuRush(RECEIVE_POS,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Middle   = task.goCmuRush(BlockPos,player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Special  = task.sideBack(),
