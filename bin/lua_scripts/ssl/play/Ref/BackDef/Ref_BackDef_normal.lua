@@ -31,7 +31,7 @@ gPlayTable.CreatePlay{
       end
     end,
   Leader   = task.defendKick(),
-  Assister = task.markingFront("First"),
+  Assister = task.multiBack(1,1),
   Middle   = task.sideBack(),
   Special  = task.support("Middle",DetectTheSupportID), 
   Defender = task.leftBack(),

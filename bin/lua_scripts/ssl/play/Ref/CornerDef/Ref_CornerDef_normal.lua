@@ -20,6 +20,7 @@ local DetectTheSupportID = function()
     end
 end
 
+local DefendMiddlePos = CGeoPoint:new_local(-450/1200*param.pitchLength,0)
 
 gPlayTable.CreatePlay{
 
@@ -32,7 +33,7 @@ gPlayTable.CreatePlay{
       end
     end,
   Leader   = task.defendMiddle(),
-  Assister = task.markingFront("First"),
+  Assister = task.goCmuRush(DefendMiddlePos,player.toPointDir(SHOOT_POS),ACC,flag.allow_dss + flag.dodge_ball),
   Middle   = task.sideBack(),
   Special  = task.support("Leader",DetectTheSupportID), 
   Defender = task.leftBack(),

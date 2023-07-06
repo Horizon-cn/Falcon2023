@@ -33,10 +33,10 @@ gPlayTable.CreatePlay{
     Leader = task.defendKick(),
     Assister =task.sideBack(),
     Middle = task.support("Leader", DetectTheSupportID),
-    Special = task.defendMiddle(),-- sideBack_Ultra
+    Special = task.defendMiddle(),-- sideBackUltra
     Defender = task.leftBack(), 
     Crosser  = task.rightBack(), 
-    Breaker  = task.markingFront("First"),
+    Breaker  = task.sideBackUltra(),--task.markingFront("First"),
     Goalie = task.goalieNew(),
     match = "[L][DC][M][A][B][S]"
 },
