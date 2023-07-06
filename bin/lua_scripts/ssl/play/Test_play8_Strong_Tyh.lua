@@ -61,7 +61,7 @@ local SwitchBallArea = function()
             return DivideArea("SixAttackFront", "SixAttackBack")
         end
     else
-        return "ChaseRush"
+        return DivideArea("ChaseRushFront", "ChaseRushBack")
     end
 end
 gPlayTable.CreatePlay{
@@ -100,7 +100,15 @@ firstState = "SixAttackFront",
     match = "[L][AM][S][C][DB]"
 },
 
-["ChaseRush"] = {
+["ChaseRushFront"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.leftBack(),
+    Middle = task.rightBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][AM]"
+},
+["ChaseRushBack"] = {
 	switch = SwitchBallArea,
 	Leader = task.chaseNew(),
 	Assister = task.leftBack(),
@@ -114,7 +122,7 @@ firstState = "SixAttackFront",
 	Leader = task.advance(),
 	Assister = task.support("Leader",DetectTheSupportID), 
     Middle = task.sideBack(), 
-    Special = task.sideBack("First"),
+    Special = task.protectBall(),
 	Defender = task.leftBack(),
 	Crosser  =  task.rightBack(),
 	Breaker  = task.defendMiddle(),
