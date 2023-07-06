@@ -431,7 +431,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -420), ("Opp_Ahead:"+ to_string(opp_ahead(pVision, _executor))).c_str(), COLOR_YELLOW);
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -440), ("CanSupportKick:" + to_string(CanSupportKick(pVision, _executor))).c_str(), COLOR_YELLOW);
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -460), ("ClosetoPosPlayerDist:" + to_string(pVision->TheirPlayer(getTheirMostClosetoPosPlayerNum(pVision, SupportPoint[TheBestSupportNumber])).Pos().dist(SupportPoint[TheBestSupportNumber]))).c_str(), COLOR_YELLOW);
-		if (opp_ahead(pVision, _executor)>=5 && CanSupportKick(pVision, _executor) && pVision->TheirPlayer(getTheirMostClosetoPosPlayerNum(pVision, SupportPoint[TheBestSupportNumber])).Pos().dist(SupportPoint[TheBestSupportNumber]) >= 60)
+		if (opp_ahead(pVision, _executor)>=4 && IHaveSupport && pVision->TheirPlayer(getTheirMostClosetoPosPlayerNum(pVision, SupportPoint[TheBestSupportNumber])).Pos().dist(SupportPoint[TheBestSupportNumber]) >= 60)
 		{
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS__PASS", COLOR_YELLOW);
 			PassPoint = SupportPoint[TheBestSupportNumber];
@@ -663,8 +663,8 @@ bool CAdvance::isTheLineBlocked(const CVisionModule* pVision, CGeoPoint startPoi
 bool CAdvance::IsOurNearHere(const CVisionModule* pVision, int supportIndex, int vecNumber) {
 	int supporter = TaskMediator::Instance()->supporter(supportIndex);
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
-	if(pVision->OurPlayer(supporter).Pos().dist(me.Pos()) > 200)
-		if (supporter != 0 && pVision->OurPlayer(supporter).Pos().dist(SupportPoint[supportIndex]) < 35)
+	if(pVision->OurPlayer(supporter).Pos().dist(me.Pos()) > 160)
+		if (supporter != 0 && pVision->OurPlayer(supporter).Pos().dist(SupportPoint[supportIndex]) < 60)
 			return true;
 	return false;
 }
@@ -864,13 +864,15 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 	double theMinOppDist_threshold = 50, supportMustNearerDist = 100;
 	/**********************************************************************************************************************/
 	//判定支撑点是否可用
+
 	for (int i = 0; i < NumberOfSupport; ++i) {
 		isOurNearPointAndFarOfMe[i] = IsOurNearHere(pVision, i, vecNumber);
 		ChangeDir[i] = fabs(Utils::Normalize(me.Dir() - (SupportPoint[i] - me.Pos()).dir()));								//传球到点“我”需要改变的角度
-		theMinOppDistToThePoint[i] =  getTheirMostClosetoPosPlayerNum(pVision, me.Pos());
+		theMinOppDistToThePoint[i] =  pVision->TheirPlayer(getTheirMostClosetoPosPlayerNum(pVision, SupportPoint[i])).Pos().dist(SupportPoint[i]);
 		NearThanMe[i] = (theirCenter.dist(SupportPoint[i]) + supportMustNearerDist < theirCenter.dist(me.Pos()));
-
-		if (isOurNearPointAndFarOfMe[i] && theMinOppDistToThePoint[i] < theMinOppDist_threshold) {
+		
+		if (isOurNearPointAndFarOfMe[i] && theMinOppDistToThePoint[i] > theMinOppDist_threshold) {
+			
 			if (MeIsInWhichArea == CanNOTBreakArea || MeIsInWhichArea == CornerArea || MeIsInWhichArea == KICKArea) {
 				isCanUse[i] = 1;
 			}
