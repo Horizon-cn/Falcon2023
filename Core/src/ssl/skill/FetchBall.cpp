@@ -26,8 +26,7 @@ namespace {
 
 		S_GOTOBALL = 1,//若球在场外使用该state开始
 		S_GOTOBALL_1, //若球在场内使用该state
-		S_GETBALL1,
-		S_GETBALL2,
+		S_GETBALL,
 		S_BACK,
 		S_CHECK1,
 		S_WAIT,
@@ -107,32 +106,29 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	case S_GOTOBALL_1:
 		if (isBallOutside) new_state = S_GOTOBALL;
 		else if ((me.Pos() - ball.Pos()).mod() < 20 && std::abs((me.Pos() - ball.Pos()).dir() - (ball.Pos() - targetPos).dir()) < 0.5) {
-			new_state = S_GETBALL2;
+			new_state = S_GETBALL;
 			//new_state = S_GOTOBALL;
 		}
 		break;
 		//场外拿球
 	case S_GOTOBALL:
 		if ((me.Pos() - ball.Pos()).mod() < 20) {
-			new_state = S_GETBALL1;
+			new_state = S_GETBALL;
 			//new_state = S_GOTOBALL;
 		}
 		break;
 
 
 		//拿球
-	case S_GETBALL1:
+	case S_GETBALL:
 		//判断是否拿到球
 		if (possession >= 0.9) {
-			new_state = S_BACK;
-			cnt = 0;
-		}
-		cnt++;
-		break;
-
-	case S_GETBALL2:
-		if (possession >= 0.9) {
-			new_state = S_TURN;
+			if (isBallOutside) {
+				new_state = S_BACK;
+			}
+			else {
+				new_state = S_TURN;
+			}
 			cnt = 0;
 		}
 		cnt++;
@@ -217,13 +213,9 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GOTOBALL_1", COLOR_CYAN);
 		}
-		else if (S_GETBALL1 == getState())
+		else if (S_GETBALL == getState())
 		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GETBALL1", COLOR_CYAN);
-		}
-		else if (S_GETBALL2 == getState())
-		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GETBALL2", COLOR_CYAN);
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GETBALL", COLOR_CYAN);
 		}
 		else if (S_BACK == getState())
 		{
@@ -265,11 +257,14 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	else if (S_GOTOBALL_1 == state()) {
 		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DODGE_BALL | PlayerStatus::NOT_DODGE_PENALTY, stopDist));
 	}
-	else if (S_GETBALL1 == state()) {
-		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, S_GOTOBALL_getball_dir, CVector(0, 0), flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
-	}
-	else if (S_GETBALL2 == state()) {
-		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
+	else if (S_GETBALL == state()) {
+		if (isBallOutside) {
+			setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, faceDir, CVector(0, 0), flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
+		}
+		else {
+			setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
+		}
+		
 	}
 	
 	else if (S_BACK == state()) {
