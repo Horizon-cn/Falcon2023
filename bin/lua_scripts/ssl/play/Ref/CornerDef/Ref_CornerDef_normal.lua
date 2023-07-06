@@ -40,7 +40,8 @@ gPlayTable.CreatePlay{
   Crosser  = task.rightBack(),
   Breaker  = task.sideBackUltra(),
   Goalie   = task.goalieNew(),
-  match    = "[L][DC][S][M][A][B]"
+  --match    = "[L][DC][S][M][A][B]"
+  match    = "[L][M][D][S][C][A][B]"
 },
   name = "Ref_CornerDef_normal",
   applicable = {

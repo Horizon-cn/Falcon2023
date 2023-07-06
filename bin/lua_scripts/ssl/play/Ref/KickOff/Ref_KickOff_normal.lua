@@ -192,7 +192,7 @@ firstState = "start",
   Breaker  = task.multiBack(3,3),
   Crosser  = task.defendMiddle(),--task.markingFront("First"),
   Goalie   = task.goalieNew(),
-  match    = "[A][L][MD][S][B][C]"
+  match    = "[S][L][MD][A][B][C]"
 },
 
 
