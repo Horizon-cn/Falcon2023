@@ -91,7 +91,7 @@ firstState = "start",
 
 ["getball1"] = {
   switch = function ()
-    if bufcnt(player.toTargetDist("Leader")<20 ,70,100)  then
+    if bufcnt(player.toPointDist("Leader", ball.pos()) < 20 ,70,100)  then
       return "kickoftoA" -- y>0 getball is correct
     end
   end,
@@ -108,7 +108,7 @@ firstState = "start",
 
 ["getball2"] = {
   switch = function ()
-    if bufcnt(player.toTargetDist("Leader")<20 ,70,100)  then
+    if bufcnt(player.toPointDist("Leader", ball.pos()) < 20 ,70,100)  then
       return "kickoftoS"
     end
   end,

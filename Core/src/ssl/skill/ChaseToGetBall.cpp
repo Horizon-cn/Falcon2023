@@ -461,6 +461,9 @@ void CChaseToGetBall::plan(const CVisionModule* pVision)
 	//5.根据当前信息综合决定球的预测位置: 离球越近或者是球速越小，预测量应随之越小//对预测位置加了修正
 	// TODO　TODO  TODO
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	setState(RUSH_TO_BALL);
+	
 	double predict_factor = 1.0;	//球位置预测因子
 	double ballVel_factor = 1.0;	//球速影响因子
 	const CVector rawBall2predictBall = predict_posBall - ball.Pos();

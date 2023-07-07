@@ -1,9 +1,9 @@
 local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(20, -ball.antiY()*math.pi*3/4)
+  return ball.pos() + Utils.Polar2Vector(30, -ball.antiY()*math.pi*3/4)
 end
 
 local SHOOT_POS = function()
-  return ball.pos()+Utils.Polar2Vector(400,ball.antiY()*math.pi/6)
+  return ball.pos()+Utils.Polar2Vector(460,ball.antiY()*math.pi/6)
 end
 
 local RECEIVE_POS = function()
@@ -15,12 +15,13 @@ local ASSIST_POS = function()
 end
 
 local KICK_POWER = function()
-  local kickPower = 13.6*math.sqrt(ball.toPointDist(SHOOT_POS()))
-  if kickPower > 450 then
-    return 450
-  else
-    return kickPower
-  end
+  return 450
+  -- local kickPower = 13.6*math.sqrt(ball.toPointDist(SHOOT_POS()))
+  -- if kickPower > 450 then
+  --   return 450
+  -- else
+  --   return kickPower
+  -- end
 end
 
 local BlockPos=ball.antiYPos(CGeoPoint:new_local(430/1200*param.pitchLength,-100/900*param.pitchWidth))
@@ -53,7 +54,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[DB][A][C][L][M][S]"
   },
 
   ["toBall"] = {
@@ -62,7 +63,7 @@ gPlayTable.CreatePlay{
         return "kickBall"
       end
     end,
-    Assister = task.staticGetBall(SHOOT_POS),
+    Assister = task.staticGetBall(SHOOT_POS,false),
     Leader   = task.goCmuRush(RECEIVE_POS, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Middle   = task.goCmuRush(ASSIST_POS, player.toPlayerHeadDir("Leader"), ACC, STOP_DSS),
     Special  = task.sideBack(),
@@ -70,7 +71,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[DB][A][C][L][M][S]"
   },
 
   ["kickBall"] = {
@@ -87,7 +88,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[DB][A][C][L][M][S]"
   },
 
   ["receiveBall"] = {
@@ -104,7 +105,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[DB][A][C][L][M][S]"
   },
 
 ["shootBall"] = {
@@ -121,7 +122,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[D][B][A][C][L][M][S]"
+    match    = "[DB][A][C][L][M][S]"
   },
 
   name = "Ref_BackPush_normal_chip",

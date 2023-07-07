@@ -222,8 +222,11 @@ void CBreak::plan(const CVisionModule* pVision) {
 
 
     TaskT grabTask(task());
-
-    if (task().player.needkick)
+    ////////
+    if (canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir()))
+        grabTask.player.angle = me.Dir();
+    else////added here
+        if (task().player.needkick)
         grabTask.player.angle = finalDir;
     else
         grabTask.player.angle = task().player.angle;
@@ -275,6 +278,12 @@ void CBreak::plan(const CVisionModule* pVision) {
     }
 
     else
+        /////////
+        if (canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir()))
+        {
+            grabTask.player.pos = me.Pos();
+        }
+        else//added here
     {
         grabTask.player.pos = move_point;
     }
@@ -824,7 +833,7 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
 
     bool flag = true;
     double x1 = me.X(), y1 = me.Y(), theta = dir;
-    float corrected_parameter = fabs(me.VelY()) * 0.05;
+    float corrected_parameter = fabs(me.VelY()) * 0.2;
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("theta:" + to_string(theta)).c_str(), COLOR_YELLOW);
     if ((theta >= -Param::Math::PI && theta <= -Param::Math::PI / 2) || ((theta <= Param::Math::PI && theta >= Param::Math::PI / 2))) {
         flag = false;

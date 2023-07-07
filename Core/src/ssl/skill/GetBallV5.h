@@ -35,6 +35,7 @@ protected:
 	bool OppIsFarThanMe(const CVisionModule* pVision, const int vecNumber);
 
 	int getTheirMostCloseAndFronttoPosPlayerNum(const CVisionModule* pVision, CGeoPoint pos);
+	void modifyGetballTaskpos(const CVisionModule* pVision, CGeoPoint &Pos);
 
 private:
 	enum {

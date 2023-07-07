@@ -26,11 +26,8 @@ gOppoConfig = {
 	KickOff		= "Ref_KickOff_normal",
 	KickOffDef  = "Ref_KickOffDef_normal",
 	
-	NorPlay     = "Test_play8_Strong_Tyh"
-	--犯规多的时候用"Test_play8_ManyFoul"
-	--犯规少的时候用"Test_play8_NotFoul"
-	--AutoChange用"Test_play8_AUTO"
+	NorPlay     = "NormalPlayPureDefence8"
 	--JLC新写  Test_play8ForPower  打得非常凶
-	--TYH版本：Test_play8_Strong_Tyh
-	--Test_play8_Ning 不要用 有问题
+	--TYH版本： Test_play8_Strong_Tyh
+	--龟壳： NormalPlayPureDefence8 不要用 有问题
 }
