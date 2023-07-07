@@ -146,7 +146,7 @@ function backShootPos(p)
 	return p + Utils.Polar2Vector(9, tmpShootDir)
 end
 
-function toPointDir(p, role)
+function toPointDir(p, role) -- todo 赛后改
 
 	return function ()
 		local idir

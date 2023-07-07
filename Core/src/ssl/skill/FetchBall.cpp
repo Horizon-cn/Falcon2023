@@ -24,15 +24,11 @@ namespace {
 	enum fetch_ball_state
 	{
 
-		S_GOTOBALL = 1,//若球在场外使用该state开始
-		S_GOTOBALL_1, //若球在场内使用该state
-		S_GETBALL1,
-		S_GETBALL2,
-		S_BACK,
-		S_CHECK1,
-		S_WAIT,
+		S_GOTOBALL = 1,
+		S_GETBALL,
 		S_TURN,
-		S_CHECK2,
+		S_PULL,
+		S_CHECK,
 		S_END
 	};
 	bool VERBOSE = true;
@@ -70,8 +66,8 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	//double adjustPre				= task().player.speed_x;
 	double adjustPre = 0.2;
 	double faceDir = Utils::Normalize((ball.Pos() - me.Pos()).dir());
-	CGeoPoint CentrePoint= CGeoPoint(0, 0);
-	double S_GOTOBALL_getball_dir = Utils::Normalize((ball.Pos() - CentrePoint).dir());//场外拿球小车朝向
+	CGeoPoint CentrePoint = CGeoPoint(0, 0);
+	double S_GOTOBALL_getball_dir = Utils::Normalize((ball.Pos() - targetPos).dir());//场外拿球小车朝向
 	double ball2barget = Utils::Normalize((ball.Pos() - targetPos).dir());
 	double finalDir = task().player.angle;
 	const double exit_speed = 50;                    //exit speed
@@ -80,12 +76,14 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	double targetdir = Utils::Normalize((targetPos - ball.Pos()).dir());
 	CVector me2ball = ball.Pos() - me.Pos();
 	CVector me2target = target - me.Pos();
+	double me2targetDir = me2target.dir();
+	double centre2meDir = (me.Pos() - CentrePoint).dir();
 	CVector target2ball = ball.Pos() - target;
 	CVector ball2ourGoal = ball.Pos() - ourGoal;
 	CVector ourGoal2ball = ourGoal - ball.Pos();
 	bool isBallOutside = (abs(ball.Pos().y()) > (Param::Field::PITCH_WIDTH / 2 - 50)) || (abs(ball.Pos().x())) > (Param::Field::PITCH_LENGTH / 2 - 50);
-	bool isMeOutside = (abs(me.Pos().y()) > (Param::Field::PITCH_WIDTH / 2 - 60)) || (abs(me.Pos().x())) > (Param::Field::PITCH_LENGTH / 2 - 60);
-
+	//bool isMeOutside = (abs(me.Pos().y()) > (Param::Field::PITCH_WIDTH / 2 - 60)) || (abs(me.Pos().x())) > (Param::Field::PITCH_LENGTH / 2 - 60);
+	bool isTargetOutside = (abs(targetPos.y()) > (Param::Field::PITCH_WIDTH / 2 - 50)) || (abs(targetPos.x())) > (Param::Field::PITCH_LENGTH / 2 - 50);
 
 
 	//拿球状态判断
@@ -97,96 +95,58 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	/***************************************************/
 	int new_state = state();
 	switch (state()) {
-		//初始阶段
 	case BEGINNING:
 		if (isBallOutside) new_state = S_GOTOBALL;
-		else new_state = S_GOTOBALL_1;
+		else new_state = S_GOTOBALL;
 		break;
 
-		//场内拿球
-	case S_GOTOBALL_1:
-		if (isBallOutside) new_state = S_GOTOBALL;
-		else if ((me.Pos() - ball.Pos()).mod() < 20 && std::abs((me.Pos() - ball.Pos()).dir() - (ball.Pos() - targetPos).dir()) < 0.5) {
-			new_state = S_GETBALL2;
-			//new_state = S_GOTOBALL;
-		}
-		break;
-		//场外拿球
 	case S_GOTOBALL:
 		if ((me.Pos() - ball.Pos()).mod() < 20) {
-			new_state = S_GETBALL1;
-			//new_state = S_GOTOBALL;
+			new_state = S_GETBALL;
 		}
 		break;
 
-
-		//拿球
-	case S_GETBALL1:
-		//判断是否拿到球
-		if (possession >= 0.9) {
-			new_state = S_BACK;
-			cnt = 0;
-		}
-		cnt++;
-		break;
-
-	case S_GETBALL2:
-		if (possession >= 0.9) {
-			new_state = S_TURN;
-			cnt = 0;
-		}
-		cnt++;
-		break;
-
-	case S_BACK:
-		if(possession>0.9&&(!isBallOutside||!isMeOutside)) {
-			new_state = S_CHECK1;
-			cnt = 0;
-		}
-		else if (me2ball.mod() > 20) {
-			if (++cnt >= 50) {
-				new_state = BEGINNING;
+	case S_GETBALL:
+		if (!isTargetOutside) {
+			if (possession >= 0.9) {
+				new_state = S_TURN;
 				cnt = 0;
 			}
 		}
 		else {
-			cnt = 0;
-		}
-		break;
-	case S_CHECK1:
-		if (cnt >= WAIT_BUFFER) {
-			new_state = S_WAIT;
-			cnt = 0;
+			if (possession >= 0.9) {
+				new_state = S_PULL;
+				cnt = 0;
+			}
 		}
 		cnt++;
 		break;
-		
-	case S_WAIT:
-		if ((ball.Pos() - me.Pos()).mod() > 50 && possession < 0.1) {
-			new_state = S_GOTOBALL_1;
-			cnt = 0;
-		}
-		cnt++;
-		break;
+
 		//吸球行进
 	case S_TURN:
-		if (((ball.Pos() - targetPos).mod() < 5 || (me.Pos() - targetPos).mod() < 15) && possession > 0.9) {
-			new_state = S_CHECK2;
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -240), to_string(isVisionHasBall(pVision, vecNumber)).c_str(), COLOR_GREEN);
+		if ((ball.Pos() - targetPos).mod() < 5 || ((me.Pos() - targetPos).mod() < 10 && !isVisionHasBall(pVision, vecNumber))) {
+			new_state = S_CHECK;
 			cnt = 0;
-		}
-		else if (me2ball.mod() > 20) {
-			if (++cnt >= 50) {
-				new_state = BEGINNING;
-				cnt = 0;
-				GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -200), "BEGINNING", COLOR_GREEN);
-			}
 		}
 		else {
 			cnt = 0;
 		}
+		cnt++;
+		break;
+	case S_PULL:
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -240), to_string(isVisionHasBall(pVision, vecNumber)).c_str(), COLOR_GREEN);
+		if ((ball.Pos() - targetPos).mod() < 5 || ((me.Pos() - targetPos).mod() < 10 && !isVisionHasBall(pVision, vecNumber))) {
+			new_state = S_CHECK;
+			cnt = 0;
+		}
+		else {
+			cnt = 0;
+		}
+		cnt++;
 		break;
 		//判断是否放球到正确位置
-	case S_CHECK2:
+	case S_CHECK:
 		if (cnt >= WAIT_BUFFER) {
 			new_state = S_END;
 			cnt = 0;
@@ -195,9 +155,11 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		break;
 		//放球结束，后退阶段
 	case S_END:
-		if ((ball.Pos() - targetPos).mod() > 15) {
+		if ((ball.Pos() - targetPos).mod() > 15 && cnt++ > 100) {
 			new_state = BEGINNING;
+			cnt = 0;
 		}
+		cnt++;
 		break;
 	default:
 		new_state = BEGINNING;
@@ -213,43 +175,27 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GOTOBALL", COLOR_CYAN);
 		}
-		else if (S_GOTOBALL_1 == getState())
+		else if (S_GETBALL == getState())
 		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GOTOBALL_1", COLOR_CYAN);
-		}
-		else if (S_GETBALL1 == getState())
-		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GETBALL1", COLOR_CYAN);
-		}
-		else if (S_GETBALL2 == getState())
-		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GETBALL2", COLOR_CYAN);
-		}
-		else if (S_BACK == getState())
-		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_BACK", COLOR_CYAN);
-		}
-		else if (S_CHECK1 == getState())
-		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_CHECK1", COLOR_CYAN);
-		}
-		else if (S_WAIT == getState())
-		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_WAIT", COLOR_CYAN);
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GETBALL", COLOR_CYAN);
 		}
 		else if (S_TURN == getState())
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_TURN", COLOR_CYAN);
 		}
-		else if (S_CHECK2 == getState())
+		else if (S_PULL == getState())
 		{
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_CHECK2", COLOR_CYAN);
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_PULL", COLOR_CYAN);
+		}
+		else if (S_CHECK == getState())
+		{
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_CHECK", COLOR_CYAN);
 		}
 		else if (S_END == getState())
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_END", COLOR_CYAN);
 		}
-		
+
 	}
 
 	setState(new_state);
@@ -262,43 +208,10 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	if (S_GOTOBALL == state()) {
 		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, S_GOTOBALL_getball_dir, CVector(0, 0), flags | PlayerStatus::DODGE_BALL | PlayerStatus::NOT_DODGE_PENALTY, stopDist));
 	}
-	else if (S_GOTOBALL_1 == state()) {
-		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DODGE_BALL | PlayerStatus::NOT_DODGE_PENALTY, stopDist));
-	}
-	else if (S_GETBALL1 == state()) {
+	else if (S_GETBALL == state()) {
 		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, S_GOTOBALL_getball_dir, CVector(0, 0), flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
 	}
-	else if (S_GETBALL2 == state()) {
-		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, finalDir, CVector(0, 0), flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
-	}
-	
-	else if (S_BACK == state()) {
-		TaskT playerTask;
-		playerTask.executor = vecNumber;
-		playerTask.player.pos = ball.Pos() + Utils::Polar2Vector(60,(CentrePoint-ball.Pos()).dir());
-		playerTask.player.angle = (ball.Pos()-CentrePoint).dir();
-		playerTask.player.vel = CVector(0, 0);
-		playerTask.player.rotvel = 0.0;
-		playerTask.player.flag = PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS | PlayerStatus::NOT_DODGE_PENALTY;
-		playerTask.player.max_speed = paramManager->PlACEBALL_SPEED;
-		playerTask.player.max_rot_speed = paramManager->PlACEBALL_ROT_SPEED;
-		playerTask.player.max_acceleration = paramManager->PlACEBALL_ACCELERATION;
-		playerTask.player.max_deceleration = paramManager->PlACEBALL_DECELERATION;
-		playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
-		setSubTask(TaskFactoryV2::Instance()->GotoPosition(playerTask));
-	}
-	else if (S_CHECK1 == state()) {
-		if (cnt >= WAIT_BUFFER / 20)
-			DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
-
-		setSubTask(PlayerRole::makeItRun(vecNumber, 0.0, 0.0, 0.0, flags | PlayerStatus::NOT_DODGE_PENALTY));
-	}
-
-	else if (S_WAIT == state()) {
-		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
-		setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(60, Utils::Normalize((me.Pos() - ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
-	}
-	else if (S_TURN == state()) {//TODO：吸球后退
+	else if (S_TURN == state()) {//TODO：吸球转身前进
 		TaskT playerTask;
 		playerTask.executor = vecNumber;
 		playerTask.player.pos = targetPos + me2ball.unit() * (-Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER);
@@ -313,7 +226,22 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
 		setSubTask(TaskFactoryV2::Instance()->GotoPosition(playerTask));
 	}
-	else if (S_CHECK2 == state()) {
+	else if (S_PULL == state()) {//TODO：吸球后退
+		TaskT playerTask;
+		playerTask.executor = vecNumber;
+		playerTask.player.pos = targetPos + me2ball.unit() * (-Param::Vehicle::V2::PLAYER_FRONT_TO_CENTER);
+		playerTask.player.angle = targetdir + Param::Math::PI;
+		playerTask.player.vel = CVector(0, 0);
+		playerTask.player.rotvel = 0.0;
+		playerTask.player.flag = PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS | PlayerStatus::NOT_DODGE_PENALTY;
+		playerTask.player.max_speed = paramManager->PlACEBALL_SPEED;
+		playerTask.player.max_rot_speed = paramManager->PlACEBALL_ROT_SPEED;
+		playerTask.player.max_acceleration = paramManager->PlACEBALL_ACCELERATION;
+		playerTask.player.max_deceleration = paramManager->PlACEBALL_DECELERATION;
+		playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
+		setSubTask(TaskFactoryV2::Instance()->GotoPosition(playerTask));
+	}
+	else if (S_CHECK == state()) {
 		if (cnt >= WAIT_BUFFER / 20)
 			DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
 
@@ -321,7 +249,7 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 
 	}
 	else if (S_END == state()) {
-		setSubTask(PlayerRole::makeItGoto(vecNumber,ball.Pos()+ Utils::Polar2Vector(100, Utils::Normalize((me.Pos()-ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
+		setSubTask(PlayerRole::makeItGoto(vecNumber, ball.Pos() + Utils::Polar2Vector(100, Utils::Normalize((me.Pos() - ball.Pos()).dir())), flags | PlayerStatus::NOT_DODGE_PENALTY | PlayerStatus::DODGE_BALL));
 		DribbleStatus::Instance()->setDribbleCommand(vecNumber, 0);//关吸球
 	}
 
@@ -340,18 +268,17 @@ CPlayerCommand* CFetchBall::execute(const CVisionModule* pVision) {
 bool CFetchBall::isVisionHasBall(const CVisionModule* pVision, const int vecNumber) {
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	const BallVisionT& ball = pVision->Ball();
-	double visionJudgDist = 11.1;
+	double visionJudgDist = 11.3;
 	bool distVisionHasBall = CVector(me.Pos() - ball.Pos()).mod() <= visionJudgDist;
 	bool dirVisionHasBall;
-	double meDir = me.Dir();
-	double me2Ball = (ball.Pos() - me.Pos()).dir();
-	double meDir_me2Ball_Diff = abs(Utils::Normalize((meDir - me2Ball)));
-	if (meDir_me2Ball_Diff < Param::Math::PI / 9.0) {
+	double playerDir = me.Dir();
+	double player2Ball = (ball.Pos() - me.Pos()).dir();
+	double playerDir_player2Ball_Diff = fabs(Utils::Normalize((playerDir - player2Ball)));
+	if (playerDir_player2Ball_Diff < visionJudgDist * Param::Math::PI / 180.0)
 		dirVisionHasBall = true;
-	}
-	else {
+	else
 		dirVisionHasBall = false;
-	}
 	bool isVisionPossession = dirVisionHasBall && distVisionHasBall;
 	return isVisionPossession;
+
 }

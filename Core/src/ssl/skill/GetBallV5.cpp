@@ -291,7 +291,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         getball_task.player.angle = finalDir;
         getball_task.player.needdribble = IS_DRIBBLE;
     }
-    else if (ball.Vel().mod() > 15) { // 动态状态下
+    else if (ball.Vel().mod() > 30) { // 动态状态下
         
         bool IsFast = (ball.Vel().mod() >= 200);
         bool IsMedium = (ball.Vel().mod() >= 80 && ball.Vel().mod() < 200);
@@ -401,7 +401,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                 getball_task.player.needdribble = IS_DRIBBLE;
             }
             */
-            getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(30.0, Utils::Normalize((ball.Pos() - me.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
+            getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(25.0, Utils::Normalize((ball.Pos() - me.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
             
             // attention!
 
@@ -441,7 +441,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
         }
         else {
             double ThisCaseFinalDir = me2ball.dir();
-            getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(10.0, Utils::Normalize((ball.Pos() - me.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
+            getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(5.0, Utils::Normalize((ball.Pos() - me.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
             
             // attention
 

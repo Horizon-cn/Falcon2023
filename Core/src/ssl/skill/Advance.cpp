@@ -1143,7 +1143,7 @@ bool CAdvance::canScore(const CVisionModule* pVision, const int vecNumber, const
 	}
 
 	double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
-	if (fabs(projection) + 5 > (Param::Field::GOAL_WIDTH) / 2 - 13) {
+	if (fabs(projection) + 5 > (Param::Field::GOAL_WIDTH) / 2 - 15) {
 		flag = false;
 		return false;
 	}
@@ -1212,8 +1212,14 @@ int CAdvance::opp_ahead(const CVisionModule* pVision, const int vecNumber) {
 }
 
 bool CAdvance::WeCanAlwaysSetKick(const CVisionModule* pVision, const int vecNumber) {
-	if (_state == BREAKSHOOT) return false;
+	
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+
+	if (_state == BREAKSHOOT) {
+		if (me.Vel().mod() > 20)return false;
+	}
+
+
 	if (MeIsInWhichArea == CenterArea)
 		if (canScore(pVision, vecNumber, OBSTACLE_RADIUS * 2.5, me.Dir()))
 			return true;
@@ -1238,12 +1244,12 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 	if ((NowIsShoot == 1)) {
 		return KICK;
 	}
-	else if ((NowIsShoot == 2) && MeIsInWhichArea != CanNOTBreakArea) {
+	else if ((NowIsShoot == 2) && MeIsInWhichArea != CanNOTBreakArea && MeIsInWhichArea != CornerArea) {
 		return BREAKSHOOT;
 	} // 持久化
 
 	else if (Me2OppTooclose(pVision, vecNumber)) {
-		if (MeIsInWhichArea == CornerArea || MeIsInWhichArea == KICKArea) {
+		if (MeIsInWhichArea == KICKArea) {
 			if (tendToShoot(pVision, vecNumber))
 				return KICK;
 			else return BREAKSHOOT;
@@ -1297,7 +1303,7 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 			return PASS;
 		}
 		else {	
-			return BREAKSHOOT;
+			return KICK;
 		}	
 	}	
 	else if (MeIsInWhichArea == CanNOTBreakArea) {  // 不能break
@@ -1308,7 +1314,7 @@ int CAdvance::GenerateNextState(const CVisionModule* pVision, const int vecNumbe
 			return PASS;
 		}
 		else {
-			return BREAKSHOOT;
+			return KICK;
 		}  
 	}	
 	else { // Kick区域

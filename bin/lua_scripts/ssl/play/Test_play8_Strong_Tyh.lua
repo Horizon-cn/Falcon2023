@@ -8,7 +8,6 @@
 -- 5 VS 7- : 同6V6 
 -- 4-: G + chaseNew + 2Back
 
-
 local AdjustOurRobotNum = world:OurRobotNum()
 local AdjustTheirRobotNum = world:TheirRobotNum()
 local EightRobot = 8
@@ -76,6 +75,7 @@ firstState = "SixAttackFront",
 -- 5 VS 7- : 同6V6 
 -- 4-: G + chaseNew + 2Back
 ---------------------------------------------------------
+-- task.goCmuRush(MIDDLE_POS_1, player.toPointDir(ball.pos())),
 ["SixAttackFront8"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),

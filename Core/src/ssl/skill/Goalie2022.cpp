@@ -13,7 +13,7 @@
 #include "defenceNew/DefenceInfoNew.h"
 #include "gpuBestAlgThread.h"
 
-#define DEBUG_EVALUATE(x) {if(goalie_debug) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-Param::Field::PITCH_LENGTH*0.7,0), x);}
+#define DEBUG_EVALUATE(x) {if(goalie_debug) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-Param::Field::PITCH_LENGTH*0.6,0), x);}
 
 namespace {
 	bool goalie_debug, is_penalty;
@@ -108,7 +108,7 @@ CGoalie2022::Tevaluate CGoalie2022::evaluate(const CVisionModule* pVision)
 	} else if (isBallShot2Goal(pVision)) {
 		DEBUG_EVALUATE("evaluate: danger, save ball!");
 		return SAVE;
-	} else if (Utils::InOurPenaltyArea(ball.Pos(), PENALTY_BUFFER)) {
+	} else if (ball.Vel().mod()<20 && Utils::InOurPenaltyArea(ball.Pos(), PENALTY_BUFFER)) {
 		if (CanSupport(pVision)) {
 			DEBUG_EVALUATE("evaluate: slow ball, safe to support");
 			return SUPPORT;

@@ -1,4 +1,4 @@
-IS_TEST_MODE = true
+IS_TEST_MODE = false
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 
@@ -14,6 +14,7 @@ gTestPlay = function ()
 		--犯规多的时候用"Test_play8_ManyFoul"
 		--犯规少的时候用"Test_play8_NotFoul"
 		--AutoChange用"Test_play8_AUTO"
+		-- NormalPlayPureDefence8   Test_play8_Strong_Tyh
 
 	else
 		return "Test_play8_Strong_Tyh" -- Test_Defence Test_PassEachOther Test_NormalMiddleDefend

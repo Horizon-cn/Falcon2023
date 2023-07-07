@@ -11,13 +11,23 @@ local FiveRobot = 5
 local FourRobot = 4
 local ThreeRobot = 3
 
+local DivideArea = function(Front, Back)
+    if (ball.posX() > 0) then
+        return Front
+    else 
+        return Back
+    end
+end
+
 local SwitchBallArea = function()
 	AdjustOurRobotNum = world:OurRobotNum()
 	AdjustTheirRobotNum = world:TheirRobotNum()
-    if AdjustOurRobotNum > SixRobot then
-        return "PureDefence7"
-	else
+    if AdjustOurRobotNum >= SevenRobot then
+        return DivideArea("PureDefence7Front", "PureDefence7Back")
+	elseif AdjustOurRobotNum == SixRobot then
 		return "PureDefence6"
+    elseif AdjustOurRobotNum <= FiveRobot then
+        return "PureDefence5"
     end
 end
 
@@ -45,29 +55,51 @@ local DetectTheSupportID = function()
 end
 gPlayTable.CreatePlay{
 
-firstState = "PureDefence7",
+firstState = "PureDefence7Front",
 
-["PureDefence7"] = {
+["PureDefence7Front"] = {
 	switch = SwitchBallArea,
 	Leader   = task.support("Special", DetectTheSupportID),
-	Assister = task.goCmuRush(MIDDLE_POS_1, player.toPointDir(ball.pos())),
+	Assister = task.goCmuRush(MIDDLE_POS_1, player.toBallDir("Assister")),
     Special  = task.advance(),
 	Defender = task.leftBack(),
 	Breaker  = task.rightBack(),
-	Crosser  = task.goCmuRush(MIDDLE_POS_3, player.toPointDir(ball.pos())),
-    Middle   = task.goCmuRush(MIDDLE_POS_2, player.toPointDir(ball.pos())),
+	Crosser  = task.defendMiddle(),
+    Middle   = task.goCmuRush(MIDDLE_POS_2, player.toBallDir("Middle")),
 	Goalie   = task.goalieNew(),
     match = "[S][DBMAC][L]"
 },
-["PureDefence6"] = {
+["PureDefence7Back"] = {
 	switch = SwitchBallArea,
+	Leader   = task.support("Special", DetectTheSupportID),
+	Assister = task.goCmuRush(MIDDLE_POS_1, player.toBallDir("Assister")),
+    Special  = task.advance(),
+	Defender = task.leftBack(),
+	Breaker  = task.rightBack(),
+	Crosser  = task.goCmuRush(MIDDLE_POS_3, player.toBallDir("Crosser")),
+    Middle   = task.goCmuRush(MIDDLE_POS_2, player.toBallDir("Middle")),
+	Goalie   = task.goalieNew(),
+    match = "[S][DBMAC][L]"
+},
+
+["PureDefence6"] = {
+    switch = SwitchBallArea,
 	Assister = task.sideBack(),
     Special  = task.advance(),
-	Defender = task.multiBack(3,1),
-	Breaker  = task.multiBack(3,2),
-	Crosser  = task.multiBack(3,3),
+	Defender = task.leftBack(),
+	Breaker  = task.rightBack(),
+	Crosser  = task.support("Special", DetectTheSupportID),
 	Goalie   = task.goalieNew(),
-    match = "[S][DBC][A]"
+    match = "[S][DCA][B]"
+},
+["PureDefence5"] = {
+    switch = SwitchBallArea,
+	Assister = task.sideBack(),
+    Special  = task.advance(),
+	Defender = task.leftBack(),
+	Breaker  = task.rightBack(),
+	Goalie   = task.goalieNew(),
+    match = "[S][DBA]"
 },
 name = "NormalPlayPureDefence8",
 applicable ={

@@ -222,8 +222,11 @@ void CBreak::plan(const CVisionModule* pVision) {
 
 
     TaskT grabTask(task());
-
-    if (task().player.needkick)
+    ////////
+    if (canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir()))
+        grabTask.player.angle = me.Dir();
+    else////added here
+        if (task().player.needkick)
         grabTask.player.angle = finalDir;
     else
         grabTask.player.angle = task().player.angle;
@@ -275,6 +278,12 @@ void CBreak::plan(const CVisionModule* pVision) {
     }
 
     else
+        /////////
+        if (canScore(pVision, vecNumber, OBSTACLE_RADIUS, me.Dir()))
+        {
+            grabTask.player.pos = me.Pos();
+        }
+        else//added here
     {
         grabTask.player.pos = move_point;
     }
