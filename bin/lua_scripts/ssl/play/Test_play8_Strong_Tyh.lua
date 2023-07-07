@@ -52,11 +52,13 @@ end
 local SwitchBallArea = function()
 	AdjustOurRobotNum = world:OurRobotNum()
 	AdjustTheirRobotNum = world:TheirRobotNum()
-    if AdjustOurRobotNum >= SixRobot then
-        return DivideArea("SixAttackFront", "SixAttackBack")
+    if AdjustOurRobotNum >= EightRobot then
+        return DivideArea("SixAttackFront8", "SixAttackBack8")
+    elseif AdjustOurRobotNum >= SixRobot then
+        return DivideArea("SixAttackFront6", "SixAttackFront6")
     elseif AdjustOurRobotNum == FiveRobot then
         if AdjustTheirRobotNum >= 7 then
-            return "PureDefence"
+            return DivideArea("PureDefenceFront", "PureDefenceBack")
         else
             return DivideArea("SixAttackFront", "SixAttackBack")
         end
@@ -74,7 +76,7 @@ firstState = "SixAttackFront",
 -- 5 VS 7- : 同6V6 
 -- 4-: G + chaseNew + 2Back
 ---------------------------------------------------------
-["SixAttackFront"] = {
+["SixAttackFront8"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.leftBack(),
@@ -84,10 +86,10 @@ firstState = "SixAttackFront",
 	Crosser = task.protectBall(),
 	Breaker  = task.sideBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AM][S][D][C][B]"
+    match = "[L][AMBD][S][C]"
 },
 
-["SixAttackBack"] = {
+["SixAttackBack8"] = {
     switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.multiBack(3,1),
@@ -97,7 +99,52 @@ firstState = "SixAttackFront",
 	Crosser = task.protectBall(),
 	Breaker  = task.sideBack(),
 	Goalie = task.goalieNew(),
-    match = "[L][AM][S][C][DB]"
+    match = "[L][AMBD][S][C]"
+},
+["SixAttackFront6"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.leftBack(),
+    Middle = task.rightBack(),
+    Special = task.support("Leader", DetectTheSupportID),
+    Defender = task.defendMiddle(),
+	Crosser = task.protectBall(),
+	Goalie = task.goalieNew(),
+    match = "[L][AMD][S][C]"
+},
+
+["SixAttackBack6"] = {
+    switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.multiBack(3,1),
+    Middle = task.multiBack(3,2),
+    Special = task.support("Leader", DetectTheSupportID),
+    Defender = task.multiBack(3,3),
+	Crosser = task.protectBall(),
+	Breaker  = task.sideBack(),
+	Goalie = task.goalieNew(),
+    match = "[L][AMB][S][C]"
+},
+["SixAttackFront"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.leftBack(),
+    Middle = task.rightBack(),
+    Special = task.support("Leader", DetectTheSupportID),
+    Defender = task.defendMiddle(),
+	Goalie = task.goalieNew(),
+    match = "[L][AMD][S]"
+},
+
+["SixAttackBack"] = {
+    switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.multiBack(3,1),
+    Middle = task.multiBack(3,2),
+    Special = task.support("Leader", DetectTheSupportID),
+    Defender = task.multiBack(3,3),
+	Goalie = task.goalieNew(),
+    match = "[L][AMD][S]"
 },
 
 ["ChaseRushFront"] = {
@@ -117,7 +164,7 @@ firstState = "SixAttackFront",
     match = "[L][AM]"
 },
 
-["PureDefence"] = {
+["PureDefenceFront"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
 	Assister = task.support("Leader",DetectTheSupportID), 
@@ -130,7 +177,18 @@ firstState = "SixAttackFront",
     match = "[L][DCB][A][S][M]"
 },
 
-
+["PureDefenceBack"] = {
+	switch = SwitchBallArea,
+	Leader = task.advance(),
+	Assister = task.support("Leader",DetectTheSupportID), 
+    Middle = task.sideBack(), 
+    Special = task.protectBall(),
+	Defender = task.leftBack(),
+	Crosser  =  task.rightBack(),
+	Breaker  = task.defendMiddle(),
+	Goalie = task.goalieNew(),
+    match = "[L][DCM][A][S][M]"
+},
 name = "Test_play8_Strong_Tyh",
 applicable ={
 	exp = "a",

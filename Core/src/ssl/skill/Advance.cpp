@@ -296,7 +296,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		//_state = PUSHOUT;
 		//_state = GET;
 		//_state = BREAKSHOOT;
-		_state = JUSTCHIPPASS;
+		_state = PASS;
 	}
 	else _state = GET;
 	*/
@@ -431,7 +431,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -420), ("Opp_Ahead:"+ to_string(opp_ahead(pVision, _executor))).c_str(), COLOR_YELLOW);
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -440), ("CanSupportKick:" + to_string(CanSupportKick(pVision, _executor))).c_str(), COLOR_YELLOW);
 		if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -460), ("ClosetoPosPlayerDist:" + to_string(pVision->TheirPlayer(getTheirMostClosetoPosPlayerNum(pVision, SupportPoint[TheBestSupportNumber])).Pos().dist(SupportPoint[TheBestSupportNumber]))).c_str(), COLOR_YELLOW);
-		if (opp_ahead(pVision, _executor)>=4 && IHaveSupport && pVision->TheirPlayer(getTheirMostClosetoPosPlayerNum(pVision, SupportPoint[TheBestSupportNumber])).Pos().dist(SupportPoint[TheBestSupportNumber]) >= 60)
+		if (opp_ahead(pVision, _executor)>=5 && IHaveSupport && pVision->TheirPlayer(getTheirMostClosetoPosPlayerNum(pVision, SupportPoint[TheBestSupportNumber])).Pos().dist(SupportPoint[TheBestSupportNumber]) >= 60)
 		{
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, -400), "BREAKPASS__PASS", COLOR_YELLOW);
 			PassPoint = SupportPoint[TheBestSupportNumber];
@@ -528,7 +528,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 		if(OppIsFarThanMe(pVision, _executor))
 			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir));
 		else
-			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir, 100));
+			setSubTask(PlayerRole::makeItlightkick(_executor, KickorPassDir, 180));
 		break;
 
 	case CHASEKICK:

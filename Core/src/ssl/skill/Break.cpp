@@ -824,7 +824,7 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
 
     bool flag = true;
     double x1 = me.X(), y1 = me.Y(), theta = dir;
-    float corrected_parameter = fabs(me.VelY()) * 0.05;
+    float corrected_parameter = fabs(me.VelY()) * 0.2;
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -450), ("theta:" + to_string(theta)).c_str(), COLOR_YELLOW);
     if ((theta >= -Param::Math::PI && theta <= -Param::Math::PI / 2) || ((theta <= Param::Math::PI && theta >= Param::Math::PI / 2))) {
         flag = false;

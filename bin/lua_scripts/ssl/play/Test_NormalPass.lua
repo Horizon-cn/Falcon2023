@@ -13,186 +13,49 @@ local Two = 280
 --   |   |  -120
 
 local SwitchBallArea = function()
-	if ball.posX() > 200 and ball.posY() < -120 then
-		ballStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
-		if ballStatus == "OurBall" then
-			return "LeftFront"..ballStatus
-		else 
-			return "LeftFront"
-		end
-	elseif ball.posX() > 200 and ball.posY() < 120 then
-			return "MiddleFront"
-	elseif ball.posX() > 200 then
-			return "RightFront"
-	elseif ball.posX() > 0 and ball.posY() < -120 then
-			return "LeftMiddleFront"
-	elseif ball.posX() > 0 and ball.posY() < 120 then
-			return "MiddleMiddleFront"
-	elseif ball.posX() > 0 then
-			return "RightMiddleFront"
-	elseif ball.posX() > -200 and ball.posY() < -120 then
-			return "LeftMiddleBack"
-	elseif ball.posX() > -200 and ball.posY() < 120 then
-			return "MiddleMiddleBack"
-	elseif ball.posX() > -200 then
-			return "RightMiddleBack"
-	elseif ball.posY() < -120 then
-			return "LeftBack"
-	elseif ball.posY() < 120 then
-			return "MiddleBack"
-	elseif true then
-			return "RightBack"
-	end
-end
-local TEST = function()
-	return "LeftFront"
+	return "SixAttackFront"
 end
 -- Leader + Assister + Powerhouse
 -- Special + Defender
 -- Goalie + Middle + Hawk
+
+
+local DetectTheSupportID = function() 
+    if ball.posX() > 200 and ball.posY() < -120 then  -- 在0号区域
+        return 2  -- 往2号区域打
+    elseif ball.posX() > 200 and ball.posY() < 120 then -- 在1号区域
+        if ball.posX() > 0 then
+            return 2
+        else 
+            return 0
+        end
+    elseif ball.posX() > 200 and ball.posY() >= 120 then -- 在2号区域
+        return 0 -- 往0号打
+    elseif ball.posX() > -200 and ball.posY() < -120 then -- 在3号区域
+        return 0 -- 往0号打
+    elseif ball.posX() > -200 and ball.posY() < 120 then -- 在4号区域
+        return 1 -- 往1号打
+    elseif ball.posX() > -200 and ball.posY() >= 120 then -- 在5号区域
+        return 2 -- 往2号打
+    else
+        return 4 -- 往4号打
+    end
+end
+
+local TargetPos1  = CGeoPoint:new_local(-410, 190)
+local TargetPos2  = CGeoPoint:new_local(-171,-136)
+
 gPlayTable.CreatePlay{
 
-firstState = "LeftFront",
+firstState = "SixAttackFront",
 
-["LeftFront"] = {
+["SixAttackFront"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
-	Assister = task.support("Leader", 2),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
+    Special = task.support("Leader", DetectTheSupportID),
+    match = "[L][S]"
 },
 
-["LeftFrontOurBall"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 2),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-
-["MiddleFront"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 5),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-
-["RightFront"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 3),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-
-["LeftMiddleFront"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 2),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-
-["MiddleMiddleFront"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 0),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-
-
-["RightMiddleFront"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 3),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-
-["LeftMiddleBack"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 2),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-["MiddleMiddleBack"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 2),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-["RightMiddleBack"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 0),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-
-["LeftBack"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 2),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-["MiddleBack"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 2),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
-["RightBack"] = {
-	switch = SwitchBallArea,
-	Leader = task.advance(),
-	Assister = task.support("Leader", 0),
-	Hawk = task.protectBall(),
-	Defender = task.multiBack(1, 1),
-	Crosser = task.rightBack(),
-	Goalie = task.goalieNew(),
-    match = "[L][ADHC]"
-},
 name = "Test_NormalPass",
 applicable ={
 	exp = "a",
