@@ -1192,6 +1192,12 @@ function staticGetBall(p, anti, f)
 	return {mexe, mpos}
 end
 
+function staticGetBallForceKick(p, anti, f)
+	-- local mexe, mpos = StaticGetBall{ pos = pos.backBall(p), dir = dir.backBall(p)}
+	local mexe, mpos = StaticGetBall{ dir = ball.backDir(p, anti), flag = f}
+	return {mexe, mpos, kick.chip, dir.defendBackClear(), pre.fieldDefender(), kp.full(),cp.specified(450), flag.force_kick}
+end
+
 -- p为朝向，如果p传的是pos的话，不需要根据ball.antiY()进行反算
 function goBackBall(p, d)
 	local mexe, mpos = GoCmuRush{ pos = ball.backPos(p, d, 0), dir = ball.backDir(p), flag = flag.dodge_ball}

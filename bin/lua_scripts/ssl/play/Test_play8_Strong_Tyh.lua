@@ -66,7 +66,7 @@ local SwitchBallArea = function()
     end
 end
 gPlayTable.CreatePlay{
-firstState = "SixAttackFront",
+firstState = "SixAttackFront8",
 
 -- 6 VS 6 : 前场：G + Advance + 2Back + Sup + DefendMiddle + Protect + Mark
 --          后场：G + Advance + 2Back + Sup + Back + Mark + Protect     -- 如果Marking犯规多，换成SideBack

@@ -63,7 +63,7 @@ gPlayTable.CreatePlay{
         return "kickBall"
       end
     end,
-    Assister = task.staticGetBall(SHOOT_POS,false),
+    Assister = task.staticGetBallForceKick(SHOOT_POS,false),
     Leader   = task.goCmuRush(RECEIVE_POS, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Middle   = task.goCmuRush(ASSIST_POS, player.toPlayerHeadDir("Leader"), ACC, STOP_DSS),
     Special  = task.sideBack(),
