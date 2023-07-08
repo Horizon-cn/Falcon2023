@@ -2,10 +2,10 @@
 local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(380/1200*param.pitchLength,150/900*param.pitchWidth))
 
 local WAIT_BALL_POS1   = function ()
-  return ball.pos() + Utils.Polar2Vector(30, -ball.antiY()*math.pi*3/4)
+  return ball.pos() + Utils.Polar2Vector(40, -ball.antiY()*math.pi*3/4)
 end
 local WAIT_BALL_POS2   = function ()
-  return ball.pos() + Utils.Polar2Vector(30, math.pi + ball.toPointDir(SHOOT_POS())())
+  return ball.pos() + Utils.Polar2Vector(40, math.pi + ball.toPointDir(SHOOT_POS())())
 end
 
 

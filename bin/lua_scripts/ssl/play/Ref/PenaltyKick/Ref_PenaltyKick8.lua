@@ -6,9 +6,10 @@ firstState = "init",
 	switch = function ()
 		if bufcnt(cond.isNormalStart()) then
 			return "pass"
+			-- return "kick"
 		end
 	end,
-	Goalie  = task.goCmuRush(CGeoPoint:new_local(-280,0),_,_,flag.dodge_ball),
+	Goalie  = task.goCmuRush(CGeoPoint:new_local(-250,0),_,_,flag.dodge_ball),
 	Leader = task.goCmuRush(CGeoPoint:new_local(-param.pitchLength/3,200/900*param.pitchWidth),_,_,flag.dodge_ball),
 	Assister = task.goCmuRush(CGeoPoint:new_local(-param.pitchLength/3,150/900*param.pitchWidth),_,_,flag.dodge_ball),
 	Middle = task.goCmuRush(CGeoPoint:new_local(-param.pitchLength/3,-150/900*param.pitchWidth),_,_,flag.dodge_ball),
@@ -26,7 +27,7 @@ firstState = "init",
 		end
 	end,
 	--Goalie  = task.penaltykick(),
-	Goalie = task.chipPass(CGeoPoint:new_local(40, 0)),   --left 30 10s,40 8s/7s   --right 30 6s,40 8s
+	Goalie = task.chipPass(CGeoPoint:new_local(10, 0)),   --left 30 10s,40 8s/7s   --right 30 6s,40 8s
 	Leader = task.goCmuRush(CGeoPoint:new_local(-param.pitchLength/3,200/900*param.pitchWidth),_,_,flag.dodge_ball),
 	Assister = task.goCmuRush(CGeoPoint:new_local(-param.pitchLength/3,150/900*param.pitchWidth),_,_,flag.dodge_ball),
 	Middle = task.goCmuRush(CGeoPoint:new_local(-param.pitchLength/3,-150/900*param.pitchWidth),_,_,flag.dodge_ball),
@@ -44,7 +45,8 @@ firstState = "init",
 		end
 	end,
 	--Goalie  = task.penaltykick(),
-	Goalie = task.chaseNew(),
+	Goalie  = task.chaseNew(),
+	--Goalie = task.advance(),
 	Leader = task.goCmuRush(CGeoPoint:new_local(-param.pitchLength/3,200/900*param.pitchWidth),_,_,flag.dodge_ball),
 	Assister = task.goCmuRush(CGeoPoint:new_local(-param.pitchLength/3,150/900*param.pitchWidth),_,_,flag.dodge_ball),
 	Middle = task.goCmuRush(CGeoPoint:new_local(-param.pitchLength/3,-150/900*param.pitchWidth),_,_,flag.dodge_ball),

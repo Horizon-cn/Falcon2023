@@ -315,19 +315,19 @@ void CGetBallV5::plan(const CVisionModule* pVision)
             if (IsMyPosIsOK && IsMyDirIsOK) {
                 // 已经对准
                 //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(-Param::Field::BALL_SIZE, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
-                getball_task.player.pos = ball.Pos();// ball.Pos() + Utils::Polar2Vector(-1.0 * maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir()));;
+                getball_task.player.pos = projMe;// ball.Pos();// ball.Pos() + Utils::Polar2Vector(-1.0 * maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir()));;
                 getball_task.player.angle = me2ball.dir();
                 getball_task.player.needdribble = IS_DRIBBLE;
             }
             else if ((expectedGetPos - ball.Pos()).mod() < (projMe - ball.Pos()).mod() && (!IsBehind)) {
                 // 已经对准
                 //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(-Param::Field::BALL_SIZE, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
-                getball_task.player.pos = projMe;// ball.Pos() + Utils::Polar2Vector(-1.0 * maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir()));;
+                getball_task.player.pos = expectedGetPos;// projMe;// projMe;// ball.Pos() + Utils::Polar2Vector(-1.0 * maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir()));;
                 getball_task.player.angle = me2ball.dir();
                 getball_task.player.needdribble = IS_DRIBBLE;
             }
             else {
-                getball_task.player.pos = expectedGetPos;
+                getball_task.player.pos = projMe;// expectedGetPos;
                 getball_task.player.angle = me2ball.dir();
 
                 if(ball2meDist < 85)getball_task.player.needdribble = IS_DRIBBLE;
@@ -370,19 +370,19 @@ void CGetBallV5::plan(const CVisionModule* pVision)
                 if (IsMyPosIsOK && IsMyDirIsOK) {
                     // 已经对准
                     //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(-Param::Field::BALL_SIZE, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
-                    getball_task.player.pos = ball.Pos();// ball.Pos() + Utils::Polar2Vector(-1.0 * maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir()));;
+                    getball_task.player.pos = projMe;// ball.Pos();// ball.Pos() + Utils::Polar2Vector(-1.0 * maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir()));;
                     getball_task.player.angle = me2ball.dir();
                     getball_task.player.needdribble = IS_DRIBBLE;
                 }
                 else if ((expectedGetPos - ball.Pos()).mod() < (projMe - ball.Pos()).mod() && (!IsBehind)) {
                     // 已经对准
                     //getball_task.player.pos = ball.Pos() + Utils::Polar2Vector(-Param::Field::BALL_SIZE, Utils::Normalize((me.Pos() - ball.Pos()).dir())); // 预测球的位置 + 5.85     这个长度越大离球越远
-                    getball_task.player.pos = projMe;// ball.Pos() + Utils::Polar2Vector(-1.0 * maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir()));;
+                    getball_task.player.pos = expectedGetPos;// projMe;// ball.Pos() + Utils::Polar2Vector(-1.0 * maxGetBallDist, Utils::Normalize((me.Pos() - ball.Pos()).dir()));;
                     getball_task.player.angle = me2ball.dir();
                     getball_task.player.needdribble = IS_DRIBBLE;
                 }
                 else {
-                    getball_task.player.pos = expectedGetPos;
+                    getball_task.player.pos = projMe;// expectedGetPos;
                     getball_task.player.angle = me2ball.dir();
 
                     if (ball2meDist < 60)getball_task.player.needdribble = IS_DRIBBLE;
@@ -603,7 +603,7 @@ int CGetBallV5::PredictForRobot(CGeoPoint point, const CVisionModule* pVision)//
     {
         capability.maxSpeed *= SLOW_FACTOR;
     }
-    capability.maxAccel = capability.maxDec = 175.0;
+    capability.maxAccel = capability.maxDec = 250.0;
     const double time_factor = 1.5;
     double usedtime = expectedCMPathTime(Robot, point, capability, CVector(0, 0), time_factor, 0);
     //cout << usedtime << endl;

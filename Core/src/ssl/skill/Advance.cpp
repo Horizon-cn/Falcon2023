@@ -329,9 +329,9 @@ void CAdvance::plan(const CVisionModule* pVision)
 			double faceDir = opp.Dir() + Param::Math::PI;
 			setSubTask(PlayerRole::makeItChaseKickV2(_executor, faceDir, ShootNotNeedDribble));
 		}
-		
+		/*
 		else if (isPassBalltoMe(pVision, _executor) ) {
-			/*我方给我进行传球*/
+			/*我方给我进行传球
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "pass ball to me", COLOR_ORANGE);
 
 			if (me2goal.mod() < KICK_DIST && (Me2OppTooclose(pVision, _executor))) {
@@ -341,7 +341,7 @@ void CAdvance::plan(const CVisionModule* pVision)
 			else KickorPassDir = (PassPoint - me.Pos()).dir();
 			setSubTask(PlayerRole::makeItReceivePass(_executor, KickorPassDir));
 		}
-	
+	*/
 		else {
 			/*并没有得到球 需要去getball*/
 			if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -300), "LOSE and GETBALL", COLOR_ORANGE);

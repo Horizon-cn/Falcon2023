@@ -313,6 +313,12 @@ CPlayerTask* CGoalie2022::saveTask(const CVisionModule* pVision)
 	flag |= PlayerStatus::QUICKLY;
 	flag |= PlayerStatus::DRIBBLING;
 
+	//temp try rush
+	//double toSaveDir = (savePoint - pVision->OurPlayer(robotNum).Pos()).dir();
+	//double v = 1000;
+	//double vx = v * cos(toSaveDir), vy = v * sin(toSaveDir);
+	//return PlayerRole::makeItRun(robotNum, vx, vy, 0);
+
 	return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
 }
 
