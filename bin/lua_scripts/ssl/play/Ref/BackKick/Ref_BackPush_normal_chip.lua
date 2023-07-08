@@ -1,9 +1,9 @@
-local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(30, -ball.antiY()*math.pi*3/4)
-end
-
 local SHOOT_POS = function()
   return ball.pos()+Utils.Polar2Vector(460,ball.antiY()*math.pi/6)
+end
+
+local WAIT_BALL_POS   = function ()
+  return ball.pos() + Utils.Polar2Vector(40, math.pi + ball.toPointDir(SHOOT_POS())())
 end
 
 local RECEIVE_POS = function()

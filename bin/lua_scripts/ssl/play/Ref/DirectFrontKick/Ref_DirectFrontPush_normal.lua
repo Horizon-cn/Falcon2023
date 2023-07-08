@@ -2,7 +2,7 @@
 local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(380/1200*param.pitchLength,150/900*param.pitchWidth))
 
 local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(30, math.pi + ball.toPointDir(SHOOT_POS())())
+  return ball.pos() + Utils.Polar2Vector(40, math.pi + ball.toPointDir(SHOOT_POS())())
 end
 
 local FRONT_POS1= ball.antiYPos(CGeoPoint:new_local(350/1200*param.pitchLength,-150/900*param.pitchWidth))
@@ -14,7 +14,7 @@ local TargetPos2= ball.antiYPos(CGeoPoint:new_local(250/1200*param.pitchLength,0
 local TargetPos3= ball.antiYPos(CGeoPoint:new_local(380/1200*param.pitchLength,150/900*param.pitchWidth))
 
 local RECEIVE_POS = function()
-  return SHOOT_POS() + Utils.Polar2Vector(20,ball.toPointDir(SHOOT_POS())()+ball.antiY()*math.pi/4)
+  return SHOOT_POS() + Utils.Polar2Vector(30,ball.toPointDir(SHOOT_POS())()+ball.antiY()*math.pi/4)
 end
 
 local BlockPos=ball.antiYPos(CGeoPoint:new_local(430/1200*param.pitchLength,-100/900*param.pitchWidth))
