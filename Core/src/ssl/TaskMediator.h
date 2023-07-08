@@ -61,6 +61,12 @@ public:
         return _rightBack.num;
     }
 
+    int helperBack() {
+        if (vision->Cycle() - _helperBack.lastCycle > 5) {
+            _helperBack.num = 0;
+        }
+        return _helperBack.num;
+    }
     //???§Ü???
     int leftCenterBack() {
         if (vision->Cycle() - _leftCenterBack.lastCycle > 5) {
@@ -138,6 +144,7 @@ public:
         return ((vecNumber != 0) &&
                 ((vecNumber == leftBack())    ||
                  (vecNumber == rightBack())   ||
+                 (vecNumber == helperBack()) ||
                  (vecNumber == singleBack())  ||
                  (vecNumber == defendHead())  ||
                  (vecNumber == sideBack())    ||
@@ -217,7 +224,12 @@ public:
         } else if ("rightBack" == role){
             _rightBack.num = num;
             _rightBack.lastCycle = vision->Cycle();
-        }else if ("leftCenterBack" == role) {
+        }
+        else if ("helperBack" == role) {
+            _helperBack.num = num;
+            _helperBack.lastCycle = vision->Cycle();
+        }
+        else if ("leftCenterBack" == role) {
             _leftCenterBack.num = num;
             _leftCenterBack.lastCycle = vision->Cycle();
         }else if ("rightCenterBack" == role) {
@@ -306,6 +318,7 @@ private:
     SpecialRole _goalie;
     SpecialRole _leftBack;
     SpecialRole _rightBack;
+    SpecialRole _helperBack;
     SpecialRole _leftCenterBack;
     SpecialRole _rightCenterBack;
     SpecialRole _singleBack;

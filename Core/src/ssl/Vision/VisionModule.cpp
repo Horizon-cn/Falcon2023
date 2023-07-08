@@ -171,7 +171,7 @@ void CVisionModule::SetNewVision(const GameInfoT& vInfo)
 	// 【#TODO】 更新贝叶斯滤波器，评估目前比赛攻防形式
 	// MatchState::Instance()->update();
 
-	// DefenceInfo::Instance()->updateDefenceInfo(this);
+	DefenceInfo::Instance()->updateDefenceInfo(this);
 	DefenceInfoNew::Instance()->updateDefenceInfoNew(this);
 
 	/////////////////////////////////////////////////////////////////////////////

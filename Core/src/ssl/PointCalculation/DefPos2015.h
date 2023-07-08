@@ -7,6 +7,7 @@
 struct Defend2015 {
     CGeoPoint leftD;    // 左后卫站位点
     CGeoPoint rightD;   // 右后卫站位点
+    CGeoPoint helperD;
 	CGeoPoint leftFrontD; //左边后位靠前站点
 	CGeoPoint rightFrontD;
 	CGeoPoint leftBackD;
@@ -21,6 +22,7 @@ struct Defend2015 {
     CGeoPoint getSidePos() { return sideD; }
     CGeoPoint getLeftPos() { return leftD;}
     CGeoPoint getRightPos() { return rightD; }
+    CGeoPoint getHelperPos() { return helperD; }
 	CGeoPoint getLeftCenPos() { return leftCenD; }
 	CGeoPoint getRightCenPos() { return rightCenD; }
     CGeoPoint getMiddlePos() { return middleD; }
@@ -42,6 +44,7 @@ class CDefPos2015 {
 		const CGeoPoint& getSidePos() { return _defendPoints.sideD; }
 		const CGeoPoint& getLeftPos() { return _defendPoints.leftD; }
 		const CGeoPoint& getRightPos() { return _defendPoints.rightD; }
+        const CGeoPoint& getHelperPos() { return _defendPoints.helperD; }
 		const CGeoPoint& getLeftCenPos() { return _defendPoints.leftCenD; }
 		const CGeoPoint& getRightCenPos() { return _defendPoints.rightCenD; }
 		const CGeoPoint& getMiddlePos() { return _defendPoints.middleD; }

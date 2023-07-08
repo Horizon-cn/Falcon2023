@@ -61,7 +61,7 @@ namespace
 	const CGeoPoint LEFT_GOAL_POST = CGeoPoint(-Field::PITCH_LENGTH / 2, -Field::GOAL_WIDTH / 2);
 	const CGeoPoint RIGHT_GOAL_POST = CGeoPoint(-Field::PITCH_LENGTH / 2, Field::GOAL_WIDTH / 2);
 	const double MaxSpeed=350;
-	int KICKPOWER = 630;
+	int KICKPOWER = 550;
 	int CHIPPOWER = 180;
 }
 
@@ -265,6 +265,8 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 	bool isReached;	//车是否赶到球的左边或者右边
 	bool notReached;
 	int  isLeft = -1; //需要赶到的方向
+	//cout<<ballVelDir<<endl;
+	//cout<<isLeft<<endl;
 	if (sin(ballVelDir)*Param::Field::PITCH_LENGTH / 2 < ball.Pos().x()*sin(ballVelDir) - ball.Pos().y()*cos(ballVelDir)){
 		isLeft = 1;
 	}
@@ -535,6 +537,7 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 		//speedUpDistanceY应该收敛的，随车球y值的差值越来越小，影响拉开角度距离（球车横向距离）的最大因素；
 		//speedUpDistanceX则影响球车纵向距离，和球速方向相关，大角度时应为负值。
 		//speedUpVel设置为球速方便后面跟球，
+		//cout<<"speed Up"<<endl;
 		if (testOn){
 			GDebugEngine::Instance()->gui_debug_msg(real_predict_ballPos, "SPEED_UP");
 			GDebugEngine::Instance()->gui_debug_x(real_predict_ballPos, COLOR_CYAN);
@@ -542,7 +545,7 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 		if (isVerticalBall){
 			chase_kick_task.player.max_acceleration = MAX_TRANSLATION_ACC;
 			if (testOn){
-				//cout << "Crazy Vertical speed up"<< endl;
+				cout << "Crazy Vertical speed up"<< endl;
 			}
 			/*speedUpDistanceY = fabs(kickPos.y() - me.Pos().y()) + crossWiseFactor[realNum] * Param::Vehicle::V2::PLAYER_SIZE + max((ballSpeed - 100)*sin(fabs(max(ballVelDir - Param::Math::PI * 35 / 180, 0)))*0.18, 0);*/
 			speedUpDistanceY = fieldFactor*fabs(kickPos.y() - me.Pos().y()) * crossWiseFactor[realNum-1] * Param::Vehicle::V2::PLAYER_SIZE + max(ballSpeed - 80, 0.0)*max(sin(fabs(ballVelDir) - Param::Math::PI * 8 / 180), 0.0)*0.28;
@@ -575,7 +578,7 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 		}
 		else if(isCrossBall){
 			if (testOn){
-				//cout << "Crazy cross speed up" << endl;
+				cout << "Crazy cross speed up" << endl;
 			}
 			/*speedUpDistanceY = 0.8*fabs(kickPos.y() - me.Pos().y()) + crossWiseFactor[realNum] * Param::Vehicle::V2::PLAYER_SIZE + max((ballSpeed - 100)*sin(fabs(max(ballVelDir - Param::Math::PI * 35 / 180, 0)))*0.18, 0);*/
 			speedUpDistanceY = fieldFactor*fabs(kickPos.y() - me.Pos().y()) * crossWiseFactor[realNum-1] * Param::Vehicle::V2::PLAYER_SIZE + max(ballSpeed - 80, 0.0)*max(sin(fabs(ballVelDir) - Param::Math::PI * 2 / 180), 0.0)*0.40;
@@ -608,7 +611,7 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 
 		else{
 			if (testOn){
-				//cout << "Crazy abnormal speed up" << endl;
+				cout << "Crazy abnormal speed up" << endl;
 			}
 			/*speedUpDistanceY = 0.8*fabs(kickPos.y() - me.Pos().y()) + crossWiseFactor[realNum] * Param::Vehicle::V2::PLAYER_SIZE + max((ballSpeed - 100)*sin(fabs(max(ballVelDir - Param::Math::PI * 35 / 180, 0)))*0.3, 0);*/
 			speedUpDistanceY = fieldFactor*fabs(kickPos.y() - me.Pos().y()) * crossWiseFactor[realNum-1] * Param::Vehicle::V2::PLAYER_SIZE + max(ballSpeed - 80, 0.0)*max(sin(fabs(ballVelDir) - Param::Math::PI * 10 / 180), 0.0)*0.35;
@@ -639,8 +642,8 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 		}
 
 		if (testOn){
-			//cout << speedUpDistanceX << endl;
-			//cout << speedUpDistanceY << endl;
+			cout << speedUpDistanceX << endl;
+			cout << speedUpDistanceY << endl;
 		}
 		chase_kick_task.player.pos = CGeoPoint(kickPos.x() + speedUpDistanceX, kickPos.y() - isLeft*speedUpDistanceY);
 		chase_kick_task.player.vel = speedUpVel;
@@ -783,7 +786,12 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 			GDebugEngine::Instance()->gui_debug_x(real_predict_ballPos, COLOR_CYAN);
 			//cout << "Getball" << endl;
 		}	
+		if (RobotSensor::Instance()->IsInfraredOn(robotNum)) {
+			setSubTask(PlayerRole::makeItNoneTrajGetBall(task().executor, finalKickDir, CVector(0, 0), task().player.flag, -2));
+		}
+		else {
 			setSubTask(PlayerRole::makeItNoneTrajGetBallV3(task().executor,finalKickDir,CVector(0,0),task().player.flag,-2));
+		}			
 			break;
 	case SPEED_DOWN:
 		chase_kick_task.player.pos = myPos;
@@ -867,9 +875,8 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 		{
 			KickStatus::Instance()->setChipKick(robotNum, CHIPPOWER);
 		}else{
-			if(task().player.kickpower)KickStatus::Instance()->setKick(robotNum, task().player.kickpower);
-			else KickStatus::Instance()->setKick(robotNum, KICKPOWER);
-		}
+			KickStatus::Instance()->setKick(robotNum, KICKPOWER);
+	}
 	}
 	if (state() != GET_BALL){
 		//SubTask的调用
@@ -879,16 +886,16 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 			if (me.Pos().x() > 220){    //TODO need Compensate for bigangle
 				if (me.Pos().y() > 170){
 					if (testOn){
-						//cout << "Compen" << endl;
+						cout << "Compen" << endl;
 					}
-					finalKickDir = finalKickDir + Param::Math::PI * 15 / 180;
+					// finalKickDir = finalKickDir + Param::Math::PI * 15 / 180;
 				}
 				else if (me.Pos().y() < -170){
 					if (testOn){
-						//cout << "Compen" << endl;
+						cout << "Compen" << endl;
 					}
 
-					finalKickDir = finalKickDir - Param::Math::PI * 15 / 180;
+					// finalKickDir = finalKickDir - Param::Math::PI * 15 / 180;
 				}
 			}
 			//printf("touch \n");
@@ -901,7 +908,6 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 				chase_kick_task.player.max_acceleration = MAX_TRANSLATION_ACC;
 			}
 			chase_kick_task.player.pos = checkPointAvoidOurPenalty(pVision, chase_kick_task.player.pos);
-			//setSubTask(TaskFactoryV2::Instance()->GotoPosition(chase_kick_task));
 			setSubTask(TaskFactoryV2::Instance()->SmartGotoPosition(chase_kick_task));
 			//if (verBos) cout << "angle " << chase_kick_task.player.angle << endl;
 		}
@@ -918,11 +924,6 @@ void CChaseKickV2::plan(const CVisionModule* pVision)
 			setSubTask(PlayerRole::makeItNoneTrajGetBall(task().executor, finalKickDir, CVector(0, 0), task().player.flag, -2));
 		}
 	}*/
-
-	if (BallStatus::Instance()->getBallPossession(true, robotNum) > 0.3) {
-		setSubTask(PlayerRole::makeItNoneTrajGetBall(robotNum, finalKickDir, CVector(0, 0), 0, 0));
-	}
-
 	CStatedTask::plan(pVision);
 }
 

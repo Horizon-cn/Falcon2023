@@ -98,7 +98,8 @@ void CMarking::plan(const CVisionModule* pVision)
 	*      ÅÐ¶ÏÊÇ·ñÒªÈÆÇ°½ØÇò      *
 	*	    By Soap 2015-4-27     *
 	*****************************/
-	const PlayerVisionT* theirKicker = &pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
+	//const PlayerVisionT* theirKicker = &pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
+	const PlayerVisionT* theirKicker = &pVision->TheirPlayer(DefenceInfo::Instance()->getSteadyAttackOppNumByPri(0));
 	double ballToEnemyDir = (enemy.Pos() - ball.Pos()).dir();
 	double meToBallDist = me.Pos().dist(ball.Pos());
 	double enemyToBallDist = enemy.Pos().dist(ball.Pos());

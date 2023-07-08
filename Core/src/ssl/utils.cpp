@@ -101,7 +101,7 @@ namespace Utils {
         double finalBuffer = buffer;
         if (WorldModel::Instance()->CurrentRefereeMsg() == "ourIndirectKick" || WorldModel::Instance()->CurrentRefereeMsg() == "theirIndirectKick"
             || WorldModel::Instance()->CurrentRefereeMsg() == "gameStop")
-            finalBuffer += 35;
+            finalBuffer += 40;
 
         return (p.x() > Param::Field::PITCH_LENGTH / 2 - Param::Field::PENALTY_AREA_DEPTH - finalBuffer
             && std::fabs(p.y()) < Param::Field::PENALTY_AREA_WIDTH / 2 + finalBuffer);
@@ -173,7 +173,7 @@ namespace Utils {
         double finalBuffer = buffer + 10;
         if (WorldModel::Instance()->CurrentRefereeMsg() == "ourIndirectKick" || WorldModel::Instance()->CurrentRefereeMsg() == "theirIndirectKick"
             || WorldModel::Instance()->CurrentRefereeMsg() == "gameStop")
-            finalBuffer += 25;
+            finalBuffer += 40;
 
         if (p.y() > 0) {
             // ??????????????????????????????????

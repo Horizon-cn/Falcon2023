@@ -577,6 +577,23 @@ void CDefPos2015::generatePos(const CVisionModule* pVision) {
 	_defendPoints.goalieD = reversePoint(RgoaliePoint);
 	_laststoredgoaliePoint = _defendPoints.goalieD;
 
+	double dist = _defendPoints.leftD.dist(_defendPoints.rightD) * 2;
+	if (pVision->Ball().Pos().y() >= 0) {
+		if (_defendPoints.rightD.y() < Param::Field::PENALTY_AREA_WIDTH * 0.5) {
+			_defendPoints.helperD = _defendPoints.rightD + Utils::Polar2Vector(dist, -Param::Math::PI * 0.5);
+		}
+		else {
+			_defendPoints.helperD = _defendPoints.rightD + Utils::Polar2Vector(dist, 0);
+		}		
+	}
+	else {
+		if (_defendPoints.leftD.y() > -Param::Field::PENALTY_AREA_WIDTH * 0.5) {
+			_defendPoints.helperD = _defendPoints.leftD + Utils::Polar2Vector(dist, Param::Math::PI * 0.5);
+		}
+		else {
+			_defendPoints.helperD = _defendPoints.leftD + Utils::Polar2Vector(dist, 0);
+		}
+	}
 
 	// Debug–≈œ¢
 	if (false) {
