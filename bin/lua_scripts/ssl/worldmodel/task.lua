@@ -774,7 +774,7 @@ function goSecondPassPos(role)
 end
 
 function support(role, num)
-	local mexe, mpos = GoCmuRush{ pos = ball.supportPassPos(num), dir = player.toShootOrRobot(role),sender=role,flag=bit:_or(flag.allow_dss, flag.dodge_ball),srole="support", num = num}
+	local mexe, mpos = GoCmuRush{ pos = ball.supportPassPos(num), dir = dir.shoot(),sender=role,flag=bit:_or(flag.allow_dss, flag.dodge_ball),srole="support", num = num}
 	return {mexe, mpos}
 end
 	
@@ -978,6 +978,17 @@ function rightBack(p)
 		ipower = p
 	end
 	local mexe, mpos = GotoMatchPos{ method = 4, acc = 500, pos = pos.rightBackPos, dir = dir.backSmartGotoDir, srole = "rightBack", flag = bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle, flag.allow_dss)}
+	return {mexe, mpos, kick.chip, dir.defendBackClear(), pre.fieldDefender(), kp.specified(ipower),cp.specified(ipower), bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
+end
+
+function helperBack(p)
+	local ipower
+	if p == nil then
+		ipower = 2700
+	else
+		ipower = p
+	end
+	local mexe, mpos = GotoMatchPos{ method = 4, acc = 500, pos = pos.helperBackPos, dir = dir.backSmartGotoDir, srole = "helperBack", flag = bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle, flag.allow_dss)}
 	return {mexe, mpos, kick.chip, dir.defendBackClear(), pre.fieldDefender(), kp.specified(ipower),cp.specified(ipower), bit:_or(flag.not_avoid_our_vehicle,flag.not_avoid_their_vehicle)}
 end
 

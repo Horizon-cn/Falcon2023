@@ -823,16 +823,16 @@ extern "C" int Skill_Marking(lua_State * L)
 	int flag = LuaModule::Instance()->GetNumberArgument(5, NULL);
 	bool front = LuaModule::Instance()->GetBoolArgument(6);
 	double dir = LuaModule::Instance()->GetNumberArgument(7, NULL);
-	//int bestEnemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
-	//if (DefenceInfo::Instance()->getOppPlayerByNum(bestEnemy)->isTheRole("RReceiver")) {
-	//	if (pri > 0) {
-	//		pri -= 1;
-	//	}
-	//}
-	int enemy = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(pri - 1);
-	DefenceInfoNew::Instance()->addMarker();
+	int bestEnemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
+	if (DefenceInfo::Instance()->getOppPlayerByNum(bestEnemy)->isTheRole("RReceiver")) {
+		if (pri > 0) {
+			pri -= 1;
+		}
+	}
+	/*int enemy = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(pri - 1);
+	DefenceInfoNew::Instance()->addMarker();*/
 
-	CPlayerTask* pTask = PlayerRole::makeItMarkEnemy(runner, enemy, front, flag, CGeoPoint(x, y), dir);
+	CPlayerTask* pTask = PlayerRole::makeItMarkEnemy(runner, bestEnemy, front, flag, CGeoPoint(x, y), dir);
 	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
 	return 0;
 }

@@ -53,7 +53,7 @@ namespace {
 	const double safeVelFactorBack = 1.0;
 
 	double stopBallAvoidDist = 70.0;
-	double ballPlacementDist = 50;
+	double ballPlacementDist = 60;
 
 	/// related to rrt
 	double startToRotateToTargetDirDist = 20;
@@ -446,7 +446,7 @@ void CSmartGotoPosition::validateFinalTarget(CGeoPoint& finalTarget, const CVisi
 	// 定位球 (FREE_KICK) 的时候需要多避对方禁区20厘米.
 	double theirPenaltyAvoidLength = avoidLength;
 	if (playerFlag & PlayerStatus::FREE_KICK) {
-		theirPenaltyAvoidLength += 20.0 + 10.0;
+		theirPenaltyAvoidLength += 40.0;
 		// update on 23.7.6 防止犯规，多避10厘米
     }
     else if (!shrinkTheirPenalty) {
@@ -567,7 +567,7 @@ CGeoPoint CSmartGotoPosition::dealPlanFail(CGeoPoint startPoint, CGeoPoint nextP
 	double buffer = 0;
 	if (WorldModel::Instance()->CurrentRefereeMsg() == "ourIndirectKick" || WorldModel::Instance()->CurrentRefereeMsg() == "theirIndirectKick"
 		|| WorldModel::Instance()->CurrentRefereeMsg() == "gameStop")
-		buffer += 20;
+		buffer += 40;
 
     CGeoRectangle theirPenalty(CGeoPoint(Param::Field::PITCH_LENGTH / 2 -Param::Field::PENALTY_AREA_DEPTH-buffer, -Param::Field::PENALTY_AREA_WIDTH / 2-buffer), CGeoPoint(Param::Field::PITCH_LENGTH / 2, Param::Field::PENALTY_AREA_WIDTH / 2 +buffer));
     CGeoRectangle ourPenalty(CGeoPoint(-Param::Field::PITCH_LENGTH / 2, -Param::Field::PENALTY_AREA_WIDTH / 2-buffer), CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH+buffer, Param::Field::PENALTY_AREA_WIDTH / 2+buffer));

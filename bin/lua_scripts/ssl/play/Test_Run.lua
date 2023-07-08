@@ -24,7 +24,7 @@ firstState = "run1",
 			return "run1";
 		end
 	end,
-	Goalie = task.goCmuRush(TargetPos1, DIR1),
+	Kicker = task.chaseNew(),
     -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""

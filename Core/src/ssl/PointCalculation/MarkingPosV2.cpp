@@ -105,16 +105,17 @@ CGeoPoint CMarkingPosV2::getMarkingPos(const CVisionModule* pVision, const int p
 	//return markingPoint[oppNum];
 	checkAllMarkingPos(pVision);
 	oppPriority = pri;
-	//int bestEnemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
-	////当receiver为最高优先级的时候，这句话可以理解为场上对方是否有receiver
-	//if (DefenceInfo::Instance()->getOppPlayerByNum(bestEnemy)->isTheRole("RReceiver"))
-	//{
-	//	if (oppPriority > 0)
-	//	{
-	//		oppPriority -= 1;
-	//	}		
-	//}
-	oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(oppPriority - 1);
+	int bestEnemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
+	//当receiver为最高优先级的时候，这句话可以理解为场上对方是否有receiver
+	if (DefenceInfo::Instance()->getOppPlayerByNum(bestEnemy)->isTheRole("RReceiver"))
+	{
+		if (oppPriority > 0)
+		{
+			oppPriority -= 1;
+		}
+	}
+	oppNum = DefenceInfo::Instance()->getAttackOppNumByPri(oppPriority);
+	//oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(oppPriority - 1);
 	return markingPoint[oppNum];
 }
 
@@ -124,13 +125,14 @@ CGeoPoint CMarkingPosV2::getMarkingPosByAbsolutePri(const CVisionModule* pVision
 	oppNum = DefenceInfo::Instance()->getSteadyAttackOppNumByPri(oppPriority);
 	if (pVision->Cycle() > logCycle[oppNum])
 	{
-	logCycle[oppNum] = pVision->Cycle();
-	markingPoint[oppNum] = generatePos(pVision);
+		logCycle[oppNum] = pVision->Cycle();
+		markingPoint[oppNum] = generatePos(pVision);
 	}
 	return markingPoint[oppNum];
 	checkAllMarkingPos(pVision);
-	oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(pri);
-	return markingPoint[oppNum];
+	oppNum = DefenceInfo::Instance()->getSteadyAttackOppNumByPri(pri);
+	//oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(pri);
+	return markingPoint[pri];
 }
 
 //根据对手车号选敌
@@ -151,12 +153,20 @@ void CMarkingPosV2::checkAllMarkingPos(const CVisionModule* pVision)
 {
 	//让防区域内的车不挤
 	if (pVision->Cycle() > _logCycle) {
-		int attackCnt = DefenceInfoNew::Instance()->getSteadyBallReceiverNum();
+		//int attackCnt = DefenceInfoNew::Instance()->getSteadyBallReceiverNum();
+		int attackCnt = DefenceInfo::Instance()->getAttackNum();
 		areaList.clear();
 		for (int i = 0; i < attackCnt; i++) {
-			int bestEnemy = DefenceInfoNew::Instance()->getBestBallChaser();
-			oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(i);
-			markingPoint[oppNum] = generatePos(pVision);
+			int bestEnemy = DefenceInfo::Instance()->getAttackOppNumByPri(0);
+			if (DefenceInfo::Instance()->getOppPlayerByNum(bestEnemy)->isTheRole("RReceiver")) {
+				oppNum = DefenceInfo::Instance()->getAttackOppNumByPri(i);
+				markingPoint[oppNum] = generatePos(pVision);
+			} else {
+				if (i < attackCnt - 1) {
+					oppNum = DefenceInfo::Instance()->getAttackOppNumByPri(i + 1);
+					markingPoint[oppNum] = generatePos(pVision);
+				}
+			}
 		}
 	}
 	vector<int>::iterator ir;
@@ -177,7 +187,8 @@ bool CMarkingPosV2::isNearestBallReceiverBeDenied(const CVisionModule* pVision)
 {
 	double minDist = 1000;
 	int receiverNum = 0;
-	int attackNum = DefenceInfoNew::Instance()->getSteadyBallReceiverNum();
+	//int attackNum = DefenceInfoNew::Instance()->getSteadyBallReceiverNum();
+	int attackNum = DefenceInfo::Instance()->getAttackNum();
 	if (pVision->Ball().Vel().mod() > NO_ADVANCE_BALL_VEL)
 	{
 		if (debug)
@@ -186,7 +197,9 @@ bool CMarkingPosV2::isNearestBallReceiverBeDenied(const CVisionModule* pVision)
 		}
 		for (int i = 0; i < attackNum; ++i)
 		{
-			int oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(i);
+			//int oppNum = DefenceInfoNew::Instance()->getSteadyBallReceiverByPri(i);
+			int oppNum = DefenceInfo::Instance()->getAttackOppNumByPri(i);
+			//if (DefenceInfo::Instance()->getOppPlayerByNum(oppNum)->isTheRole("RReceiver"))
 			double dist_opp_ball = pVision->TheirPlayer(oppNum).Pos().dist(pVision->Ball().Pos());
 			if (dist_opp_ball < minDist)
 			{
@@ -230,7 +243,7 @@ CGeoPoint CMarkingPosV2::generatePos(const CVisionModule* pVision)
 		double angle_oppVel_opp2Goal = fabs(Utils::Normalize(opp2ourGoalVector.dir() - oppVel.dir()));
 
 		//immortalKick
-		if (false)//todo 新防守体系移植过程中没搞太懂(DefenceInfo::Instance()->getOppPlayerByNum(oppNum)->getAttributeValue("AChaseAbility") > CHASE_JUDGE_VALUE)
+		if (DefenceInfo::Instance()->getOppPlayerByNum(oppNum)->getAttributeValue("AChaseAbility") > CHASE_JUDGE_VALUE)//todo 新防守体系移植过程中没搞太懂(DefenceInfo::Instance()->getOppPlayerByNum(oppNum)->getAttributeValue("AChaseAbility") > CHASE_JUDGE_VALUE)
 		{
 			bool defenderOK = (defenderNum != 0) && pVision->OurPlayer(defenderNum).Valid();
 			CGeoPoint preOppPos = oppPos + Utils::Polar2Vector(oppVel.mod() * predictTime, oppVel.dir());//专对于ImmortalKick，不需要根据对手速度朝向修改predictTime

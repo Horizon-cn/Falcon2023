@@ -218,6 +218,10 @@ function rightBackPos()
 	return defPos2015:getDefPos2015(vision):getRightPos()
 end
 
+function helperBackPos()
+	return defPos2015:getDefPos2015(vision):getHelperPos()
+end
+
 function leftCenterBackPos()
 	return defPos2015:getDefPos2015(vision):getLeftCenPos()
 end

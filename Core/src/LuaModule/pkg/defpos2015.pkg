@@ -3,6 +3,7 @@ $#include "DefPos2015.h"
 struct Defend2015 {
     CGeoPoint leftD;
     CGeoPoint rightD;
+    CGeoPoint helperD;
     CGeoPoint leftFrontD;
   	CGeoPoint rightFrontD;
 	  CGeoPoint leftBackD;
@@ -16,6 +17,7 @@ struct Defend2015 {
     CGeoPoint getSidePos();
     CGeoPoint getLeftPos();
     CGeoPoint getRightPos();
+    CGeoPoint getHelperPos();
   	CGeoPoint getLeftCenPos();
   	CGeoPoint getRightCenPos();
     CGeoPoint getMiddlePos();
@@ -34,6 +36,7 @@ class CDefPos2015 {
 		const CGeoPoint& getSidePos();
 		const CGeoPoint& getLeftPos();
 		const CGeoPoint& getRightPos();
+        const CGeoPoint& getHelperPos();
 		const CGeoPoint& getLeftCenPos();
 		const CGeoPoint& getRightCenPos();
 		const CGeoPoint& getMiddlePos();
