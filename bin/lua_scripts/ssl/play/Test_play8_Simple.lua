@@ -77,6 +77,9 @@ firstState = "SixAttackFront",
 -- 4-: G + chaseNew + 2Back
 ---------------------------------------------------------
 -- task.goCmuRush(MIDDLE_POS_1, player.toPointDir(ball.pos())),
+-- player.toShootOrRobot(role)
+-- task.advance(),
+-- task.chaseNew()
 ["SixAttackFront8"] = {
 	switch = SwitchBallArea,
 	Leader = task.advance(),
@@ -186,7 +189,7 @@ firstState = "SixAttackFront",
     Special = task.marking("First"), -- task.protectBall(),
 	Defender = task.leftBack(),
 	Crosser  =  task.rightBack(),
-	Breaker  = task.defendMiddle(),
+	Breaker  = task.marking("Second"),
 	Goalie = task.goalieNew(),
     match = "[L][DCM][A][S][M]"
 },

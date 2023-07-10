@@ -370,8 +370,14 @@ void CAdvance::plan(const CVisionModule* pVision)
 			}
 			else {
 				if (Advance_DEBUG_ENGINE) GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(500, -350), "Kick is NOT DirOK ", COLOR_ORANGE);
-				KickorPassDir = GenerateShootDir(pVision, _executor);
-				setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+				if (me.X() < 200) {
+					KickorPassDir = GenerateShootDir(pVision, _executor);
+					setSubTask(PlayerRole::makeItNoneTrajGetBall(_executor, KickorPassDir, CVector(0, 0), ShootNotNeedDribble, GetBallBias));
+				}
+				else {
+					KickorPassDir = GenerateShootDir(pVision, _executor);
+					setSubTask(PlayerRole::makeItNoneTrajGetBallV3(task().executor, KickorPassDir, CVector(0, 0), task().player.flag, 0));
+				}
 			}
 		}
 		break;
@@ -664,7 +670,7 @@ bool CAdvance::IsOurNearHere(const CVisionModule* pVision, int supportIndex, int
 	int supporter = TaskMediator::Instance()->supporter(supportIndex);
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
 	if(pVision->OurPlayer(supporter).Pos().dist(me.Pos()) > 160)
-		if (supporter != 0 && pVision->OurPlayer(supporter).Pos().dist(SupportPoint[supportIndex]) < 60)
+		if (supporter != 0 && pVision->OurPlayer(supporter).Pos().dist(SupportPoint[supportIndex]) < 100)
 			return true;
 	return false;
 }
@@ -871,7 +877,7 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 		theMinOppDistToThePoint[i] =  pVision->TheirPlayer(getTheirMostClosetoPosPlayerNum(pVision, SupportPoint[i])).Pos().dist(SupportPoint[i]);
 		NearThanMe[i] = (theirCenter.dist(SupportPoint[i]) + supportMustNearerDist < theirCenter.dist(me.Pos()));
 		
-		if (isOurNearPointAndFarOfMe[i] && theMinOppDistToThePoint[i] > theMinOppDist_threshold) {
+		if (isOurNearPointAndFarOfMe[i]/* && theMinOppDistToThePoint[i] > theMinOppDist_threshold*/) {
 			
 			if (MeIsInWhichArea == CanNOTBreakArea || MeIsInWhichArea == CornerArea || MeIsInWhichArea == KICKArea) {
 				isCanUse[i] = 1;
@@ -888,7 +894,8 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 	if (!OneOfUsCanShoot)
 	{
 		TheBestSupportNumber = 1;
-		return 0;
+		if (fabs(me.Y()) < 120 && me.X() > 355)return 0;
+		return 1;
 	}
 	else {
 		int idx = -1, minDir = 1e9;
@@ -904,6 +911,8 @@ int CAdvance::CanSupportKick(const CVisionModule* pVision, int vecNumber) {
 int CAdvance::toChipOrToFlat(const CVisionModule* pVision, int vecNumber, CGeoPoint TargetPoint) {
 	// 0chip 1flat
 	const PlayerVisionT& me = pVision->OurPlayer(vecNumber);
+	if (me.X() > 0)return 1;
+	else return 0;
 	if (isTheLineBlocked(pVision, me.Pos(), TargetPoint) && me.Pos().dist(TargetPoint) <= ParamManager::Instance()->maxChipDist)return 0;
 
 	return 1;

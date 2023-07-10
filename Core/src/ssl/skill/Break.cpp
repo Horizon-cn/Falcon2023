@@ -188,7 +188,8 @@ void CBreak::plan(const CVisionModule* pVision) {
     double me2enemy_dist = me2Enemy.mod();
     double alphaangle = fabs(Utils::Normalize(me2Ball.dir() - me2Enemy.dir()));
     bool criterion = Utils::Normalize(me2Ball.dir() - me2Enemy.dir()) > 0;
-    const CVector me2target = passTarget - me.Pos();
+    //const CVector me2target = passTarget - me.Pos();
+    const CVector me2target = CGeoPoint(Param::Field::PITCH_LENGTH / 2 + 15, 0) - me.Pos();
     double finalDir = me2target.dir();
 
     bool canShoot = true;
@@ -841,7 +842,7 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
     if (Param::Field::MAX_PLAYER == 0)
     {
         double projection = y1 + tan(theta) * (Param::Field::PITCH_LENGTH / 2 - x1);
-        if (fabs(projection) + 2 + corrected_parameter > (Param::Field::GOAL_WIDTH - 10) / 2) {
+        if (fabs(projection) + 2 + corrected_parameter > (Param::Field::GOAL_WIDTH - 40) / 2) {
             flag = false;
         }
     }
@@ -859,12 +860,12 @@ bool CBreak::canScore(const CVisionModule* pVision, const int vecNumber, const d
         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, -475), ("radius:" + to_string(radius)).c_str(), COLOR_YELLOW);
         //changed 6.29
         if (pVision->TheirPlayer(i).Vel().mod() < 50) {
-            if (r < radius  || fabs(projection) + 2 + corrected_parameter>(Param::Field::GOAL_WIDTH - 10) / 2) {
+            if (r < radius  || fabs(projection) + 2 + corrected_parameter>(Param::Field::GOAL_WIDTH - 40) / 2) {
                 flag = false;
                 break;
             }
         }
-        else if (r < radius || fabs(projection) + 2 + corrected_parameter>(Param::Field::GOAL_WIDTH - 10) / 2) {
+        else if (r < radius || fabs(projection) + 2 + corrected_parameter>(Param::Field::GOAL_WIDTH - 40) / 2) {
             flag = false;
             break;
         }

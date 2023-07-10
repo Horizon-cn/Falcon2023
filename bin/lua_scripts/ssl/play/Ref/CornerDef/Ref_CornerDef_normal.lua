@@ -20,7 +20,8 @@ local DetectTheSupportID = function()
     end
 end
 
-local DefendMiddlePos = CGeoPoint:new_local(-450/1200*param.pitchLength,0)
+local DefendMiddlePos = CGeoPoint:new_local(-470/1200*param.pitchLength,20)
+local DefendMiddlePos_2 = CGeoPoint:new_local(-470/1200*param.pitchLength,-20)
 
 gPlayTable.CreatePlay{
 
@@ -33,11 +34,11 @@ gPlayTable.CreatePlay{
       end
     end,
   Leader   = task.defendMiddle(),
-  Assister = task.goCmuRush(DefendMiddlePos,player.toPointDir(SHOOT_POS),ACC,flag.allow_dss + flag.dodge_ball),
-  Middle   = task.sideBack(),
+  Assister = task.goCmuRush(DefendMiddlePos_2,player.toPointDir(SHOOT_POS),ACC,flag.allow_dss + flag.dodge_ball),
+  Middle   = task.goCmuRush(DefendMiddlePos,player.toPointDir(SHOOT_POS),ACC,flag.allow_dss + flag.dodge_ball),
   Special  = task.support("Leader",DetectTheSupportID), 
-  Defender = task.leftBack(),
-  Crosser  = task.rightBack(),
+  Defender = task.sideBack(),
+  Crosser  = task.singleBack(),
   Breaker  = task.sideBackUltra(),
   Goalie   = task.goalieNew(),
   --match    = "[L][DC][S][M][A][B]"

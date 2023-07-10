@@ -26,6 +26,7 @@ namespace {
 
 		S_GOTOBALL = 1,
 		S_GETBALL,
+		S_BACK,
 		S_TURN,
 		S_PULL,
 		S_CHECK,
@@ -82,13 +83,12 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	CVector ball2ourGoal = ball.Pos() - ourGoal;
 	CVector ourGoal2ball = ourGoal - ball.Pos();
 	bool isBallOutside = (abs(ball.Pos().y()) > (Param::Field::PITCH_WIDTH / 2 - 50)) || (abs(ball.Pos().x())) > (Param::Field::PITCH_LENGTH / 2 - 50);
-	//bool isMeOutside = (abs(me.Pos().y()) > (Param::Field::PITCH_WIDTH / 2 - 60)) || (abs(me.Pos().x())) > (Param::Field::PITCH_LENGTH / 2 - 60);
+	bool isMeOutside = (abs(me.Pos().y()) > (Param::Field::PITCH_WIDTH / 2 - 60)) || (abs(me.Pos().x())) > (Param::Field::PITCH_LENGTH / 2 - 60);
 	bool isTargetOutside = (abs(targetPos.y()) > (Param::Field::PITCH_WIDTH / 2 - 50)) || (abs(targetPos.x())) > (Param::Field::PITCH_LENGTH / 2 - 50);
 
 
 	//拿球状态判断
 	double possession = BallStatus::Instance()->getBallPossession(true, vecNumber);
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -220), to_string(possession).c_str(), COLOR_GREEN);
 
 	/********************set subTask********************/
 	/*状态机跳转   -by lsp*/
@@ -96,14 +96,23 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	int new_state = state();
 	switch (state()) {
 	case BEGINNING:
-		if (isBallOutside) new_state = S_GOTOBALL;
-		else new_state = S_GOTOBALL;
+		if (isBallOutside) {
+			new_state = S_GOTOBALL;
+			cnt = 0;
+		}
+		else {
+			new_state = S_GOTOBALL;
+			cnt = 0;
+		}
+		cnt++;
 		break;
 
 	case S_GOTOBALL:
 		if ((me.Pos() - ball.Pos()).mod() < 20) {
 			new_state = S_GETBALL;
+			cnt = 0;
 		}
+		cnt++;
 		break;
 
 	case S_GETBALL:
@@ -112,19 +121,37 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 				new_state = S_TURN;
 				cnt = 0;
 			}
+			else {
+				if (cnt >= 100)
+					new_state = S_BACK;
+				cnt = 0;
+			}
 		}
 		else {
 			if (possession >= 0.9) {
 				new_state = S_PULL;
 				cnt = 0;
 			}
+			else {
+				if (cnt >= 100)
+					new_state = S_BACK;
+				cnt = 0;
+			}
+		}
+
+		cnt++;
+		break;
+
+	case S_BACK:
+		if (!isMeOutside) {
+			new_state = S_GOTOBALL;
+			cnt = 0;
 		}
 		cnt++;
 		break;
 
 		//吸球行进
 	case S_TURN:
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -240), to_string(isVisionHasBall(pVision, vecNumber)).c_str(), COLOR_GREEN);
 		if ((ball.Pos() - targetPos).mod() < 5 || ((me.Pos() - targetPos).mod() < 10 && !isVisionHasBall(pVision, vecNumber))) {
 			new_state = S_CHECK;
 			cnt = 0;
@@ -135,7 +162,6 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		cnt++;
 		break;
 	case S_PULL:
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -240), to_string(isVisionHasBall(pVision, vecNumber)).c_str(), COLOR_GREEN);
 		if ((ball.Pos() - targetPos).mod() < 5 || ((me.Pos() - targetPos).mod() < 10 && !isVisionHasBall(pVision, vecNumber))) {
 			new_state = S_CHECK;
 			cnt = 0;
@@ -179,6 +205,10 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_GETBALL", COLOR_CYAN);
 		}
+		else if (S_BACK == getState())
+		{
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_BACK", COLOR_CYAN);
+		}
 		else if (S_TURN == getState())
 		{
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -170), "F_S_TURN", COLOR_CYAN);
@@ -210,6 +240,22 @@ void CFetchBall::plan(const CVisionModule* pVision) {
 	}
 	else if (S_GETBALL == state()) {
 		setSubTask(PlayerRole::makeItNoneTrajGetBallForStatic(vecNumber, S_GOTOBALL_getball_dir, CVector(0, 0), flags | PlayerStatus::DRIBBLING | PlayerStatus::NOT_DODGE_PENALTY));
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(170, -220), ("cnt: " + to_string(cnt)).c_str(), COLOR_GREEN);
+	}
+	else if (S_BACK == state()) {
+		TaskT playerTask;
+		playerTask.executor = vecNumber;
+		playerTask.player.pos = me.Pos() + Utils::Polar2Vector(50, Utils::Normalize(me2targetDir));
+		playerTask.player.angle = targetdir + Param::Math::PI;
+		playerTask.player.vel = CVector(0, 0);
+		playerTask.player.rotvel = 0.0;
+		playerTask.player.flag = PlayerStatus::DRIBBLING | PlayerStatus::ALLOW_DSS | PlayerStatus::NOT_DODGE_PENALTY;
+		playerTask.player.max_speed = paramManager->PlACEBALL_SPEED;
+		playerTask.player.max_rot_speed = paramManager->PlACEBALL_ROT_SPEED;
+		playerTask.player.max_acceleration = paramManager->PlACEBALL_ACCELERATION;
+		playerTask.player.max_deceleration = paramManager->PlACEBALL_DECELERATION;
+		playerTask.player.max_rot_acceleration = paramManager->PlACEBALL_ROT_ACCELERATION;
+		setSubTask(TaskFactoryV2::Instance()->GotoPosition(playerTask));
 	}
 	else if (S_TURN == state()) {//TODO：吸球转身前进
 		TaskT playerTask;

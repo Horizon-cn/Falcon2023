@@ -112,7 +112,7 @@ gPlayTable.CreatePlay{
   ["receiveBall"] = {
     switch = function ()
       if bufcnt(ball.toPlayerHeadDist("Leader") < 5, "fast", 180) then--
-        return "exit"
+        return "shootBall"
       end
     end,
     Assister = task.support("Leader",DetectBallAreaFront),
@@ -126,22 +126,22 @@ gPlayTable.CreatePlay{
     match    = "[D][A][L][B][C][M][S]"
   },
 
--- ["shootBall"] = {
---     switch = function ()
---       if bufcnt(player.kickBall("Leader"), 3, 150) then--
---         return "exit"
---       end
---     end,
---     Assister = task.support("Leader",DetectBallAreaFront),
---     Leader   = task.advance(),
---     Middle   = task.protectBall(),
---     Special  = task.sideBack(),
---     Defender = task.multiBack(3,1),
---     Breaker  = task.multiBack(3,2),
---     Crosser  = task.multiBack(3,3),
---     Goalie   = task.goalieNew(),
---     match    = "[D][B][A][L][C][M][S]"
---   },
+ ["shootBall"] = {
+     switch = function ()
+       if bufcnt(player.kickBall("Leader"), 3, 150) then--
+         return "exit"
+       end
+     end,
+     Assister = task.support("Leader",DetectBallAreaFront),
+     Leader   = task.touch(CGeoPoint:new_local(6000, 0)),
+     Middle   = task.protectBall(),
+     Special  = task.sideBack(),
+     Defender = task.multiBack(3,1),
+     Breaker  = task.multiBack(3,2),
+     Crosser  = task.multiBack(3,3),
+     Goalie   = task.goalieNew(),
+     match    = "[D][B][A][L][C][M][S]"
+   },
 
   name = "Ref_DirectCornerPush_normal",
   applicable = {

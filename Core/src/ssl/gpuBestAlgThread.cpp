@@ -48,7 +48,7 @@ namespace gpuCalcArea {
 	const double PI = 3.1415926;
 	const int Color_Size = 256;
 
-	const double differenceX = Param::Field::PITCH_LENGTH / 15;
+	const double differenceX = Param::Field::PITCH_LENGTH / 10;
 
 	const double middleFrontBorderX = Param::Field::PITCH_LENGTH / 6;
 	const double middleBackBorderX = -Param::Field::PITCH_LENGTH / 6;

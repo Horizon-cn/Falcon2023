@@ -1,6 +1,6 @@
 
-local WAIT_BALL_POS   = function ()
-  return ball.pos() + Utils.Polar2Vector(40, math.pi + ball.toPointDir(SHOOT_POS())())
+local SHOOT_POS = function()
+  return ball.pos()+Utils.Polar2Vector(300, ball.antiY()*math.pi/6)
 end
 
 local WAIT_BALL_POS   = function ()
@@ -48,14 +48,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.goCmuRush(WAIT_BALL_POS,player.toPointDir(SHOOT_POS),_,flag.allow_dss + flag.dodge_ball),
-    Leader   = task.goCmuRush(RECEIVE_POS, player.toPointDir(SHOOT_POS), ACC, STOP_DSS),
+    Leader   = task.goCmuRush(RECEIVE_POS, dir.shoot(), ACC, STOP_DSS),
     Middle   = task.goCmuRush(ASSIST_POS, player.toPlayerHeadDir("Leader"), ACC, STOP_DSS),
     Special  = task.sideBack(),
     Defender = task.multiBack(3,1),
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[DB][A][C][L][M][S]"
+    match    = "[DB][A][L][S][C][M]"
   },
 
   ["toBall"] = {
@@ -65,14 +65,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.staticGetBallForceKick(SHOOT_POS,false),
-    Leader   = task.goCmuRush(RECEIVE_POS, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Middle   = task.goCmuRush(ASSIST_POS, player.toPlayerHeadDir("Leader"), ACC, STOP_DSS),
+    Leader   = task.goCmuRush(RECEIVE_POS, dir.shoot(), ACC, STOP_DSS),
+    Middle   = task.goCmuRush(ASSIST_POS, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Special  = task.sideBack(),
     Defender = task.multiBack(3,1),
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[DB][A][C][L][M][S]"
+    match    = "[DB][A][L][S][C][M]"
   },
 
   ["kickBall"] = {
@@ -82,14 +82,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.chipPass(SHOOT_POS, KICK_POWER,_,_,flag.force_kick),
-    Leader   = task.goCmuRush(RECEIVE_POS, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
-    Middle   = task.goCmuRush(ASSIST_POS, player.toPlayerHeadDir("Leader"), ACC, STOP_DSS),
+    Leader   = task.goCmuRush(RECEIVE_POS, dir.shoot(), ACC, STOP_DSS),
+    Middle   = task.goCmuRush(ASSIST_POS, player.toPlayerHeadDir("Assister"), ACC, STOP_DSS),
     Special  = task.sideBack(),
     Defender = task.multiBack(3,1),
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[DB][A][C][L][M][S]"
+    match    = "[DB][A][L][S][C][M]"
   },
 
   ["receiveBall"] = {
@@ -106,7 +106,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[DB][A][C][L][M][S]"
+    match    = "[DB][A][L][S][C][M]"
   },
 
 ["shootBall"] = {
@@ -123,7 +123,7 @@ gPlayTable.CreatePlay{
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[DB][A][C][L][M][S]"
+    match    = "[DB][A][L][S][C][M]"
   },
 
   name = "Ref_BackPush_normal_chip",

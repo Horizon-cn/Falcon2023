@@ -483,7 +483,7 @@ void CGetBallV5::plan(const CVisionModule* pVision)
 
     getball_task.player.IsGetBaller = true;
 
-    getball_task.player.needdribble = 1;
+    //getball_task.player.needdribble = 1;
 
     // attention防止被绕前
     modifyGetballTaskpos(pVision, getball_task.player.pos);

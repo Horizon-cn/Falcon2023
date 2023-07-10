@@ -1,5 +1,5 @@
 --【接球点】可根据实车情况进行调整
-local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(380/1200*param.pitchLength,150/900*param.pitchWidth))
+local SHOOT_POS = ball.antiYPos(CGeoPoint:new_local(380/1200*param.pitchLength,0/900*param.pitchWidth))
 
 local WAIT_BALL_POS   = function ()
   return ball.pos() + Utils.Polar2Vector(40, math.pi + ball.toPointDir(SHOOT_POS())())
@@ -17,7 +17,7 @@ local RECEIVE_POS = function()
   return SHOOT_POS() + Utils.Polar2Vector(40,ball.toPointDir(SHOOT_POS())())
 end
 
-local BlockPos=ball.antiYPos(CGeoPoint:new_local(430/1200*param.pitchLength,-100/900*param.pitchWidth))
+local BlockPos=ball.antiYPos(CGeoPoint:new_local(430/1200*param.pitchLength,100/900*param.pitchWidth))
 --【传球力度】可根据实车情况进行调整
 local KICK_POWER=function()
   return 13.6*math.sqrt(ball.toPointDist(SHOOT_POS()))

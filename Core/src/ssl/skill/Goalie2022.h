@@ -39,6 +39,7 @@ private:
 	bool isPosInCornerShootArea(CGeoPoint pos);
 
 	Tpenalty last_penalty_status;
+	int last_penalty_attack_cycle;
 };
 
 #endif //__GOALIE_2022_H__

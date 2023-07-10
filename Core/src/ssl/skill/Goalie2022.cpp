@@ -31,7 +31,7 @@ namespace {
 	double BLOCK_DIST;
 }
 
-CGoalie2022::CGoalie2022() :last_penalty_status(PENALTY_WAIT)
+CGoalie2022::CGoalie2022() :last_penalty_status(PENALTY_WAIT), last_penalty_attack_cycle(0)
 {
 	goalie_debug = paramManager->GOALIE_DEBUG;
 	trickPoint = CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH * paramManager->TRICKPOS_DIV_PENALTY, 0);
@@ -70,6 +70,7 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 		pTask = clearBallTask(pVision);
 		break;
 	case ATTACK_ENEMY_PENALTY:
+		last_penalty_attack_cycle = pVision->Cycle();
 		pTask = attackEnemyPenaltyTask(pVision);
 		break;
 	case ATTACK_ENEMY:
@@ -102,13 +103,16 @@ CGoalie2022::Tevaluate CGoalie2022::evaluate(const CVisionModule* pVision)
 	} else if (!ball.Valid()) {
 		DEBUG_EVALUATE("evaluate: invalid ball");
 		return NORMAL;
-	} else if (IsFarFromBack(ball.Pos())) {
+	} else if (ShouldAttackPenalty(pVision)) {
+		DEBUG_EVALUATE("evaluate: attack enemy in penalty");
+		return ATTACK_ENEMY_PENALTY;
+	} /*else if (IsFarFromBack(ball.Pos())) {
 		DEBUG_EVALUATE("evaluate: far ball");
 		return NORMAL;
-	} else if (isBallShot2Goal(pVision)) {
+	}*/ else if (isBallShot2Goal(pVision)) {
 		DEBUG_EVALUATE("evaluate: danger, save ball!");
 		return SAVE;
-	} else if (ball.Vel().mod()<20 && Utils::InOurPenaltyArea(ball.Pos(), PENALTY_BUFFER)) {
+	} else if (ball.Vel().mod() < 20 && Utils::InOurPenaltyArea(ball.Pos(), PENALTY_BUFFER)) {
 		if (CanSupport(pVision)) {
 			DEBUG_EVALUATE("evaluate: slow ball, safe to support");
 			return SUPPORT;
@@ -124,9 +128,6 @@ CGoalie2022::Tevaluate CGoalie2022::evaluate(const CVisionModule* pVision)
 			DEBUG_EVALUATE("evaluate: slow ball, safe to support");
 			return SUPPORT;
 		}
-	} else if (ShouldAttackPenalty(pVision)) {
-		DEBUG_EVALUATE("evaluate: attack enemy in penalty");
-		return ATTACK_ENEMY_PENALTY;
 	} else if (ShouldAttack(pVision)) {
 		DEBUG_EVALUATE("evaluate: attack enemy");
 		return ATTACK_ENEMY;
@@ -169,7 +170,7 @@ bool CGoalie2022::CanSupport(const CVisionModule* pVision)
 {
 	const BallVisionT& ball = pVision->Ball();
 
-	if(is_penalty)
+	if (is_penalty)
 		return false;
 	for (int i = 0; i < Param::Field::MAX_PLAYER; i++)
 	{
@@ -240,15 +241,51 @@ bool CGoalie2022::ShouldAttack(const CVisionModule* pVision)
 	return free_enemy <= 1;
 }
 // 点球如果敌人踢球前带太远，我们更容易抢到球，直接上去拿球
-//todo 未完成
 bool CGoalie2022::ShouldAttackPenalty(const CVisionModule* pVision)
 {
 	BallVisionT Ball = pVision->Ball();
+	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(300, 0), to_string(Ball.Vel().mod()).c_str());
+	PlayerVisionT me = pVision->OurPlayer(task().executor);
 	PlayerVisionT enemy = pVision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
+	double me2ballDist = Ball.Pos().dist(me.Pos());
+	double ball2meDir = (me.Pos() - Ball.Pos()).dir();
+	double enemy2ballDist = Ball.Pos().dist(enemy.Pos());
+	double ball2enemyDir = (enemy.Pos() - Ball.Pos()).dir();
+	double v_enemy = 250;
+	double v_me = 100;
+	// 过近扑救不需要
+	if (pVision->Cycle() - this_shoot_cycle < 100 && Ball.Pos().x() < -300 && me.Pos().x()<-400 && Ball.Vel().mod()>300)
+		return false;
+	// 稳定状态机，冲出去就别犹豫
+	if (pVision->Cycle() - last_penalty_attack_cycle < 15)
+		return true;
 	if (!is_penalty)
 		return false;
 	if (Ball.Pos().dist(enemy.Pos()) < 100)
 		return false;
+	if (Ball.Vel().mod() < 30)
+	{
+		if (me2ballDist / enemy2ballDist < 0.6)
+			return true;
+		else if (enemy.Vel().mod() < 100 && me2ballDist / enemy2ballDist < 0.8)
+			return true;
+		else
+			return false;
+	} else if (Ball.Vel().mod() > v_enemy) {//fast ball, enemy can't chase
+		CGeoLine ballVelLine(Ball.Pos(), Ball.Vel().dir());
+		CGeoPoint proj = ballVelLine.projection(me.Pos());
+		if (   proj.dist(me.Pos())<1.5*Param::Vehicle::V2::PLAYER_SIZE    /*fabs(Utils::Normalize(ball2meDir - Ball.Vel().dir())) < Param::Math::PI / 18*/) {
+			return true;
+		} else {
+			return false;
+		}
+	} else { // 球速适中，判断位置
+		double enemyGetBallTime = enemy2ballDist / (v_enemy - Ball.Vel().mod());
+		double meGetBallTime = me2ballDist / (v_me + Ball.Vel().mod());
+
+		return false;//todo
+	}
+
 
 	return false;
 }
@@ -273,7 +310,7 @@ CPlayerTask* CGoalie2022::normalTask(const CVisionModule* pVision)
 	else
 		DefPoint = intersect.IntersectPoint();
 	if (isPosInCornerShootArea(defenceTarget)) //封死近角
-		DefPoint = syntYPos(defenceTarget,CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Vehicle::V2::PLAYER_SIZE, Param::Field::GOAL_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE));
+		DefPoint = syntYPos(defenceTarget, CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Vehicle::V2::PLAYER_SIZE, Param::Field::GOAL_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE));
 	double dir;
 	const PlayerVisionT& me = pVision->OurPlayer(robotNum);
 	if (ball.Valid()) {
@@ -312,12 +349,6 @@ CPlayerTask* CGoalie2022::saveTask(const CVisionModule* pVision)
 	int flag = task().player.flag;
 	flag |= PlayerStatus::QUICKLY;
 	flag |= PlayerStatus::DRIBBLING;
-
-	//temp try rush
-	//double toSaveDir = (savePoint - pVision->OurPlayer(robotNum).Pos()).dir();
-	//double v = 1000;
-	//double vx = v * cos(toSaveDir), vy = v * sin(toSaveDir);
-	//return PlayerRole::makeItRun(robotNum, vx, vy, 0);
 
 	return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
 }
@@ -419,10 +450,16 @@ CPlayerTask* CGoalie2022::clearBallTask(const CVisionModule* pVision)
 	return PlayerRole::makeItNoneTrajGetBall(robotNum, dir, CVector(0, 0), flag);
 	//拿到球后通过lua层面检测会自己踢出去
 }
-//todo 未完成
+
 CPlayerTask* CGoalie2022::attackEnemyPenaltyTask(const CVisionModule* pVision)
 {
-	return nullptr;
+	int robotNum = task().executor;
+	const PlayerVisionT& me = pVision->OurPlayer(robotNum);
+	const BallVisionT& ball = pVision->Ball();
+	int flag = task().player.flag;
+	flag |= PlayerStatus::QUICKLY;
+	flag |= PlayerStatus::DRIBBLING;
+	return PlayerRole::makeItGoto(robotNum, ball.Pos(), me.Dir(), flag);
 }
 
 CPlayerTask* CGoalie2022::attackEnemyTask(const CVisionModule* pVision)
@@ -646,7 +683,7 @@ double CGoalie2022::CalClearBallDir(const CVisionModule* pVision)
 CGeoPoint CGoalie2022::syntYPos(CGeoPoint reference, CGeoPoint target)
 {
 	int sign = (reference.y() > 0) - (reference.y() < 0);
-	return CGeoPoint(target.x(),sign*target.y());
+	return CGeoPoint(target.x(), sign * target.y());
 }
 
 bool CGoalie2022::isPosInCornerShootArea(CGeoPoint pos)
@@ -659,5 +696,5 @@ bool CGoalie2022::isPosInCornerShootArea(CGeoPoint pos)
 	double angle_penaltyRightCorner2leftGoalPost = (penaltyRightCorner - leftGoalPost).dir();
 	double angle_pos2rightGoalPost = (pos - rightGoalPost).dir();
 	double angle_penaltyLeftCorner2rightGoalPost = (penaltyLeftCorner - rightGoalPost).dir();
-	return (angle_pos2leftGoalPost>angle_penaltyRightCorner2leftGoalPost) || (angle_pos2rightGoalPost<angle_penaltyLeftCorner2rightGoalPost);
+	return (angle_pos2leftGoalPost > angle_penaltyRightCorner2leftGoalPost) || (angle_pos2rightGoalPost < angle_penaltyLeftCorner2rightGoalPost);
 }

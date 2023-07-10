@@ -106,14 +106,14 @@ gPlayTable.CreatePlay{
       end
     end,
     Assister = task.support("Special",4),
-    Special  = task.receive(ball.pos(),RECEIVE_POS2),
+    Special  = task.advance(),
     Leader   = task.goCmuRush(BLOCK_POS2,_,_,flag.allow_dss + flag.dodge_ball),
     Middle   = task.multiBack(3,1),
     Defender = task.sideBack(),
     Breaker  = task.multiBack(3,2),
     Crosser  = task.multiBack(3,3),
     Goalie   = task.goalieNew(),
-    match    = "[M][S][B][L][D][C][A]"
+    match    = "[M][A][S][B][D][L][C]"
   },
 
   name = "Ref_MiddleKick_normal",
