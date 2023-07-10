@@ -265,10 +265,10 @@ function advance()
 	local ball2NextAdvancerDir = (player.pos(nextAdvancer) - ball.pos()):dir()
 	local angleDiff = math.abs(ball2NextAdvancerDir - ball.velDir())
 	local ball2NextAdvancerDist = ball.pos():dist(player.pos(nextAdvancer))
-	-- if nextAdvancer > 0 and nextAdvancer < param.maxPlayer and ball.velMod() > 70 and not (angleDiff > math.pi/2 and ball2NextAdvancerDist > 60) then
-	-- 	advancePos = player.pos(nextAdvancer)
-	-- 	print(advancePos:x())
-	-- else
+	if nextAdvancer > 0 and nextAdvancer < param.maxPlayer and ball.velMod() > 70 and not (angleDiff > math.pi/2 and ball2NextAdvancerDist > 60) then
+		advancePos = player.pos(nextAdvancer)
+		print(advancePos:x())
+	else
 		if (ball.posX()>=0 and ball.velX()>-300) then
 			--return CGeoPoint(ball.posX()+k_v_1*ball.velX(),ball.posY()+k_v_2*ball.velY())
 			advancePos = CGeoPoint(ball.posX()+k_v_2*math.abs(ball.velX())*ball.velX(),ball.posY()+k_v_2*math.abs(ball.velY())*ball.velY())
@@ -280,7 +280,7 @@ function advance()
 				advancePos = ball.pos()
 			end
 		end
-	-- end
+	end
 	--debugEngine:gui_debug_msg(advancePos, "hereeeeeee", 4)  			
 	return advancePos
 end
