@@ -5,16 +5,6 @@
 	- [未走完的路](./TODO.md)
 	- [前人的肩膀](./Document.md)
 
-## Attention！motion参数注意
-
-![Motion](./wiki/Motion.png)
-
-**仿真**下PERIOD-MOVE-X设为0.01到0.05效果较好
-
-**实车**下PERIOD-MOVE-X设为0.1到0.3效果较好
-
-
-
 ## 框架组成
 
 - `3rdParty` -- 编译所用第三方库
