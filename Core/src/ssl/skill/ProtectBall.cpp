@@ -24,7 +24,6 @@ namespace
     bool verBos = false;
     const int State_Counter_Num=3;
 };
-int CProtectBall::protectBallNum = -1;
 CProtectBall::CProtectBall()
 {
     _lastCycle = 0;
@@ -92,12 +91,16 @@ void CProtectBall::plan(const CVisionModule* pVision)
             }
             break;
         case Approach_Ball:
-            if (oppo2BallDist < 40) {
+            if (self2predictDist > 100) {
+                new_state = Approach_Ball;
+            }
+            else if (oppo2BallDist < 40) {
                 if (verBos) cout << "Approach_Ball-->Block" << endl;
                 new_state = Block;
             }
             else {
-                new_state = Approach_Ball;
+                if (verBos) cout << "Approach_Ball-->Protect_Ball" << endl;
+                new_state = Protect_Ball;
             }
             break;
         case Protect_Ball:
@@ -108,17 +111,22 @@ void CProtectBall::plan(const CVisionModule* pVision)
             else if (self2predictDist > 100) {
                 if (verBos) cout << "Protect_Ball-->Approach_Ball" << endl;
                 new_state = Approach_Ball;
-            }else {
+            }
+            else {
                 new_state = Protect_Ball;
             }
             break;
         case Block:
-            if (oppo2BallDist > 40) {
-                if (verBos) cout << "Block-->Protect_Ball" << endl;
-                new_state = Protect_Ball;
+            if (oppo2BallDist < 40) {
+                new_state = Block;
+            }
+            else if (self2predictDist > 100) {
+                if (verBos) cout << "Block-->Approach_Ball" << endl;
+                new_state = Approach_Ball;
             }
             else {
-                new_state = Block;
+                if (verBos) cout << "Block-->Protect_Ball" << endl;
+                new_state = Protect_Ball;
             }
             break;
         default:
@@ -229,12 +237,7 @@ void CProtectBall::plan(const CVisionModule* pVision)
 				BlockPos = BlockPos2;
 			}
             if ((BlockPos - self.Pos()).mod() < 5) {
-                if (dist1 > dist2) {
-                    BlockPos = BlockPos1;
-                }
-                else {
-                    BlockPos = BlockPos2;
-                }
+                BlockPos = pVision->OurPlayer(advancer).Pos() + Utils::Polar2Vector(advancer2oppo.mod() / 2, Utils::Normalize(advancer2oppo.dir()));
             }
             //GDebugEngine::Instance()->gui_debug_x(BlockPos, COLOR_BLUE);//≤‚ ‘”√
             double BlockDir = Utils::Normalize((ball.Pos()-self.Pos()).dir());

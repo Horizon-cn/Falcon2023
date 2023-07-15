@@ -21,7 +21,6 @@ protected:
 
 private:
 	CPlayerCommand* _directCommand;	//Ö±½Ó·¢ËÍÃüÁî
-	static int protectBallNum;
 	int _lastCycle;
 	int _stateCounter;
 };
