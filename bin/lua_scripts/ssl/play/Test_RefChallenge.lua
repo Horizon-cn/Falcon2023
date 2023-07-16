@@ -1,3 +1,6 @@
+-- from ZJU mark
+-- 夺旗战裁判代码
+
 local BELONG_DIST = 125
 local BELONG_ANGLE = 30
 local SUM_TIME = 60

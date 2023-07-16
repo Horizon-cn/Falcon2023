@@ -1,28 +1,24 @@
 gOppoConfig = {
-  ----------------------play---------------------------------------------------------------
+----------------------------play-----------------------------------
 
-	DirectCornerKick  = {"Ref_DirectCornerPush8"},
-	
-	IndirectCornerKick  = {"Ref_IndirectCornerPush8"},
-	
-	DirectFrontKick   = {"Ref_DirectFrontPush8"},
-	
-	IndirectFrontKick   = {"Ref_IndirectFrontPush8"},
-	
-	BackKick    = {"Ref_BackPush8"},
+	CornerKick  = {"Ref_CornerKick_PureDefence8"},
+	FrontKick   = {"Ref_FrontKick_PureDefence8"},
+	BackKick    = {"Ref_BackKick_PureDefence8"},
 
--------------------------------Def---------------------------------------------------
+-------------------------------Def-----------------------------------
 
-	CornerDef   = "Ref_CornerDef8",
-	BackDef 	= "Ref_BackDef8",
-	MiddleDef   = "Ref_MiddleDef8",
-	FrontDef    = "Ref_FrontDef8",
+	CornerDef   = "Ref_CornerDef_PureDefence8",
+	FrontDef    = "Ref_FrontDef_PureDefence8",
+	MiddleDef   = "Ref_MiddleDef_PureDefence8",
+	BackDef 	= "Ref_BackDef_PureDefence8",
 
-	PenaltyKick = "Ref_PenaltyKick8",
-	PenaltyDef  = "Ref_PenaltyDef8",
+-------------------------------Special-------------------------------
 
-	KickOff		= "Ref_KickOff8",
-	KickOffDef  = "Ref_KickOffDef8",
+	PenaltyKick = "Ref_PenaltyKick_normal",
+	PenaltyDef  = "Ref_PenaltyDef_normal",
+
+	KickOff		= "Ref_KickOff_PureDefence8",
+	KickOffDef  = "Ref_KickOffDef_PureDefence8",
 	
-	NorPlay     = "NormalPlayPureDefence8"
+	NorPlay     = "Nor_8_PureDefence"
 }

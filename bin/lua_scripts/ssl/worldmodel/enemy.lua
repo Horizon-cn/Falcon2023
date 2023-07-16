@@ -99,23 +99,6 @@ function hasReceiver()
 	return CEnemyHasReceiver()
 end
 
-gEnemyMsg = {
-	-- 门将的位置（包括消失处理）
-	goaliePos = CGeoPoint:new_local(param.pitchLength/2.0,0)
-}
-
-function updateCorrectGoaliePos()
-	local theirGoalieNum = vision:TheirGoalie()
-	if enemy.valid(theirGoalieNum) then
-		gEnemyMsg.goaliePos = enemy.pos(theirGoalieNum)
-	end
-	return gEnemyMsg.goaliePos
-end
-
-function getTheirGoaliePos()
-	return gEnemyMsg.goaliePos
-end
-
 function best()
 	return defenceInfoNew:getBestBallChaser()
 end

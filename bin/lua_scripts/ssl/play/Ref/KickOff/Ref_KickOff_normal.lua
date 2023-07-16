@@ -1,3 +1,5 @@
+-- 状态机写复杂了，其实是getball用法不对
+
 local START_POS = CGeoPoint:new_local(27/1200*param.pitchLength,0)
 local START_POS_1 = CGeoPoint:new_local(27/1200*param.pitchLength,18/900*param.pitchWidth)
 local START_POS_2 = CGeoPoint:new_local(27/1200*param.pitchLength,-18/900*param.pitchWidth)

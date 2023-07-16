@@ -1,41 +1,33 @@
-IS_TEST_MODE = false
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 
+IS_TEST_MODE = false
+-- Test_Run Test_Run6 Test_Speed
+-- Test_Goalie Test_PassEachOther Test_NormalPass
+-- Test_AdvanceV4 Test_MultiBack Test_GoSupport
 if not IS_YELLOW then
-	OPPONENT_NAME = "NormalKick"-- PureDefence8 NormalKick
+	gTestPlay = "Test_Run"
+else
+	gTestPlay = "Test_Run"
+end
+
+-- PureDefence8 NormalKick
+if not IS_YELLOW then
+	OPPONENT_NAME = "NormalKick"
 else
 	OPPONENT_NAME = "NormalKick"
 end
 
-gTestPlay = function ()
-	if not IS_YELLOW then
-		return "Test_Run" -- Test_AdvanceV4 Test_NormalPass Test_play6 Test_Run
-		--犯规多的时候用"Test_play8_ManyFoul"
-		--犯规少的时候用"Test_play8_NotFoul"
-		--AutoChange用"Test_play8_AUTO"
-		-- NormalPlayPureDefence8   Test_play8_Strong_Tyh
-
-	else
-		return "Test_play8_Simple" -- Test_Defence Test_PassEachOther Test_NormalMiddleDefend
-	end
-end
-gNormalPlay = "Test_play8_AUTO"
-gSwitchNum = {
-	["normal"]  = 6,
-	["backup"]  = 7,
-	["state"]   = "normal"
-}
-
 -- 有0号在场门将就是0号，没有0号在场，看这里设置的号码
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
-	["Kicker"]   = {7},
-	["Goalie"]   = {0},
-	["Tier"]	 = {13},
-	["Receiver"] = {12}
+	Goalie   = {0},
+	Kicker   = {11},
+	Tier	 = {13},
+	Receiver = {12}
 }
 
+--todo 清理无用skill
 gSkill = {
 	--走位
 	"GoAndTurn",
@@ -100,117 +92,85 @@ gSkill = {
 
 gRefPlayTable = {
 	--开球进攻
-	"Ref/KickOff/Ref_KickOff8",
+	"Ref/KickOff/Ref_KickOff_PureDefence8",
 	"Ref/KickOff/Ref_KickOff_normal",
 	--开球防守
-	"Ref/KickOffDef/Ref_KickOffDef8",
+	"Ref/KickOffDef/Ref_KickOffDef_PureDefence8",
 	"Ref/KickOffDef/Ref_KickOffDef_normal",
 
 	--角球进攻
-	"Ref/DirectCornerKick/Ref_DirectCornerPush8",
-	"Ref/DirectCornerKick/Ref_DirectCornerPush_normal",
-	"Ref/IndirectCornerKick/Ref_IndirectCornerPush8",
-	"Ref/IndirectCornerKick/Ref_IndirectCornerPush_normal_chip",
+	"Ref/CornerKick/Ref_CornerKick_PureDefence8",
+	"Ref/CornerKick/Ref_CornerKick_normal",
 	--前场进攻
-	"Ref/DirectFrontKick/Ref_DirectFrontPush8",
-	"Ref/DirectFrontKick/Ref_DirectFrontPush_normal",
-	"Ref/IndirectFrontKick/Ref_IndirectFrontPush8",
-	"Ref/IndirectFrontKick/Ref_IndirectFrontPush_normal_chip",
+	"Ref/FrontKick/Ref_FrontKick_PureDefence8",
+	"Ref/FrontKick/Ref_FrontKick_normal",
 	--中场进攻
 	"Ref/MiddleKick/Ref_MiddleKick_normal",
 	--后场进攻
-	"Ref/BackKick/Ref_BackPush8",
-	"Ref/BackKick/Ref_BackKick",
-	"Ref/BackKick/Ref_BackPush_normal_chip",
+	"Ref/BackKick/Ref_BackKick_PureDefence8",
+	"Ref/BackKick/Ref_BackKick_normal",
 
 	--角球防守
-	"Ref/CornerDef/Ref_CornerDef8",
+	"Ref/CornerDef/Ref_CornerDef_PureDefence8",
 	"Ref/CornerDef/Ref_CornerDef_normal",
-	--中场防守
-	"Ref/MiddleDef/Ref_MiddleDef8",
-	"Ref/MiddleDef/Ref_MiddleDef_normal",
 	--前场防守
-	"Ref/FrontDef/Ref_FrontDef8",
+	"Ref/FrontDef/Ref_FrontDef_PureDefence8",
 	"Ref/FrontDef/Ref_FrontDef_normal",
+	--中场防守
+	"Ref/MiddleDef/Ref_MiddleDef_PureDefence8",
+	"Ref/MiddleDef/Ref_MiddleDef_normal",
 	--后场防守
-	"Ref/BackDef/Ref_BackDef8",
+	"Ref/BackDef/Ref_BackDef_PureDefence8",
 	"Ref/BackDef/Ref_BackDef_normal",
 
 	--己方放球
-	"Ref/BallPlace/Ref_OurBallPlaceV2",
+	"Ref/BallPlace/Ref_OurBallPlace",
 	--对方放球
 	"Ref/BallPlace/Ref_TheirBallPlace",
 
 	--点球进攻
-	"Ref/PenaltyKick/Ref_PenaltyKick8",
+	"Ref/PenaltyKick/Ref_PenaltyKick_normal",--todo
+	"Ref/PenaltyKick/Ref_PenaltyKick_simple",
 	--点球防守
-	"Ref/PenaltyDef/Ref_PenaltyDef8",
+	"Ref/PenaltyDef/Ref_PenaltyDef_normal",
 
 	--停止站位
-	"Ref/GameStop/Ref_StopV2_normal",
-	"Ref/GameStop/Ref_StopV3",
-	"Ref/GameStop/Ref_StopV3_normal",
-	"Ref/GameStop/Ref_StopV2_Play8",
-	--PureDefence8
-	"Ref/GameStop/Ref_StopCornerDefPureDefence",
-	--NormalKick
-	"Ref/GameStop/Ref_Stop4CornerKick",
-	"Ref/GameStop/Ref_Stop4FrontKick",
-	"Ref/GameStop/Ref_Stop4MiddleKick",
-	"Ref/GameStop/Ref_Stop4BackKick",
-	"Ref/GameStop/Ref_Stop4CornerDef_play8",
-	"Ref/GameStop/Ref_Stop4BackDef_play8",
-	"Ref/GameStop/Ref_Stop4MiddleDef_play8",
-	"Ref/GameStop/Ref_Stop4FrontDef_play8",
+	"Ref/GameStop/Ref_Stop_normal",
 
 	--强制停止
 	"Ref/Ref_HaltV1",
 }
 
-gBayesPlayTable = {
-	"Nor/NormalPlayMark",
+gNorPlayTable = {
+	"Nor/Nor_6",
+	"Nor/Nor_6_defend",
+	"Nor/Nor_8_PureDefence",
+	"Nor/Nor_8_Power",
+	"Nor/Nor_8_Strong_Tyh",
+	"Nor/Nor_8_Simple"
 }
 
 gTestPlayTable = {
+	-- 特殊
 	"Test_RefChallenge",
+	-- 基础移动相关
 	"Test_Run",
-	"Test_BezierRun",
+	"Test_Run6",
+	"Test_DSS",
+	"Test_Circle",
+	"Test_Speed",
+	"Test_TimeDelayTest",
+	-- 基础skill相关
 	"Test_GetBall",
 	"Test_ChaseKick",
-	"Test_PassNormal",
-	"Test_ReceivePass",
 	"Test_PassEachOther",
-	"Test_StaticGetBall",
-	"Test_Speed",
+	"Test_Goalie",
+	"Test_TouchKick",
+	"Test_NormalPass",
+	-- 组合相关
+	"Test_ProtectBall",
 	"Test_Advance",
 	"Test_GoSupport",
 	"Test_AdvanceV4",
-	"Test_TouchKick",
-	"Test_Defence",
-	"Test_Goalie",
-	"Test_MultiBack",
-	"Test_ProtectBall",
-	"Test_TimeDelayTest",
-	"Test_GoTechChalPos",
-	"Test_NormalPlay",
-	"Test_NormalAttack",
-	"Test_NormalDefend",
-	"Test_AvoidFoulDefend",
-	"Test_NormalMiddleDefend",
-	"Test_Circle",
-	"NormalPlay",
-	"NormalPlayPureDefence8",
-	"Test_defend6",
-	"Test_play6ForTest",
-	"Test_DSS",
-	"Test_Run6",
-	"Test_play8_AUTO",
-	"Test_play8_ManyFoul",
-	"Test_play8_NotFoul",
-	"Test_play3",
-	"Test_NormalPass",
-	"Test_play8ForPower",
-	"Test_play6",
-	"Test_play8_Strong_Tyh",
-	"Test_play8_Simple"
+	"Test_MultiBack"
 }

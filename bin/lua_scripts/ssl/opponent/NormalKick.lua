@@ -1,34 +1,29 @@
 gOppoConfig = {
-  ----------------------play---------------------------------------------------------------
+------------------------------play-----------------------------------
 
-	DirectCornerKick  = {"Ref_DirectCornerPush_normal"},
-
-	-- IndirectCornerKick  = {"Ref_IndirectCornerPush_normal_chip"},
-
-	DirectFrontKick   = {"Ref_DirectFrontPush_normal"},
-
-	-- IndirectFrontKick   = {"Ref_IndirectFrontPush_normal_chip"},
-
+	CornerKick  = {"Ref_CornerKick_normal"},
+	FrontKick   = {"Ref_FrontKick_normal"},
 	MiddleKick    = {"Ref_MiddleKick_normal"},
-
-	BackKick    = {"Ref_BackPush_normal_chip"},
+	BackKick    = {"Ref_BackKick_normal"},
 	
--------------------------------Def---------------------------------------------------
+-------------------------------Def-----------------------------------
 
 	CornerDef   = "Ref_CornerDef_normal",
-	BackDef 	= "Ref_BackDef_normal",
-	MiddleDef   = "Ref_MiddleDef_normal",
 	FrontDef    = "Ref_FrontDef_normal",
+	MiddleDef   = "Ref_MiddleDef_normal",
+	BackDef 	= "Ref_BackDef_normal",
 
-	PenaltyKick = "Ref_PenaltyKick8",
-	PenaltyDef  = "Ref_PenaltyDef8",
+-------------------------------Special-------------------------------
+
+	PenaltyKick = "Ref_PenaltyKick_normal",
+	PenaltyDef  = "Ref_PenaltyDef_normal",
 
 	KickOff		= "Ref_KickOff_normal",
 	KickOffDef  = "Ref_KickOffDef_normal",
 	
-	NorPlay     = "Test_play8_Simple" -- "NormalPlayPureDefence8"
-	--JLC新写  Test_play8ForPower  打得非常凶
-	--TYH版本： Test_play8_Strong_Tyh
-	--龟壳： NormalPlayPureDefence8 不要用 有问题
-	-- Test_play8_Simple
+	NorPlay     = "Nor_8_Simple"
+	-- 压制型  Nor_8_Power
+	-- ZYJ Nor_8_Simple
+	-- TYH Nor_8_Strong_Tyh
+	-- 龟壳： Nor_8_PureDefence
 }

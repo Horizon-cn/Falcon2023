@@ -14,7 +14,6 @@ end
 
 
 function isGameOn()
-	--print("check game on")
 	return vision:gameState():gameOn()
 end
 
@@ -57,10 +56,6 @@ end
 
 function canDefenceExit()
 	return world:CanDefenceExit()
-end
-
-function timeRemain()
---	return vision:TimeRemain()
 end
 
 function ourGoal()

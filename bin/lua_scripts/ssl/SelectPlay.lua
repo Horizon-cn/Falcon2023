@@ -1,15 +1,3 @@
--- if gSwitchNum["state"] == "normal" then
--- 	if not player.realNumExist(gSwitchNum["normal"]) and player.realNumExist(gSwitchNum["backup"]) then
--- 		print("change to backup")
--- 		gSwitchNum["state"] = "backup"
--- 	end
--- elseif gSwitchNum["state"] == "backup" then
--- 	if not player.realNumExist(gSwitchNum["backup"]) and player.realNumExist(gSwitchNum["normal"]) then
--- 		print("change to normal")
--- 		gSwitchNum["state"] = "normal"
--- 	end
--- end
-
 gNormalPlay = gOppoConfig.NorPlay
 
 function RunRefScript(name)
@@ -42,15 +30,6 @@ function SelectRefPlay()
 end
 
 function SelectBayesPlay()
-	--gCurrentPlay = "Nor_PassAndShoot"
-	-- gCurrentPlay = "Nor_MorePass"
-
-	--add by twj 14/5/12
-	--------------------
-	if gNormalPlay == "NormalPlayNew" or gNormalPlay == "NormalPlayDefend" or gNormalPlay == "NormalPlayOneState" then
-		world:clearBallStateCouter()
-	end
-	---------------------
 	gCurrentPlay = gNormalPlay
 	ResetPlay(gCurrentPlay)
 end
@@ -83,18 +62,6 @@ else
 			ResetPlay(gCurrentPlay)
 		end
 	else
-		--add by twj 14/5/12
-		------------------------------------------
-		if gNormalPlay == "NormalPlayNew" or gNormalPlay == "NormalPlayDefend" or gNormalPlay == "NormalPlayOneState" 
-		or gNormalPlay == "NormalPlayMark" or gNormalPlay == "NormalPlayLongchip" then
-			world:setBallHandler(gRoleNum["Leader"])
-			gLastBallStatus=gCurrentBallStatus
-			gCurrentBallStatus=world:getBallStatus(vision:Cycle(),gRoleNum["Leader"])
-			gLastFieldArea=gCurrentFieldArea
-			gCurrentFieldArea=cond.judgeFieldArea()
-		end
-		--------------------------------------------
-
 		if gLastPlay == "" or NeedExit(gCurrentPlay) then
 			print("Play: "..gCurrentPlay.." Exit!!")
 			SelectBayesPlay()
