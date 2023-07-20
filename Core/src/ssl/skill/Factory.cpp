@@ -15,6 +15,7 @@
 //1.atom skills(TODO)
 #include "GotoPosition.h"
 #include "SmartGotoPosition.h"
+#include "Rush.h"
 
 //2.basic skills(TODO)
 #include "StopRobot.h"
@@ -128,6 +129,10 @@ CPlayerTask* CTaskFactoryV2::GotoPosition(const TaskT& task) {
 
 CPlayerTask* CTaskFactoryV2::SmartGotoPosition(const TaskT& task) {
 	return MakeTask< CSmartGotoPosition >(task);
+}
+
+CPlayerTask* CTaskFactoryV2::Rush(const TaskT& task) {
+	return MakeTask< CRush >(task);
 }
 
 CPlayerTask* CTaskFactoryV2::GotoPositionNew(const TaskT& task) {
@@ -476,6 +481,14 @@ namespace PlayerRole {
 		return TaskFactoryV2::Instance()->GotoPosition(playerTask);
 	}
 
+	CPlayerTask* makeItRush(const int num, const CGeoPoint& target, const int flags)
+	{
+		static TaskT playerTask;
+		playerTask.executor = num;
+		playerTask.player.pos = target;
+		playerTask.player.flag = flags;
+		return TaskFactoryV2::Instance()->Rush(playerTask);
+	}
 
 	CPlayerTask* makeItCrazyPush(const int num, double faceDir)
 	{

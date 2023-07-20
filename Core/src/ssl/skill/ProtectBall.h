@@ -17,7 +17,7 @@ public:
 	virtual bool isEmpty()const { return false; }
 	virtual CPlayerCommand* execute(const CVisionModule* pVision);
 protected:
-	virtual void toStream(std::ostream& os) const { os << "Skill: CPassBall\n"; }
+	virtual void toStream(std::ostream& os) const { os << "Skill: CProtectBall\n"; }
 
 private:
 	CPlayerCommand* _directCommand;	//Ö±½Ó·¢ËÍÃüÁî

@@ -293,6 +293,25 @@ extern "C" int Skill_SmartGotoPoint(lua_State * L)
 	return 0;
 }
 
+extern "C" int Skill_Rush(lua_State * L)
+{
+	TaskT playerTask;
+	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
+	playerTask.executor = runner;
+	double x = LuaModule::Instance()->GetNumberArgument(2, NULL);
+	double y = LuaModule::Instance()->GetNumberArgument(3, NULL);
+	int flag = LuaModule::Instance()->GetNumberArgument(4, NULL);
+	playerTask.player.pos = CGeoPoint(x, y);
+	playerTask.player.vel = CVector(0.0, 0.0);
+	playerTask.player.rotvel = 0;
+	playerTask.player.flag = flag;
+
+	CPlayerTask* pTask = PlayerRole::makeItRush(runner, CGeoPoint(x, y),flag);
+	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
+
+	return 0;
+}
+
 extern "C" int Skill_BezierRush(lua_State * L)
 {
 	TaskT playerTask;
@@ -1285,6 +1304,7 @@ luaDef GUIGlue[] =
 	{"CBezierRush",			Skill_BezierRush},
 	{"CGoAroundRobot",		Skill_GoAroundRobot},
 	{"CGoTechChalPos",      Skill_GoTechChalPos},
+	{"CRush",               Skill_Rush},
 	//ÆäËû
 	{"CGoSupport",          Skill_GoSupport},
 	{"CStopRobot",			Skill_Stop},
