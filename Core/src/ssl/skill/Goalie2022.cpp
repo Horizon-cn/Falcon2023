@@ -243,6 +243,8 @@ bool CGoalie2022::ShouldAttack(const CVisionModule* pVision)
 // 点球如果敌人踢球前带太远，我们更容易抢到球，直接上去拿球
 bool CGoalie2022::ShouldAttackPenalty(const CVisionModule* pVision)
 {
+	if (!is_penalty)
+		return false;
 	BallVisionT Ball = pVision->Ball();
 	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(300, 0), to_string(Ball.Vel().mod()).c_str());
 	PlayerVisionT me = pVision->OurPlayer(task().executor);
