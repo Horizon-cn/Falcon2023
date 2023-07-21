@@ -18,8 +18,6 @@ else
 	OPPONENT_NAME = "NormalKick"
 end
 
--- 有0号在场门将就是0号，没有0号在场，看这里设置的号码
--- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
 	Goalie   = {0},
 	Kicker   = {11},
@@ -27,7 +25,6 @@ gRoleFixNum = {
 	Receiver = {12}
 }
 
---todo 清理无用skill
 gSkill = {
 	--走位
 	"GoAndTurn",
@@ -59,6 +56,7 @@ gSkill = {
 	"SlowGetBall",
 	"StaticGetBall",
 	--进攻
+	"Rush",
 	"ChaseKick",
 	"ChaseKickV2",
 	"AdvanceBall",
@@ -129,7 +127,7 @@ gRefPlayTable = {
 	"Ref/BallPlace/Ref_TheirBallPlace",
 
 	--点球进攻
-	"Ref/PenaltyKick/Ref_PenaltyKick_normal",--todo
+	"Ref/PenaltyKick/Ref_PenaltyKick_normal",
 	"Ref/PenaltyKick/Ref_PenaltyKick_simple",
 	--点球防守
 	"Ref/PenaltyDef/Ref_PenaltyDef_normal",
@@ -161,6 +159,7 @@ gTestPlayTable = {
 	"Test_Speed",
 	"Test_TimeDelayTest",
 	-- 基础skill相关
+	"Test_Rush",
 	"Test_GetBall",
 	"Test_ChaseKick",
 	"Test_PassEachOther",

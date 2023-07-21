@@ -12,12 +12,7 @@ function Rush(task)
   end
 
   matchPos = function()
-    if type(task.pos) == "function" then
-      mpos = task.pos()
-    else
-      mpos = task.pos
-    end
-    return mpos
+    return ball.pos()
   end
 
   return execute, matchPos
