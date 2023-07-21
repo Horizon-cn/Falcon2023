@@ -55,6 +55,19 @@ function goBezierRush(p, d, a, f)
 	return {mexe, mpos}
 end
 
+function rush(p,f)
+	local iflag
+	if f ~= nil then
+		iflag = f
+	else
+		iflag = 0
+	end
+
+	local mexe, mpos = Rush{pos = p, flag = iflag}
+	return {mexe, mpos}
+end 
+
+
 ------------------------------------- 射门相关的skill ---------------------------------------
 
 function testBreak(p)
