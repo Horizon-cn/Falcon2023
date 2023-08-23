@@ -103,30 +103,6 @@ function IsRoleActive(rolename)
 	return false
 end
 
--- 注意，此处只是针对间接和直接定位球的防守
--- 此时，Leader和Goalie不参与第二次防碰撞检测
-function UsePenaltyCleaner(curPlay)
-	for rolename, task in pairs(curPlay[gRealState]) do
-		if(type(task) == "table" and rolename ~= "match" and rolename ~= "Goalie" and rolename ~= "Kicker") then
-			--ERROR here,FIX IT!!!!!!!!!!!!!
-			--print("string.sub(rolename,1,1) =",string.sub(rolename,1,1),"\n")
-			--print("gRoleNum[rolename] =",gRoleNum[rolename],"\n")
-			--print("gRolePos[rolename]:x() =",gRolePos[rolename]:x(),"\n")
-			--print("gRolePos[rolename]:y() =",gRolePos[rolename]:y(),"\n")
-			CAddPenaltyCleaner(string.sub(rolename,1,1), gRoleNum[rolename], gRolePos[rolename]:x(), gRolePos[rolename]:y())
-		end
-	end
-	CCleanPenalty()
-	for rolename, task in pairs(curPlay[gRealState]) do
-		if(type(task) == "table" and rolename ~= "match" and rolename ~= "Goalie" and rolename ~= "Kicker") then
-			local x, y = CGetPenaltyCleaner(string.sub(rolename,1,1))
-			gRolePos[rolename] = CGeoPoint:new_local(x,y)
-		end
-	end
-	-- print(gCurrentState, CGetResetMatchStr())
-	DoRoleMatchReset(CGetResetMatchStr())
-end
-
 function DoRolePosMatch(curPlay, isPlaySwitched, isStateSwitched)
 	if gCurrentState == "exit" or gCurrentState == "finish" then
 		gRealState = gLastState

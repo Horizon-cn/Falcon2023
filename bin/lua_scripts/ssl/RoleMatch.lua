@@ -102,51 +102,6 @@ function RemoveExistNum(num)
 	gOurExistNum[num] = -1
 end
 
-function DoRoleMatchReset(str)
-	-- 循环获得需要重新匹配的角色
-	while true do
-		local character = string.sub(str, 1, 1)
-		
-		if character ~= '[' then
-			break
-		end
-
-		local endPos, _ = string.find(str, ']')
-		local roleTable = {}
-		local numTable = {}
-		for subIndex = 2, endPos-1 do
-			local roleNameStr = gRoleLookUpTable[string.sub(str, subIndex, subIndex)]
-			table.insert(roleTable, roleNameStr)
-			table.insert(numTable, gRoleNum[roleNameStr])
-		end
-
-		-- 开始对每个分组进行重新的匹配
-		local nrows = table.getn(roleTable)
-		local ncols = table.getn(numTable)
-		local matrix = Matrix_double_:new_local(nrows, ncols)
-		for row = 1, nrows do
-			for col = 1, ncols do
-				matrix:setValue(row-1, col-1, GetMatchPotential(numTable[col], roleTable[row]))
-			end
-		end
-
-		local m = Munkres:new_local()
-		m:solve(matrix)
-
-		for row = 1, nrows do
-			for col = 1, ncols do
-				if matrix:getValue(row-1, col-1) == 0 then
-					gRoleNum[roleTable[row]] = numTable[col]				
-					break
-				end
-			end
-		end
-
-		str = string.sub(str,endPos+1)
-		if str == "" then break end
-	end
-end
-
 function DoMunkresMatch(rolePos)
 	local nrows = table.getn(rolePos)
 	local ncolsIndex = {}
