@@ -77,8 +77,8 @@ function gPlayTable.CreatePlay(spec)
 			assert(attr_table.match ~= nil)
 			new_attr_table = {}
 			for rolename, roletask in pairs(attr_table) do
-				if type(rolename) ~= "function" and rolename ~= "switch" and string.find(rolename,"000") then
-					roles = split(rolename,"000")
+				if type(rolename) ~= "function" and rolename ~= "switch" and string.find(rolename,"_") then
+					roles = split(rolename,"_")
 					assert(table_length(roles) == table_length(roletask))
 					for i=1,table_length(roles) do
 						new_attr_table[roles[i]] = roletask[i]

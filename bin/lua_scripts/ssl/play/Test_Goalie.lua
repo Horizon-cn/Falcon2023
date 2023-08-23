@@ -9,7 +9,7 @@ firstState = "goalie",
 		end
 	end,
 	Powerhouse = task.advance(),
-	Defender000Assister000Hawk = combo.multiBack(3),
+	Defender_Assister_Hawk = combo.multiBack(3),
 	Finisher = task.sideBackUltra(),
 	Goalie = task.goalieNew(),
     match="[P][ADH]",
