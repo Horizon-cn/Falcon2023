@@ -38,8 +38,12 @@ CVector CBallSpeedModel::speedForTime(int frame, const CVisionModule* pVision )
 CVector CBallSpeedModel::speedForDist(double dist, const CVisionModule* pVision )
 {
 	update(pVision);
-	double vel_mod = sqrt(_ballVel.mod() * _ballVel.mod() - 2 * cal_acc * dist);
-	return _ballVel * vel_mod  / (vel_factor * _ballVel.mod());
+	double vel_mod_2 = _ballVel.mod() * _ballVel.mod() - 2 * cal_acc * dist;
+	if (vel_mod_2 > 0) {
+		return _ballVel * sqrt(vel_mod_2) / (vel_factor * _ballVel.mod());
+	} else {
+		return CVector(0,0);
+	}
 }
 
 // 计算球运动一定距离的时间

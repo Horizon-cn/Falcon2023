@@ -145,17 +145,14 @@ class CParamManagerSkill : public Falcon::ParamManager {
             loadParam(SUPPORT_DIST, "Support/SUPPORT_DIST", 1);
 
             loadParam(GOALIE_DEBUG, "Goalie/GOALIE_DEBUG", 1);
-            loadParam(AGGRESSIVE_GOALIE, "Goalie/AGGRESSIVE_GOALIE", 1);
-            loadParam(HAVE_BALL_DIST, "Goalie/HAVE_BALL_DIST", 30);
-            loadParam(CLOSE_DIST, "Goalie/CLOSE_DIST", 30);
-            loadParam(CHALLENGE_BALL_DIST, "Goalie/CHALLENGE_BALL_DIST", 60);
-            loadParam(BLOCK_DIST, "Goalie/BLOCK_DIST", 60);
+            loadParam(PENALTY_CALC_METHOD, "Goalie/PENALTY_CALC_METHOD", 2);
+            loadParam(NORMAL_CALC_METHOD, "Goalie/NORMAL_CALC_METHOD", 0);
+            loadParam(BLOCK_DIST, "Goalie/BLOCK_DIST", 100);
 
             loadParam(RANDOM_NUM, "PenaltyGoalie/RANDOM_NUM", 5);
             loadParam(RANDOM_MIN, "PenaltyGoalie/RANDOM_MIN", -0.3);
             loadParam(RANDOM_MAX, "PenaltyGoalie/RANDOM_MAX", 0.3);
             loadParam(STABLE_FRAME_INTERVAL, "PenaltyGoalie/STABLE_FRAME_INTERVAL", 5);
-            loadParam(TRICKPOS_DIV_PENALTY, "PenaltyGoalie/TRICKPOS_DIV_PENALTY", 1);
            
             loadParam(BREAK_SHOOT_ACCURACY, "BREAK/SHOOT_ACCURACY", 10);
             loadParam(BREAK_DEBUG, "BREAK/DEBUG", 1);
@@ -342,17 +339,14 @@ class CParamManagerSkill : public Falcon::ParamManager {
         //GetBallParam GET_BALL_PARAM;
         // Goalie2022参数 by SYLG
         bool GOALIE_DEBUG;
-        bool AGGRESSIVE_GOALIE;
-        double HAVE_BALL_DIST;
-        double CLOSE_DIST;
-        double CHALLENGE_BALL_DIST;
         double BLOCK_DIST;
+        int PENALTY_CALC_METHOD;
+        int NORMAL_CALC_METHOD;
         // Goalie2022点球参数 by SYLG
         int RANDOM_NUM;
         double RANDOM_MIN;
         double RANDOM_MAX;
         int STABLE_FRAME_INTERVAL;
-        double TRICKPOS_DIV_PENALTY;
         //break 参数
         double BREAK_SHOOT_ACCURACY;
         bool BREAK_DEBUG;
