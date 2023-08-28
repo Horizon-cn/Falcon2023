@@ -24,7 +24,7 @@ namespace {
 
 CGoalie2022::CGoalie2022() :lastSaveCycle(0), startCycle_ballInsidePenalty(0), startCycle_ballOutsidePenalty(0),
 needSave(false), needClear(false), needSupport(false), isNewSave(false),
-trickStart(false), trickFinish(false), needAttack(false),
+trickStart(false), trickFinish(false), needAttack(false),need_to_be_rescued(false),
 cycle_ballInsidePenalty(0), cycle_penaltyAttack(0)
 {
 	goalie_debug = paramManager->GOALIE_DEBUG;
@@ -72,9 +72,12 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 				if (vision->gameState().gameOn()) {
 					setState(NORMAL);
 				}
+				else if (need_to_be_rescued) { setState(NEED_TO_BE_RESCUED); }
 				break;
 			case NORMAL:
-				if (needSave) {
+				if (need_to_be_rescued) { 
+					setState(NEED_TO_BE_RESCUED); 
+				}else if (needSave) {
 					setState(SAVE);
 				} else if (needAttack) {
 					setState(PENALTY_ATTACK);
@@ -83,14 +86,18 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 				}
 				break;
 			case SAVE:
-				if (needAttack) {
+				if (need_to_be_rescued) {
+					setState(NEED_TO_BE_RESCUED);
+				}else if (needAttack) {
 					setState(PENALTY_ATTACK);
 				} else if (!needSave) {
 					setState(NORMAL);
 				}
 				break;
 			case PENALTY_TRICK:
-				if (needSave) {
+				if (need_to_be_rescued) {
+					setState(NEED_TO_BE_RESCUED);
+				}else if (needSave) {
 					setState(SAVE);
 					trickFinish = true;
 				} else if (trickFinish) {
@@ -98,8 +105,21 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 				}
 				break;
 			case PENALTY_ATTACK:
-				if (needSave && cycle_penaltyAttack < 0.5 * Param::Vision::FRAME_RATE) {
+				if (need_to_be_rescued) {
+					setState(NEED_TO_BE_RESCUED);
+				}else if (needSave && cycle_penaltyAttack < 0.5 * Param::Vision::FRAME_RATE) {
 					setState(SAVE);
+				}
+				break;
+			case NEED_TO_BE_RESCUED:
+				 if (!need_to_be_rescued&&needSave) {
+					setState(SAVE);
+				}
+				else if (!need_to_be_rescued && needAttack) {
+					setState(PENALTY_ATTACK);
+				}
+				else if (!need_to_be_rescued && trickStart && !trickFinish) {
+					setState(PENALTY_TRICK);
 				}
 				break;
 			}
@@ -107,6 +127,8 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 	} else {
 		if (false) {
 			setState(TEST);
+		} else if (need_to_be_rescued) {
+			setState(NEED_TO_BE_RESCUED);
 		} else if (vision->gameState().gameOff()) {
 			setState(NORMAL);
 		} else if (needSave) {
@@ -152,6 +174,9 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 	case PENALTY_ATTACK:
 		DEBUG("attack");
 		setSubTask(attackTask());
+	case NEED_TO_BE_RESCUED:
+		DEBUG("need to be rescued");
+		setSubTask(rescueTask());
 	}
 
 	CStatedTask::plan(pVision);
@@ -159,12 +184,32 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 
 void CGoalie2022::updateBallJudgementOfGoalie()
 {
-	needSave = needAttack = needClear = needSupport = false;
+	need_to_be_rescued=needSave = needAttack = needClear = needSupport = false;
 
 	const BallVisionT& ball = vision->Ball();
 	if (!ball.Valid())
 		return;
-
+	int myNum = task().executor;
+	const PlayerVisionT& me = vision->OurPlayer(myNum);
+	DEBUG("count need to be rescued", 3);
+	CGeoPoint left1(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
+	CGeoPoint left2(-Param::Field::PITCH_LENGTH / 2-10, +Param::Field::GOAL_WIDTH / 2);
+	CGeoPoint left3(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2+20);
+	CGeoPoint left4(-Param::Field::PITCH_LENGTH / 2-10, +Param::Field::GOAL_WIDTH / 2+20);
+	GDebugEngine::Instance()->gui_debug_line(left1, left2, COLOR_BLUE);
+	GDebugEngine::Instance()->gui_debug_line(left1, left3, COLOR_BLUE);
+	GDebugEngine::Instance()->gui_debug_line(left3, left4, COLOR_BLUE);
+	GDebugEngine::Instance()->gui_debug_line(left2, left4, COLOR_BLUE);
+	if (me.X() < -Param::Field::PITCH_LENGTH / 2  && me.Y() > Param::Field::GOAL_WIDTH / 2 && me.Y() < Param::Field::GOAL_WIDTH / 2 + 20)
+	{
+		need_to_be_rescued = true;
+		DEBUG("get inside", 3);
+	}
+	if (me.X() < -Param::Field::PITCH_LENGTH / 2  && me.Y() < - Param::Field::GOAL_WIDTH / 2 && me.Y() >- Param::Field::GOAL_WIDTH / 2 - 20)
+	{
+		need_to_be_rescued = true;
+		DEBUG("get inside", 3);
+	}
 	bool maybeShoot = false;
 	double dist_ball2goal;
 	if (ball.VelX() < 0 && ball.Vel().mod() > 50) {
@@ -375,7 +420,18 @@ CPlayerTask* CGoalie2022::attackTask()
 	return PlayerRole::makeItNoneTrajGetBall(myNum, dir, CVector(0, 0), flags);
 }
 
+CPlayerTask* CGoalie2022::rescueTask()
+{   
+	DEBUG("need to be rescued", 3);
+	int myNum = task().executor;
+	const PlayerVisionT& me = vision->OurPlayer(myNum);
+	CGeoPoint rescuepointleft( - Param::Field::PITCH_LENGTH / 2 + 30 , - Param::Field::GOAL_WIDTH / 2);
+	CGeoPoint rescuepointright( - Param::Field::PITCH_LENGTH / 2 + 30 ,   Param::Field::GOAL_WIDTH / 2);
 
+	if(me.Y() > 0)
+	return PlayerRole::makeItGoto(myNum, rescuepointright, me.Dir(), PlayerStatus::DRIBBLING);
+	else return PlayerRole::makeItGoto(myNum, rescuepointleft, me.Dir(), PlayerStatus::DRIBBLING);
+}
 bool CGoalie2022::isMeReady4Ball(double dist_ball2goal)
 {
 	const PlayerVisionT& me = vision->OurPlayer(task().executor);

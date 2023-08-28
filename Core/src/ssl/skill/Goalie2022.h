@@ -5,7 +5,7 @@
 
 class CGoalie2022 :public CStatedTask {
 public:
-	enum GoalieState { NORMAL, SAVE, CLEAR, SUPPORT, PENALTY_WAIT, PENALTY_TRICK, PENALTY_ATTACK, TEST };
+	enum GoalieState { NORMAL, SAVE, CLEAR, SUPPORT, PENALTY_WAIT, PENALTY_TRICK, PENALTY_ATTACK, TEST ,NEED_TO_BE_RESCUED };
 	CGoalie2022();
 	virtual void plan(const CVisionModule* pVision);
 	virtual bool isEmpty()const { return false; }
@@ -21,6 +21,7 @@ private:
 	CPlayerTask* clearTask();
 	CPlayerTask* supportTask();
 	CPlayerTask* attackTask();
+	CPlayerTask* rescueTask();
 
 	bool isMeReady4Ball(double dist_ball2goal);
 	bool canMeAttack();
@@ -34,7 +35,7 @@ private:
 	int lastSaveCycle, startCycle_ballInsidePenalty, startCycle_ballOutsidePenalty;
 	bool needSave, needClear, needSupport;
 	bool trickStart, trickFinish, needAttack;
-	bool isNewSave;
+	bool isNewSave,need_to_be_rescued;
 	int cycle_ballInsidePenalty,cycle_penaltyAttack;
 };
 

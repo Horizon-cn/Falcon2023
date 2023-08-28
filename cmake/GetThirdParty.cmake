@@ -23,7 +23,7 @@ find_package(VarTypes)
 IF(WIN32)
 	## if you have different Qt visions and CMake cannot link the right one, you can manually set the correct path or use the environment variable    
     #set(CMAKE_PREFIX_PATH $ENV{QT_CMAKE})
-    set(CMAKE_PREFIX_PATH "C:/QT/5.15.2/msvc2019_64/lib/cmake/Qt5")
+    set(CMAKE_PREFIX_PATH "H:/QT/5.15.2/msvc2019_64/lib/cmake/Qt5")
     #message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}")
 ENDIF()
 find_package(Qt5 COMPONENTS Core Quick QuickControls2 SerialPort Widgets Network Gui Qml OpenGL Gamepad LinguistTools REQUIRED)
