@@ -8,7 +8,7 @@ firstState = "init",
 			return "kick"
 		end
 	end,
-	Goalie  = task.goCmuRush(CGeoPoint:new_local(-param.pitchLength/2,0),0),
+	Goalie  = task.goalieNew("penalty"),
 	Leader = task.goCmuRush(CGeoPoint:new_local(param.pitchLength/3,200/900*param.pitchWidth),_,_,flag.dodge_ball),
 	Assister = task.goCmuRush(CGeoPoint:new_local(param.pitchLength/3,150/900*param.pitchWidth),_,_,flag.dodge_ball),
 	Middle = task.goCmuRush(CGeoPoint:new_local(param.pitchLength/3,-150/900*param.pitchWidth),_,_,flag.dodge_ball),

@@ -5,7 +5,7 @@
 
 class CGoalie2022 :public CStatedTask {
 public:
-	enum GoalieState { NORMAL, SAVE, CLEAR, SUPPORT, PENALTY_WAIT, PENALTY_TRICK, PENALTY_ATTACK, TEST ,NEED_TO_BE_RESCUED };
+	enum GoalieState { ADJUST, NORMAL, SAVE, CLEAR, SUPPORT, PENALTY_WAIT, PENALTY_TRICK, PENALTY_ATTACK, TEST };
 	CGoalie2022();
 	virtual void plan(const CVisionModule* pVision);
 	virtual bool isEmpty()const { return false; }
@@ -13,15 +13,16 @@ public:
 protected:
 	virtual void toStream(std::ostream& os) const { os << "Skill: CGoalie2022\n"; }
 private:
-	void updateBallJudgementOfGoalie();
+	void updateSelfJudge();
+	void updateBallJudge();
 	void updateCycleCounter();
 
+	CPlayerTask* adjustTask();
 	CPlayerTask* normalTask();
 	CPlayerTask* saveTask();
 	CPlayerTask* clearTask();
 	CPlayerTask* supportTask();
 	CPlayerTask* attackTask();
-	CPlayerTask* rescueTask();
 
 	bool isMeReady4Ball(double dist_ball2goal);
 	bool canMeAttack();
@@ -33,9 +34,9 @@ private:
 	CGeoPoint syntYPos(const CGeoPoint& ref, const CGeoPoint& target);
 
 	int lastSaveCycle, startCycle_ballInsidePenalty, startCycle_ballOutsidePenalty;
-	bool needSave, needClear, needSupport;
+	bool needSave, needClear, needSupport, needAdjust;
 	bool trickStart, trickFinish, needAttack;
-	bool isNewSave,need_to_be_rescued;
+	bool isNewSave;
 	int cycle_ballInsidePenalty,cycle_penaltyAttack;
 };
 
