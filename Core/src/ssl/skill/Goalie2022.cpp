@@ -23,8 +23,8 @@ namespace {
 }
 
 CGoalie2022::CGoalie2022() :lastSaveCycle(0), startCycle_ballInsidePenalty(0), startCycle_ballOutsidePenalty(0),
-needSave(false), needClear(false), needSupport(false), isNewSave(false),
-trickStart(false), trickFinish(false), needAttack(false),need_to_be_rescued(false),
+needSave(false), needClear(false), needSupport(false), needAdjust(false), isNewSave(false),
+trickStart(false), trickFinish(false), needAttack(false),
 cycle_ballInsidePenalty(0), cycle_penaltyAttack(0)
 {
 	goalie_debug = paramManager->GOALIE_DEBUG;
@@ -59,25 +59,27 @@ const void DEBUG(const char msg[], int mode = 0) {
 
 void CGoalie2022::plan(const CVisionModule* pVision)
 {
-	const BallVisionT& ball = vision->Ball();
-	updateBallJudgementOfGoalie();
+	updateSelfJudge();
+	updateBallJudge();
 
-	if (task().player.isPenalty) {
-		if (vision->gameState().theirPenaltyKick()) {
+	if (task().player.isPenalty) { // 点球状态机
+		if (needAdjust) {
+			setState(ADJUST);
+		} else if (vision->gameState().theirPenaltyKick()) {
 			setState(PENALTY_WAIT);
 			trickStart = trickFinish = false;
 		} else {
 			switch (state()) {
+			case ADJUST:
+				setState(NORMAL);
+				break;
 			case PENALTY_WAIT:
 				if (vision->gameState().gameOn()) {
 					setState(NORMAL);
 				}
-				else if (need_to_be_rescued) { setState(NEED_TO_BE_RESCUED); }
 				break;
 			case NORMAL:
-				if (need_to_be_rescued) { 
-					setState(NEED_TO_BE_RESCUED); 
-				}else if (needSave) {
+				if (needSave) {
 					setState(SAVE);
 				} else if (needAttack) {
 					setState(PENALTY_ATTACK);
@@ -86,18 +88,14 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 				}
 				break;
 			case SAVE:
-				if (need_to_be_rescued) {
-					setState(NEED_TO_BE_RESCUED);
-				}else if (needAttack) {
+				if (needAttack) {
 					setState(PENALTY_ATTACK);
 				} else if (!needSave) {
 					setState(NORMAL);
 				}
 				break;
 			case PENALTY_TRICK:
-				if (need_to_be_rescued) {
-					setState(NEED_TO_BE_RESCUED);
-				}else if (needSave) {
+				if (needSave) {
 					setState(SAVE);
 					trickFinish = true;
 				} else if (trickFinish) {
@@ -105,30 +103,17 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 				}
 				break;
 			case PENALTY_ATTACK:
-				if (need_to_be_rescued) {
-					setState(NEED_TO_BE_RESCUED);
-				}else if (needSave && cycle_penaltyAttack < 0.5 * Param::Vision::FRAME_RATE) {
+				if (needSave && cycle_penaltyAttack < 0.5 * Param::Vision::FRAME_RATE) {
 					setState(SAVE);
-				}
-				break;
-			case NEED_TO_BE_RESCUED:
-				 if (!need_to_be_rescued&&needSave) {
-					setState(SAVE);
-				}
-				else if (!need_to_be_rescued && needAttack) {
-					setState(PENALTY_ATTACK);
-				}
-				else if (!need_to_be_rescued && trickStart && !trickFinish) {
-					setState(PENALTY_TRICK);
 				}
 				break;
 			}
 		}
-	} else {
+	} else { // 非点球状态机
 		if (false) {
 			setState(TEST);
-		} else if (need_to_be_rescued) {
-			setState(NEED_TO_BE_RESCUED);
+		} else if (needAdjust) {
+			setState(ADJUST);
 		} else if (vision->gameState().gameOff()) {
 			setState(NORMAL);
 		} else if (needSave) {
@@ -149,11 +134,15 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 		break;
 	case PENALTY_WAIT:
 		DEBUG("wait");
-		setSubTask(PlayerRole::makeItGoto(task().executor, CGeoPoint(0, 0), 0, task().player.flag));
+		setSubTask(PlayerRole::makeItGoto(task().executor, CGeoPoint(-Param::Field::PITCH_LENGTH/2, 0), 0, task().player.flag));
 		break;
 	case PENALTY_TRICK:
 		DEBUG("trick");
 		setSubTask(PlayerRole::makeItGoto(task().executor, trickPoint, 0, task().player.flag));
+		break;
+	case ADJUST:
+		DEBUG("adjust");
+		setSubTask(adjustTask());
 		break;
 	case NORMAL:
 		DEBUG("normal");
@@ -174,42 +163,31 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 	case PENALTY_ATTACK:
 		DEBUG("attack");
 		setSubTask(attackTask());
-	case NEED_TO_BE_RESCUED:
-		DEBUG("need to be rescued");
-		setSubTask(rescueTask());
+		break;
 	}
 
 	CStatedTask::plan(pVision);
 }
 
-void CGoalie2022::updateBallJudgementOfGoalie()
+void CGoalie2022::updateSelfJudge()
 {
-	need_to_be_rescued=needSave = needAttack = needClear = needSupport = false;
+	const PlayerVisionT& me = vision->OurPlayer(task().executor);
+	if (me.X() < -Param::Field::PITCH_LENGTH / 2
+		&& Utils::InBetween(fabs(me.Y()), Param::Field::GOAL_WIDTH / 2, Param::Field::GOAL_WIDTH / 2 + 20)) {
+		needAdjust = true;
+	} else {
+		needAdjust = false;
+	}
+}
+
+void CGoalie2022::updateBallJudge()
+{
+	needSave = needAttack = needClear = needSupport = false;
 
 	const BallVisionT& ball = vision->Ball();
 	if (!ball.Valid())
 		return;
-	int myNum = task().executor;
-	const PlayerVisionT& me = vision->OurPlayer(myNum);
-	DEBUG("count need to be rescued", 3);
-	CGeoPoint left1(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
-	CGeoPoint left2(-Param::Field::PITCH_LENGTH / 2-10, +Param::Field::GOAL_WIDTH / 2);
-	CGeoPoint left3(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2+20);
-	CGeoPoint left4(-Param::Field::PITCH_LENGTH / 2-10, +Param::Field::GOAL_WIDTH / 2+20);
-	GDebugEngine::Instance()->gui_debug_line(left1, left2, COLOR_BLUE);
-	GDebugEngine::Instance()->gui_debug_line(left1, left3, COLOR_BLUE);
-	GDebugEngine::Instance()->gui_debug_line(left3, left4, COLOR_BLUE);
-	GDebugEngine::Instance()->gui_debug_line(left2, left4, COLOR_BLUE);
-	if (me.X() < -Param::Field::PITCH_LENGTH / 2  && me.Y() > Param::Field::GOAL_WIDTH / 2 && me.Y() < Param::Field::GOAL_WIDTH / 2 + 20)
-	{
-		need_to_be_rescued = true;
-		DEBUG("get inside", 3);
-	}
-	if (me.X() < -Param::Field::PITCH_LENGTH / 2  && me.Y() < - Param::Field::GOAL_WIDTH / 2 && me.Y() >- Param::Field::GOAL_WIDTH / 2 - 20)
-	{
-		need_to_be_rescued = true;
-		DEBUG("get inside", 3);
-	}
+
 	bool maybeShoot = false;
 	double dist_ball2goal;
 	if (ball.VelX() < 0 && ball.Vel().mod() > 50) {
@@ -226,10 +204,10 @@ void CGoalie2022::updateBallJudgementOfGoalie()
 					CGeoPoint p = ball.Pos() + ball.Vel().unit() * (dist_ball2goal - Param::Field::PENALTY_AREA_DEPTH);
 					GDebugEngine::Instance()->gui_debug_msg(p, ("predict v: " + to_string(predictSpd.mod())).c_str());
 					if (predictSpd.mod() > 20) {
-						maybeShoot = true; DEBUG("aaa", 4);
+						maybeShoot = true;
 					}
 				} else {
-					maybeShoot = true; DEBUG("bbb", 4);
+					maybeShoot = true;
 				}
 			}
 		}
@@ -307,6 +285,14 @@ void CGoalie2022::updateCycleCounter() {
 	}
 }
 
+
+CPlayerTask* CGoalie2022::adjustTask()
+{
+	int myNum = task().executor;
+	const PlayerVisionT& me = vision->OurPlayer(myNum);
+	CGeoPoint adjustPos(-Param::Field::PITCH_LENGTH / 2 + 30, Param::Field::GOAL_WIDTH / 2);
+	return PlayerRole::makeItGoto(myNum, syntYPos(me.Pos(), adjustPos), me.Dir(), task().player.flag);
+}
 
 CPlayerTask* CGoalie2022::normalTask()
 {
@@ -420,18 +406,6 @@ CPlayerTask* CGoalie2022::attackTask()
 	return PlayerRole::makeItNoneTrajGetBall(myNum, dir, CVector(0, 0), flags);
 }
 
-CPlayerTask* CGoalie2022::rescueTask()
-{   
-	DEBUG("need to be rescued", 3);
-	int myNum = task().executor;
-	const PlayerVisionT& me = vision->OurPlayer(myNum);
-	CGeoPoint rescuepointleft( - Param::Field::PITCH_LENGTH / 2 + 30 , - Param::Field::GOAL_WIDTH / 2);
-	CGeoPoint rescuepointright( - Param::Field::PITCH_LENGTH / 2 + 30 ,   Param::Field::GOAL_WIDTH / 2);
-
-	if(me.Y() > 0)
-	return PlayerRole::makeItGoto(myNum, rescuepointright, me.Dir(), PlayerStatus::DRIBBLING);
-	else return PlayerRole::makeItGoto(myNum, rescuepointleft, me.Dir(), PlayerStatus::DRIBBLING);
-}
 bool CGoalie2022::isMeReady4Ball(double dist_ball2goal)
 {
 	const PlayerVisionT& me = vision->OurPlayer(task().executor);
