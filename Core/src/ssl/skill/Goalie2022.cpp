@@ -519,6 +519,29 @@ CGeoPoint CGoalie2022::generateNormalPoint(CGeoPoint defenceTarget)
 	} else {
 		method = paramManager->NORMAL_CALC_METHOD;
 	}
+	//守门员匀速模型下球速与守门员速度比值
+	//int k = 4;
+	CGeoPoint goalleft(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
+	CGeoPoint goalright(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
+	CGeoPoint goalleft1(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH * 0.2, -Param::Field::GOAL_WIDTH / 2);
+	CGeoPoint goalright1(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH * 0.2, Param::Field::GOAL_WIDTH / 2);
+	const BallVisionT& ball = vision->Ball();
+	const PlayerVisionT& enemy = vision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
+	
+	double cita1 = Utils::Normalize(((goalleft - defenceTarget).dir() + (goalright - defenceTarget).dir())) / 2;
+	double cita2 = fabs(CVector(defenceTarget - goalleft).dir() - CVector(defenceTarget - goalright).dir()) / 2;
+	//没什么用的匀速模型算出的守门员位置
+	//double forwardstandlength = fabs(10 * Param::Vehicle::V2::PLAYER_SIZE / (2 * (tan(cita2) - k / (k * k - 1))));
+	double forwardstandlength = 1200;
+	CGeoPoint defendPoint;
+	defendPoint = defenceTarget + Utils::Polar2Vector(-1.0 * forwardstandlength, cita1);
+	CGeoLine defenceLine(defenceTarget, defendPoint);
+	CGeoLine PenaltyLine(goalleft1, goalright1);
+	CGeoLineLineIntersection intersectstar(defenceLine, PenaltyLine);
+	
+	
+	
+	method = 1;
 	switch (method) {
 	case 0: // 传统算法 球门中心连线
 		if (isPosInCornerShootArea(defenceTarget)) { //封死近角
@@ -533,7 +556,14 @@ CGeoPoint CGoalie2022::generateNormalPoint(CGeoPoint defenceTarget)
 		}
 		break;
 	case 1: // 角平分线算点法 by jj
-		defPoint = CGeoPoint(0, 0);
+		
+		if (intersectstar.Intersectant()) {
+			defPoint = intersectstar.IntersectPoint();
+		}
+		else {
+			defPoint = goalCentre;
+		}
+		
 		break;
 	case 2: // （点球使用）加权随机摇摆
 	{
