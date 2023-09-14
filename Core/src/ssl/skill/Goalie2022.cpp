@@ -336,12 +336,36 @@ CPlayerTask* CGoalie2022::saveTask()
 
 	int robotNum = task().executor;
 	const PlayerVisionT& me = vision->OurPlayer(robotNum);
-
-	int flag = task().player.flag;
-	flag |= PlayerStatus::QUICKLY;
-	flag |= PlayerStatus::DRIBBLING;
-
-	return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
+	double dist = me.Pos().dist(savePoint);
+	double dist0 = goalCentre.dist(savePoint);
+	if (ball.Vel().mod() > 700) 
+	{
+		if (dist > Param::Field::GOAL_WIDTH * 0.5 * 0.2)
+		{   
+			double  vw, vx0, vy0;
+			double max_vel = 1000;
+			if (ball.VelY() > 0) { vx0 = 0; vy0 = 1000; }
+			else { vx0 = 0; vy0 = -1000; }
+			vw = 0;
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -200), "openrun", COLOR_BLUE);
+			return PlayerRole::makeItRunLocalVersion(robotNum, vx0, vy0, vw);
+		}
+		else{
+			int flag = task().player.flag;
+			flag |= PlayerStatus::QUICKLY;
+			flag |= PlayerStatus::DRIBBLING;
+			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -200), "controlrun", COLOR_BLUE);
+			return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
+		}
+	}
+	else{
+		int flag = task().player.flag;
+		flag |= PlayerStatus::QUICKLY;
+		flag |= PlayerStatus::DRIBBLING;
+		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -200), "normalrun", COLOR_BLUE);
+		return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
+	}
+	
 }
 
 CPlayerTask* CGoalie2022::clearTask()
@@ -606,6 +630,8 @@ CGeoPoint CGoalie2022::generateSavePoint()
 	CVector ball2me(ball.Pos() - me.Pos());
 	CGeoLine me_vertical2_me2ballLine(me.Pos(), ball2me.dir() + Param::Math::PI / 2);
 	CGeoLineLineIntersection intersect(ballVelLine, me_vertical2_me2ballLine);
+	//GDebugEngine::Instance()->gui_debug_line(intersect.IntersectPoint(), me.Pos(), COLOR_BLUE);
+	//GDebugEngine::Instance()->gui_debug_line(intersect.IntersectPoint(), ball.Pos(), COLOR_BLUE);
 	CGeoPoint savePoint;
 	if (intersect.Intersectant() && Utils::InOurPenaltyArea(intersect.IntersectPoint(), 0)) {
 		savePoint = intersect.IntersectPoint();
