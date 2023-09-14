@@ -32,7 +32,7 @@ private:
 	double calcClearDir();
 	double nearestEnemyFrom(CGeoPoint p);
 	CGeoPoint syntYPos(const CGeoPoint& ref, const CGeoPoint& target);
-
+	void calSupportDirandPower(double*);
 	int lastSaveCycle, startCycle_ballInsidePenalty, startCycle_ballOutsidePenalty;
 	bool needSave, needClear, needSupport, needAdjust;
 	bool trickStart, trickFinish, needAttack;
