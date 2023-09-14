@@ -17,6 +17,8 @@ namespace {
 	bool goalie_debug;
 
 	CGeoPoint goalCentre(-Param::Field::PITCH_LENGTH / 2, 0);
+	CGeoPoint leftGoalPost(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
+	CGeoPoint rightGoalPost(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
 	CGeoLine baseLine(goalCentre, Param::Math::PI / 2);
 	CGeoLine moveLine(goalCentre + CVector(Param::Field::PENALTY_AREA_DEPTH / 4.0, 0), Param::Math::PI / 2);
 	CGeoPoint trickPoint(goalCentre + Utils::Polar2Vector(Param::Field::PENALTY_AREA_DEPTH, 0));
@@ -134,7 +136,7 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 		break;
 	case PENALTY_WAIT:
 		DEBUG("wait");
-		setSubTask(PlayerRole::makeItGoto(task().executor, CGeoPoint(-Param::Field::PITCH_LENGTH/2, 0), 0, task().player.flag));
+		setSubTask(PlayerRole::makeItGoto(task().executor, CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0), 0, task().player.flag));
 		break;
 	case PENALTY_TRICK:
 		DEBUG("trick");
@@ -502,7 +504,6 @@ bool CGoalie2022::isPosInCornerShootArea(const CGeoPoint& pos)
 {
 	CGeoPoint convertPos = syntYPos(CGeoPoint(0, 1), pos); // 在 y>0 的半场考虑
 	CGeoPoint penaltyRightCorner(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH, Param::Field::PENALTY_AREA_WIDTH / 2);
-	CGeoPoint leftGoalPost(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
 	double dir_pos2leftGoalPost = (convertPos - leftGoalPost).dir();
 	double dir_penaltyRightCorner2leftGoalPost = (penaltyRightCorner - leftGoalPost).dir();
 	return dir_pos2leftGoalPost > dir_penaltyRightCorner2leftGoalPost;
@@ -517,28 +518,6 @@ CGeoPoint CGoalie2022::generateNormalPoint(CGeoPoint defenceTarget)
 	} else {
 		method = paramManager->NORMAL_CALC_METHOD;
 	}
-	//守门员匀速模型下球速与守门员速度比值
-	//int k = 4;
-	CGeoPoint goalleft(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
-	CGeoPoint goalright(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
-	CGeoPoint goalleft1(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH * 0.2, -Param::Field::GOAL_WIDTH / 2);
-	CGeoPoint goalright1(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH * 0.2, Param::Field::GOAL_WIDTH / 2);
-	const BallVisionT& ball = vision->Ball();
-	const PlayerVisionT& enemy = vision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
-	
-	double cita1 = Utils::Normalize(((goalleft - defenceTarget).dir() + (goalright - defenceTarget).dir())) / 2;
-	double cita2 = fabs(CVector(defenceTarget - goalleft).dir() - CVector(defenceTarget - goalright).dir()) / 2;
-	//没什么用的匀速模型算出的守门员位置
-	//double forwardstandlength = fabs(10 * Param::Vehicle::V2::PLAYER_SIZE / (2 * (tan(cita2) - k / (k * k - 1))));
-	double forwardstandlength = 1200;
-	CGeoPoint defendPoint;
-	defendPoint = defenceTarget + Utils::Polar2Vector(-1.0 * forwardstandlength, cita1);
-	CGeoLine defenceLine(defenceTarget, defendPoint);
-	CGeoLine PenaltyLine(goalleft1, goalright1);
-	CGeoLineLineIntersection intersectstar(defenceLine, PenaltyLine);
-	
-	
-	
 	method = 1;
 	switch (method) {
 	case 0: // 传统算法 球门中心连线
@@ -547,22 +526,26 @@ CGeoPoint CGoalie2022::generateNormalPoint(CGeoPoint defenceTarget)
 		} else {
 			CGeoLine defenceLine(defenceTarget, goalCentre);
 			CGeoLineLineIntersection intersect(defenceLine, moveLine);
-			if (!intersect.Intersectant())
+			if (!intersect.Intersectant()) {
 				defPoint = goalCentre;
-			else
+			} else {
 				defPoint = intersect.IntersectPoint();
+			}
 		}
 		break;
-	case 1: // 角平分线算点法 by jj
-		
-		if (intersectstar.Intersectant()) {
-			defPoint = intersectstar.IntersectPoint();
-		}
-		else {
+	case 1: // 目标连向两门柱的角平分线 by jj
+	{
+		CVector target2left(leftGoalPost - defenceTarget);
+		CVector target2right(rightGoalPost - defenceTarget);
+		CGeoLine bisectorLine(defenceTarget, Utils::Normalize((target2left.dir() + target2right.dir()) / 2));
+		CGeoLineLineIntersection intersect(bisectorLine, moveLine);
+		if (!intersect.Intersectant()) {
 			defPoint = goalCentre;
+		} else {
+			defPoint = intersect.IntersectPoint();
 		}
-		
-		break;
+	}
+	break;
 	case 2: // （点球使用）加权随机摇摆
 	{
 		CGeoPoint defCentre;//防守中心，影响随机点的分布
