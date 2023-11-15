@@ -65,7 +65,7 @@ $ sudo make install
 		- Where is the source code : D:/Falcon_2023
 		- Where to build the binaries : D:/Falcon_2023/build
 	- 直接 Configure
-	- 完成后点击 Generate，再点击 Open Project
+	- 完成后无报错，点击 Generate，再点击 Open Project
 	- 在 vs 中选择 Release x64 模式
 	- 开始生成，没有报错则完成
 	- 运行 bin/package.bat，首次编译或更换 QT 路径时需删除 package.txt 重新输入路径,如：
@@ -79,7 +79,7 @@ $ sudo make install
     	set(N 4)
     endif()
     ```
-	- 如果需要使用 GPU，将 cmake 中的 ENABLE_CUDA 置为 ON，~~按照 [wiki教程](https://gitlab.com/src-ssl/src/-/wikis/Algorithm/加入cuda的falcon编译) 配置~~，[cuda 12.0下载](https://jbox.sjtu.edu.cn/l/I1f4um)
+	- 如果需要使用 GPU，将 cmake 中的 ENABLE_CUDA 置为 ON，~~按照 [wiki教程](https://github.com/sjtu-src/Wiki/blob/master/docs/Algorithm/%E5%8A%A0%E5%85%A5cuda%E7%9A%84falcon%E7%BC%96%E8%AF%91.md) 配置~~，[cuda 12.0下载](https://jbox.sjtu.edu.cn/l/I1f4um)
 	![ENABLE_CUDA](wiki/ENABLE_CUDA.png)
 
 ## 开发须知
@@ -97,7 +97,7 @@ $ sudo make install
 	endif()
 	```
 - 国际化语言包：Client 每次编译后文件夹中都会生成 zh_CN.ts，这属于临时文件，不会上传到 git。生成 .qm 文件后将两者都复制到 bin/Language 里面，便于查错
-  - [Linguist入门参考](https://gitlab.com/src-ssl/src/-/wikis/Software/Qt%E5%A4%9A%E8%AF%AD%E8%A8%80%E5%88%87%E6%8D%A2%E7%9A%84%E5%AE%9E%E7%8E%B0)
+  - [Linguist入门参考](https://github.com/sjtu-src/Wiki/blob/master/docs/Software/Qt%E5%A4%9A%E8%AF%AD%E8%A8%80%E5%88%87%E6%8D%A2%E7%9A%84%E5%AE%9E%E7%8E%B0.md)
 
 ## 使用方法
 
@@ -106,7 +106,7 @@ $ sudo make install
 - 开启新的分界面在 Widget 里面选择，RemoteControl中将 ControlMode 拨至右侧支持 xBox 手柄控制
 - Help/Language 切换语言
 - 键盘快捷键 “r” 重新载入某一参数文件 (*.ini)
-- 其他操作与 [owl2操作手册](https://gitlab.com/src-ssl/src/-/wikis/Software/owl2操作手册) 中类似
+- 其他操作与 [owl2操作手册](https://github.com/sjtu-src/Wiki/blob/master/docs/Software/owl2%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.md) 中类似
 
 ## 常见问题
 
