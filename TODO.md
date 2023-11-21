@@ -22,7 +22,7 @@
 	- [x] 采用KDDockWidgets
 	- [x] 优化界面的初始化排布，分界面可恢复
 	- [x] 优化各种显示物体的大小，画面整洁易观察
-	- [ ] Fields初始大小有时会有问题，填充不满
+	- [x] Fields初始大小有时会有问题，填充不满
 	- [x] 裁判盒优化，恢复next command
 	- [ ] 解决关于KDDockWidgets的Warning
 	- [ ] 分图层绘制，防止Fields崩溃

@@ -627,10 +627,13 @@ void Field::wheelEvent (QWheelEvent *e) {
 #endif
 void Field::setSize(int width, int height) {
     if (width > 0 && height > 0) {
-        opm->updateParam(opm->canvasHeight, "Canvas/canvasHeight", height, true);
-        opm->updateParam(opm->canvasWidth, "Canvas/canvasWidth", width, true);
-        // 自动保持场地的正常尺寸
-        opm->updateParam(opm->param_canvasHeight, "Canvas/param_canvasHeight", height * 1.0 / width * opm->param_canvasWidth, true);
+        opm->canvasWidth = width;
+        opm->canvasHeight = height;
+        opm->param_canvasHeight = height * 1.0 / width * opm->param_canvasWidth;
+        //opm->updateParam(opm->canvasHeight, "Canvas/canvasHeight", height, true);
+        //opm->updateParam(opm->canvasWidth, "Canvas/canvasWidth", width, true);
+        //// 自动保持场地的正常尺寸
+        //opm->updateParam(opm->param_canvasHeight, "Canvas/param_canvasHeight", height * 1.0 / width * opm->param_canvasWidth, true);
         GlobalSettings::Instance()->needRepaint();
     }
 }
