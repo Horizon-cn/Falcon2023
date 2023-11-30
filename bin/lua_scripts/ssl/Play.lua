@@ -77,8 +77,8 @@ function gPlayTable.CreatePlay(spec)
 			assert(attr_table.match ~= nil)
 			new_attr_table = {}
 			for rolename, roletask in pairs(attr_table) do
-				if type(rolename) ~= "function" and rolename ~= "switch" and string.find(rolename,"000") then
-					roles = split(rolename,"000")
+				if type(rolename) ~= "function" and rolename ~= "switch" and string.find(rolename,"_") then
+					roles = split(rolename,"_")
 					assert(table_length(roles) == table_length(roletask))
 					for i=1,table_length(roles) do
 						new_attr_table[roles[i]] = roletask[i]
@@ -101,30 +101,6 @@ function IsRoleActive(rolename)
 		end
 	end
 	return false
-end
-
--- 注意，此处只是针对间接和直接定位球的防守
--- 此时，Leader和Goalie不参与第二次防碰撞检测
-function UsePenaltyCleaner(curPlay)
-	for rolename, task in pairs(curPlay[gRealState]) do
-		if(type(task) == "table" and rolename ~= "match" and rolename ~= "Goalie" and rolename ~= "Kicker") then
-			--ERROR here,FIX IT!!!!!!!!!!!!!
-			--print("string.sub(rolename,1,1) =",string.sub(rolename,1,1),"\n")
-			--print("gRoleNum[rolename] =",gRoleNum[rolename],"\n")
-			--print("gRolePos[rolename]:x() =",gRolePos[rolename]:x(),"\n")
-			--print("gRolePos[rolename]:y() =",gRolePos[rolename]:y(),"\n")
-			CAddPenaltyCleaner(string.sub(rolename,1,1), gRoleNum[rolename], gRolePos[rolename]:x(), gRolePos[rolename]:y())
-		end
-	end
-	CCleanPenalty()
-	for rolename, task in pairs(curPlay[gRealState]) do
-		if(type(task) == "table" and rolename ~= "match" and rolename ~= "Goalie" and rolename ~= "Kicker") then
-			local x, y = CGetPenaltyCleaner(string.sub(rolename,1,1))
-			gRolePos[rolename] = CGeoPoint:new_local(x,y)
-		end
-	end
-	-- print(gCurrentState, CGetResetMatchStr())
-	DoRoleMatchReset(CGetResetMatchStr())
 end
 
 function DoRolePosMatch(curPlay, isPlaySwitched, isStateSwitched)
