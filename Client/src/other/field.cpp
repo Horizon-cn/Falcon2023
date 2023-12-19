@@ -626,14 +626,24 @@ void Field::wheelEvent (QWheelEvent *e) {
 }
 #endif
 void Field::setSize(int width, int height) {
+    qDebug() << "set size triggered!";
     if (width > 0 && height > 0) {
-        opm->canvasWidth = width;
-        opm->canvasHeight = height;
-        opm->param_canvasHeight = height * 1.0 / width * opm->param_canvasWidth;
-        //opm->updateParam(opm->canvasHeight, "Canvas/canvasHeight", height, true);
-        //opm->updateParam(opm->canvasWidth, "Canvas/canvasWidth", width, true);
+        opm->updateParam(opm->canvasHeight, "Canvas/canvasHeight", height, true);
+        opm->updateParam(opm->canvasWidth, "Canvas/canvasWidth", width, true);
         //// 自动保持场地的正常尺寸
-        //opm->updateParam(opm->param_canvasHeight, "Canvas/param_canvasHeight", height * 1.0 / width * opm->param_canvasWidth, true);
+        opm->updateParam(opm->param_canvasHeight, "Canvas/param_canvasHeight", height * 1.0 / width * opm->param_canvasWidth, true);
+        
+        //setImplicitWidth(opm->canvasWidth);
+        //setImplicitHeight(opm->canvasHeight);
+        //pixmap = new QPixmap(QSize(opm->canvasWidth, opm->canvasHeight));
+        //pixmapPainter.begin(pixmap);
+        //pixmapPainter.setRenderHint(QPainter::Antialiasing, true);
+        //heat_pixmap = new QPixmap(QSize(opm->canvasWidth, opm->canvasHeight));
+        //heatPainter.begin(heat_pixmap);
+        ////    pixmapPainter.setRenderHint(QPainter::TextAntialiasing, true);
+        ////    pixmapPainter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        //::area = QRect(0, 0, this->property("width").toReal(), this->property("height").toReal());
+
         GlobalSettings::Instance()->needRepaint();
     }
 }
