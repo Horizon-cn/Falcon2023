@@ -1,31 +1,25 @@
-local ALL_AVOID = flag.dodge_ball + flag.avoid_stop_ball_circle + flag.avoid_shoot_line
-local ALL_NOT_AVOID = flag.not_avoid_their_vehicle + flag.not_avoid_our_vehicle + flag.not_dodge_penalty
-local FLAG = ALL_NOT_AVOID --+ flag.dribbling
-local DSS=flag.allow_dss
-
-local TargetPos1  = CGeoPoint:new_local(600, 0)
-local TargetPos2  = CGeoPoint:new_local(-171,-136)
-local TargetPos3  = CGeoPoint:new_local(-245,105)
-local TargetPos4  = CGeoPoint:new_local(-100,200)
+local TargetPos1  = CGeoPoint:new_local(400, 250)
+local TargetPos2  = CGeoPoint:new_local(-400,250)
+local TargetPos3  = CGeoPoint:new_local(-400,-250)
+local TargetPos4  = CGeoPoint:new_local(400,-250)
 
 local DIR1  = 0
-local DIR2  = 1
-local DIR3  = -1
+local DIR2  = 1.5
+local DIR3  = 3
+local DIR4	= -1.5
 
 local distThreshold = 10
-local ACC = nil
 
 gPlayTable.CreatePlay{
 
 firstState = "run1",
 ["run1"] = {
 	switch = function ()
-		if true then
-			return "run1";
+		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 150, 1000) then
+			return "run2";
 		end
 	end,
-	Kicker = task.chaseNew(),
-    -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
+    Kicker = task.goCmuRush(TargetPos1, DIR1),
 
     match = ""
 },
@@ -37,7 +31,6 @@ firstState = "run1",
 		end
 	end,
 	Kicker = task.goCmuRush(TargetPos2, DIR2),
-    -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
 },
@@ -45,11 +38,10 @@ firstState = "run1",
 ["run3"] = {
 	switch = function ()
 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 150, 1000) then
-			return "run1";
+			return "run4";
 		end
 	end,
 	Kicker = task.goCmuRush(TargetPos3, DIR3),
-    -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
 
     match = ""
 },
@@ -57,26 +49,24 @@ firstState = "run1",
 ["run4"] = {
 	switch = function ()
 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 150, 1000) then
-			return "run5"	;
-		end
-	end,
-	Kicker = task.goCmuRush(TargetPos4, DIR1),
-    -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
-
-    match = ""
-},
-
-["run5"] = {
-	switch = function ()
-		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 150, 1000) then
 			return "run1"	;
 		end
 	end,
-	Kicker = task.goCmuRush(TargetPos1, DIR1),
-    -- Kicker = task.goCmuRush(TargetPos1, DIR, ACC, DSS),
+	Kicker = task.goCmuRush(TargetPos4, DIR4),
 
     match = ""
 },
+
+-- ["run5"] = {
+-- 	switch = function ()
+-- 		if bufcnt(player.toTargetDist("Kicker") < distThreshold , 150, 1000) then
+-- 			return "run1"	;
+-- 		end
+-- 	end,
+-- 	Kicker = task.goCmuRush(TargetPos4, DIR4),
+
+--     match = ""
+-- },
 name = "Test_Run",
 applicable ={
 	exp = "a",

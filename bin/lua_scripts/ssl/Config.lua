@@ -1,7 +1,8 @@
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 
-IS_TEST_MODE = false
+IS_TEST_MODE = true
+-- Test_Run Test_Break Test_ChaseNew Test_GetBall
 -- Test_Run Test_Run6 Test_Speed
 -- Test_Goalie Test_PassEachOther Test_NormalPass
 -- Test_AdvanceV4 Test_MultiBack Test_GoSupport
@@ -171,5 +172,8 @@ gTestPlayTable = {
 	"Test_Advance",
 	"Test_GoSupport",
 	"Test_AdvanceV4",
-	"Test_MultiBack"
+	"Test_MultiBack",
+
+	"Test_Break",
+	"Test_ChaseNew",
 }

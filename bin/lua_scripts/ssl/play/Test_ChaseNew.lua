@@ -7,12 +7,12 @@ firstState = "run1",
 			return "run1";
 		end
 	end,
-    Kicker = task.getBall(ball.pos()),
+    Kicker = task.chaseNew(),
 
     match = ""
 },
 
-name = "Test_GetBall",
+name = "Test_ChaseNew",
 applicable ={
 	exp = "a",
 	a = true

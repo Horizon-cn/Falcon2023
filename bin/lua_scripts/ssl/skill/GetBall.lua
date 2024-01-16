@@ -1,6 +1,5 @@
 function GetBall(task)
 	local mdir
-	local mflag = task.flag or 0
 
 	execute = function(runner)
 		if type(task.dir) == "function" then
@@ -9,7 +8,7 @@ function GetBall(task)
 			mdir = task.dir
 		end
 
-		return GetBall(runner, mdir)
+		return CGetBall(runner, mdir)
 	end
 
 	matchPos = function()

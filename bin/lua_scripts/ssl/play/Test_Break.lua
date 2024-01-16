@@ -7,12 +7,12 @@ firstState = "run1",
 			return "run1";
 		end
 	end,
-    Kicker = task.getBall(ball.pos()),
+    Kicker = task.testBreak(CGeoPoint:new_local(450,0)),
 
     match = ""
 },
 
-name = "Test_GetBall",
+name = "Test_Break",
 applicable ={
 	exp = "a",
 	a = true
