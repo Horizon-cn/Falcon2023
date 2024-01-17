@@ -25,6 +25,7 @@ Copyright (C) 2011, Parsian Robotic Center (eew.aut.ac.ir/~parsian/grsim)
 #include <QUdpSocket>
 #include <QList>
 
+#include "geometry.h"
 
 #include "graphics.h"
 #include "physics/pworld.h"
@@ -51,6 +52,7 @@ class SendingPacket {
     SSL_WrapperPacket* packet;
     int t;
 };
+typedef QList<CGeoShape*> blindSpotList;
 
 class SSLWorld : public QObject
 {
@@ -66,8 +68,13 @@ private:
     KickStatus lastKickState[TEAM_COUNT][MAX_ROBOT_COUNT];
 	bool closeYellowSimulation;		//xjw
 	bool closeWallSimulation;		//xjw
+    QList<blindSpotList> blindSpots;  //SYLG
 	bool OutofField(dReal x, dReal y, double dist);	//xjw
 	bool touchGoal(dReal x, dReal y, double dist);	//xjw
+    void clearBlindSpot(int cam_id);    //SYLG
+    void addBlindSpot(int cam_id, int robot_idx);   //SYLG
+    bool inBlindSpot(int cam_id, dReal x, dReal y); //SYLG
+
 public:    
     dReal customDT;
     bool isGLEnabled;

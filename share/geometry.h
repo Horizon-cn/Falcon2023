@@ -286,10 +286,23 @@ class CGeoShape {
     virtual ~CGeoShape() { }
     virtual bool HasPoint( const CGeoPoint& p) const = 0;
 };
+
+/************************************************************************/
+/*                        CGeoQuadrilateral                                 */
+/************************************************************************/
+class CGeoQuadrilateral : public CGeoShape {
+public:
+    CGeoQuadrilateral() :CGeoQuadrilateral(CGeoPoint(), CGeoPoint(), CGeoPoint(), CGeoPoint()) {}
+    CGeoQuadrilateral(const CGeoPoint p1, const CGeoPoint p2, const CGeoPoint p3, const CGeoPoint p4);
+    virtual bool HasPoint(const CGeoPoint& p) const;
+    CGeoPoint _point[4];
+    CGeoPoint _center;
+};
+
 /************************************************************************/
 /*                        CGeoRectangle                                 */
 /************************************************************************/
-class CGeoRectangle : public CGeoShape {
+class CGeoRectangle : public CGeoQuadrilateral {
   public:
     CGeoRectangle() {
         calPoint(0, 0, 0, 0);
@@ -321,7 +334,6 @@ class CGeoRectangle : public CGeoShape {
             return std::min(s1.dist2Point(p), std::min(s2.dist2Point(p), std::min(s3.dist2Point(p), s4.dist2Point(p))));
         }
     }
-    virtual bool HasPoint(const CGeoPoint& p) const;
     CGeoPoint _point[4];
 };
 
@@ -453,6 +465,27 @@ class CGeoSegmentCircleIntersection {
   private:
     bool _intersectant;
     int intersection_size;
+    CGeoPoint _point1;
+    CGeoPoint _point2;
+};
+
+/*********************************************************************/
+/*                     CGeoCircleTangent                             */
+/********************************************************************/
+class CGeoCircleTangent {
+public:
+    CGeoCircleTangent(const CGeoCirlce& circle,const CGeoPoint& p);
+    const CGeoPoint& point1() const {
+        return _point1;
+    }
+    const CGeoPoint& point2() const {
+        return _point2;
+    }
+    int size() {
+        return tangent_size;
+    }
+private:
+    int tangent_size;
     CGeoPoint _point1;
     CGeoPoint _point2;
 };

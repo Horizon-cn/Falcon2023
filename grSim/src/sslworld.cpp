@@ -141,6 +141,9 @@ SSLWorld::SSLWorld(QGLWidget* parent,ConfigWidget* _cfg,RobotsFomation *form1,Ro
     customDT = -1;    
     _w = this;
     cfg = _cfg;
+    for (int i = 0; i < cfg->NumOfCam(); i++) {
+        blindSpots.append(blindSpotList());
+    }
 	closeYellowSimulation = !cfg->EnableYellowSim();
 	closeWallSimulation = !cfg->EnableWallSim();
 	if (closeYellowSimulation) std::cout << "yellow simulator : disabled"<<std::endl;
@@ -224,7 +227,6 @@ SSLWorld::SSLWorld(QGLWidget* parent,ConfigWidget* _cfg,RobotsFomation *form1,Ro
     walls[9] = new PFixedBox(-gpos2_x, gpos_y, gpos_z,
                              gsiz_x, gthick, gsiz_z,
                              tone, tone, tone);
-    
     p->addObject(ground);
     p->addObject(ball);
     p->addObject(ray);
@@ -754,19 +756,20 @@ bool SSLWorld::visibleInCam(int id, double x, double y)
 SSL_WrapperPacket* SSLWorld::generatePacket(int cam_id)
 {
     SSL_WrapperPacket* packet = new SSL_WrapperPacket;
-    dReal x,y,z,dir,k;
-    ball->getBodyPosition(x,y,z);
+    clearBlindSpot(cam_id);
+    dReal x, y, z, dir, k;
+    ball->getBodyPosition(x, y, z);
     // packet->set_login_name(cfg->LoginName());   
     packet->mutable_detection()->set_camera_id(cam_id);
-    packet->mutable_detection()->set_frame_number(framenum);    
-    dReal t_elapsed = timer->elapsed()/1000.0;
+    packet->mutable_detection()->set_frame_number(framenum);
+    dReal t_elapsed = timer->elapsed() / 1000.0;
     packet->mutable_detection()->set_t_capture(t_elapsed);
     packet->mutable_detection()->set_t_sent(t_elapsed);
     dReal bot_dev_x = cfg->bot_noiseDeviation_x();
     dReal bot_dev_y = cfg->bot_noiseDeviation_y();
     dReal bot_dev_a = cfg->bot_noiseDeviation_angle();
-	dReal ball_dev_x = cfg->ball_noiseDeviation_x();
-	dReal ball_dev_y = cfg->ball_noiseDeviation_y();
+    dReal ball_dev_x = cfg->ball_noiseDeviation_x();
+    dReal ball_dev_y = cfg->ball_noiseDeviation_y();
     if (sendGeomCount++ % cfg->sendGeometryEvery() == 0)
     {
         SSL_GeometryData* geom = packet->mutable_geometry();
@@ -797,27 +800,16 @@ SSL_WrapperPacket* SSLWorld::generatePacket(int cam_id)
         addFieldLinesArcs(field);
 
     }
-    if (cfg->noise()==false) {
-		bot_dev_x = 0;bot_dev_y = 0;bot_dev_a = 0;
-		ball_dev_x = 0; ball_dev_y = 0; 
-	}
-    if ((cfg->vanishing()==false) || (rand0_1() > cfg->ball_vanishing()))
-    {
-        if (visibleInCam(cam_id, x, y)) {
-            SSL_DetectionBall* vball = packet->mutable_detection()->add_balls();
-            vball->set_x(randn_notrig(x*1000.0f,ball_dev_x));
-            vball->set_y(randn_notrig(y*1000.0f,ball_dev_y));
-            vball->set_z(z*1000.0f);
-            vball->set_pixel_x(x*1000.0f);
-            vball->set_pixel_y(y*1000.0f);
-            vball->set_confidence(0.9 + rand0_1()*0.1);
-        }
+    if (cfg->noise() == false) {
+        bot_dev_x = 0; bot_dev_y = 0; bot_dev_a = 0;
+        ball_dev_x = 0; ball_dev_y = 0;
     }
-    for(int i = 0; i < cfg->Robots_Count(); i++){
-        if ((cfg->vanishing()==false) || (rand0_1() > cfg->blue_team_vanishing()))
+    for (int i = 0; i < cfg->Robots_Count(); i++) {
+        addBlindSpot(cam_id, i);
+        if ((cfg->vanishing() == false) || (rand0_1() > cfg->blue_team_vanishing()))
         {
             if (!robots[i]->on) continue;
-            robots[i]->getXY(x,y);
+            robots[i]->getXY(x, y);
             dir = robots[i]->getDir(k);
             // reset when the robot has turned over
             if (cfg->ResetTurnOver()) {
@@ -828,20 +820,21 @@ SSL_WrapperPacket* SSLWorld::generatePacket(int cam_id)
             if (visibleInCam(cam_id, x, y)) {
                 SSL_DetectionRobot* rob = packet->mutable_detection()->add_robots_blue();
                 rob->set_robot_id(i);
-                rob->set_pixel_x(x*1000.0f);
-                rob->set_pixel_y(y*1000.0f);
+                rob->set_pixel_x(x * 1000.0f);
+                rob->set_pixel_y(y * 1000.0f);
                 rob->set_confidence(1);
-                rob->set_x(randn_notrig(x*1000.0f,bot_dev_x));
-                rob->set_y(randn_notrig(y*1000.0f,bot_dev_y));
-                rob->set_orientation(normalizeAngle(randn_notrig(dir,bot_dev_a))*M_PI/180.0f);
+                rob->set_x(randn_notrig(x * 1000.0f, bot_dev_x));
+                rob->set_y(randn_notrig(y * 1000.0f, bot_dev_y));
+                rob->set_orientation(normalizeAngle(randn_notrig(dir, bot_dev_a)) * M_PI / 180.0f);
             }
         }
     }
-    for(int i = cfg->Robots_Count(); i < cfg->Robots_Count()*(2 /*- closeYellowSimulation*/); i++){
-        if ((cfg->vanishing()==false) || (rand0_1() > cfg->yellow_team_vanishing()))
+    for (int i = cfg->Robots_Count(); i < cfg->Robots_Count() * (2 /*- closeYellowSimulation*/); i++) {
+        addBlindSpot(cam_id, i);
+        if ((cfg->vanishing() == false) || (rand0_1() > cfg->yellow_team_vanishing()))
         {
             if (!robots[i]->on) continue;
-            robots[i]->getXY(x,y);
+            robots[i]->getXY(x, y);
             dir = robots[i]->getDir(k);
             // reset when the robot has turned over
             if (cfg->ResetTurnOver()) {
@@ -851,14 +844,27 @@ SSL_WrapperPacket* SSLWorld::generatePacket(int cam_id)
             }
             if (visibleInCam(cam_id, x, y)) {
                 SSL_DetectionRobot* rob = packet->mutable_detection()->add_robots_yellow();
-                rob->set_robot_id(i-cfg->Robots_Count());
-                rob->set_pixel_x(x*1000.0f);
-                rob->set_pixel_y(y*1000.0f);
+                rob->set_robot_id(i - cfg->Robots_Count());
+                rob->set_pixel_x(x * 1000.0f);
+                rob->set_pixel_y(y * 1000.0f);
                 rob->set_confidence(1);
-                rob->set_x(randn_notrig(x*1000.0f,bot_dev_x));
-                rob->set_y(randn_notrig(y*1000.0f,bot_dev_y));
-                rob->set_orientation(normalizeAngle(randn_notrig(dir,bot_dev_a))*M_PI/180.0f);
+                rob->set_x(randn_notrig(x * 1000.0f, bot_dev_x));
+                rob->set_y(randn_notrig(y * 1000.0f, bot_dev_y));
+                rob->set_orientation(normalizeAngle(randn_notrig(dir, bot_dev_a)) * M_PI / 180.0f);
             }
+        }
+    }
+    if ((cfg->vanishing() == false) || (rand0_1() > cfg->ball_vanishing()))
+    {
+        ball->getBodyPosition(x, y, z);
+        if (visibleInCam(cam_id, x, y) && !inBlindSpot(cam_id, x, y)) {
+            SSL_DetectionBall* vball = packet->mutable_detection()->add_balls();
+            vball->set_x(randn_notrig(x * 1000.0f, ball_dev_x));
+            vball->set_y(randn_notrig(y * 1000.0f, ball_dev_y));
+            vball->set_z(z * 1000.0f);
+            vball->set_pixel_x(x * 1000.0f);
+            vball->set_pixel_y(y * 1000.0f);
+            vball->set_confidence(0.9 + rand0_1() * 0.1);
         }
     }
     return packet;
@@ -998,6 +1004,202 @@ bool SSLWorld::touchGoal(dReal x, dReal y, double r) {
 	if (fabs(x - walls[8]->getX()) < cfg->Goal_Thickness() + cfg->Goal_Depth() / 2 + r && fabs(y - walls[8]->getY()) < cfg->Goal_Thickness() + r) return 1;
 	if (fabs(x - walls[9]->getX()) < cfg->Goal_Thickness() + cfg->Goal_Depth() / 2 + r && fabs(y - walls[9]->getY()) < cfg->Goal_Thickness() + r) return 1;
 	return 0;
+}
+
+void SSLWorld::clearBlindSpot(int cam_id)
+{
+    for (auto& blindSpot : blindSpots[cam_id]) {
+        delete blindSpot;
+    }
+    blindSpots[cam_id].clear();
+}
+
+void SSLWorld::addBlindSpot(int cam_id, int robot_idx)
+{
+    bool enable = cfg->BlindSpot();
+    if (enable) {
+        dReal robot_x, robot_y;
+        robots[robot_idx]->getXY(robot_x, robot_y);
+        if (!visibleInCam(cam_id, robot_x, robot_y))
+            return;
+        double cam_x, cam_y, cam_z = cfg->HeightOfCam();
+        if (cfg->Division() == "Division A") {
+            switch (cfg->NumOfCam()) {
+            case 1:
+                switch (cam_id) {
+                case 0:
+                    cam_x = 0; cam_y = 0;
+                    break;
+                default:
+                    cam_x = cam_y = 0;
+                }
+                break;
+            case 2:
+                switch (cam_id) {
+                case 0:
+                    cam_x = -3.000; cam_y = 0;
+                    break;
+                case 1:
+                    cam_x = 3.000; cam_y = 0;
+                    break;
+                default:
+                    cam_x = cam_y = 0;
+                }
+                break;
+            case 4:
+                switch (cam_id) {
+                case 0:
+                    cam_x = -3.000; cam_y = -2.250;
+                    break;
+                case 1:
+                    cam_x = -3.000; cam_y = 2.250;
+                    break;
+                case 2:
+                    cam_x = 3.000; cam_y = -2.250;
+                    break;
+                case 3:
+                    cam_x = 3.000; cam_y = 2.250;
+                    break;
+                default:
+                    cam_x = cam_y = 0;
+                }
+                break;
+            case 8:
+                switch (cam_id) {
+                case 0:
+                    cam_x = -4.500; cam_y = -2.250;
+                    break;
+                case 1:
+                    cam_x = -4.500; cam_y = 2.250;
+                    break;
+                case 2:
+                    cam_x = -1.500; cam_y = -2.250;
+                    break;
+                case 3:
+                    cam_x = -1.500; cam_y = 2.250;
+                    break;
+                case 4:
+                    cam_x = 1.500; cam_y = -2.250;
+                    break;
+                case 5:
+                    cam_x = 1.500; cam_y = 2.250;
+                    break;
+                case 6:
+                    cam_x = 4.500; cam_y = -2.250;
+                    break;
+                case 7:
+                    cam_x = 4.500; cam_y = 2.250;
+                    break;
+                default:
+                    cam_x = cam_y = 0;
+                }
+                break;
+            default:
+                cam_x = cam_y = 0;
+            }
+        } else {
+            switch (cfg->NumOfCam()) {
+            case 1:
+                switch (cam_id) {
+                case 0:
+                    cam_x = 0; cam_y = 0;
+                    break;
+                default:
+                    cam_x = cam_y = 0;
+                }
+                break;
+            case 2:
+                switch (cam_id) {
+                case 0:
+                    cam_x = -2.250; cam_y = 0;
+                    break;
+                case 1:
+                    cam_x = 2.250; cam_y = 0;
+                    break;
+                default:
+                    cam_x = cam_y = 0;
+                }
+                break;
+            case 4:
+                switch (cam_id) {
+                case 0:
+                    cam_x = -2.250; cam_y = -1.500;
+                    break;
+                case 1:
+                    cam_x = -2.250; cam_y = 1.500;
+                    break;
+                case 2:
+                    cam_x = 2.250; cam_y = -1.500;
+                    break;
+                case 3:
+                    cam_x = 2.250; cam_y = 1.500;
+                    break;
+                default:
+                    cam_x = cam_y = 0;
+                }
+                break;
+            case 8:
+                switch (cam_id) {
+                case 0:
+                    cam_x = -3.375; cam_y = -1.500;
+                    break;
+                case 1:
+                    cam_x = -3.375; cam_y = 1.500;
+                    break;
+                case 2:
+                    cam_x = -1.125; cam_y = -1.500;
+                    break;
+                case 3:
+                    cam_x = -1.125; cam_y = 1.500;
+                    break;
+                case 4:
+                    cam_x = 1.125; cam_y = -1.500;
+                    break;
+                case 5:
+                    cam_x = 1.125; cam_y = 1.500;
+                    break;
+                case 6:
+                    cam_x = 3.375; cam_y = -1.500;
+                    break;
+                case 7:
+                    cam_x = 3.375; cam_y = 1.500;
+                    break;
+                default:
+                    cam_x = cam_y = 0;
+                }
+                break;
+            default:
+                cam_x = cam_y = 0;
+            }
+        }
+        double robot_r = robots[robot_idx]->cfg->robotSettings.RobotRadius;
+        double robot_z = robots[robot_idx]->cfg->robotSettings.RobotHeight;
+        // 圆柱（机器人）对摄像头的盲区可分为三部分。
+        // 圆柱底面圆，此部分可省略
+        // 圆柱顶面的投影圆 proj
+        // 两圆的外公切线与两圆切点形成的四边形
+        double proj_x = (robot_z * cam_x - robot_x * cam_z) / (robot_z - cam_z);
+        double proj_y = (robot_z * cam_y - robot_y * cam_z) / (robot_z - cam_z);
+        double proj_r = robot_r * cam_z / (cam_z - robot_z);
+        blindSpots[cam_id].append(new CGeoCirlce(CGeoPoint(proj_x, proj_y), proj_r));
+        //从外公切线交点intersect引切线，若有4个交点说明该四边形存在
+        CGeoPoint intersect((robot_r * proj_x - proj_r * robot_x) / (robot_r - proj_r), (robot_r * proj_y - proj_r * robot_y) / (robot_r - proj_r));
+        CGeoCircleTangent robot_tangent(CGeoCirlce(CGeoPoint(robot_x, robot_y), robot_r), intersect);
+        CGeoCircleTangent proj_tangent(CGeoCirlce(CGeoPoint(proj_x, proj_y), proj_r), intersect);
+        if (robot_tangent.size() + proj_tangent.size() == 4) {
+            blindSpots[cam_id].append(new CGeoQuadrilateral(robot_tangent.point1(), robot_tangent.point2(), proj_tangent.point1(), proj_tangent.point2()));
+        }
+    }
+}
+
+bool SSLWorld::inBlindSpot(int cam_id, dReal x, dReal y)
+{
+    for (auto& blindSpot : blindSpots[cam_id]) {
+        if (blindSpot->HasPoint(CGeoPoint(x, y))) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void RobotsFomation::setAll(dReal* xx,dReal *yy)

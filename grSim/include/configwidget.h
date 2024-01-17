@@ -178,6 +178,7 @@ public:
   DEF_VALUE(bool, Bool, wheelSpeedCallBack);
   DEF_VALUE(bool,Bool,SyncWithGL)
   DEF_VALUE(int,Intz,NumOfCam)
+  DEF_VALUE(double, Double, HeightOfCam)        //SYLG
   DEF_VALUE(double,Double,DesiredFPS)
   DEF_VALUE(double,Double,DeltaTime)
   DEF_VALUE(int,Intz,sendGeometryEvery)
@@ -201,6 +202,7 @@ public:
   DEF_VALUE(double,Double,ball_vanishing)
   DEF_VALUE(double,Double,blue_team_vanishing)
   DEF_VALUE(double,Double,yellow_team_vanishing)
+  DEF_VALUE(bool, Bool, BlindSpot)      //SYLG
   DEF_VALUE(std::string, String, plotter_addr)
   DEF_VALUE(int, Intz, plotter_port)
   DEF_VALUE(bool, Bool, plotter)  

@@ -111,6 +111,7 @@ ConfigWidget::ConfigWidget()
     VarListPtr worldp_vars(new VarList("World"));
     phys_vars->addChild(worldp_vars);
         ADD_VALUE(worldp_vars,Intz,NumOfCam,opm->value("Camera/total_cameras", 1).toInt(),"The number of cameras")
+        ADD_VALUE(worldp_vars, Double, HeightOfCam, opm->value("Camera/camera_height", 3.5).toDouble(), "The height of cameras")
         ADD_VALUE(worldp_vars,Double,DesiredFPS,spm->value("World/DesiredFPS", 75).toDouble(),"Desired FPS")
         ADD_VALUE(worldp_vars,Bool,SyncWithGL,spm->value("World", "SyncWithGL", false).toBool(),"Synchronize ODE with OpenGL")
         ADD_VALUE(worldp_vars,Double,DeltaTime,spm->value("World/DeltaTime", 0.016).toDouble(),"ODE time step")
@@ -151,6 +152,9 @@ ConfigWidget::ConfigWidget()
         ADD_VALUE(vanishing_vars,Double,blue_team_vanishing,spm->value("Vanishing", "blue_team_vanishing", 0).toDouble(),"Blue team")
         ADD_VALUE(vanishing_vars,Double,yellow_team_vanishing,spm->value("Vanishing", "yellow_team_vanishing", 0).toDouble(),"Yellow team")
         ADD_VALUE(vanishing_vars,Double,ball_vanishing,spm->value("Vanishing", "ball_vanishing", 0).toDouble(),"Ball")
+    VarListPtr blindSpot_vars(new VarList("Blind Spot area"));
+        comm_vars->addChild(blindSpot_vars);
+        ADD_VALUE(blindSpot_vars, Bool, BlindSpot, spm->value("BlindSpot", "blindSpot", false).toBool(), "enable blind spot")
 
     //world=VarXML::read(world,(qApp->applicationDirPath() + QString("/../data/config/") + QString(".grsim.xml")).toStdString());
 
