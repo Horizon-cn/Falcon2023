@@ -184,6 +184,7 @@ void CGoalie2022::updateSelfJudge()
 
 void CGoalie2022::updateBallJudge()
 {
+	static bool last_needClear;
 	needSave = needAttack = needClear = needSupport = false;
 
 	const BallVisionT& ball = vision->Ball();
@@ -225,39 +226,49 @@ void CGoalie2022::updateBallJudge()
 		} else { // not ready
 			needSave = true;
 		}
-	}
-	else if (Utils::InOurPenaltyArea(ball.Pos(), 0)) {
-		//if (ball.Vel().mod() < 30) {
-		if (cycle_ballInsidePenalty > 5 * Param::Vision::FRAME_RATE) { //  规则：对于处在禁区内的球，守门员需要在10s内将球清出禁区
-			needSupport = true;
-		}
-		else {
-			for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
-				const PlayerVisionT& enemy = vision->TheirPlayer(i);
-				if (enemy.Valid() &&
-					enemy.Pos().dist(ball.Pos()) < 100 || Utils::InOurPenaltyArea(enemy.Pos(), 100)) {
-					needClear = true;
+	} else {
+		// state machine for clear and support
+		if (last_needClear) {
+			if (!Utils::InOurPenaltyArea(ball.Pos(), 10)) {
+				needClear = false;
+				last_needClear = false;
+			} else {
+				needClear = true;
+			}
+		} else if (Utils::InOurPenaltyArea(ball.Pos(), 0)) {
+			if (cycle_ballInsidePenalty > 5 * Param::Vision::FRAME_RATE) { //  规则：对于处在禁区内的球，守门员需要在10s内将球清出禁区
+				needClear = true;
+			} else {
+				needSupport = true; // 注意：此处是for-else结构的替代，不是一定support
+				for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
+					const PlayerVisionT& enemy = vision->TheirPlayer(i);
+					if (enemy.Valid() &&
+						enemy.Pos().dist(ball.Pos()) < 100 || Utils::InOurPenaltyArea(enemy.Pos(), 100)) {
+						needClear = true;
+						needSupport = false;
+						break;
+					}
 				}
 			}
-			needSupport = true;
+			last_needClear = needClear;
 		}
-		//} else {
-	//}
-	} else if (canMeAttack()) {
-		needAttack = true;
-	} else if (task().player.isPenalty && !trickStart && !trickFinish) {
-		const PlayerVisionT& enemy = vision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
-		if (enemy.Pos().dist(ball.Pos()) < 50 && enemy.Pos().x() < 0 && enemy.Pos().x() > -200) {
-			trickStart = true;
-		} else {
+		if (!needClear && !needSupport) {
+			if (canMeAttack()) {
+				needAttack = true;
+			} else if (task().player.isPenalty && !trickStart && !trickFinish) {
+				const PlayerVisionT& enemy = vision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
+				if (enemy.Pos().dist(ball.Pos()) < 50 && enemy.Pos().x() < 0 && enemy.Pos().x() > -200) {
+					trickStart = true;
+				} else {
+				}
+			} else if (trickStart && !trickFinish) {
+				const PlayerVisionT& me = vision->OurPlayer(task().executor);
+				if (me.Pos().dist(trickPoint) < 20) {
+					trickFinish = true;
+				} else {
+				}
+			}
 		}
-	} else if (trickStart && !trickFinish) {
-		const PlayerVisionT& me = vision->OurPlayer(task().executor);
-		if (me.Pos().dist(trickPoint) < 20) {
-			trickFinish = true;
-		} else {
-		}
-	} else {
 	}
 }
 
@@ -341,36 +352,34 @@ CPlayerTask* CGoalie2022::saveTask()
 	int robotNum = task().executor;
 	const PlayerVisionT& me = vision->OurPlayer(robotNum);
 	double dist = me.Pos().dist(savePoint);
-	
-	if (ball.Vel().mod() > 700) 
+
+	if (ball.Vel().mod() > 700)
 	{
 		if (dist > Param::Field::GOAL_WIDTH * 0.5 * 0.2)
-		{   
+		{
 			double  vw, vx0, vy0;
 			double max_vel = 1000;
 			double cita = ((me.Pos() - savePoint).dir());
-			vx0 = 1000 * cos((cita)); vy0 = -1000*sin((cita)); 
-	
+			vx0 = 1000 * cos((cita)); vy0 = -1000 * sin((cita));
+
 			vw = 0;
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -200), "openrun", COLOR_BLUE);
 			return PlayerRole::makeItRunLocalVersion(robotNum, vx0, vy0, vw);
-		}
-		else{
+		} else {
 			int flag = task().player.flag;
 			flag |= PlayerStatus::QUICKLY;
 			flag |= PlayerStatus::DRIBBLING;
 			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -200), "controlrun", COLOR_BLUE);
 			return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
 		}
-	}
-	else{
+	} else {
 		int flag = task().player.flag;
 		flag |= PlayerStatus::QUICKLY;
 		flag |= PlayerStatus::DRIBBLING;
 		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -200), "normalrun", COLOR_BLUE);
 		return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
 	}
-	
+
 }
 
 CPlayerTask* CGoalie2022::clearTask()
@@ -378,23 +387,38 @@ CPlayerTask* CGoalie2022::clearTask()
 	int myNum = task().executor;
 	const PlayerVisionT& me = vision->OurPlayer(myNum);
 	const BallVisionT& ball = vision->Ball();
+	const PlayerVisionT& enemy = vision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
+	int flag = task().player.flag;
 
 	double clearDir = calcClearDir();
 
-	double precision;
-	if (cycle_ballInsidePenalty < 5 * Param::Vision::FRAME_RATE) {
-		precision = Param::Math::PI / 72;
-	} else if (cycle_ballInsidePenalty < 8 * Param::Vision::FRAME_RATE) {
-		precision = Param::Math::PI / 18;
-	} else {
-		precision = Param::Math::PI/10;
-	}
-	if (fabs(Utils::Normalize(me.Dir() - clearDir)) < precision) {
+	if (cycle_ballInsidePenalty > 7 * Param::Vision::FRAME_RATE
+		|| me.Pos().dist(ball.Pos()) < 0.5 * enemy.Pos().dist(ball.Pos())) {
+		// 危险：球在禁区内停留时间过长（罚球将在禁区旁进行）或敌方离球非常近
+		// 此时在保证不乌龙的情况下应直接冲向球
+		CVector rushBall = ball.Pos() - me.Pos();
+		cout << rushBall.dir() << endl;
+		if (fabs(rushBall.dir()) > Param::Math::PI / 2) {
+			CGeoLine ballVelLine(ball.Pos(), rushBall.dir());
+			CGeoLineLineIntersection interseciton(baseLine, ballVelLine);
+			if (interseciton.Intersectant()) {
+				CGeoPoint goalPoint = interseciton.IntersectPoint(); // 进球点
+				if (fabs(goalPoint.y()) < Param::Field::GOAL_WIDTH / 2 + 5 * Param::Vehicle::V2::PLAYER_SIZE) {
+					// 很可能乌龙，先绕开球回到球门中心
+					return PlayerRole::makeItGoto(myNum, goalCentre, me.Dir(), flag | PlayerStatus::AVOID_STOP_BALL_CIRCLE);
+				}
+			}
+		}
+		// 不会乌龙，直接冲向球
 		KickStatus::Instance()->setChipKick(myNum, 550);
+		return PlayerRole::makeItGoto(myNum, ball.Pos() + Utils::Polar2Vector(100, rushBall.dir()), me.Dir(), flag | PlayerStatus::DRIBBLING);
+	} else {
+		// 时间较充足，鉴于目前getball精度不足，使用static方法
+		if (fabs(Utils::Normalize(me.Dir() - clearDir)) < Param::Math::PI / 36) {
+			KickStatus::Instance()->setChipKick(myNum, 550);
+		}
+		return PlayerRole::makeItNoneTrajGetBallForStatic(myNum, clearDir, CVector(0, 0), flag | PlayerStatus::DRIBBLING);
 	}
-
-	int flag = task().player.flag;
-	flag |= PlayerStatus::DRIBBLING;
 
 	return PlayerRole::makeItNoneTrajGetBall(myNum, clearDir, CVector(0, 0), flag);
 }
@@ -404,73 +428,28 @@ CPlayerTask* CGoalie2022::clearTask()
 CPlayerTask* CGoalie2022::supportTask()
 {
 	int myNum = task().executor;
-
+	const PlayerVisionT& me = vision->OurPlayer(myNum);
 	const BallVisionT& ball = vision->Ball();
-	//CGeoPoint leftSupportTarget(Param::Field::PITCH_LENGTH / 4, -Param::Field::PITCH_WIDTH / 4);
-	//CGeoPoint rightSupportTarget(Param::Field::PITCH_LENGTH / 4, Param::Field::PITCH_WIDTH / 4);
-	//double supportDir;
-	/*if (nearestEnemyFrom(leftSupportTarget) > nearestEnemyFrom(rightSupportTarget)) {
+	CGeoPoint leftSupportTarget(Param::Field::PITCH_LENGTH / 4, -Param::Field::PITCH_WIDTH / 4);
+	CGeoPoint rightSupportTarget(Param::Field::PITCH_LENGTH / 4, Param::Field::PITCH_WIDTH / 4);
+
+	double supportDir;
+	if (nearestEnemyFrom(leftSupportTarget) > nearestEnemyFrom(rightSupportTarget)) {
 		supportDir = (leftSupportTarget - ball.Pos()).dir();
 	} else {
 		supportDir = (rightSupportTarget - ball.Pos()).dir();
-	}*/
-	GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -200), "supporttask", COLOR_BLUE);
-	double supportarray[2];
-	calSupportDirandPower(supportarray);
-	const PlayerVisionT& me = vision->OurPlayer(myNum);
-	if (fabs(Utils::Normalize(me.Dir() - supportarray[0]) < Param::Math::PI / 18)) {
-		KickStatus::Instance()->setChipKick(myNum, supportarray[1]);
+	}
+
+	if (fabs(Utils::Normalize(me.Dir() - supportDir) < Param::Math::PI / 18)) {
+		KickStatus::Instance()->setChipKick(myNum, 500);
 	}
 
 	int flag = task().player.flag;
 	flag |= PlayerStatus::DRIBBLING;
 
-	return PlayerRole::makeItNoneTrajGetBall(myNum, supportarray[0], CVector(0, 0), flag);
+	return PlayerRole::makeItNoneTrajGetBall(myNum, supportDir, CVector(0, 0), flag);
 }
-void CGoalie2022::calSupportDirandPower(double* support)
-{
-	int myNum = task().executor;
-	const PlayerVisionT& me = vision->OurPlayer(myNum);
-	const BallVisionT& ball = vision->Ball();
 
-
-	double dir_me2ball = (ball.Pos() - me.Pos()).dir();
-
-	
-	double ememy2MaybeSupportPlayerDist[Param::Field::MAX_PLAYER];
-	for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
-		CGeoPoint pos = vision->OurPlayer(i).Pos();
-		ememy2MaybeSupportPlayerDist[i] = 1000;
-		if (i == myNum) { ememy2MaybeSupportPlayerDist[i] = 0; continue; }
-		if (pos.x() > 0.1 * 0.5 * Param::Field::PITCH_LENGTH || pos.x() < -0.5 * 0.5 * Param::Field::PITCH_LENGTH || pos.y() > 0.95 * 0.5 * Param::Field::PITCH_WIDTH || pos.y() < -0.95 * 0.5 * Param::Field::PITCH_WIDTH)
-		{
-			ememy2MaybeSupportPlayerDist[i] = 0;
-			continue;
-		}
-		for (int j = 0; j < Param::Field::MAX_PLAYER; j++) {
-			CGeoPoint enemypos = vision->TheirPlayer(j).Pos();
-			if (pos.dist(enemypos) < ememy2MaybeSupportPlayerDist[i]) {
-				ememy2MaybeSupportPlayerDist[i] = pos.dist(enemypos);
-			}
-		}
-
-	}
-	//此处minindex为maxdist对应index
-	int minIndex = 1;
-	for (int i = 1; i < Param::Field::MAX_PLAYER; i++) {
-		if (ememy2MaybeSupportPlayerDist[i] > ememy2MaybeSupportPlayerDist[minIndex]) {
-			minIndex = i;
-		}
-	}
-	cout << ememy2MaybeSupportPlayerDist[minIndex] << endl;
-	cout << minIndex<<endl;
-	CGeoPoint pos = vision->OurPlayer(minIndex).Pos();
-	double SupportBallDir = ( pos-me.Pos()).dir();
-	GDebugEngine::Instance()->gui_debug_line(me.Pos(), pos, COLOR_BLUE);
-	support[0] = SupportBallDir;
-	
-	support[1] = me.Pos().dist(pos) - 200;
-}
 CPlayerTask* CGoalie2022::attackTask()
 {
 	int myNum = task().executor;
@@ -583,14 +562,18 @@ CGeoPoint CGoalie2022::generateNormalPoint(CGeoPoint defenceTarget)
 		break;
 	case 1: // 目标连向两门柱的角平分线 by jj
 	{
-		CVector target2left(leftGoalPost - defenceTarget);
-		CVector target2right(rightGoalPost - defenceTarget);
-		CGeoLine bisectorLine(defenceTarget, Utils::Normalize((target2left.dir() + target2right.dir()) / 2));
-		CGeoLineLineIntersection intersect(bisectorLine, moveLine);
-		if (!intersect.Intersectant()) {
-			defPoint = goalCentre;
+		if (isPosInCornerShootArea(defenceTarget)) { //封死近角
+			defPoint = syntYPos(defenceTarget, CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Vehicle::V2::PLAYER_SIZE, Param::Field::GOAL_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE));
 		} else {
-			defPoint = intersect.IntersectPoint();
+			CVector target2left(leftGoalPost - defenceTarget);
+			CVector target2right(rightGoalPost - defenceTarget);
+			CGeoLine bisectorLine(defenceTarget, Utils::Normalize((target2left.dir() + target2right.dir()) / 2));
+			CGeoLineLineIntersection intersect(bisectorLine, moveLine);
+			if (!intersect.Intersectant()) {
+				defPoint = goalCentre;
+			} else {
+				defPoint = intersect.IntersectPoint();
+			}
 		}
 	}
 	break;
