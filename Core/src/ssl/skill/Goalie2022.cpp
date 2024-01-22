@@ -199,7 +199,7 @@ void CGoalie2022::updateBallJudge()
 		if (interseciton.Intersectant()) {
 			CGeoPoint goalPoint = interseciton.IntersectPoint(); // 进球点
 			if (fabs(goalPoint.y()) < Param::Field::GOAL_WIDTH / 2 + Param::Vehicle::V2::PLAYER_SIZE) {
-				// todo 考虑球以大速度滚向射门路线上的敌人并touch打另一边
+				// 考虑球以大速度滚向射门路线上的敌人并touch打另一边
 				dist_ball2goal = ball.Pos().dist(goalPoint);
 				// 离得远的低速球不需要考虑
 				if (dist_ball2goal > 2 * Param::Field::GOAL_WIDTH) { // 使用球门宽度作为度量单位，必要时参数化
@@ -353,30 +353,22 @@ CPlayerTask* CGoalie2022::saveTask()
 	const PlayerVisionT& me = vision->OurPlayer(robotNum);
 	double dist = me.Pos().dist(savePoint);
 
-	if (ball.Vel().mod() > 700)
+	// todo 暂时禁用。需实车测试能否从相对静止直接给车发一个较大的速度（会走歪？）
+	if (false && ball.Vel().mod() > 500 && dist > Param::Field::GOAL_WIDTH * 0.5 * 0.2)
 	{
-		if (dist > Param::Field::GOAL_WIDTH * 0.5 * 0.2)
-		{
-			double  vw, vx0, vy0;
-			double max_vel = 1000;
-			double cita = ((me.Pos() - savePoint).dir());
-			vx0 = 1000 * cos((cita)); vy0 = -1000 * sin((cita));
-
-			vw = 0;
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -200), "openrun", COLOR_BLUE);
-			return PlayerRole::makeItRunLocalVersion(robotNum, vx0, vy0, vw);
-		} else {
-			int flag = task().player.flag;
-			flag |= PlayerStatus::QUICKLY;
-			flag |= PlayerStatus::DRIBBLING;
-			GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -200), "controlrun", COLOR_BLUE);
-			return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
-		}
+		double  vx, vy, vw;
+		double max_vel = 1000;
+		double dir_me2save = ((me.Pos() - savePoint).dir());
+		vx = max_vel * cos((dir_me2save));
+		vy = max_vel * sin((dir_me2save));
+		vw = 0;
+		DEBUG("open run", 3);
+		return PlayerRole::makeItRunLocalVersion(robotNum, vx, vy, vw);
 	} else {
 		int flag = task().player.flag;
 		flag |= PlayerStatus::QUICKLY;
 		flag |= PlayerStatus::DRIBBLING;
-		GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-200, -200), "normalrun", COLOR_BLUE);
+		DEBUG("normal run", 3);
 		return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
 	}
 
