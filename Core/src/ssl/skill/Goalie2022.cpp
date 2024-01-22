@@ -17,13 +17,15 @@ namespace {
 	bool goalie_debug;
 
 	CGeoPoint goalCentre(-Param::Field::PITCH_LENGTH / 2, 0);
+	CGeoPoint leftGoalPost(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
+	CGeoPoint rightGoalPost(-Param::Field::PITCH_LENGTH / 2, Param::Field::GOAL_WIDTH / 2);
 	CGeoLine baseLine(goalCentre, Param::Math::PI / 2);
 	CGeoLine moveLine(goalCentre + CVector(Param::Field::PENALTY_AREA_DEPTH / 4.0, 0), Param::Math::PI / 2);
 	CGeoPoint trickPoint(goalCentre + Utils::Polar2Vector(Param::Field::PENALTY_AREA_DEPTH, 0));
 }
 
 CGoalie2022::CGoalie2022() :lastSaveCycle(0), startCycle_ballInsidePenalty(0), startCycle_ballOutsidePenalty(0),
-needSave(false), needClear(false), needSupport(false), isNewSave(false),
+needSave(false), needClear(false), needSupport(false), needAdjust(false), isNewSave(false),
 trickStart(false), trickFinish(false), needAttack(false),
 cycle_ballInsidePenalty(0), cycle_penaltyAttack(0)
 {
@@ -59,15 +61,20 @@ const void DEBUG(const char msg[], int mode = 0) {
 
 void CGoalie2022::plan(const CVisionModule* pVision)
 {
-	const BallVisionT& ball = vision->Ball();
-	updateBallJudgementOfGoalie();
+	updateSelfJudge();
+	updateBallJudge();
 
-	if (task().player.isPenalty) {
-		if (vision->gameState().theirPenaltyKick()) {
+	if (task().player.isPenalty) { // 点球状态机
+		if (needAdjust) {
+			setState(ADJUST);
+		} else if (vision->gameState().theirPenaltyKick()) {
 			setState(PENALTY_WAIT);
 			trickStart = trickFinish = false;
 		} else {
 			switch (state()) {
+			case ADJUST:
+				setState(NORMAL);
+				break;
 			case PENALTY_WAIT:
 				if (vision->gameState().gameOn()) {
 					setState(NORMAL);
@@ -104,9 +111,11 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 				break;
 			}
 		}
-	} else {
+	} else { // 非点球状态机
 		if (false) {
 			setState(TEST);
+		} else if (needAdjust) {
+			setState(ADJUST);
 		} else if (vision->gameState().gameOff()) {
 			setState(NORMAL);
 		} else if (needSave) {
@@ -127,11 +136,15 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 		break;
 	case PENALTY_WAIT:
 		DEBUG("wait");
-		setSubTask(PlayerRole::makeItGoto(task().executor, CGeoPoint(0, 0), 0, task().player.flag));
+		setSubTask(PlayerRole::makeItGoto(task().executor, CGeoPoint(-Param::Field::PITCH_LENGTH / 2, 0), 0, task().player.flag));
 		break;
 	case PENALTY_TRICK:
 		DEBUG("trick");
 		setSubTask(PlayerRole::makeItGoto(task().executor, trickPoint, 0, task().player.flag));
+		break;
+	case ADJUST:
+		DEBUG("adjust");
+		setSubTask(adjustTask());
 		break;
 	case NORMAL:
 		DEBUG("normal");
@@ -152,13 +165,26 @@ void CGoalie2022::plan(const CVisionModule* pVision)
 	case PENALTY_ATTACK:
 		DEBUG("attack");
 		setSubTask(attackTask());
+		break;
 	}
 
 	CStatedTask::plan(pVision);
 }
 
-void CGoalie2022::updateBallJudgementOfGoalie()
+void CGoalie2022::updateSelfJudge()
 {
+	const PlayerVisionT& me = vision->OurPlayer(task().executor);
+	if (me.X() < -Param::Field::PITCH_LENGTH / 2
+		&& Utils::InBetween(fabs(me.Y()), Param::Field::GOAL_WIDTH / 2, Param::Field::GOAL_WIDTH / 2 + 20)) {
+		needAdjust = true;
+	} else {
+		needAdjust = false;
+	}
+}
+
+void CGoalie2022::updateBallJudge()
+{
+	static bool last_needClear;
 	needSave = needAttack = needClear = needSupport = false;
 
 	const BallVisionT& ball = vision->Ball();
@@ -173,7 +199,7 @@ void CGoalie2022::updateBallJudgementOfGoalie()
 		if (interseciton.Intersectant()) {
 			CGeoPoint goalPoint = interseciton.IntersectPoint(); // 进球点
 			if (fabs(goalPoint.y()) < Param::Field::GOAL_WIDTH / 2 + Param::Vehicle::V2::PLAYER_SIZE) {
-				// todo 考虑球以大速度滚向射门路线上的敌人并touch打另一边
+				// 考虑球以大速度滚向射门路线上的敌人并touch打另一边
 				dist_ball2goal = ball.Pos().dist(goalPoint);
 				// 离得远的低速球不需要考虑
 				if (dist_ball2goal > 2 * Param::Field::GOAL_WIDTH) { // 使用球门宽度作为度量单位，必要时参数化
@@ -181,10 +207,10 @@ void CGoalie2022::updateBallJudgementOfGoalie()
 					CGeoPoint p = ball.Pos() + ball.Vel().unit() * (dist_ball2goal - Param::Field::PENALTY_AREA_DEPTH);
 					GDebugEngine::Instance()->gui_debug_msg(p, ("predict v: " + to_string(predictSpd.mod())).c_str());
 					if (predictSpd.mod() > 20) {
-						maybeShoot = true; DEBUG("aaa", 4);
+						maybeShoot = true;
 					}
 				} else {
-					maybeShoot = true; DEBUG("bbb", 4);
+					maybeShoot = true;
 				}
 			}
 		}
@@ -195,42 +221,54 @@ void CGoalie2022::updateBallJudgementOfGoalie()
 			if (canMeAttack()) {
 				needAttack = true;
 			} else {
-				needClear = true;
+				needSupport = true;
 			}
 		} else { // not ready
 			needSave = true;
 		}
-	} else if (Utils::InOurPenaltyArea(ball.Pos(), 0)) {
-		if (ball.Vel().mod() < 30) {
+	} else {
+		// state machine for clear and support
+		if (last_needClear) {
+			if (!Utils::InOurPenaltyArea(ball.Pos(), 10)) {
+				needClear = false;
+				last_needClear = false;
+			} else {
+				needClear = true;
+			}
+		} else if (Utils::InOurPenaltyArea(ball.Pos(), 0)) {
 			if (cycle_ballInsidePenalty > 5 * Param::Vision::FRAME_RATE) { //  规则：对于处在禁区内的球，守门员需要在10s内将球清出禁区
 				needClear = true;
 			} else {
+				needSupport = true; // 注意：此处是for-else结构的替代，不是一定support
 				for (int i = 0; i < Param::Field::MAX_PLAYER; i++) {
 					const PlayerVisionT& enemy = vision->TheirPlayer(i);
 					if (enemy.Valid() &&
 						enemy.Pos().dist(ball.Pos()) < 100 || Utils::InOurPenaltyArea(enemy.Pos(), 100)) {
 						needClear = true;
+						needSupport = false;
+						break;
 					}
 				}
-				needSupport = true;
 			}
-		} else {
+			last_needClear = needClear;
 		}
-	} else if (canMeAttack()) {
-		needAttack = true;
-	} else if (task().player.isPenalty && !trickStart && !trickFinish) {
-		const PlayerVisionT& enemy = vision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
-		if (enemy.Pos().dist(ball.Pos()) < 50 && enemy.Pos().x() < 0 && enemy.Pos().x() > -200) {
-			trickStart = true;
-		} else {
+		if (!needClear && !needSupport) {
+			if (canMeAttack()) {
+				needAttack = true;
+			} else if (task().player.isPenalty && !trickStart && !trickFinish) {
+				const PlayerVisionT& enemy = vision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
+				if (enemy.Pos().dist(ball.Pos()) < 50 && enemy.Pos().x() < 0 && enemy.Pos().x() > -200) {
+					trickStart = true;
+				} else {
+				}
+			} else if (trickStart && !trickFinish) {
+				const PlayerVisionT& me = vision->OurPlayer(task().executor);
+				if (me.Pos().dist(trickPoint) < 20) {
+					trickFinish = true;
+				} else {
+				}
+			}
 		}
-	} else if (trickStart && !trickFinish) {
-		const PlayerVisionT& me = vision->OurPlayer(task().executor);
-		if (me.Pos().dist(trickPoint) < 20) {
-			trickFinish = true;
-		} else {
-		}
-	} else {
 	}
 }
 
@@ -262,6 +300,14 @@ void CGoalie2022::updateCycleCounter() {
 	}
 }
 
+
+CPlayerTask* CGoalie2022::adjustTask()
+{
+	int myNum = task().executor;
+	const PlayerVisionT& me = vision->OurPlayer(myNum);
+	CGeoPoint adjustPos(-Param::Field::PITCH_LENGTH / 2 + 30, Param::Field::GOAL_WIDTH / 2);
+	return PlayerRole::makeItGoto(myNum, syntYPos(me.Pos(), adjustPos), me.Dir(), task().player.flag);
+}
 
 CPlayerTask* CGoalie2022::normalTask()
 {
@@ -305,12 +351,27 @@ CPlayerTask* CGoalie2022::saveTask()
 
 	int robotNum = task().executor;
 	const PlayerVisionT& me = vision->OurPlayer(robotNum);
+	double dist = me.Pos().dist(savePoint);
 
-	int flag = task().player.flag;
-	flag |= PlayerStatus::QUICKLY;
-	flag |= PlayerStatus::DRIBBLING;
+	// todo 暂时禁用。需实车测试能否从相对静止直接给车发一个较大的速度（会走歪？）
+	if (false && ball.Vel().mod() > 500 && dist > Param::Field::GOAL_WIDTH * 0.5 * 0.2)
+	{
+		double  vx, vy, vw;
+		double max_vel = 1000;
+		double dir_me2save = ((me.Pos() - savePoint).dir());
+		vx = max_vel * cos((dir_me2save));
+		vy = max_vel * sin((dir_me2save));
+		vw = 0;
+		DEBUG("open run", 3);
+		return PlayerRole::makeItRunLocalVersion(robotNum, vx, vy, vw);
+	} else {
+		int flag = task().player.flag;
+		flag |= PlayerStatus::QUICKLY;
+		flag |= PlayerStatus::DRIBBLING;
+		DEBUG("normal run", 3);
+		return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
+	}
 
-	return PlayerRole::makeItGoto(robotNum, savePoint, me.Dir(), flag);
 }
 
 CPlayerTask* CGoalie2022::clearTask()
@@ -318,23 +379,38 @@ CPlayerTask* CGoalie2022::clearTask()
 	int myNum = task().executor;
 	const PlayerVisionT& me = vision->OurPlayer(myNum);
 	const BallVisionT& ball = vision->Ball();
+	const PlayerVisionT& enemy = vision->TheirPlayer(DefenceInfoNew::Instance()->getBestBallChaser());
+	int flag = task().player.flag;
 
 	double clearDir = calcClearDir();
 
-	double precision;
-	if (cycle_ballInsidePenalty < 5 * Param::Vision::FRAME_RATE) {
-		precision = Param::Math::PI / 18;
-	} else if (cycle_ballInsidePenalty < 8 * Param::Vision::FRAME_RATE) {
-		precision = Param::Math::PI / 8;
-	} else {
-		precision = Param::Math::PI;
-	}
-	if (fabs(Utils::Normalize(me.Dir() - clearDir)) < precision) {
+	if (cycle_ballInsidePenalty > 7 * Param::Vision::FRAME_RATE
+		|| me.Pos().dist(ball.Pos()) < 0.5 * enemy.Pos().dist(ball.Pos())) {
+		// 危险：球在禁区内停留时间过长（罚球将在禁区旁进行）或敌方离球非常近
+		// 此时在保证不乌龙的情况下应直接冲向球
+		CVector rushBall = ball.Pos() - me.Pos();
+		cout << rushBall.dir() << endl;
+		if (fabs(rushBall.dir()) > Param::Math::PI / 2) {
+			CGeoLine ballVelLine(ball.Pos(), rushBall.dir());
+			CGeoLineLineIntersection interseciton(baseLine, ballVelLine);
+			if (interseciton.Intersectant()) {
+				CGeoPoint goalPoint = interseciton.IntersectPoint(); // 进球点
+				if (fabs(goalPoint.y()) < Param::Field::GOAL_WIDTH / 2 + 5 * Param::Vehicle::V2::PLAYER_SIZE) {
+					// 很可能乌龙，先绕开球回到球门中心
+					return PlayerRole::makeItGoto(myNum, goalCentre, me.Dir(), flag | PlayerStatus::AVOID_STOP_BALL_CIRCLE);
+				}
+			}
+		}
+		// 不会乌龙，直接冲向球
 		KickStatus::Instance()->setChipKick(myNum, 550);
+		return PlayerRole::makeItGoto(myNum, ball.Pos() + Utils::Polar2Vector(100, rushBall.dir()), me.Dir(), flag | PlayerStatus::DRIBBLING);
+	} else {
+		// 时间较充足，鉴于目前getball精度不足，使用static方法
+		if (fabs(Utils::Normalize(me.Dir() - clearDir)) < Param::Math::PI / 36) {
+			KickStatus::Instance()->setChipKick(myNum, 550);
+		}
+		return PlayerRole::makeItNoneTrajGetBallForStatic(myNum, clearDir, CVector(0, 0), flag | PlayerStatus::DRIBBLING);
 	}
-
-	int flag = task().player.flag;
-	flag |= PlayerStatus::DRIBBLING;
 
 	return PlayerRole::makeItNoneTrajGetBall(myNum, clearDir, CVector(0, 0), flag);
 }
@@ -344,10 +420,11 @@ CPlayerTask* CGoalie2022::clearTask()
 CPlayerTask* CGoalie2022::supportTask()
 {
 	int myNum = task().executor;
-
+	const PlayerVisionT& me = vision->OurPlayer(myNum);
 	const BallVisionT& ball = vision->Ball();
 	CGeoPoint leftSupportTarget(Param::Field::PITCH_LENGTH / 4, -Param::Field::PITCH_WIDTH / 4);
 	CGeoPoint rightSupportTarget(Param::Field::PITCH_LENGTH / 4, Param::Field::PITCH_WIDTH / 4);
+
 	double supportDir;
 	if (nearestEnemyFrom(leftSupportTarget) > nearestEnemyFrom(rightSupportTarget)) {
 		supportDir = (leftSupportTarget - ball.Pos()).dir();
@@ -355,9 +432,8 @@ CPlayerTask* CGoalie2022::supportTask()
 		supportDir = (rightSupportTarget - ball.Pos()).dir();
 	}
 
-	const PlayerVisionT& me = vision->OurPlayer(myNum);
 	if (fabs(Utils::Normalize(me.Dir() - supportDir) < Param::Math::PI / 18)) {
-		KickStatus::Instance()->setChipKick(myNum, 550);
+		KickStatus::Instance()->setChipKick(myNum, 500);
 	}
 
 	int flag = task().player.flag;
@@ -374,7 +450,6 @@ CPlayerTask* CGoalie2022::attackTask()
 	int flags = task().player.flag;
 	return PlayerRole::makeItNoneTrajGetBall(myNum, dir, CVector(0, 0), flags);
 }
-
 
 bool CGoalie2022::isMeReady4Ball(double dist_ball2goal)
 {
@@ -448,7 +523,6 @@ bool CGoalie2022::isPosInCornerShootArea(const CGeoPoint& pos)
 {
 	CGeoPoint convertPos = syntYPos(CGeoPoint(0, 1), pos); // 在 y>0 的半场考虑
 	CGeoPoint penaltyRightCorner(-Param::Field::PITCH_LENGTH / 2 + Param::Field::PENALTY_AREA_DEPTH, Param::Field::PENALTY_AREA_WIDTH / 2);
-	CGeoPoint leftGoalPost(-Param::Field::PITCH_LENGTH / 2, -Param::Field::GOAL_WIDTH / 2);
 	double dir_pos2leftGoalPost = (convertPos - leftGoalPost).dir();
 	double dir_penaltyRightCorner2leftGoalPost = (penaltyRightCorner - leftGoalPost).dir();
 	return dir_pos2leftGoalPost > dir_penaltyRightCorner2leftGoalPost;
@@ -463,6 +537,7 @@ CGeoPoint CGoalie2022::generateNormalPoint(CGeoPoint defenceTarget)
 	} else {
 		method = paramManager->NORMAL_CALC_METHOD;
 	}
+	method = 1;
 	switch (method) {
 	case 0: // 传统算法 球门中心连线
 		if (isPosInCornerShootArea(defenceTarget)) { //封死近角
@@ -470,15 +545,30 @@ CGeoPoint CGoalie2022::generateNormalPoint(CGeoPoint defenceTarget)
 		} else {
 			CGeoLine defenceLine(defenceTarget, goalCentre);
 			CGeoLineLineIntersection intersect(defenceLine, moveLine);
-			if (!intersect.Intersectant())
+			if (!intersect.Intersectant()) {
 				defPoint = goalCentre;
-			else
+			} else {
 				defPoint = intersect.IntersectPoint();
+			}
 		}
 		break;
-	case 1: // 角平分线算点法 by jj
-		defPoint = CGeoPoint(0, 0);
-		break;
+	case 1: // 目标连向两门柱的角平分线 by jj
+	{
+		if (isPosInCornerShootArea(defenceTarget)) { //封死近角
+			defPoint = syntYPos(defenceTarget, CGeoPoint(-Param::Field::PITCH_LENGTH / 2 + Param::Vehicle::V2::PLAYER_SIZE, Param::Field::GOAL_WIDTH / 2 - Param::Vehicle::V2::PLAYER_SIZE));
+		} else {
+			CVector target2left(leftGoalPost - defenceTarget);
+			CVector target2right(rightGoalPost - defenceTarget);
+			CGeoLine bisectorLine(defenceTarget, Utils::Normalize((target2left.dir() + target2right.dir()) / 2));
+			CGeoLineLineIntersection intersect(bisectorLine, moveLine);
+			if (!intersect.Intersectant()) {
+				defPoint = goalCentre;
+			} else {
+				defPoint = intersect.IntersectPoint();
+			}
+		}
+	}
+	break;
 	case 2: // （点球使用）加权随机摇摆
 	{
 		CGeoPoint defCentre;//防守中心，影响随机点的分布
@@ -546,6 +636,8 @@ CGeoPoint CGoalie2022::generateSavePoint()
 	CVector ball2me(ball.Pos() - me.Pos());
 	CGeoLine me_vertical2_me2ballLine(me.Pos(), ball2me.dir() + Param::Math::PI / 2);
 	CGeoLineLineIntersection intersect(ballVelLine, me_vertical2_me2ballLine);
+	//GDebugEngine::Instance()->gui_debug_line(intersect.IntersectPoint(), me.Pos(), COLOR_BLUE);
+	//GDebugEngine::Instance()->gui_debug_line(intersect.IntersectPoint(), ball.Pos(), COLOR_BLUE);
 	CGeoPoint savePoint;
 	if (intersect.Intersectant() && Utils::InOurPenaltyArea(intersect.IntersectPoint(), 0)) {
 		savePoint = intersect.IntersectPoint();
