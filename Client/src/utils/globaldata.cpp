@@ -89,27 +89,6 @@ void CGlobalData::setCameraMatrixA() {
             break;
         case 2:
             cameraMatrix[0].fillCenter(GS->saoConvert(CGeoPoint(-3000, 0)));
-            cameraMatrix[0].height = 6000;
-            cameraMatrix[0].leftedge.min = cameraMatrix[0].campos.x() - 3300;
-            cameraMatrix[0].leftedge.max = cameraMatrix[0].campos.x() - 3000;
-            cameraMatrix[0].rightedge.min = cameraMatrix[0].campos.x() + 2400;
-            cameraMatrix[0].rightedge.max = cameraMatrix[0].campos.x() + 2000;
-            cameraMatrix[0].downedge.min = cameraMatrix[0].campos.y() - 4900;
-            cameraMatrix[0].downedge.max = cameraMatrix[0].campos.y() - 4900;
-            cameraMatrix[0].upedge.min = cameraMatrix[0].campos.y() + 4900;
-            cameraMatrix[0].upedge.max = cameraMatrix[0].campos.y() + 4900;
-
-            cameraMatrix[1].fillCenter(GS->saoConvert(CGeoPoint(3000, 0)));
-            cameraMatrix[1].height = 6000;
-            cameraMatrix[1].leftedge.min = cameraMatrix[1].campos.x() - 4000;
-            cameraMatrix[1].leftedge.max = cameraMatrix[1].campos.x() - 3600;
-            cameraMatrix[1].rightedge.min = cameraMatrix[1].campos.x() + 3300;
-            cameraMatrix[1].rightedge.max = cameraMatrix[1].campos.x() + 3000;
-            cameraMatrix[1].downedge.min = cameraMatrix[1].campos.y() - 4900;
-            cameraMatrix[1].downedge.max = cameraMatrix[1].campos.y() - 4900;
-            cameraMatrix[1].upedge.min = cameraMatrix[1].campos.y() + 4900;
-            cameraMatrix[1].upedge.max = cameraMatrix[1].campos.y() + 4900;
-            /*cameraMatrix[0].fillCenter(GS->saoConvert(CGeoPoint(-3170, 0)));
             cameraMatrix[1].fillCenter(GS->saoConvert(CGeoPoint(3000, 0)));
             for (int i = 0; i < opm->total_cameras; i = i + 1) {
                 cameraMatrix[i].height = 6000;
@@ -120,8 +99,8 @@ void CGlobalData::setCameraMatrixA() {
                 cameraMatrix[i].downedge.min = cameraMatrix[i].campos.y() - 4800;
                 cameraMatrix[i].downedge.max = cameraMatrix[i].campos.y() - 4800;
                 cameraMatrix[i].upedge.min = cameraMatrix[i].campos.y() + 4900;
-                cameraMatrix[i].upedge.max = cameraMatrix[i].campos.y() + 4900;*/
-            //}
+                cameraMatrix[i].upedge.max = cameraMatrix[i].campos.y() + 4900;
+            }
             break;
         case 4:
             cameraMatrix[0].fillCenter(GS->saoConvert(CGeoPoint(-3000, -2250)));
@@ -196,10 +175,10 @@ void CGlobalData::setCameraMatrixB() {
             }
             break;
         case 4:
-            cameraMatrix[0].fillCenter(GS->saoConvert(CGeoPoint(-2195, -1404)));
-            cameraMatrix[1].fillCenter(GS->saoConvert(CGeoPoint(-2310, 1477)));
-            cameraMatrix[2].fillCenter(GS->saoConvert(CGeoPoint(2162, -1529)));
-            cameraMatrix[3].fillCenter(GS->saoConvert(CGeoPoint(2410, 1579)));          
+            cameraMatrix[0].fillCenter(GS->saoConvert(CGeoPoint(-2250, -1500)));
+            cameraMatrix[1].fillCenter(GS->saoConvert(CGeoPoint(-2250, 1500)));
+            cameraMatrix[2].fillCenter(GS->saoConvert(CGeoPoint(2250, -1500)));
+            cameraMatrix[3].fillCenter(GS->saoConvert(CGeoPoint(2250, 1500)));          
             for (int i = 0; i < opm->total_cameras; i++) {
                 cameraMatrix[i].height = 4000;
                 cameraMatrix[i].leftedge.min = cameraMatrix[i].campos.x() - 3300;
