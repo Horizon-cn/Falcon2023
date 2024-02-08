@@ -103,6 +103,15 @@ CPlayerTask* CTaskFactoryV2::MakeTask(const TaskT& task)
 
 //working
 //
+// CPlayerTask* CTaskFactoryV2::GofourRobot(const TaskT& task){
+// 	return MakeTask< CGofourRobot >(task);
+// }
+CPlayerTask* makeItTechDefence(const int num)
+{
+	static TaskT playerTask;
+	playerTask.executor=num;
+	return TaskFactoryV2::Instance()->TechDefence(playerTask);
+}
 CPlayerTask* CTaskFactoryV2::lightkick(const TaskT& task)
 {
 	return MakeTask<Clightkick>(task);
@@ -115,7 +124,9 @@ CPlayerTask* CTaskFactoryV2::SpeedTest(const TaskT& task)
 {
 	return MakeTask<CSpeedTest>(task);
 }
-
+CTaskFactoryV2* CTaskFactoryV2::TechDefenceRobot(const TaskT& task){
+	return MakeTask< CTechDefence >(task);
+}
 
 //////////////////////////////////////////////////////////////////////////
 // current now debugged skill for game
@@ -368,6 +379,13 @@ CPlayerTask* CTaskFactoryV2::DribbleTurnKickV2(const TaskT& task) {
 //////////////////////////////////////////////////////////////////////////
 // define the namespace used to provide interface for task calling
 namespace PlayerRole {
+	// CPlayerTask* makeItGofour(const int num)
+	// {
+	// 	static TaskT playerTask;
+	// 	playerTask.executor =num;
+	// 	return TaskFactoryV2::Instance()->GofourRobot(playerTask);
+
+	// }
 	CPlayerTask* makeItlightkick(const int num, const double dir, const double power)
 	{	
 		static TaskT playerTask;

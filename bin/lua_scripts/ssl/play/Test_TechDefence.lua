@@ -8,12 +8,12 @@ gPlayTable.CreatePlay{
         return "start"
       end
     end,
-    Leader   = task.advance(),
-    Assister = task.markingFront("First"),
-    Special  = task.markingFront("Second"),
-    match    = "[L][AS]"
+    Leader   = task.techdefence(),
+    -- Assister = task.markingFront("First"),
+    -- Special  = task.markingFront("Second"),
+    match    = ""
   },
-  name = "Test_TechCh",
+  name = "Test_TechDefence",
   applicable = {
   	exp = "a",    
   	a = true
