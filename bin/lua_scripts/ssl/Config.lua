@@ -1,4 +1,4 @@
-IS_TEST_MODE = false
+IS_TEST_MODE = true
 IS_SIMULATION = CGetIsSimulation()
 IS_YELLOW = CGetIsYellow()
 
@@ -10,14 +10,14 @@ end
 
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_Run" -- Test_AdvanceV4 Test_NormalPass Test_play6 Test_Run
+		return "Test_physics" -- Test_AdvanceV4 Test_NormalPass Test_play6 Test_Run
 		--犯规多的时候用"Test_play8_ManyFoul"
 		--犯规少的时候用"Test_play8_NotFoul"
 		--AutoChange用"Test_play8_AUTO"
 		-- NormalPlayPureDefence8   Test_play8_Strong_Tyh
 
 	else
-		return "Test_play8_Simple" -- Test_Defence Test_PassEachOther Test_NormalMiddleDefend
+		return "Test_physics" -- Test_Defence Test_PassEachOther Test_NormalMiddleDefend
 	end
 end
 gNormalPlay = "Test_play8_AUTO"
@@ -214,5 +214,6 @@ gTestPlayTable = {
 	"Test_play8ForPower",
 	"Test_play6",
 	"Test_play8_Strong_Tyh",
-	"Test_play8_Simple"
+	"Test_play8_Simple",
+	"Test_physics"
 }

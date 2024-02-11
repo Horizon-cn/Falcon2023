@@ -12,6 +12,7 @@ class CPlayerTask;
 class CTaskFactoryV2 {
 public:
 	// CPlayerTask* CtaskFactoryV2::GofourRobot(const TaskT& task);
+	CPlayerTask* TechDefenceRobot(const TaskT& task);
 	CPlayerTask* GoPIDCircle(const TaskT& task);
 	CPlayerTask* Break(const TaskT& task);
 	CPlayerTask* lightkick(const TaskT& task);

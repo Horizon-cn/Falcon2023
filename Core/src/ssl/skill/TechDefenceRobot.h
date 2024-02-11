@@ -1,11 +1,15 @@
 #ifndef TechDefence_h__
 #define TechDefence_h__
 #include <skill/PlayerTask.h>
-class CTechDefenceRobot : public CStatedTask{
+class CTechDefence : public CStatedTask{
 public:
-	CTechDefenceRobot();
-	virtual void plan(const CVisionModule* pVision);
+	CTechDefence();
+	~CTechDefence();
 	virtual void plan(const CVisionModule* pVision);
 	virtual bool isEmpty() const { return false;}
+	virtual CPlayerCommand* execute(const CVisionModule * pVision);
+
 protected:
 };
+
+#endif //TechDefence_h__
