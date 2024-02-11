@@ -8,7 +8,7 @@ firstState = "touch",
 ["touch"] = {
 	switch = function ()
 		if ball.velMod()>5 then 
-			print(ball.posX(),ball.posY(),ball.velMod())
+			print(ball.velMod())
 			return "touch";
 		end
 	end,

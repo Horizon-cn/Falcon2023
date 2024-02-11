@@ -386,7 +386,7 @@ CPlayerCommand* CTandem::execute(const CVisionModule* pVision)
 		return _directCommand;
 	}
 
-	std::cout<<"nocmd_";
+	// std::cout<<"nocmd_";
 	return 0;
 }
 

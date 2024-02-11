@@ -3,6 +3,8 @@
 #include "VisionModule.h"
 #include "Global.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
 
 
 #include <iostream>
@@ -19,12 +21,44 @@
 #include <vector>
 #include <variant>
 #include <string>
-
+#include <cmath>
 using namespace std;
 
-namespace {
+namespace 
+{
 enum TDstate {getball ,wait};//setState(getball);if (state()==getball);
 }
+
+
+// 假设 CGeoPoint 和 CGeoLine 的定义如前所述
+class Intercept {
+public:
+    Intercept(const CGeoPoint& O, const double& DIR, const CGeoPoint& A) 
+        : O(O), DIR(DIR), A(A), M(O, CGeoPoint(O.x() + std::cos(DIR), O.y() + std::sin(DIR))) {
+        H = M.projection(A); // 计算垂足H并存储
+        AHdist = A.dist(H); // 计算A到H的距离并存储
+    }
+    
+    CGeoPoint FootH() const {
+        return H; // 直接返回计算得到的垂足
+    }
+
+    CGeoLine LineM() const {
+        return M; // 直接返回计算得到的射线
+    }
+
+    double DistanceAH() const {
+        return AHdist; // 直接返回A到H的距离
+    }
+
+private:
+    CGeoPoint O;
+    double DIR;
+    CGeoPoint A;
+    CGeoLine M;
+    CGeoPoint H;
+    double AHdist;
+};
 
 
 
@@ -38,6 +72,7 @@ void CTechDefence::plan(const CVisionModule* pVision)
 	TaskT taskR1(task());
 	int rolenum=task().executor;
 	taskR1.executor=rolenum;
+	//set the executor of this plan
 //----------------------------------------------
 	std::vector<const PlayerVisionT*> OPptrs;
 	for (int irole = 1; irole <= Param::Field::MAX_PLAYER; ++irole)
@@ -48,32 +83,26 @@ void CTechDefence::plan(const CVisionModule* pVision)
 			OPptrs.push_back(&OPtmp);
 		}
 	}
-	if (OPptrs.size() != 3) 
-	{
-	    std::cout << "OPptrs length error: " << OPptrs.size() << std::endl;
-	}
-	std::cout<< OPptrs[1]->Vel().mod();
-	//OPptrs consists of three pointers that represent our three players that are present on the field.
-	//To call their information,use OPptrs[1]->Vel().mod() or OPptrs[1]->Dir()
-// ---------------------------------------------
-	CGeoPoint POS1(122, 13);
-    CGeoPoint POS3(123, 40);
-	const PlayerVisionT& theirCar = pVision->TheirPlayer(1);
-	const PlayerVisionT& ourCar =pVision->OurPlayer(1);// ourCar.Dir()   or:pVision->AllPlayer(i).Pos().dist(ball.Pos())
-	const PlayerVisionT& thisCar =pVision->OurPlayer(task().executor);
 	const BallVisionT& ball = pVision->Ball();//ball.Pos().X()和ball().Pos().Y()  ball.Vel().mod() 
-	auto ans="a";
 // ---------------------------------------------
-	
-//----------------------------------------------
-	if (ans = "pick")
-	{
+	CGeoPoint O(0, 0); // 射线的起点
+    double DIR = M_PI / 4; // 射线的方向，以弧度表示，这里是45度角
+    CGeoPoint A(3, 1); // 射线外的点A
 
-	}
+    Intercept calculator(O, DIR, A);
+    CGeoPoint H = calculator.FootH(); // 获取垂足H的坐标
+    CGeoLine M = calculator.LineM(); // 获取射线M
+    double distance = calculator.DistanceAH(); // 获取A到H的距离
+    std::cout << "FootH: (" << H.x() <<","<<H.y()<<")";
+    // std::cout << "LineM: " << M << std::endl;
+    std::cout << "DistanceAH: " << distance ;
+//----------------------------------------------
 	setSubTask(TaskFactoryV2::Instance()->GotoPosition(taskR1));//将taskR1给走位subtask执行
 	CStatedTask::plan(pVision);
 }
-	
+
+
+
 
 
 CTechDefence::~CTechDefence() {
@@ -88,3 +117,4 @@ CPlayerCommand* CTechDefence::execute(const CVisionModule* pVision)
 	}
 	return NULL;
 }
+#endif
