@@ -112,21 +112,6 @@ CGeoPoint backpos(const CGeoPoint& A, const CGeoPoint& H, double distback) {
     return CGeoPoint(Bx, By);
 }
 
-// int main() {
-//     CGeoPoint A(0, 0); // 点A的坐标
-//     CGeoPoint H(4, 0); // 点H的坐标
-//     double distback = 2; // AB距离，正值表示同方向，负值表示反方向
-    
-//     CGeoPoint B = backpos(A, H, distback);
-//     std::cout << "B点坐标：(" << B.x() << ", " << B.y() << ")" << std::endl;
-    
-//     // 使用负值测试
-//     distback = -2;
-//     B = backpos(A, H, distback);
-//     std::cout << "使用负值的B点坐标：(" << B.x() << ", " << B.y() << ")" << std::endl;
-
-//     return 0;
-// }
 
 
 CTech3Pass::CTech3Pass() 
