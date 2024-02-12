@@ -1279,11 +1279,19 @@ extern "C" int Skill_TechDefence(lua_State * L)
 	TaskMediator::Instance()->setPlayerTask(runner,pTask,1);
 	return 0;
 }
+extern "C" int Skill_Tech3Pass(lua_State * L)
+{
+	int runner = LuaModule::Instance()->GetNumberArgument(1,NULL);
+	CPlayerTask* pTask =PlayerRole::makeItTech3Pass(runner);
+	TaskMediator::Instance()->setPlayerTask(runner,pTask,1);
+	return 0;
+}
 luaDef GUIGlue[] =
 {
 	//Î»ÖÃÒÆ¶¯
 	// {"CGofour",				Skill_Gofour},
 	{"CTechDefence",		Skill_TechDefence},
+	{"CTech3Pass",			Skill_Tech3Pass},
 	{"CGoPIDCircle",		Skill_GoPIDCircle},
 	{"CSpeedTest",			Skill_SpeedTest},
 	{"CPenaltyKickV2",      Skill_PenaltyKickV2},

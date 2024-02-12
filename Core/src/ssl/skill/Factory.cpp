@@ -80,6 +80,7 @@
 #include "ChaseToGetBall.h"
 #include "lightkick.h"
 #include "TechDefenceRobot.h"
+#include "Tech3PassRobot.h"
 
 /************************************************************************/
 /*                      TaskFactoryV2                                    */
@@ -123,7 +124,9 @@ CPlayerTask* CTaskFactoryV2::SpeedTest(const TaskT& task)
 CPlayerTask* CTaskFactoryV2::TechDefenceRobot(const TaskT& task){
 	return MakeTask<CTechDefence>(task);
 }
-
+CPlayerTask* CTaskFactoryV2::Tech3PassRobot(const TaskT& task){
+	return MakeTask<CTech3Pass>(task);
+}
 //////////////////////////////////////////////////////////////////////////
 // current now debugged skill for game
 CPlayerTask* CTaskFactoryV2::GoPIDCircle(const TaskT& task) {
@@ -380,6 +383,13 @@ namespace PlayerRole {
 		static TaskT playerTask;
 		playerTask.executor =num;
 		return TaskFactoryV2::Instance()->TechDefenceRobot(playerTask);
+
+	}
+	CPlayerTask* makeItTech3Pass(const int num)
+	{
+		static TaskT playerTask;
+		playerTask.executor =num;
+		return TaskFactoryV2::Instance()->Tech3PassRobot(playerTask);
 
 	}
 

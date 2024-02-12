@@ -8,12 +8,12 @@ gPlayTable.CreatePlay{
         return "start"
       end
     end,
-    Leader   = task.techdefence(),
+    Leader   = task.tech3pass(),
     -- Assister = task.markingFront("First"),
     -- Special  = task.markingFront("Second"),
     match    = ""
   },
-  name = "Test_TechDefence",
+  name = "Test_Tech3Pass",
   applicable = {
   	exp = "a",    
   	a = true
@@ -22,8 +22,3 @@ gPlayTable.CreatePlay{
   timeout = 99999
 
 }
--- [1,2,3]
--- [1,2,3,2,3]
--- [,2]
--- [,3]
--- [3]

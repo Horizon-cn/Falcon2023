@@ -38,6 +38,7 @@ gRoleFixNum = {
 
 gSkill = {
 	"TechDefence",
+	"Tech3Pass",
 	--走位
 	"GoAndTurn",
 	"DribbleTurn",
@@ -174,6 +175,7 @@ gBayesPlayTable = {
 
 gTestPlayTable = {
 	"Test_TechDefence",
+	"Test_Tech3Pass",
 	"Test_RefChallenge",
 	"Test_Run",
 	"Test_BezierRun",
