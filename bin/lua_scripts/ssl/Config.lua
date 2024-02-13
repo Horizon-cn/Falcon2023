@@ -10,14 +10,14 @@ end
 
 gTestPlay = function ()
 	if not IS_YELLOW then
-		return "Test_physics" -- Test_AdvanceV4 Test_NormalPass Test_play6 Test_Run
+		return "Test_TechDefence" -- Test_AdvanceV4 Test_NormalPass Test_play6 Test_Run
 		--犯规多的时候用"Test_play8_ManyFoul"
 		--犯规少的时候用"Test_play8_NotFoul"
 		--AutoChange用"Test_play8_AUTO"
 		-- NormalPlayPureDefence8   Test_play8_Strong_Tyh
 
 	else
-		return "Test_physics" -- Test_Defence Test_PassEachOther Test_NormalMiddleDefend
+		return "Test_TechDefence" -- Test_Defence Test_PassEachOther Test_NormalMiddleDefend
 	end
 end
 gNormalPlay = "Test_play8_AUTO"
@@ -31,7 +31,7 @@ gSwitchNum = {
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
 	["Kicker"]   = {7},
-	["Goalie"]   = {0},
+	-- ["Goalie"]   = {0},
 	["Tier"]	 = {13},
 	["Receiver"] = {12}
 }
