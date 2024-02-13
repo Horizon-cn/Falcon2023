@@ -61,33 +61,41 @@ void CTech3Pass::plan(const CVisionModule* pVision)
     }
     std::cout << std::endl;
 // -----------------------------------------------CALCULATE THREE POINTS
-	enum states {PrepareAndPass,Receive};
-	setState(PrepareAndPass);
-	CGeoPoint B;
-	switch(state())
+	enum states {PrepareAndPass,Receive,Test};
+	setState(Test);
+	CGeoPoint B1;
+	CGeoPoint A1;
+	CGeoPoint A2;
+	CGeoPoint A3;
+	CGeoPoint A4;
+	if (state()==Test)
 	{
-	case PrepareAndPass:
+		A1=CGeoPoint(-75,-130);
+		A2=CGeoPoint(-75,130);
+		A3=CGeoPoint(150,0);
+		
+// ------------------------------------------------IF ROBOT IS TO GO TO A POINT ,THEN DEFINE A1 A2 A3 ABOVE
 	    if (rolenum==rolenums[1])
 	    {
-	    	B=CGeoPoint(-75,-130);
+	    	A4=A1
 	    }
 	    else if (rolenum==rolenums[2])
 	    {
-	    	B=CGeoPoint(-75,130);
+	    	A4=A2
 	    }
 	    else if (rolenum==rolenums[3])
 	    {
-	    	B=CGeoPoint(150,0);
+	    	A4=A3
 	    }
-	    taskR1.player.pos=B;
-	    setSubTask(TaskFactoryV2::Instance()->GotoPosition(taskR1));//将taskR1给走位subtask执行
+	    taskR1.player.pos=A4;
+	    setSubTask(TaskFactoryV2::Instance()->GotoPosition(taskR1));
 		CStatedTask::plan(pVision);
-		break;
-	case Receive:
-		break;
-	default:
-		break;
 	}
+	else if ()
+	{
+
+	}
+	
 }
 CTech3Pass::~CTech3Pass() {
 }
