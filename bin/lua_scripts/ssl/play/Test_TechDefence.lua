@@ -8,9 +8,9 @@ gPlayTable.CreatePlay{
         return "start"
       end
     end,
-    Special  = task.techdefence(),
-    Assister=task.techdefence(),
-    Leader=task.techdefence(),
+    Special  = task.techdefence(1),
+    Assister=task.techdefence(2),
+    Leader=task.techdefence(3),
     -- Assister = task.markingFront("First"),
     -- Special  = task.markingFront("Second"),
     match    = "[L][S][A]"

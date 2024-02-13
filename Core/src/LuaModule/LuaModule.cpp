@@ -1282,7 +1282,8 @@ extern "C" int Skill_TechDefence(lua_State * L)
 extern "C" int Skill_Tech3Pass(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1,NULL);
-	CPlayerTask* pTask =PlayerRole::makeItTech3Pass(runner);
+	int idx=LuaModule::Instance()->GetNumberArgument(2,NULL);
+	CPlayerTask* pTask = PlayerRole::makeItTech3Pass(runner,idx);
 	TaskMediator::Instance()->setPlayerTask(runner,pTask,1);
 	return 0;
 }
