@@ -28,6 +28,22 @@ namespace
 {
 enum TDstate {getball ,wait};//setState(getball);if (state()==getball);
 }
+double normalizeAngle(double angle) {
+    while (angle > M_PI) angle -= 2 * M_PI;
+    while (angle <= -M_PI) angle += 2 * M_PI;
+    return angle;
+}
+bool DIRsame(double angle1, double angle2) {
+    const double tolerance = 30 * M_PI / 180; // 5度转换为弧度
+    angle1 = normalizeAngle(angle1);
+    angle2 = normalizeAngle(angle2);
+    double diff = std::abs(angle1 - angle2);
+    double sum = std::abs(angle1 + angle2);
+    bool same= diff <= tolerance || (std::abs(angle1) > M_PI - tolerance && std::abs(angle2) > M_PI - tolerance && sum <= tolerance);
+    CGeoPoint T(0,-30);
+    if (same){GDebugEngine::Instance()->gui_debug_msg(T,"same", COLOR_RED);}
+    return same;
+}
 CGeoPoint backpos(const CGeoPoint& A, const CGeoPoint& H, double distback) {
     // 计算向量AH
     double dx = H.x() - A.x();
@@ -65,10 +81,14 @@ public:
         // 计算O到H的方向
         double SHP=A.dist(H)*tan(AHP);
         double ohDir = (H - O).dir();
-        if(std::abs(Utils::Normalize(ohDir - DIR)) < 0.3 || std::abs(Utils::Normalize(ohDir - DIR - 2 * M_PI)) < 0.3) {
-            return backpos(O, H, SOH + SHP);
+        if(!DIRsame(DIR,ohDir)) {
+            GDebugEngine::Instance()->gui_debug_msg(O,"O", COLOR_PURPLE);
+            GDebugEngine::Instance()->gui_debug_msg(H,"H", COLOR_PURPLE);
+            return backpos(H, O, SHP); 
         } else {
-            return backpos(H, O, SHP); // 如果方向相反，延伸距离需要为负
+            GDebugEngine::Instance()->gui_debug_msg(O,"O", COLOR_YELLOW);
+            GDebugEngine::Instance()->gui_debug_msg(H,"H", COLOR_YELLOW);
+            return backpos(O, H, SOH + SHP);// 如果方向相反，延伸距离需要为负
         }
     }
 
@@ -83,6 +103,9 @@ public:
     double DistanceOH() const {
         return SOH;
     }
+    double OHDIR() const {
+        return (H - O).dir();
+    }
 
 private:
     CGeoPoint O;
@@ -94,26 +117,36 @@ private:
 };
 
 
-double time_H(double v0, double s,string option) {
-    double a;
-    if (option=="O")
-    {
-        a = -1.93;
-    }
-    else if (option=="A")
-    {
-        a=3;
-    }
+double timeOH(double v0, double s) {
+    double a = -1.93;
     double discriminant = v0 * v0 - 2 * a * (-s);
     if (discriminant < 0) {
         if (v0>0.5)
         {
-         return 0.1;
+        	return -v0/a;
         }
+
     }
     double t = (-v0 + std::sqrt(discriminant)) / a;
     return t;
 }
+
+double getdistback(const double& SAH, const double& TAH) {
+	double maxa=4;
+    double SF = 0.5 * maxa * std::pow(TAH, 2); // 使用std::pow进行幂运算
+    if (SAH >= SF) {
+        return 2 * SAH; // 假设这里是期望的返回逻辑
+    } else if (0.5 * SF < SAH && SAH < SF) { // 分开进行比较
+        double T2 = TAH * std::pow((SF - SAH) / (2 * SF), 0.5); // 再次使用std::pow
+        return maxa * std::pow( (TAH - T2), 2); // 修改括号和幂运算
+    }
+    return SAH;
+}
+#include <cmath> // For std::sqrt, std::cos, and std::sin
+#include <iostream>
+
+// Assuming CGeoPoint and CGeoLine classes are defined as provided above
+
 
 
 CTechDefence::CTechDefence() 
@@ -157,44 +190,43 @@ void CTechDefence::plan(const CVisionModule* pVision)
     double VOP=OPptrs[1]->Vel().mod()*0.01;
     double maxa=3;
     double SAH;
-    double TAH;
     double SOH;
-    double TOH;
+    double TAH;
     double distback;
+    double SF;
     double AHP=0;
-    int maxIndex;
-    std::vector<double> TAHs;
-    std::vector<double> TOHs;
-    std::vector<double> TOHs_TAHs;
+    std::vector<double> SAHs;
+    std::vector<double> SFs;
     CGeoPoint H;
 // -----------------------------------------------WHETHER THERE IS ENOUGH TIME TO INTERCEPT THE BALL
     H=calculator.AHPFootH(0);
-    SAH =A.dist(H)*0.01; // 获取A到H的距离
-    TAH=time_H(VOP,SAH,"A");
+    SAH = A.dist(H)*0.01; // 获取A到H的距离
     SOH=O.dist(H)*0.01;
-    TOH=time_H(VB,SOH,"O"); 
-    // double distback=getdistback(SAH,TOH);
-    if (TAH>TOH ||VB<0.1)
+    TAH=timeOH(VB,SOH); 
+    // double distback=getdistback(SAH,TAH);
+    SF = 0.5 * maxa * std::pow(TAH, 2)+TAH*VOP;
+    if (SAH>=SF-0.1) //添加车运动方向-->H 的限制
+    {
+// --------------------------------------------THERE IS NO AMPLE TIME TO INTERCEPT THE BALL.DECIDE ON THE INTERCEPT ANGLE
+        distback=1000;
+        for (AHP=0;AHP<M_PI/2;AHP+=0.1)
+        {
+
+            H=calculator.AHPFootH(AHP);
+            SAH = A.dist(H)*0.01; // 获取A到H的距离
+            SOH=O.dist(H)*0.01;
+            TAH=timeOH(VB,SOH); 
+            SF = 0.5 * maxa * std::pow(TAH, 2)+TAH*VOP;
+            if (SAH+0.16<SF) //添加车运动方向-->H 的限制
+            {
+                break;   
+            }
+            SAHs.push_back(SAH);
+            SFs.push_back(SF);
+        }
+    }else 
     {
         distback=0;
-    }
-    else
-    {
-        distback=1000;
-        for (AHP=0;AHP<1.5;AHP+=0.1)
-        {
-        H=calculator.AHPFootH(AHP);
-        SAH =A.dist(H)*0.01; 
-        TAH=time_H(VOP,SAH,"A");
-        SOH=O.dist(H)*0.01;
-        TOH=time_H(VB,SOH,"O"); 
-        TAHs.push_back(TAH);
-        TOHs.push_back(TOH);
-        TOHs_TAHs.push_back(TOH-TAH);
-        }
-        auto maxIter = std::max_element(TOHs_TAHs.begin(), TOHs_TAHs.end());
-        maxIndex = std::distance(TOHs_TAHs.begin(), maxIter);
-        H=calculator.AHPFootH(0.1*maxIndex);
     }
 //----------------------------------------------CALCULATE POINTBACK FROM DISTBACK.THE distback AND H ARE RENEWED
     CGeoPoint B= backpos(A,H,distback);
@@ -211,44 +243,34 @@ void CTechDefence::plan(const CVisionModule* pVision)
     CGeoPoint O4(0,80);
     CGeoPoint O5(0,100);
     CGeoPoint O6(0,120);
-	// GDebugEngine::Instance()->gui_debug_msg(O0, ("SAH: " + std::to_string(TOH)).c_str(), COLOR_RED);
-	// GDebugEngine::Instance()->gui_debug_msg(O1, ("TAH: " + std::to_string(TAHs[maxIndex])).c_str(), COLOR_RED);
-	// GDebugEngine::Instance()->gui_debug_msg(O2, ("TOH: " + std::to_string(TOHs[maxIndex])).c_str(), COLOR_RED);
-	GDebugEngine::Instance()->gui_debug_msg(O1, ("VOP: " + std::to_string(VOP)).c_str(), COLOR_RED);
-	GDebugEngine::Instance()->gui_debug_msg(O2, ("VB: " + std::to_string(VB)).c_str(), COLOR_RED);
-	// GDebugEngine::Instance()->gui_debug_msg(O5, ("SOH: " + std::to_string(SOH)).c_str(), COLOR_RED);
-    GDebugEngine::Instance()->gui_debug_msg(O3, ("AHP: " + std::to_string(maxIndex*0.1)).c_str(), COLOR_RED);
+    CGeoPoint O7(0,140);
+    CGeoPoint O8(0,160);
+	GDebugEngine::Instance()->gui_debug_msg(O0, ("TAH: " + std::to_string(TAH)).c_str(), COLOR_RED);
+	GDebugEngine::Instance()->gui_debug_msg(O1, ("SAH: " + std::to_string(SAH)).c_str(), COLOR_RED);
+	GDebugEngine::Instance()->gui_debug_msg(O2, ("SF: " + std::to_string(SF)).c_str(), COLOR_RED);
+	GDebugEngine::Instance()->gui_debug_msg(O3, ("VOP: " + std::to_string(VOP)).c_str(), COLOR_RED);
+	GDebugEngine::Instance()->gui_debug_msg(O4, ("VB: " + std::to_string(VB)).c_str(), COLOR_RED);
+	GDebugEngine::Instance()->gui_debug_msg(O5, ("SOH: " + std::to_string(SOH)).c_str(), COLOR_RED);
+    GDebugEngine::Instance()->gui_debug_msg(O6, ("AHP: " + std::to_string(AHP)).c_str(), COLOR_RED);
+    GDebugEngine::Instance()->gui_debug_msg(O7, ("DIR: " + std::to_string(DIR)).c_str(), COLOR_RED);
+    GDebugEngine::Instance()->gui_debug_msg(O8, ("OHDIR: " + std::to_string(calculator.OHDIR())).c_str(), COLOR_RED);
    	GDebugEngine::Instance()->gui_debug_line(O,H,COLOR_WHITE);
    	GDebugEngine::Instance()->gui_debug_line(A,B,COLOR_WHITE);
-    double yS;
-    CGeoPoint O10;
-    yS=0;
-    O10=CGeoPoint(-100,0);
-    GDebugEngine::Instance()->gui_debug_msg(O10,"TAH", COLOR_RED);
-    for (double i:TAHs)
+    CGeoPoint A1(75,-130);
+    CGeoPoint A2(75,130);
+    CGeoPoint A3(-150,0);
+    GDebugEngine::Instance()->gui_debug_arc(A1,30,0,360, COLOR_YELLOW);
+    GDebugEngine::Instance()->gui_debug_arc(A2,30,0,360, COLOR_YELLOW);
+    GDebugEngine::Instance()->gui_debug_arc(A3,30,0,360, COLOR_YELLOW);
+    for (double iSAH:SAHs)
     {
-        yS=yS+20;
-        O10.setY(yS);
-        GDebugEngine::Instance()->gui_debug_msg(O10,std::to_string(i).c_str(), COLOR_RED);
+        
+        GDebugEngine::Instance()->gui_debug_msg(B,"BBBB", COLOR_RED);
     }
-    yS=0;
-    O10=CGeoPoint(-200,0);
-    GDebugEngine::Instance()->gui_debug_msg(O10, "TOH", COLOR_RED);
-    for (double i : TOHs) {
-        yS = yS + 20;
-        O10.setY(yS);
-        GDebugEngine::Instance()->gui_debug_msg(O10, std::to_string(i).c_str(), COLOR_RED);
-    }
-    yS=0;
-    O10=CGeoPoint(-300,0);
-    GDebugEngine::Instance()->gui_debug_msg(O10, "TOH-TAH", COLOR_RED);
-    for (double i : TOHs_TAHs) {
-        yS = yS + 20;
-        O10.setY(yS);
-        GDebugEngine::Instance()->gui_debug_msg(O10, std::to_string(i).c_str(), COLOR_RED);
-    }
+
 //----------------------------------------------SET SUB TASKS
 	setSubTask(TaskFactoryV2::Instance()->GotoPosition(taskR1));//将taskR1给走位subtask执行
+    
 	CStatedTask::plan(pVision);
 }
 

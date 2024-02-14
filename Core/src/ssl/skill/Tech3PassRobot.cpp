@@ -94,13 +94,12 @@ void CTech3Pass::plan(const CVisionModule* pVision)
 	}
 // -----------------------------------------------PRINT PLAYER ROLE INFOS
 	std::cout<<"possballrole<"<<possballrole<<">";
+
 	// std::cout<<"task().executor"<<rolenum<<std::endl;
     // for (int i : rolenums) {
     //     std::cout << i << " ";
     // }
     // std::cout << std::endl;
-
-    
 
 // -----------------------------------------------CALCULATE THREE POINTS
 	enum states {PrepareAndPass,Receive,Test};
@@ -126,14 +125,32 @@ void CTech3Pass::plan(const CVisionModule* pVision)
 	    {
 	    	A4=A3;
 	    }
+	    GDebugEngine::Instance()->gui_debug_arc(A1,300,0,360, COLOR_RED);
+		GDebugEngine::Instance()->gui_debug_arc(A2,300,0,360, COLOR_RED);
+		GDebugEngine::Instance()->gui_debug_arc(A3,300,0,360, COLOR_RED);
 	    taskR1.player.pos=A4;
 	    setSubTask(TaskFactoryV2::Instance()->GotoPosition(taskR1));
+	    KickStatus::Instance()->setKick(1, 5000);
 		CStatedTask::plan(pVision);
 	}
 	else if (state()==PrepareAndPass)
 	{
 
-	}
+	}// setSubTask(PlayerRole::makeItShootBallV2(1,0, task().player.flag));
+	// CGeoPoint O0(0,0);
+    // CGeoPoint O1(0,20);
+    // CGeoPoint O2(0,40);
+    // CGeoPoint O3(0,60);
+    // CGeoPoint O4(0,80);
+    // CGeoPoint O5(0,100);
+    // CGeoPoint O6(0,120);
+
+	// GDebugEngine::Instance()->gui_debug_msg(O1, ("SAH: " + std::to_string(SAH)).c_str(), COLOR_RED);
+	// GDebugEngine::Instance()->gui_debug_msg(O2, ("SF: " + std::to_string(SF)).c_str(), COLOR_RED);
+	// GDebugEngine::Instance()->gui_debug_msg(O3, ("VOP: " + std::to_string(VOP)).c_str(), COLOR_RED);
+	// GDebugEngine::Instance()->gui_debug_msg(O4, ("VB: " + std::to_string(VB)).c_str(), COLOR_RED);
+	// GDebugEngine::Instance()->gui_debug_msg(O5, ("SOH: " + std::to_string(SOH)).c_str(), COLOR_RED);
+    // GDebugEngine::Instance()->gui_debug_msg(O6, ("AHP: " + std::to_string(AHP)).c_str(), COLOR_RED);
 	
 }
 CTech3Pass::~CTech3Pass() {
