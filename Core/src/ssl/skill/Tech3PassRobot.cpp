@@ -86,6 +86,7 @@ void CTech3Pass:: passto(int num, const CVisionModule* pVision)
         case state_ready: 
             if (CVector(centre - ball.Pos()).mod() <= 30)
                 setState(state_pass);
+                
             //if(runner == num && CVector(centre - ball.Pos()).mod() <= 120)
             if(runner == num && ball.Vel().mod() > 100)
                 setState(state_wait);
