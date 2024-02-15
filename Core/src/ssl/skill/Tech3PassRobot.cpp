@@ -24,20 +24,20 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
-CTech3Pass:: CTech3Pass(){}
+CTech3Pass:: CTech3Pass()
+{
+
+}
 CTech3Pass:: ~CTech3Pass(){}
 int CTech3Pass:: buff = 0;
 int CTech3Pass:: num = 2; 
 int CTech3Pass:: ifstep2 = 0;
-CGeoPoint CTech3Pass::limitpos(CGeoPoint pos, const CVisionModule* pVision)
+int CTech3Pass:: ifstart = 0;
+CGeoPoint CTech3Pass::limitpos(CGeoPoint pos, int fla)
 {
     int runner = task().executor;
-    const PlayerVisionT& self = pVision->OurPlayer(runner);
-    const CGeoPoint mypos = self.Pos();
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 0), to_string(pos.x()).c_str(), COLOR_WHITE);
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 50), to_string(pos.y()).c_str(), COLOR_WHITE);
     // const CVector target2center = centre - pos;
-    const CVector target2center = pos - centre;
+    const CVector target2center = (pos - centre) * fla;
     const double dis = target2center.mod();
     if(dis < 30) return pos;
     else
@@ -64,17 +64,6 @@ void CTech3Pass:: passto(int num, const CVisionModule* pVision)
     CVector ball2me, receiver2me;
     TaskT subtask(task());
     subtask.executor = runner;
-    double minn = 1000000;
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), to_string(ball.Vel().mod()).c_str(), COLOR_BLUE);
-    for (int i = 0; i <= 2; i++)
-    {
-        const CVector player2target = pVision->OurPlayer(runner).Pos() - circleCenter[i];
-        const double dis = player2target.mod();
-        if (minn > dis)
-            minn = dis, centre = circleCenter[i];
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 0 + 10 * i), to_string(i).c_str(), COLOR_RED);
-        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 50 + 10 * i), to_string(dis).c_str(), COLOR_RED);
-    }
     const CGeoCirlce mecircle(centre, 30);
     CGeoLine ballline(ball.Pos(), ball.Vel().dir());
     CGeoLineCircleIntersection waitpoint (ballline, mecircle);
@@ -108,8 +97,8 @@ void CTech3Pass:: passto(int num, const CVisionModule* pVision)
     {
         case state_ready:
             //subtask.player.pos = limitpos(ball.Pos(), pVision);
-            //subtask.player.pos = (subtask.player.pos.midPoint(centre));
-            subtask.player.pos = centre;
+            subtask.player.pos = (limitpos(ball.Pos(), -1).midPoint(centre));
+            //subtask.player.pos = centre;
             subtask.player.angle = CVector(ball.Pos() - subtask.player.pos).dir();
             setSubTask(TaskFactoryV2::Instance()->GotoPosition(subtask));
             break;
@@ -124,14 +113,16 @@ void CTech3Pass:: passto(int num, const CVisionModule* pVision)
                 GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 100), "step2", COLOR_YELLOW);
                 //subtask.player.pos = waitpoint.point1().midPoint(waitpoint.point2());
                 subtask.player.pos = (CVector(waitpoint.point2() - ball.Pos()).mod() < CVector(waitpoint.point1() - ball.Pos()).mod()) ? waitpoint.point1() : waitpoint.point2();
-                subtask.player.angle = CVector(ball.Pos() - subtask.player.pos).dir();
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 0), to_string(subtask.player.pos.x()).c_str(), COLOR_WHITE);
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 50), to_string(subtask.player.pos.y()).c_str(), COLOR_WHITE);
+                subtask.player.angle = CVector(ball.Pos() - pVision->OurPlayer(runner).Pos()).dir();
                 setSubTask(TaskFactoryV2::Instance()->GotoPosition(subtask));
             }
             else
             {
                 GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 100), "step1", COLOR_YELLOW);
                 //subtask.player.pos = (CVector(waitpoint.point2() - ball.Pos()).mod() < CVector(waitpoint.point1() - ball.Pos()).mod()) ? waitpoint.point1() : waitpoint.point2();
-                subtask.player.pos = limitpos(ballline.projection(pVision->OurPlayer(runner).Pos()), pVision);
+                subtask.player.pos = limitpos(ballline.projection(pVision->OurPlayer(runner).Pos()));
                 subtask.player.angle = CVector(ball.Pos() - subtask.player.pos).dir();
                 if(CVector(pVision->OurPlayer(runner).Pos() - subtask.player.pos).mod() < 5)
                     ifstep2 = 1;
@@ -178,7 +169,37 @@ void CTech3Pass:: plan(const CVisionModule* pVision)
     GDebugEngine::Instance()->gui_debug_arc(circleCenter[0], 90,0,360, COLOR_RED);
 	GDebugEngine::Instance()->gui_debug_arc(circleCenter[1], 30,0,360, COLOR_RED);
 	GDebugEngine::Instance()->gui_debug_arc(circleCenter[2], 30,0,360, COLOR_RED);
-    passto(foo(), pVision);
+    double minn = 1000000;
+    const BallVisionT& ball = pVision->Ball();
+    int runner = task().executor;
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), to_string(ball.Vel().mod()).c_str(), COLOR_BLUE);
+    for (int i = 0; i <= 2; i++)
+    {
+        const CVector player2target = pVision->OurPlayer(runner).Pos() - circleCenter[i];
+        const double dis = player2target.mod();
+        if (minn > dis)
+            minn = dis, centre = circleCenter[i];
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 0 + 10 * i), to_string(i).c_str(), COLOR_RED);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 50 + 10 * i), to_string(dis).c_str(), COLOR_RED);
+    }
+    for(int irole = 0; irole <= Param::Field::MAX_PLAYER; irole++)
+    {
+        const PlayerVisionT& runner = pVision->OurPlayer(irole);
+        
+        if(runner.Valid())
+            if(CVector(ball.Pos() - runner.Pos()).mod() <= 45)
+                ifstart = 1;
+    };
+    if(ifstart)
+        passto(foo(), pVision);
+    else
+    {
+        TaskT subtask(task());
+        subtask.player.pos = limitpos(ball.Pos(), -1);
+        subtask.player.angle = CVector(ball.Pos() - pVision->OurPlayer(runner).Pos()).dir();
+        setSubTask(TaskFactoryV2::Instance()->GotoPosition(subtask));
+    }
+        // setSubTask(PlayerRole::makeItGoto(task().executor, limitpos(ball.Pos(), pVision), CVector(ball.Pos() - pVision->OurPlayer(runner).Pos()).dir()));
 }
 CPlayerCommand* CTech3Pass:: execute(const CVisionModule * pVision)
 {
