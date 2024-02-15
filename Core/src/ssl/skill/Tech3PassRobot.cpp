@@ -3,8 +3,7 @@
 #include "VisionModule.h"
 #include "Global.h"
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
+
 
 
 #include <iostream>
@@ -16,194 +15,139 @@
 #include "RobotSensor.h"
 #include "param.h"
 #include "WorldModel/WorldModel.h"
-
+#include "BallStatus.h"
 
 #include <vector>
 #include <variant>
 #include <string>
 #include <cmath>
-using namespace std;
-
-namespace 
-{
-enum TDstate {getball ,wait};//setState(getball);if (state()==getball);
-}
-
-
-// 假设 CGeoPoint 和 CGeoLine 的定义如前所述
-class Intercept {
-public:
-    Intercept(const CGeoPoint& O, const double& DIR, const CGeoPoint& A) 
-        : O(O), DIR(DIR), A(A), M(O, CGeoPoint(O.x() + std::cos(DIR), O.y() + std::sin(DIR))) {
-        H = M.projection(A); // 计算垂足H并存储
-    }
-    
-    CGeoPoint FootH() const {
-        return H; // 直接返回计算得到的垂足
-    }
-
-    CGeoLine LineM() const {
-        return M; // 直接返回计算得到的射线
-    }
-
-    double DistanceAH() const {
-        return A.dist(H); // 直接返回A到H的距离
-    }
-    double DistanceOH() const {
-    	return O.dist(H);
-    }
-
-private:
-    CGeoPoint O;
-    double DIR;
-    CGeoPoint A;
-    CGeoLine M;
-    CGeoPoint H;
-    double AHdist;
-};
-
-double timeOH(double v0, double s) {
-    double a = -1.93;
-    double discriminant = v0 * v0 - 2 * a * (-s);
-    if (discriminant < 0) {
-        if (v0>0.5)
-        {
-        	return 0.1;
-        }
-
-    }
-    double t = (-v0 + std::sqrt(discriminant)) / a;
-    return t;
-}
-
-double getdistback(const double& SAH, const double& TAH) {
-	double maxa=4;
-    double SF = 0.5 * maxa * std::pow(TAH, 2); // 使用std::pow进行幂运算
-    if (SAH >= SF) {
-        return 2 * SAH; // 假设这里是期望的返回逻辑
-    } else if (0.5 * SF < SAH && SAH < SF) { // 分开进行比较
-        double T2 = TAH * std::pow((SF - SAH) / (2 * SF), 0.5); // 再次使用std::pow
-        return maxa * std::pow( (TAH - T2), 2); // 修改括号和幂运算
-    }
-    return SAH; // 如果上述条件都不满足，应该有一个默认返回值
-}
-#include <cmath> // For std::sqrt, std::cos, and std::sin
-#include <iostream>
-
-// Assuming CGeoPoint and CGeoLine classes are defined as provided above
-
-CGeoPoint backpos(const CGeoPoint& A, const CGeoPoint& H, double distback) {
-    // 计算向量AH
-    double dx = H.x() - A.x();
-    double dy = H.y() - A.y();
-    
-    // 计算AH向量的长度
-    double lengthAH = std::sqrt(dx * dx + dy * dy);
-    
-    // 计算单位向量的方向
-    double unitX = dx / lengthAH;
-    double unitY = dy / lengthAH;
-    
-    // 根据distback正负确定B点在AH的同方向还是反方向
-    // 并计算B点的坐标
-    double Bx = A.x() + unitX * distback;
-    double By = A.y() + unitY * distback;
-    
-    return CGeoPoint(Bx, By);
-}
-
-
-
-CTech3Pass::CTech3Pass() 
-{
-	
-}
-
-void CTech3Pass::plan(const CVisionModule* pVision)
-{
-	TaskT taskR1(task());
-	int rolenum=task().executor;
-	taskR1.executor=0;
-	//set the executor of this plan
-//----------------------------------------------INITIALIZE ALL PLAYER INFOS AND BALL INFOS
-	std::vector<const PlayerVisionT*> OPptrs;
-	for (int irole = 1; irole <= Param::Field::MAX_PLAYER; ++irole)
-	{
-		const PlayerVisionT& OPtmp=pVision->OurPlayer(irole);
-		if (OPtmp.Valid())
-		{
-			OPptrs.push_back(&OPtmp);
-		}
-	}
-	const BallVisionT& ball = pVision->Ball();//ball.Pos().x() ball().Pos().y()  ball.Vel().mod() ball.Vel().dir()
-//-------------------------------------------------BASIC PASSING BALL
-
-// ---------------------------------------------PREPARE INPUTS FOR CLASS INTERCEPT 
-	CGeoPoint O=ball.Pos(); // 射线的起点
-    double DIR =ball.Vel().dir(); 
-    CGeoPoint A=OPptrs[1]->Pos(); // 射线外的点A,应该先有一个谁快要接到球的判断车号，或踢球者也可以改这个谁快要接到球的车号
-// ----------------------------------------------GET INFOS FROM CLASS INTERCEPT
-    
-    Intercept calculator(O, DIR, A);
-    CGeoPoint H = calculator.FootH(); // 获取垂足H的坐标
-    CGeoLine M = calculator.LineM(); // 获取射线M
-    double SAH = calculator.DistanceAH()*0.01; // 获取A到H的距离
-    double SOH=calculator.DistanceOH()*0.01;
-    double VB=ball.Vel().mod()*0.01;
-    double VOP=OPptrs[1]->Vel().mod()*0.01;
-//----------------------------------------------PREPARE INFOS FOR DISTBACK TO MAKE INTERCEPTION FASTER(TAH,SAH)
-    double TAH=timeOH(VB,SOH); 
-//----------------------------------------------CALCULATE DISTBACK
-    // double distback=getdistback(SAH,TAH);
-    double distback;
-    double maxa=3;
-    double SF = 0.5 * maxa * std::pow(TAH, 2)+TAH*VOP;
-    if (SAH>=SF-0.1) //添加车运动方向-->H 的限制
-    {
-    	distback = 1000;
-	} else 
-	{
-    	distback = 0;
-	}
-//----------------------------------------------CALCULATE POINTBACK FROM DISTBACK
-    CGeoPoint B= backpos(A,H,distback);
-    taskR1.player.pos=B;
-//----------------------------------------------PRINT ALL INFOS
-    GDebugEngine::Instance()->gui_debug_msg(O,"O", COLOR_RED);
-    GDebugEngine::Instance()->gui_debug_msg(H,"HH", COLOR_RED);
-    GDebugEngine::Instance()->gui_debug_msg(A,"AAA", COLOR_RED);
-    GDebugEngine::Instance()->gui_debug_msg(B,"BBBB", COLOR_RED);
-    CGeoPoint O0(0,0);
-    CGeoPoint O1(0,20);
-    CGeoPoint O2(0,40);
-    CGeoPoint O3(0,60);
-    CGeoPoint O4(0,80);
-    CGeoPoint O5(0,100);
-	GDebugEngine::Instance()->gui_debug_msg(O0, ("TAH: " + std::to_string(TAH)).c_str(), COLOR_RED);
-	GDebugEngine::Instance()->gui_debug_msg(O1, ("SAH: " + std::to_string(SAH)).c_str(), COLOR_RED);
-	GDebugEngine::Instance()->gui_debug_msg(O2, ("SF: " + std::to_string(SF)).c_str(), COLOR_RED);
-	GDebugEngine::Instance()->gui_debug_msg(O3, ("VOP: " + std::to_string(VOP)).c_str(), COLOR_RED);
-	GDebugEngine::Instance()->gui_debug_msg(O4, ("VB: " + std::to_string(VB)).c_str(), COLOR_RED);
-	GDebugEngine::Instance()->gui_debug_msg(O5, ("SOH: " + std::to_string(SOH)).c_str(), COLOR_RED);
-   	GDebugEngine::Instance()->gui_debug_line(O,H,COLOR_WHITE);
-   	GDebugEngine::Instance()->gui_debug_line(A,B,COLOR_WHITE);
-
-//----------------------------------------------SET SUB TASKS
-	setSubTask(TaskFactoryV2::Instance()->GotoPosition(taskR1));//将taskR1给走位subtask执行
-	CStatedTask::plan(pVision);
-}
-
-
-CTech3Pass::~CTech3Pass() {
-
-}
-
-
-CPlayerCommand* CTech3Pass::execute(const CVisionModule* pVision)
-{
-	if (subTask()){
-		return subTask()->execute(pVision);
-	}
-	return NULL;
-}
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
 #endif
+CTech3Pass:: CTech3Pass(){}
+CTech3Pass:: ~CTech3Pass(){}
+CGeoPoint CTech3Pass::limitpos(CGeoPoint pos, const CVisionModule* pVision)
+{
+    int runner = task().executor;
+    const PlayerVisionT& self = pVision->OurPlayer(runner);
+    const CGeoPoint mypos = self.Pos();
+    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 0), to_string(minn).c_str(), COLOR_RED);
+    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 50), to_string(centre.y()).c_str(), COLOR_RED);
+    const CVector target2center = centre - pos;
+    const double dis = target2center.mod();
+    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500, -350), to_string(dis).c_str(), COLOR_RED);
+    if(dis < 30) return pos;
+    else
+        return centre + target2center.unit() * 30;
+}
+void CTech3Pass:: passto(int num, const CVisionModule* pVision)
+{
+    int runner = task().executor;
+    const BallVisionT& ball = pVision->Ball();
+    CVector ball2me, receiver2me;
+    TaskT subtask(task());
+    subtask.executor = runner;
+    double minn = 1000000;
+    for (int i = 0; i <= 2; i++)
+    {
+        const CVector player2target = pVision->OurPlayer(runner).Pos() - circleCenter[i];
+        const double dis = player2target.mod();
+        if (minn > dis)
+            minn = dis, centre = circleCenter[i];
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 0 + 10 * i), to_string(i).c_str(), COLOR_RED);
+        GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 50 + 10 * i), to_string(dis).c_str(), COLOR_RED);
+    }
+    const CGeoCirlce mecircle(centre, 30);
+    CGeoLine ballline(ball.Pos(), ball.Vel().dir());
+    CGeoLineCircleIntersection waitpoint (ballline, mecircle);
+    switch(state())
+    {
+        case BEGINNING: 
+            setState(state_ready);
+        break;
+        case state_ready: 
+            if (CVector(centre - ball.Pos()).mod() <= 30)
+                setState(state_pass);
+            if(runner == num && CVector(centre - ball.Pos()).mod() <= 90)
+                setState(state_wait);
+        break; 
+        case state_wait:
+            if(CVector(centre - ball.Pos()).mod() > 90)
+                setState(state_ready);
+            // if(BallStatus::Instance()->getBallPossession(false, runner) > 0.5)
+            //     setState(state_pass);
+        break;
+        case state_pass:
+            if(CVector(centre - ball.Pos()).mod() > 30)
+                setState(state_ready);
+        break;
+    }
+    
+    switch(state())
+    {
+        case state_ready:
+            subtask.player.pos = limitpos(ball.Pos(), pVision);
+            subtask.player.angle = CVector(ball.Pos() - subtask.player.pos).dir();
+            setSubTask(TaskFactoryV2::Instance()->GotoPosition(subtask));
+            break;
+        case state_wait:
+            ball2me = ball.Pos() - pVision->OurPlayer(runner).Pos();
+
+            if(CVector(centre - ball.Pos()).mod() <= 30)
+                setSubTask(PlayerRole::makeItNoneTrajGetBall(num, ball2me.dir()));
+            else
+            {
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 100), "giao", COLOR_YELLOW);
+                //subtask.player.pos = (CVector(waitpoint.point2() - ball.Pos()).mod() < CVector(waitpoint.point1() - ball.Pos()).mod()) ? waitpoint.point1() : waitpoint.point2();
+                subtask.player.pos = waitpoint.point1().midPoint(waitpoint.point2());
+                subtask.player.angle = CVector(ball.Pos() - subtask.player.pos).dir();
+                setSubTask(TaskFactoryV2::Instance()->GotoPosition(subtask));
+            }
+            break;
+        case state_pass:
+            // limitpos(ball.Pos(), pVision);
+            receiver2me = CVector(pVision->OurPlayer(num).Pos() - pVision->OurPlayer(runner).Pos());
+            ball2me = CVector(ball.Pos() - pVision->OurPlayer(runner).Pos());
+            // if(BallStatus::Instance()->getBallPossession(false, runner) <= 0.5)
+            setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
+            if(BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && fabs(receiver2me.dir() - ball2me.dir()) < 0.05)
+            {
+                
+                setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
+                // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 100), to_string(fabs(receiver2me.dir())).c_str(), COLOR_YELLOW);
+                // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 130), to_string(fabs(ball2me.dir())).c_str(), COLOR_YELLOW);
+
+                KickStatus::Instance()->setKick(runner, 500);
+                //setSubTask(PlayerRole::makeItChaseKickV2(runner, dir.dir()));
+            }
+            // }
+            // subtask.player.angle = dir.dir();
+            // setSubTask(TaskFactoryV2::Instance()->fPassBall(subtask));
+            // setSubTask(PlayerRole::makeItChaseKickV2(runner, dir.dir(),0, 500));
+            break;
+    }
+    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500, -350), (std::to_string(state())).c_str, COLOR_RED);
+
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500 + 40 * runner, 0), to_string(state()).c_str(), COLOR_RED);
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500 + 100 * runner, -150), to_string(CVector(pVision->OurPlayer(runner).Pos() - ball.Pos()).mod()).c_str(), COLOR_RED);
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500 + 40 * runner, -350), to_string(runner).c_str(), COLOR_RED);
+    CStatedTask::plan(pVision);
+}
+void CTech3Pass:: plan(const CVisionModule* pVision)
+{
+    int num;
+    num = 2;
+    GDebugEngine::Instance()->gui_debug_arc(circleCenter[0], 30,0,360, COLOR_RED);
+    GDebugEngine::Instance()->gui_debug_arc(circleCenter[0], 90,0,360, COLOR_RED);
+	GDebugEngine::Instance()->gui_debug_arc(circleCenter[1], 30,0,360, COLOR_RED);
+	GDebugEngine::Instance()->gui_debug_arc(circleCenter[2], 30,0,360, COLOR_RED);
+    passto(num, pVision);
+}
+CPlayerCommand* CTech3Pass:: execute(const CVisionModule * pVision)
+{
+    if(subTask())
+    {
+        return subTask()->execute(pVision);
+    }
+    return NULL;
+}

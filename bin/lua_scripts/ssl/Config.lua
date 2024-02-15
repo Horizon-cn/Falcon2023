@@ -8,7 +8,7 @@ IS_TEST_MODE = true
 -- Test_Goalie Test_PassEachOther Test_NormalPass
 -- Test_AdvanceV4 Test_MultiBack Test_GoSupport
 if not IS_YELLOW then
-	gTestPlay = "Test_Run"
+	gTestPlay = "Test_Tech3Pass"
 else
 	gTestPlay = "Test_Run"
 end
@@ -20,18 +20,6 @@ else
 	OPPONENT_NAME = "NormalKick"
 end
 
-gTestPlay = function ()
-	if not IS_YELLOW then
-		return "Test_physics" -- Test_AdvanceV4 Test_NormalPass Test_play6 Test_Run
-		--犯规多的时候用"Test_play8_ManyFoul"
-		--犯规少的时候用"Test_play8_NotFoul"
-		--AutoChange用"Test_play8_AUTO"
-		-- NormalPlayPureDefence8   Test_play8_Strong_Tyh
-
-	else
-		return "Test_physics" -- Test_Defence Test_PassEachOther Test_NormalMiddleDefend
-	end
-end
 gNormalPlay = "Test_play8_AUTO"
 gSwitchNum = {
 	["normal"]  = 6,
@@ -43,9 +31,9 @@ gSwitchNum = {
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
 	Goalie   = {0},
-	Kicker   = {11},
-	Tier	 = {13},
-	Receiver = {12}
+	Kicker   = {1},
+	Tier	 = {2},
+	Receiver = {3}
 }
 
 gSkill = {
@@ -200,27 +188,26 @@ gTestPlayTable = {
 	"Test_MultiBack",
 	"Test_ProtectBall",
 	"Test_TimeDelayTest",
-	"Test_GoTechChalPos",
-	"Test_NormalPlay",
-	"Test_NormalAttack",
-	"Test_NormalDefend",
-	"Test_AvoidFoulDefend",
-	"Test_NormalMiddleDefend",
-	"Test_Circle",
-	"NormalPlay",
-	"NormalPlayPureDefence8",
-	"Test_defend6",
-	"Test_play6ForTest",
-	"Test_DSS",
-	"Test_Run6",
-	"Test_play8_AUTO",
-	"Test_play8_ManyFoul",
-	"Test_play8_NotFoul",
-	"Test_play3",
-	"Test_NormalPass",
-	"Test_play8ForPower",
-	"Test_play6",
-	"Test_play8_Strong_Tyh",
-	"Test_play8_Simple",
-	"Test_physics"
+	-- "Test_NormalPlay",
+	-- "Test_NormalAttack",
+	-- "Test_NormalDefend",
+	-- "Test_AvoidFoulDefend",
+	-- "Test_NormalMiddleDefend",
+	-- -- "Test_Circle",
+	-- "NormalPlay",
+	-- "NormalPlayPureDefence8",
+	-- "Test_defend6",
+	-- "Test_play6ForTest",
+	-- "Test_DSS",
+	-- "Test_Run6",
+	-- "Test_play8_AUTO",
+	-- "Test_play8_ManyFoul",
+	-- "Test_play8_NotFoul",
+	-- "Test_play3",
+	-- "Test_NormalPass",
+	-- "Test_play8ForPower",
+	-- "Test_play6",
+	-- "Test_play8_Strong_Tyh",
+	-- "Test_play8_Simple",
+	-- "Test_physics"
 }

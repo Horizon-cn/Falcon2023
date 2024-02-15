@@ -8,7 +8,15 @@ public:
 	virtual void plan(const CVisionModule* pVision);
 	virtual bool isEmpty() const { return false;}
 	virtual CPlayerCommand* execute(const CVisionModule * pVision);
-
+	CGeoPoint limitpos(CGeoPoint pos, const CVisionModule* pVision);
+	void passto(int receiver, const CVisionModule* pVision);
+	enum State {
+		state_ready = 1,
+		state_wait,
+		state_pass
+	};
+	CGeoPoint circleCenter[3] = {CGeoPoint(150, 0), CGeoPoint(-75, 130), CGeoPoint(-75, -130)};
+	CGeoPoint centre;
 protected:
 };
 
