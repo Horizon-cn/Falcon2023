@@ -30,9 +30,11 @@ CTech3Pass:: CTech3Pass()
 }
 CTech3Pass:: ~CTech3Pass(){}
 int CTech3Pass:: buff = 0;
-int CTech3Pass:: num = -1; //
+int CTech3Pass:: num = 2; 
 int CTech3Pass:: ifstep2 = 0;
 int CTech3Pass:: ifstart = 0;
+int CTech3Pass:: rotvelbuff = 0;
+int CTech3Pass:: forcekickbuff = 0;
 //=================================================================初始化(可以考虑放进构造函数)
 
 CGeoPoint CTech3Pass::limitpos(CGeoPoint pos, int fla)
@@ -62,12 +64,13 @@ double crossProduct(const CGeoPoint& A, const CGeoPoint& B, const CGeoPoint& C) 
 CGeoPoint CTech3Pass:: passwho(const CGeoPoint& A1, const CGeoPoint& A2, const CGeoPoint& A3, const CGeoPoint& B1) {
     CGeoPoint AM = midpoint(A2, A3);
     double cp = crossProduct(A1, AM, B1);
-    // Assuming positive cross product means B1 is on the same side as A2 relative to the line A1-AM
-    if (cp > 0) {
-        return A3; // B1 is on the side of A3,need to turn to A2
-    } else {
-        return A2; // B1 is on the side of A2,need to turn to A3
-    }
+    double cp2 = crossProduct(A1, AM, A2);
+    double cp3 = crossProduct(A1, AM, A3);
+    std::cout << cp << " " << cp2 << " " << cp3 << "point" << AM.x() << "mid" << AM.y() << endl;
+    if((cp < 0) == (cp2 < 0))
+        return A3;
+    else
+        return A2;
 }
 
 int postonum(const CGeoPoint& pos, const CVisionModule* pVision)//位置转球员号码
@@ -82,7 +85,7 @@ int postonum(const CGeoPoint& pos, const CVisionModule* pVision)//位置转球�
 }
 int CTech3Pass::passwho(const CVisionModule* pVision)
 {
-    if(BallStatus::Instance()->getBallPossession(true, num) > 0.8 || num == -1)//判断新一轮传球是否开始
+    if(BallStatus::Instance()->getBallPossession(true, num) > 0.8 )//判断新一轮传球是否开始
     {    
         //num = num % 3 + 1;
         CGeoPoint playerpos[4];
@@ -100,9 +103,17 @@ int CTech3Pass::passwho(const CVisionModule* pVision)
             if(player.Valid())
                 playerpos[cur++] = player.Pos();
         }
+        for(int i = 0; i <= 2; i++)
+        {
+            //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-420, 0 + 20*i), to_string(playerpos[i].x()).c_str(), COLOR_BLUE);
+            //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-330, 0 + 20*i), to_string(playerpos[i].y()).c_str(), COLOR_BLUE);
+            std::cout << playerpos[i].x() << " " << playerpos[i].y() << " " << num << std::endl;
+        }
+        //std::cout << num << " asdas" << postonum(playerpos[0], pVision) << " " << postonum(playerpos[1], pVision) << std::endl;
         num = postonum(passwho(pVision->OurPlayer(num).Pos(), playerpos[0], playerpos[1], playerpos[2]), pVision);
         buff = 0;
         ifstep2 = 0;
+        rotvelbuff = 0;
     }
     return num;
 }
@@ -128,7 +139,7 @@ bool CTech3Pass:: passwhen(const CVisionModule* pVision)
 
 void CTech3Pass:: passto(const int num, const CVisionModule* pVision)
 {
-    // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 20), to_string(num).c_str(), COLOR_BLUE);
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 20), to_string(num).c_str(), COLOR_BLUE);
     int runner = task().executor;
     const BallVisionT& ball = pVision->Ball();
     const PlayerVisionT& me = pVision->OurPlayer(runner);
@@ -201,18 +212,24 @@ void CTech3Pass:: passto(const int num, const CVisionModule* pVision)
         case state_pass:
             receiver2me = CVector(pVision->OurPlayer(num).Pos() - pVision->OurPlayer(runner).Pos());
             ball2me = CVector(ball.Pos() - pVision->OurPlayer(runner).Pos());
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 120), to_string(rotvelbuff).c_str(), COLOR_YELLOW);
+            forcekickbuff++;
             if(fabs(receiver2me.dir() - ball2me.dir()) < 0.1) buff++;
+            if(fabs(me.RotVel()) < 0.1) rotvelbuff++;
+            else rotvelbuff = 0;
             setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
-            if(BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && 
+            if((BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && 
                 ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.05) || 
-                buff > 30) && fabs(me.RotVel()) < 0.1 && passwhen(pVision))
+                buff > 30) && rotvelbuff >= 10 && passwhen(pVision)) ||
+                forcekickbuff > 400)
                 //------------------------------------------------------------------------------passwhen 有待完善
             {
                 setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
                 
                 GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 100), "kick", COLOR_YELLOW);
                 buff = 0;
-
+                rotvelbuff = 0;
+                forcekickbuff = 0;
                 KickStatus::Instance()->setKick(runner, 600);
                 //setSubTask(PlayerRole::makeItChaseKickV2(runner, dir.dir()));
             }
