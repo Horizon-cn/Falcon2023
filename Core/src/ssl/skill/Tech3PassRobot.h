@@ -18,9 +18,9 @@ public:
 		state_wait,
 		state_pass
 	};
-	static int num, buff, ifstep2, ifstart;
-	CGeoPoint circleCenter[3] = {CGeoPoint(150, 0), CGeoPoint(-75, 130), CGeoPoint(-75, -130)};
-	CGeoPoint centre;
+	static int num, buff, ifstep2, ifstart;//num为接球人, buff用于buffcnt, ifstep2和ifstart用于切换状态
+	CGeoPoint circleCenter[3] = {CGeoPoint(150, 0), CGeoPoint(-75, 130), CGeoPoint(-75, -130)};//三个圆心
+	CGeoPoint centre;//自身机器人圆心
 protected:
 };
 
