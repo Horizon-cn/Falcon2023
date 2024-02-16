@@ -34,7 +34,7 @@ int CTech3Pass:: num = 2;
 int CTech3Pass:: ifstep2 = 0;
 int CTech3Pass:: ifstart = 0;
 int CTech3Pass:: rotvelbuff = 0;
-int CTech3Pass:: forcekickbuff = 0;
+//int CTech3Pass:: forcekickbuff = 0;
 //=================================================================初始化(可以考虑放进构造函数)
 
 CGeoPoint CTech3Pass::limitpos(CGeoPoint pos, int fla)
@@ -187,7 +187,7 @@ void CTech3Pass:: passto(const int num, const CVisionModule* pVision)
             if(CVector(centre - ball.Pos()).mod() <= 30)
                 setSubTask(PlayerRole::makeItNoneTrajGetBall(num, ball2me.dir()));
             //else if(CVector(centre - ball.Pos()).mod() <= 90)
-            else if(ifstep2)
+            else if(ifstep2 && CVector(centre - ball.Pos()).mod() <= 60)
             {
                 GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100 + 100 * runner, 100), "step2", COLOR_YELLOW);
                 //subtask.player.pos = waitpoint.point1().midPoint(waitpoint.point2());
@@ -213,15 +213,14 @@ void CTech3Pass:: passto(const int num, const CVisionModule* pVision)
             receiver2me = CVector(pVision->OurPlayer(num).Pos() - pVision->OurPlayer(runner).Pos());
             ball2me = CVector(ball.Pos() - pVision->OurPlayer(runner).Pos());
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 120), to_string(rotvelbuff).c_str(), COLOR_YELLOW);
-            forcekickbuff++;
+            // forcekickbuff++;
             if(fabs(receiver2me.dir() - ball2me.dir()) < 0.1) buff++;
             if(fabs(me.RotVel()) < 0.1) rotvelbuff++;
             else rotvelbuff = 0;
             setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
             if((BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && 
                 ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.05) || 
-                buff > 30) && rotvelbuff >= 10 && passwhen(pVision)) ||
-                forcekickbuff > 400)
+                buff > 30) && rotvelbuff >= 10 && passwhen(pVision)))
                 //------------------------------------------------------------------------------passwhen 有待完善
             {
                 setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
@@ -229,7 +228,7 @@ void CTech3Pass:: passto(const int num, const CVisionModule* pVision)
                 GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 100), "kick", COLOR_YELLOW);
                 buff = 0;
                 rotvelbuff = 0;
-                forcekickbuff = 0;
+          
                 KickStatus::Instance()->setKick(runner, 600);
                 //setSubTask(PlayerRole::makeItChaseKickV2(runner, dir.dir()));
             }
