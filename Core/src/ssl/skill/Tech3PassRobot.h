@@ -12,6 +12,7 @@ public:
 	void passto(int receiver, const CVisionModule* pVision);
 	int passwho(const CVisionModule* pVision);
 	CGeoPoint passwho(const CGeoPoint& A1, const CGeoPoint& A2, const CGeoPoint& A3, const CGeoPoint& B1);
+	bool passwhen(const CVisionModule* pVision);
 	enum State {
 		state_ready = 1,
 		state_wait,

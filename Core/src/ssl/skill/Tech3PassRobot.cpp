@@ -80,6 +80,22 @@ int postonum(const CGeoPoint& pos, const CVisionModule* pVision)
     }
 }
 //cin pVision 
+bool CTech3Pass:: passwhen(const CVisionModule* pVision)
+{
+    const BallVisionT& ball = pVision->Ball();
+    const PlayerVisionT& me = pVision->OurPlayer(task().executor);
+    for(int irole = 0; irole <= Param::Field::MAX_PLAYER; irole++)
+    {
+        const PlayerVisionT& player = pVision->TheirPlayer(irole);
+        if(player.Valid())
+        {
+            CVector enemy2ball = player.Pos() - ball.Pos();
+            if(fabs(enemy2ball.dir() - me.Dir()) > 0.05)
+                return true;
+        }
+    }
+    return false;
+}
 int CTech3Pass::passwho(const CVisionModule* pVision)
 {
     if(BallStatus::Instance()->getBallPossession(true, num) > 0.8)
@@ -196,7 +212,9 @@ void CTech3Pass:: passto(const int num, const CVisionModule* pVision)
             // if(BallStatus::Instance()->getBallPossession(false, runner) <= 0.5)
             setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
             //passwhen
-            if(BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.05) || buff > 30) && fabs(me.RotVel()) < 0.1)
+            if(BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && 
+                ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.05) || 
+                buff > 30) && fabs(me.RotVel()) < 0.1 && passwhen(pVision))
             {
                 setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
                 
