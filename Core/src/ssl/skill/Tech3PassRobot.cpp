@@ -43,12 +43,69 @@ CGeoPoint CTech3Pass::limitpos(CGeoPoint pos, int fla)
     else
         return centre + target2center.unit() * 30;
 }
-int CTech3Pass::foo()
+CGeoPoint midpoint(const CGeoPoint& A, const CGeoPoint& B) {
+    return CGeoPoint((A.x() + B.x()) / 2.0, (A.y() + B.y()) / 2.0);
+}
+
+// Function to calculate the cross product of two vectors A and B
+double crossProduct(const CGeoPoint& A, const CGeoPoint& B, const CGeoPoint& C) {
+    CGeoPoint AB(B.x() - A.x(), B.y() - A.y());
+    CGeoPoint AC(C.x() - A.x(), C.y() - A.y());
+    return AB.x() * AC.y() - AB.y() * AC.x();
+}
+
+// Main function to determine on which side of the line through A1 and AM the point B1 lies
+CGeoPoint CTech3Pass:: passwho(const CGeoPoint& A1, const CGeoPoint& A2, const CGeoPoint& A3, const CGeoPoint& B1) {
+    CGeoPoint AM = midpoint(A2, A3);
+    double cp = crossProduct(A1, AM, B1);
+    // Assuming positive cross product means B1 is on the same side as A2 relative to the line A1-AM
+    if (cp > 0) {
+        return A3; // B1 is on the side of A3,need to turn to A2
+    } else {
+        return A2; // B1 is on the side of A2,need to turn to A3
+    }
+}
+
+int postonum(const CGeoPoint& pos, const CVisionModule* pVision)
 {
-    //static int num = 2, buff = 0;
+         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-325 + 100, 0), to_string(pos.x()).c_str(), COLOR_BLUE);
+         GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-325 + 100, 20), to_string(pos.y()).c_str(), COLOR_BLUE);
+
+    for(int irole = 0; irole <= Param::Field::MAX_PLAYER; irole++)
+    {
+        const PlayerVisionT& player = pVision->OurPlayer(irole);
+        if(player.Valid())
+            if(CVector(player.Pos() - pos).mod() < 3)
+                return irole;
+    }
+}
+//cin pVision 
+int CTech3Pass::passwho(const CVisionModule* pVision)
+{
     if(BallStatus::Instance()->getBallPossession(true, num) > 0.8)
     {    
-        num = num % 3 + 1;
+        //num = num % 3 + 1;
+        CGeoPoint playerpos[4];
+        int cur = 0;
+        for(int irole = 0; irole <= Param::Field::MAX_PLAYER; irole++)
+        {
+            const PlayerVisionT& player = pVision->OurPlayer(irole);
+            if(irole == num)    continue;
+            if(player.Valid())
+                playerpos[cur++] = player.Pos();
+        }
+        for(int irole = 0; irole <= Param::Field::MAX_PLAYER; irole++)
+        {
+            const PlayerVisionT& player = pVision->TheirPlayer(irole);
+            if(player.Valid())
+                playerpos[cur++] = player.Pos();
+        }
+        // for(int i = 0; i <= 2; i++)
+        // {
+        //     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-325 + 100*i, 0), to_string(playerpos[i].x()).c_str(), COLOR_BLUE);
+        //     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-325 + 100*i, 20), to_string(playerpos[i].y()).c_str(), COLOR_BLUE);
+        // }
+        num = postonum(passwho(pVision->OurPlayer(num).Pos(), playerpos[0], playerpos[1], playerpos[2]), pVision);
         buff = 0;
         ifstep2 = 0;
         //passwho(), intercept()
@@ -56,7 +113,7 @@ int CTech3Pass::foo()
     // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 20), to_string(num).c_str(), COLOR_BLUE);
     return num;
 }
-void CTech3Pass:: passto(int num, const CVisionModule* pVision)
+void CTech3Pass:: passto(const int num, const CVisionModule* pVision)
 {
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 20), to_string(num).c_str(), COLOR_BLUE);
     int runner = task().executor;
@@ -138,6 +195,7 @@ void CTech3Pass:: passto(int num, const CVisionModule* pVision)
             if(fabs(receiver2me.dir() - ball2me.dir()) < 0.1) buff++;
             // if(BallStatus::Instance()->getBallPossession(false, runner) <= 0.5)
             setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
+            //passwhen
             if(BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.05) || buff > 30) && fabs(me.RotVel()) < 0.1)
             {
                 setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
@@ -194,7 +252,7 @@ void CTech3Pass:: plan(const CVisionModule* pVision)
                 ifstart = 1;
     };
     if(ifstart)
-        passto(foo(), pVision);
+        passto(passwho(pVision), pVision);
     else
     {
         TaskT subtask(task());

@@ -10,7 +10,8 @@ public:
 	virtual CPlayerCommand* execute(const CVisionModule * pVision);
 	CGeoPoint limitpos(CGeoPoint pos, int fla = 1);
 	void passto(int receiver, const CVisionModule* pVision);
-	int foo();
+	int passwho(const CVisionModule* pVision);
+	CGeoPoint passwho(const CGeoPoint& A1, const CGeoPoint& A2, const CGeoPoint& A3, const CGeoPoint& B1);
 	enum State {
 		state_ready = 1,
 		state_wait,
