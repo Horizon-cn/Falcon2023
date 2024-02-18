@@ -23,9 +23,10 @@
 #include <string>
 #include <cmath>
 using namespace std;
-
 namespace {enum TDstate {getball ,wait};}
 int rJam=45;
+vector<CGeoPoint>  centers  = { CGeoPoint(75,-130), CGeoPoint(75,130), CGeoPoint(-150,0) };
+vector<CGeoCirlce> Circles  = { CGeoCirlce(centers[0], rJam), CGeoCirlce(centers[1], rJam), CGeoCirlce(centers[2], rJam) };
 int findIndex(const std::vector<int>& vec, int target) {
     auto it = std::find(vec.begin(), vec.end(), target);
     if (it != vec.end()) {return std::distance(vec.begin(), it);}
@@ -76,16 +77,14 @@ double amidDir(double A, double B, double dir,double vel,double Vthreshold) {
     else if (tortn2!=0) {return tortn2;}
     else                {return 0;}}
 double gotoAngle(double a,double b,double c,double d,double DIR,double VR,CGeoPoint A){
-    double a_c=amidDir(a,c,DIR,VR,0.1);
-    std::cout<<"amidDir("<<a<<c<<DIR<<VR<<0.1<<"->"<<a_c<<std::endl;
+    double a_c=amidDir(a,c,DIR,VR,0.2);
+    // std::cout<<"amidDir("<<a<<c<<DIR<<VR<<0.1<<"->"<<a_c<<std::endl;
     if      (amidDir(a,d,DIR,1,0)){drawDir(A,DIR,"a d");return a;}
     else if (amidDir(d,c,DIR,1,0)){drawDir(A,DIR,"d c");return c;}
     else if (a_c)                 {drawDir(A,DIR,to_string(a_c).c_str());return a_c;}
     else if (amidDir(a,b,DIR,1,0)){drawDir(A,DIR,"a b");return a;}
     else if (amidDir(b,c,DIR,1,0)){drawDir(A,DIR,"b c");return c;}}
 CGeoPoint JamA2Jampos(CGeoPoint Apos,double DIR){   
-    vector<CGeoPoint>  centers  = { CGeoPoint(75,-130), CGeoPoint(75,130), CGeoPoint(-150,0) };
-    vector<CGeoCirlce> Circles  = { CGeoCirlce(centers[0], rJam), CGeoCirlce(centers[1], rJam), CGeoCirlce(centers[2], rJam) };
     int icircle;
     for(int i = 0; i < 3; ++i){if (centers[i].dist(Apos)<32){icircle=i;break;}}
     CGeoPoint JamP(Apos.x() + 200 * std::cos(DIR), Apos.y() + 200 * std::sin(DIR));
@@ -93,6 +92,18 @@ CGeoPoint JamA2Jampos(CGeoPoint Apos,double DIR){
     GDebugEngine::Instance()->gui_debug_line(JamP,Apos,COLOR_CYAN);
     CGeoSegmentCircleIntersection Intersection = CGeoSegmentCircleIntersection(JamPline,Circles[icircle]);
     return Intersection.point1();}
+int whichTPclose(std::vector<const PlayerVisionT*> TPptrs,std::vector<int>TProlenums,CGeoPoint center)
+{
+for (size_t i = 0; i < TPptrs.size(); ++i)
+{
+    CGeoPoint TPpos=TPptrs[i]->Pos();
+    // std::cout<<"TPptrs["<<i<<"]->Pos()=("<<TPpos.x()<<","<<TPpos.y()<<")"<<std::endl;
+    if (TPpos.dist(center)<35){
+        // std::cout<<"CAR NUM CLOSE TO BALL CIRCLE IS:"<<TProlenums[i]<<"with index"<<i<<std::endl;
+        return TProlenums[i];}
+}
+return -1;
+}
 CGeoPoint midpoint1(const CGeoPoint& A, const CGeoPoint& B) {return CGeoPoint((A.x() + B.x()) / 2.0, (A.y() + B.y()) / 2.0);}
 CTechDefence::CTechDefence(){}
 
@@ -108,11 +119,45 @@ void CTechDefence::plan(const CVisionModule* pVision){
         if (OPtmp.Valid()){OPptrs.push_back(&OPtmp);OProlenums.push_back(irole);}
         if (TPtmp.Valid()){TPptrs.push_back(&TPtmp);TProlenums.push_back(irole);}}
     const BallVisionT& ball = pVision->Ball();
+    CGeoPoint ballpos=ball.Pos();
 //-------------------------------------------------CALCULATE WHICH CIRCLE TO FOCUS(RETURN CAR NUM)
-    int focusNum=2;//car num
+    int focusNum=-1;//index from TPptrs
+    for (int i = 0; i < 3; ++i)
+    {
+        if (centers[i].dist(ballpos)<40)
+            {
+                GDebugEngine::Instance()->gui_debug_msg(centers[i],"this circle has ball",COLOR_WHITE);
+                focusNum=whichTPclose(TPptrs,TProlenums,centers[i]);
+                // std::cout<<"TProlenums:[";for (int i : TProlenums) {std::cout << i << " ";}std::cout <<"]"<< std::endl;
+                // std:cout<<"whichTPclose(TPptrs,TProlenums,centers[i])"<<"TPptrs[0]"
+                // <<TPptrs[0]->Pos().y()<<"TPptrs[1]"<<TPptrs[1]->Pos().y()<<"TPptrs[2]"<<TPptrs[2]->Pos().y()
+                // <<"centers[i]=("<<centers[i].x()<<","<<centers[i].y()<<")\n->"<<focusNum<<"\n";
+                break;
+            }
+    }
+    
+    if (focusNum==-1){
+        for (int i = 0; i < 3; ++i)
+        {
+            getcircledir(ballpos,centers[i],35);
+            double qiexianA1=normalizeAngle1(qiexiandir[0]-M_PI);
+            double qiexianA2=normalizeAngle1(qiexiandir[1]-M_PI);
+            drawDir(ballpos,qiexianA1,"qiexian0");
+            drawDir(ballpos,qiexianA2,"qiexian1");
+            if (amidDir(qiexianA1,qiexianA2,ball.Vel().dir(),1,0)&&ball.Vel().mod()>50)
+            {
+                focusNum=whichTPclose(TPptrs,TProlenums,centers[i]);
+                break;
+            }
+        }
+    }
+    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, -100), ("focusnum:"+to_string(focusNum)).c_str(), COLOR_BLUE);
+CGeoPoint Jampos;
+double DIR=0;
+if (focusNum!=-1){
 //-------------------------------------------------CALCULATE a,b,c,d,DIR,VR of the certain car num
     CGeoPoint A=TPptrs[findIndex(TProlenums,focusNum)]->Pos();
-    double DIR=TPptrs[findIndex(TProlenums,focusNum)]->Dir();
+    DIR=TPptrs[findIndex(TProlenums,focusNum)]->Dir();
     double VR=OPptrs[0]->RotVel();//should be TPptrs[findIndex(TProlenums,focusNum)]->RotVel();
     CGeoPoint ORA(0,0);
     // GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo" + std::to_string(VR)).c_str(), COLOR_RED);
@@ -132,21 +177,28 @@ void CTechDefence::plan(const CVisionModule* pVision){
     double a=normalizeAngle1(qiexiandir[0]-M_PI);
     double c=normalizeAngle1(qiexiandir[1]-M_PI);
 // //-------------------------------------------------DEBUG INFOS
-    std::cout<<"OProlenums:[";for (int i : OProlenums) {std::cout << i << " ";}std::cout <<"]"<< std::endl;
-    std::cout<<"TProlenums:[";for (int i : TProlenums) {std::cout << i << " ";}std::cout <<"]"<< std::endl;
-    std::cout<<"TProlenumsR:[";for (int i : TProlenumsR) {std::cout << i << " ";}std::cout <<"]"<< std::endl;
+    // std::cout<<"OProlenums:[";for (int i : OProlenums) {std::cout << i << " ";}std::cout <<"]"<< std::endl;
+    // std::cout<<"TProlenums:[";for (int i : TProlenums) {std::cout << i << " ";}std::cout <<"]"<< std::endl;
+    // std::cout<<"TProlenumsR:[";for (int i : TProlenumsR) {std::cout << i << " ";}std::cout <<"]"<< std::endl;
     // std::cout<<"findIndex(TProlenums,TProlenumsR[1])="<<findIndex(TProlenums,TProlenumsR[1])<<std::endl;
     // std::cout<<"TPptrs[1] pos x="<<TPptrs[TProlenumsR[0]]->Pos().x()<<std::endl;
-    std::cout<<"b:{"<<b<<"};d{"<<d<<"};a{"<<a<<"};c{"<<c<<"}"<<std::endl;
-    CGeoPoint C01(75, -130);CGeoPoint C02(75, 130);CGeoPoint C03(-150, 0);
-    GDebugEngine::Instance()->gui_debug_arc(C01, 30, 0, 360, COLOR_YELLOW);
-    GDebugEngine::Instance()->gui_debug_arc(C02, 30, 0, 360, COLOR_YELLOW);
-    GDebugEngine::Instance()->gui_debug_arc(C03, 30, 0, 360, COLOR_YELLOW);
+    // std::cout<<"b:{"<<b<<"};d{"<<d<<"};a{"<<a<<"};c{"<<c<<"}"<<std::endl;
+    CGeoPoint O1(75, -130);
+    CGeoPoint O2(75, 130);
+    CGeoPoint O3(-150, 0);
+    GDebugEngine::Instance()->gui_debug_arc(O1, 30, 0, 360, COLOR_YELLOW);
+    GDebugEngine::Instance()->gui_debug_arc(O2, 30, 0, 360, COLOR_YELLOW);
+    GDebugEngine::Instance()->gui_debug_arc(O3, 30, 0, 360, COLOR_YELLOW);
     drawDir(A,a,"a");drawDir(A,b,"b");drawDir(A,c,"c");drawDir(A,d,"d");
 //-------------------------------------------------GO TO WHICH ANGLE
     double JamAngle=gotoAngle(a,b,c,d,DIR,VR,A);
     drawDir(A,JamAngle,"JamAngle");
-    CGeoPoint Jampos=JamA2Jampos(A,JamAngle);
+    Jampos=JamA2Jampos(A,JamAngle);
+}
+else
+{
+    Jampos=ballpos;
+}
 //-------------------------------------------------SET TASK 
     TaskT taskR1(task());
     int rolenum=task().executor;
