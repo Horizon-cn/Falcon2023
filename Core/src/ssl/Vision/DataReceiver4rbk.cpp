@@ -144,6 +144,7 @@ bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameIn
             info.player[id].pos.y = msgY2InfoY(robot.y());
             info.player[id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
             info.player[id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
+            info.player[id].dirvel=robot.rotate_vel();
         }
         for (int i = 0; i < vision.robots_yellow_size(); i++) {
             const Vision_DetectionRobot& robot = vision.robots_yellow(i);
@@ -157,6 +158,7 @@ bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameIn
             info.player[Param::Field::MAX_PLAYER + id].pos.y = msgY2InfoY(robot.y());
             info.player[Param::Field::MAX_PLAYER + id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
             info.player[Param::Field::MAX_PLAYER + id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
+            info.player[Param::Field::MAX_PLAYER + id].dirvel=robot.rotate_vel();
         }
     }
     else {
@@ -172,6 +174,7 @@ bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameIn
             info.player[id].pos.y = msgY2InfoY(robot.y());
             info.player[id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
             info.player[id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
+            info.player[id].dirvel =robot.rotate_vel();
         }
         for (int i = 0; i < vision.robots_blue_size(); i++) {
             const Vision_DetectionRobot& robot = vision.robots_blue(i);
@@ -185,6 +188,7 @@ bool CDataReceiver4rbk::rawVision2VisualInfo(const COptionModule *pOption,GameIn
             info.player[Param::Field::MAX_PLAYER + id].pos.y = msgY2InfoY(robot.y());
             info.player[Param::Field::MAX_PLAYER + id].vel = CVector(msgX2InfoX(robot.vel_x()), msgY2InfoY(robot.vel_y()));
             info.player[Param::Field::MAX_PLAYER + id].acc = CVector(msgX2InfoX(robot.accelerate_x()), msgY2InfoY(robot.accelerate_y()));
+            info.player[Param::Field::MAX_PLAYER + id].dirvel=robot.rotate_vel();
         }
     }
     //info = visionInfo;

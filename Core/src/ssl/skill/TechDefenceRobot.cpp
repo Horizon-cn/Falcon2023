@@ -158,9 +158,10 @@ if (focusNum!=-1){
 //-------------------------------------------------CALCULATE a,b,c,d,DIR,VR of the certain car num
     CGeoPoint A=TPptrs[findIndex(TProlenums,focusNum)]->Pos();
     DIR=TPptrs[findIndex(TProlenums,focusNum)]->Dir();
-    double VR=OPptrs[0]->RotVel();//should be TPptrs[findIndex(TProlenums,focusNum)]->RotVel();
+    // double VR=OPptrs[0]->RotVel();
+    double VR=TPptrs[findIndex(TProlenums,focusNum)]->RotVel();
     CGeoPoint ORA(0,0);
-    // GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo" + std::to_string(VR)).c_str(), COLOR_RED);
+    GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo" + std::to_string(VR)).c_str(), COLOR_RED);
     std::vector<int>TProlenumsR=TProlenums;
     eraseElement(TProlenumsR,focusNum);
     CGeoPoint A2=TPptrs[findIndex(TProlenums,TProlenumsR[0])]->Pos();
