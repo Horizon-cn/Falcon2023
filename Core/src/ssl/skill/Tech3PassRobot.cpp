@@ -235,7 +235,7 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
             std:: cout << "ifchange " << ifchange << endl;
             // forcekickbuff++;
             if(fabs(receiver2me.dir() - ball2me.dir()) < 0.1) buff++;
-            if(fabs(me.RotVel()) < 0.1) rotvelbuff++;
+            if(fabs(me.RotVel()) < 0.1) {rotvelbuff++;}//CGeoPoint ORA(100,0);GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo" + std::to_string(me.RotVel())).c_str(), COLOR_YELLOW);
             else rotvelbuff = 0;
             if(passwhen(pVision) && (BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && 
                 ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.05) || 
@@ -269,9 +269,29 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
     CStatedTask::plan(pVision);
 }
 //=================================================================================================================================具体pass实现
-
-void CTech3Pass:: plan(const CVisionModule* pVision)
-{   
+int findIndex0(const std::vector<int>& vec, int target) {
+    auto it = std::find(vec.begin(), vec.end(), target);
+    if (it != vec.end()) {return std::distance(vec.begin(), it);}
+    std::cout<<"INDEX NOT FOUND";return -1;}
+void CTech3Pass:: plan(const CVisionModule* pVision){   
+// 	std::vector<const PlayerVisionT*> OPptrs;
+//     std::vector<const PlayerVisionT*> TPptrs;
+//     std::vector<int> OProlenums;
+//     std::vector<int>TProlenums;
+//     for (int irole = 0; irole <= Param::Field::MAX_PLAYER; ++irole){
+//         const PlayerVisionT& OPtmp = pVision->OurPlayer(irole);
+//         const PlayerVisionT& TPtmp = pVision->TheirPlayer(irole);
+//         if (OPtmp.Valid()){OPptrs.push_back(&OPtmp);OProlenums.push_back(irole);}
+//         if (TPtmp.Valid()){TPptrs.push_back(&TPtmp);TProlenums.push_back(irole);}}
+// //-------------------------------------------------CALCULATE WHICH CIRCLE TO FOCUS(RETURN CAR NUM)
+//     int focusNum=1;//car num
+// //-------------------------------------------------CALCULATE a,b,c,d,DIR,VR of the certain car num
+//     // CGeoPoint A=TPptrs[findIndex0(TProlenums,focusNum)]->Pos();
+//     // double DIR=TPptrs[findIndex0(TProlenums,focusNum)]->Dir();
+//     double VR=OPptrs[0]->RotVel();
+//     CGeoPoint ORA(0,0);
+//     GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo OPptrs[0]" + std::to_string(VR)).c_str(), COLOR_PURPLE);
+// //-------------------------------------------------ABOVE IS FOR TESTING ROTATE VELO
     double minn = 1000000;
     const BallVisionT& ball = pVision->Ball();
     int runner = task().executor;
