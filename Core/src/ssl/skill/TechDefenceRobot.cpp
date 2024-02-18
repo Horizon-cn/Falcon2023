@@ -79,11 +79,12 @@ double amidDir(double A, double B, double dir,double vel,double Vthreshold) {
 double gotoAngle(double a,double b,double c,double d,double DIR,double VR,CGeoPoint A){
     double a_c=amidDir(a,c,DIR,VR,0.2);
     // std::cout<<"amidDir("<<a<<c<<DIR<<VR<<0.1<<"->"<<a_c<<std::endl;
-    if      (amidDir(a,d,DIR,1,0)){drawDir(A,DIR,"a d");return a;}
-    else if (amidDir(d,c,DIR,1,0)){drawDir(A,DIR,"d c");return c;}
-    else if (a_c)                 {drawDir(A,DIR,to_string(a_c).c_str());return a_c;}
-    else if (amidDir(a,b,DIR,1,0)){drawDir(A,DIR,"a b");return a;}
-    else if (amidDir(b,c,DIR,1,0)){drawDir(A,DIR,"b c");return c;}}
+    // if      (amidDir(a,d,DIR,1,0)){drawDir(A,DIR,"a d");return a;}
+    // else if (amidDir(d,c,DIR,1,0)){drawDir(A,DIR,"d c");return c;}
+    // else if (a_c)                 {drawDir(A,DIR,to_string(a_c).c_str());return a_c;}
+    // else if (amidDir(a,b,DIR,1,0)){drawDir(A,DIR,"a b");return a;}
+    // else if (amidDir(b,c,DIR,1,0)){drawDir(A,DIR,"b c");return c;}}
+    return DIR;}
 CGeoPoint JamA2Jampos(CGeoPoint Apos,double DIR){   
     int icircle;
     for(int i = 0; i < 3; ++i){if (centers[i].dist(Apos)<32){icircle=i;break;}}
@@ -108,6 +109,12 @@ CGeoPoint midpoint1(const CGeoPoint& A, const CGeoPoint& B) {return CGeoPoint((A
 CTechDefence::CTechDefence(){}
 
 void CTechDefence::plan(const CVisionModule* pVision){
+    CGeoPoint O1(75, -130);
+    CGeoPoint O2(75, 130);
+    CGeoPoint O3(-150, 0);
+    GDebugEngine::Instance()->gui_debug_arc(O1, 30, 0, 360, COLOR_YELLOW);
+    GDebugEngine::Instance()->gui_debug_arc(O2, 30, 0, 360, COLOR_YELLOW);
+    GDebugEngine::Instance()->gui_debug_arc(O3, 30, 0, 360, COLOR_YELLOW);
 //----------------------------------------------INITIALIZE ALL PLAYER INFOS AND BALL INFOS
     std::vector<const PlayerVisionT*> OPptrs;
     std::vector<const PlayerVisionT*> TPptrs;
@@ -142,8 +149,8 @@ void CTechDefence::plan(const CVisionModule* pVision){
             getcircledir(ballpos,centers[i],35);
             double qiexianA1=normalizeAngle1(qiexiandir[0]-M_PI);
             double qiexianA2=normalizeAngle1(qiexiandir[1]-M_PI);
-            drawDir(ballpos,qiexianA1,"qiexian0");
-            drawDir(ballpos,qiexianA2,"qiexian1");
+            drawDir(ballpos,qiexianA1,to_string(qiexianA1).c_str());
+            drawDir(ballpos,qiexianA2,to_string(qiexianA2).c_str());
             if (amidDir(qiexianA1,qiexianA2,ball.Vel().dir(),1,0)&&ball.Vel().mod()>50)
             {
                 focusNum=whichTPclose(TPptrs,TProlenums,centers[i]);
@@ -188,12 +195,6 @@ if (focusNum!=-1){
     // std::cout<<"findIndex(TProlenums,TProlenumsR[1])="<<findIndex(TProlenums,TProlenumsR[1])<<std::endl;
     // std::cout<<"TPptrs[1] pos x="<<TPptrs[TProlenumsR[0]]->Pos().x()<<std::endl;
     // std::cout<<"b:{"<<b<<"};d{"<<d<<"};a{"<<a<<"};c{"<<c<<"}"<<std::endl;
-    CGeoPoint O1(75, -130);
-    CGeoPoint O2(75, 130);
-    CGeoPoint O3(-150, 0);
-    GDebugEngine::Instance()->gui_debug_arc(O1, 30, 0, 360, COLOR_YELLOW);
-    GDebugEngine::Instance()->gui_debug_arc(O2, 30, 0, 360, COLOR_YELLOW);
-    GDebugEngine::Instance()->gui_debug_arc(O3, 30, 0, 360, COLOR_YELLOW);
     drawDir(A,a,"a");drawDir(A,b,"b");drawDir(A,c,"c");drawDir(A,d,"d");
 //-------------------------------------------------GO TO WHICH ANGLE
     double JamAngle=gotoAngle(a,b,c,d,DIR,VR,A);
@@ -202,11 +203,12 @@ if (focusNum!=-1){
 //-------------------------------------------------SET TASK 
     taskR1.player.pos=Jampos;
     taskR1.player.angle=normalizeAngle1(DIR-M_PI);
-	setSubTask(TaskFactoryV2::Instance()->GotoPosition(taskR1));//将taskR1给走位subtask执行
 }else{
-    CVector ball2me = ball.Pos() - OPptrs[0]->Pos();
-	setSubTask(PlayerRole::makeItChaseKickV1(OProlenums[0],ball2me.dir()));
+    // CVector ball2me = ball.Pos() - OPptrs[0]->Pos();
+	// setSubTask(PlayerRole::makeItChaseKickV1(OProlenums[0],ball2me.dir()));
+    taskR1.player.pos=OPptrs[0]->Pos();
 }
+setSubTask(TaskFactoryV2::Instance()->GotoPosition(taskR1));//将taskR1给走位subtask执行
 CStatedTask::plan(pVision);}
 CTechDefence::~CTechDefence() {}
 

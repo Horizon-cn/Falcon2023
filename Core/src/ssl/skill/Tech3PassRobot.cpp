@@ -86,6 +86,34 @@ int postonum(const CGeoPoint& pos, const CVisionModule* pVision)//位置转球�
                 return irole;
     }
 }
+double normalizeAngle0(double angle) {
+    while (angle > M_PI) angle -= 2 * M_PI;
+    while (angle <= -M_PI) angle += 2 * M_PI;
+    return angle;}
+double sortdir0(double A, double B, double dir, double vel,double threshold) {
+    if ((A >= dir && dir >= B) || (B >= dir && dir >= A)) {
+        if (vel > threshold) {return normalizeAngle0(std::max(A, B));}
+        else if (vel<=-threshold) {return normalizeAngle0(std::min(A, B));}}
+    return 0;}
+double amidDir0(double A, double B, double dir,double vel,double Vthreshold) {
+    const double thres = 0.2;
+    double A1 = A;
+    double B1 = B;
+    double A2 = A;
+    double B2 = B;
+    if (std::abs(A - B) > M_PI) {
+        if (A < 0) {A1 = 2 * M_PI + A;}
+        if (B < 0) {B1 = 2 * M_PI + B;}
+        if (A > 0) {A2 = A - 2 * M_PI;}
+        if (B > 0) {B2 = B - 2 * M_PI;}}
+    double tortn1 = sortdir0(A1, B1, dir, vel,Vthreshold);
+    double tortn2 = sortdir0(A2, B2, dir, vel,Vthreshold);
+    if      (tortn1!=0) {return tortn1;}
+    else if (tortn2!=0) {return tortn2;}
+    else                {return 0;}}
+// double processAngle(double angle){
+// 	if amidDir0()
+// }
 void CTech3Pass::passwho(const CVisionModule* pVision, int change, int passer)
 {
     if(change)
@@ -268,6 +296,7 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
                 rotvelbuff = 0;
                 start = clock();
                 KickStatus::Instance()->setKick(runner, 450);
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 100), "Jamed, reducing precision and shoot power...", COLOR_YELLOW);
             }
             else if(BallStatus::Instance()->getBallPossession(true, runner) > 0.8)
             {
