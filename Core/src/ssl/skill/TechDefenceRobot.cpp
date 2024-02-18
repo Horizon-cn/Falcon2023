@@ -152,6 +152,10 @@ void CTechDefence::plan(const CVisionModule* pVision){
         }
     }
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(100, -100), ("focusnum:"+to_string(focusNum)).c_str(), COLOR_BLUE);
+//-------------------------------------------------INITIALIZE STATE SWITCHING AND TASK
+TaskT taskR1(task());
+int rolenum=task().executor;
+taskR1.executor=OProlenums[0];
 CGeoPoint Jampos;
 double DIR=0;
 if (focusNum!=-1){
@@ -195,19 +199,15 @@ if (focusNum!=-1){
     double JamAngle=gotoAngle(a,b,c,d,DIR,VR,A);
     drawDir(A,JamAngle,"JamAngle");
     Jampos=JamA2Jampos(A,JamAngle);
-}
-else
-{
-    Jampos=ballpos;
-}
 //-------------------------------------------------SET TASK 
-    TaskT taskR1(task());
-    int rolenum=task().executor;
-    taskR1.executor=OProlenums[0];
     taskR1.player.pos=Jampos;
     taskR1.player.angle=normalizeAngle1(DIR-M_PI);
 	setSubTask(TaskFactoryV2::Instance()->GotoPosition(taskR1));//将taskR1给走位subtask执行
-	CStatedTask::plan(pVision);}
+}else{
+    CVector ball2me = ball.Pos() - OPptrs[0]->Pos();
+	setSubTask(PlayerRole::makeItChaseKickV1(OProlenums[0],ball2me.dir()));
+}
+CStatedTask::plan(pVision);}
 CTechDefence::~CTechDefence() {}
 
 CPlayerCommand* CTechDefence::execute(const CVisionModule* pVision)

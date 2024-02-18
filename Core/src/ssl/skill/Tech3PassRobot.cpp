@@ -7,6 +7,7 @@
 
 
 #include <iostream>
+#include <time.h>
 #include "GDebugEngine.h"
 #include "Vision/VisionModule.h"
 #include "skill/Factory.h"
@@ -35,6 +36,7 @@ int CTech3Pass:: ifstep2 = 0;
 int CTech3Pass:: ifstart = 0;
 int CTech3Pass:: rotvelbuff = 0;
 int CTech3Pass:: ifchange = 0;
+
 //int CTech3Pass:: forcekickbuff = 0;
 //=================================================================初始化(可以考虑放进构造函数)
 
@@ -128,7 +130,7 @@ bool CTech3Pass:: passwhen(const CVisionModule* pVision)
     const BallVisionT& ball = pVision->Ball();
     //const PlayerVisionT& me = pVision->OurPlayer(task().executor);
     const CVector receiver2ball = pVision->OurPlayer(num).Pos() - ball.Pos();
-    GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 120), "giao", COLOR_YELLOW);
+    //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 120), "giao", COLOR_YELLOW);
     for (int irole = 0; irole <= Param::Field::MAX_PLAYER; irole++)
     {
         const PlayerVisionT& player = pVision->TheirPlayer(irole);
@@ -137,14 +139,16 @@ bool CTech3Pass:: passwhen(const CVisionModule* pVision)
         {
             CVector enemy2ball = player.Pos() - ball.Pos();
             // CVector enemy2ball = ball.Pos() - player.Pos();
-            if(fabs(enemy2ball.dir() - receiver2ball.dir()) > 0.1)
+            if(fabs(enemy2ball.dir() - receiver2ball.dir()) > 0.25)
             {
  
                 ifchange = 0;
                 return true;
             }
             // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-460, 50), to_string(enemy2ball.dir()).c_str(), COLOR_BLUE);
-            // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-460, 70), to_string(me.Dir()).c_str(), COLOR_BLUE);
+            // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-460, 70), to_string(receiver2ball.dir()).c_str(), COLOR_BLUE);
+            std::cout << "enemy2ball " << enemy2ball.dir() << endl;
+            std::cout << "receiver2ball " << receiver2ball.dir() << endl; 
         }
     }
     std:: cout << "giaogiao" << endl;
@@ -228,18 +232,22 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
             }
             break;
         case state_pass:
+        {
+            static clock_t  start = clock(), end = clock();
+            end = clock();
+            clock_t duration = end - start;
             receiver2me = CVector(pVision->OurPlayer(num).Pos() - pVision->OurPlayer(runner).Pos());
             ball2me = CVector(ball.Pos() - pVision->OurPlayer(runner).Pos());
-            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 120), to_string(rotvelbuff).c_str(), COLOR_YELLOW);
-            // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 140), to_string(ifstart).c_str(), COLOR_YELLOW);
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 120), to_string(duration).c_str(), COLOR_YELLOW);
+            GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 140), to_string(passwhen(pVision)).c_str(), COLOR_YELLOW);
             std:: cout << "ifchange " << ifchange << endl;
             // forcekickbuff++;
             if(fabs(receiver2me.dir() - ball2me.dir()) < 0.1) buff++;
             if(fabs(me.RotVel()) < 0.1) {rotvelbuff++;}//CGeoPoint ORA(100,0);GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo" + std::to_string(me.RotVel())).c_str(), COLOR_YELLOW);
             else rotvelbuff = 0;
-            if(passwhen(pVision) && (BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && 
+            if((passwhen(pVision) || duration >= 20000) && BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && 
                 ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.05) || 
-                buff > 30) && rotvelbuff >= 7 ))
+                buff > 30) && rotvelbuff >= 7 )
                 //------------------------------------------------------------------------------passwhen 有待完善
             {
                 setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
@@ -247,21 +255,37 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
                 GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 120), to_string(passwhen(pVision)).c_str(), COLOR_YELLOW);
                 buff = 0;
                 rotvelbuff = 0;
-          
+                start = clock();
                 KickStatus::Instance()->setKick(runner, 600);
                 //setSubTask(PlayerRole::makeItChaseKickV2(runner, dir.dir()));
             }
+            else if(passwhen(pVision) && BallStatus::Instance()->getBallPossession(true, runner) > 0.8 &&
+             fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.15 && 
+             duration >= 9000)
+            {
+                setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
+                buff = 0;
+                rotvelbuff = 0;
+                start = clock();
+                KickStatus::Instance()->setKick(runner, 450);
+            }
             else if(BallStatus::Instance()->getBallPossession(true, runner) > 0.8)
             {
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 100), "kick_ready", COLOR_YELLOW);
+
                 subtask.player.flag = PlayerStatus::DRIBBLING;
                 subtask.player.pos = pVision->OurPlayer(runner).Pos();
                 subtask.player.angle = receiver2me.dir();
                 setSubTask(TaskFactoryV2::Instance()->GotoPosition(subtask));
             }
             else
+            {
+                GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 100), "kick_get", COLOR_YELLOW);
                 setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
-            if(ifchange >= 60)
+            }
+            if(ifchange >= 60 && duration < 20000)
                 passwho(pVision, 1, runner);
+        }
     }
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500 + 40 * runner, 0), to_string(state()).c_str(), COLOR_RED);
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-500 + 100 * runner, -150), to_string(CVector(pVision->OurPlayer(runner).Pos() - ball.Pos()).mod()).c_str(), COLOR_RED);
@@ -269,29 +293,8 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
     CStatedTask::plan(pVision);
 }
 //=================================================================================================================================具体pass实现
-int findIndex0(const std::vector<int>& vec, int target) {
-    auto it = std::find(vec.begin(), vec.end(), target);
-    if (it != vec.end()) {return std::distance(vec.begin(), it);}
-    std::cout<<"INDEX NOT FOUND";return -1;}
-void CTech3Pass:: plan(const CVisionModule* pVision){   
-// 	std::vector<const PlayerVisionT*> OPptrs;
-//     std::vector<const PlayerVisionT*> TPptrs;
-//     std::vector<int> OProlenums;
-//     std::vector<int>TProlenums;
-//     for (int irole = 0; irole <= Param::Field::MAX_PLAYER; ++irole){
-//         const PlayerVisionT& OPtmp = pVision->OurPlayer(irole);
-//         const PlayerVisionT& TPtmp = pVision->TheirPlayer(irole);
-//         if (OPtmp.Valid()){OPptrs.push_back(&OPtmp);OProlenums.push_back(irole);}
-//         if (TPtmp.Valid()){TPptrs.push_back(&TPtmp);TProlenums.push_back(irole);}}
-// //-------------------------------------------------CALCULATE WHICH CIRCLE TO FOCUS(RETURN CAR NUM)
-//     int focusNum=1;//car num
-// //-------------------------------------------------CALCULATE a,b,c,d,DIR,VR of the certain car num
-//     // CGeoPoint A=TPptrs[findIndex0(TProlenums,focusNum)]->Pos();
-//     // double DIR=TPptrs[findIndex0(TProlenums,focusNum)]->Dir();
-//     double VR=OPptrs[0]->RotVel();
-//     CGeoPoint ORA(0,0);
-//     GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo OPptrs[0]" + std::to_string(VR)).c_str(), COLOR_PURPLE);
-// //-------------------------------------------------ABOVE IS FOR TESTING ROTATE VELO
+void CTech3Pass:: plan(const CVisionModule* pVision)
+{   
     double minn = 1000000;
     const BallVisionT& ball = pVision->Ball();
     int runner = task().executor;
@@ -300,8 +303,7 @@ void CTech3Pass:: plan(const CVisionModule* pVision){
 	GDebugEngine::Instance()->gui_debug_arc(circleCenter[1], 30,0,360, COLOR_RED);
 	GDebugEngine::Instance()->gui_debug_arc(circleCenter[2], 30,0,360, COLOR_RED);
     GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(0, 0), to_string(ball.Vel().mod()).c_str(), COLOR_BLUE);
-    
-    
+     
     for (int i = 0; i <= 2; i++)
     {
         const CVector player2target = pVision->OurPlayer(runner).Pos() - circleCenter[i];
