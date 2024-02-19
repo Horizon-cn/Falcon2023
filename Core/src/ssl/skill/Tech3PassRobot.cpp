@@ -36,10 +36,14 @@ int CTech3Pass:: ifstep2 = 0;
 int CTech3Pass:: ifstart = 0;
 int CTech3Pass:: rotvelbuff = 0;
 int CTech3Pass:: ifchange = 0;
-
+vector<CGeoPoint>  centers0  = { CGeoPoint(75,-130), CGeoPoint(75,130), CGeoPoint(-150,0) };
 //int CTech3Pass:: forcekickbuff = 0;
 //=================================================================初始化(可以考虑放进构造函数)
-
+void drawDir0(CGeoPoint A,double DIR,string msg){
+    CGeoPoint D(A.x() + 100 * std::cos(DIR), A.y() + 100 * std::sin(DIR));
+    CGeoSegment AD(A,D);
+    GDebugEngine::Instance()->gui_debug_line(A,D,COLOR_YELLOW);
+    GDebugEngine::Instance()->gui_debug_msg(D,(msg).c_str(), COLOR_WHITE);}
 CGeoPoint CTech3Pass::limitpos(CGeoPoint pos, int fla)
 {
     int runner = task().executor;
@@ -111,44 +115,89 @@ double amidDir0(double A, double B, double dir,double vel,double Vthreshold) {
     if      (tortn1!=0) {return tortn1;}
     else if (tortn2!=0) {return tortn2;}
     else                {return 0;}}
-// double processAngle(double angle){
-// 	if amidDir0()
-// }
+double qiexiandir0[3];
+void getcircledir0 (const CGeoPoint& playerpos, const CGeoPoint& centre, const double r){
+    // CGeoLine player2centre(playerpos, centre);
+    const CVector player2centre = playerpos - centre;
+    const double vertical = player2centre.dir() + 3.1415926/2;
+    const CGeoPoint p1 (centre.x() + r * cos(vertical), centre.y() + r * sin(vertical));
+    const CGeoPoint p2 (centre.x() - r * cos(vertical), centre.y() - r * sin(vertical));
+    const CVector player2p1 = playerpos - p1;
+    const CVector player2p2 = playerpos - p2;
+    qiexiandir0[0] = player2p1.dir() < player2p2.dir() ? player2p1.dir() : player2p2.dir();
+    qiexiandir0[1] = player2p1.dir() > player2p2.dir() ? player2p1.dir() : player2p2.dir();}
+double processAngle(double angle,int duration){
+	double adjustA;
+	if (duration>9000){adjustA=0.15;}
+	else{adjustA=0.05;}
+	if (amidDir0(-0.255,-0.799,angle,1,0)){return normalizeAngle0(angle+adjustA);}
+	else if (amidDir0(2.366,2.876,angle,1,0)){return normalizeAngle0(angle-adjustA);}
+	else if (amidDir0(-1.343,-1.857,angle,1,0)){return normalizeAngle0(angle-adjustA);}
+	else if (amidDir0(1.349,1.876,angle,1,0)){return normalizeAngle0(angle+adjustA);}
+	else if (amidDir0(0.762,0.273,angle,1,0)){return normalizeAngle0(angle-adjustA);}
+	else if (amidDir0(-2.89,-2.37,angle,1,0)){return normalizeAngle0(angle+adjustA);}}
+// int whichTPclose(std::vector<const PlayerVisionT*> TPptrs,std::vector<int>TProlenums,CGeoPoint center){
+// for (size_t i = 0; i < TPptrs.size(); ++i){
+//     CGeoPoint TPpos=TPptrs[i]->Pos();
+//     // std::cout<<"TPptrs["<<i<<"]->Pos()=("<<TPpos.x()<<","<<TPpos.y()<<")"<<std::endl;
+//     if (TPpos.dist(center)<35){
+//         // std::cout<<"CAR NUM CLOSE TO BALL CIRCLE IS:"<<TProlenums[i]<<"with index"<<i<<std::endl;
+//         return TProlenums[i];}}
+//     return -1;}
+// int whichCircleclose()
 void CTech3Pass::passwho(const CVisionModule* pVision, int change, int passer)
 {
     if(change)
         num = passer;
     if(BallStatus::Instance()->getBallPossession(true, num) > 0.8 || change)//判断新一轮传球是否开始
-    {    
-        //num = num % 3 + 1;
-        CGeoPoint playerpos[4];
-        int cur = 0;
-        for(int irole = 0; irole <= Param::Field::MAX_PLAYER; irole++)
-        {
-            const PlayerVisionT& player = pVision->OurPlayer(irole);
-            if(irole == num)    continue;
-            if(player.Valid())
-                playerpos[cur++] = player.Pos();
-        }
-        for(int irole = 0; irole <= Param::Field::MAX_PLAYER; irole++)
-        {
-            const PlayerVisionT& player = pVision->TheirPlayer(irole);
-            if(player.Valid())
-                playerpos[cur++] = player.Pos();
-        }
-        for(int i = 0; i <= 2; i++)
-        {
-            //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-420, 0 + 20*i), to_string(playerpos[i].x()).c_str(), COLOR_BLUE);
-            //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-330, 0 + 20*i), to_string(playerpos[i].y()).c_str(), COLOR_BLUE);
-            std::cout << playerpos[i].x() << " " << playerpos[i].y() << " " << num << std::endl;
-        }
-        //std::cout << num << " asdas" << postonum(playerpos[0], pVision) << " " << postonum(playerpos[1], pVision) << std::endl;
-        num = postonum(passwho(pVision->OurPlayer(num).Pos(), playerpos[0], playerpos[1], playerpos[2]), pVision);
-        buff = 0;
-        ifstep2 = 0;
-        rotvelbuff = 0;
-        ifchange = 0;
-        //所有buff刷新
+    {   
+	    // std::vector<const PlayerVisionT*> OPptrsR;
+	    // std::vector<const PlayerVisionT*> OPptrsGB;
+	    // std::vector<int>OProlenumsR;
+	    // std::vector<int>OProlenumsGB;
+	    // for (int irole = 0; irole <= Param::Field::MAX_PLAYER; ++irole){
+        // const PlayerVisionT& OPtmp = pVision->OurPlayer(irole);
+        // if (OPtmp.Valid()&&BallStatus::Instance()->getBallPossession(true, num) < 0.5){OPptrsR.push_back(&OPtmp);OProlenumsR.push_back(irole);}
+    	// else if (OPtmp.Valid()&&BallStatus::Instance()->getBallPossession(true, num) >0.8){OPptrsGB.push_back(&OPtmp);OProlenumsGB.push_back(irole);}}
+        // for (int iroleR:OProlenumsR){if getcircledir0(pVision->OurPlayer(OProlenumsR).Pos(),)}
+    	// // const BallVisionT& ball = pVision->Ball();
+    	
+        // if(pVision->OurPlayer(num).Dir()){
+    	// 	buff = 0;
+	    //     ifstep2 = 0;
+	    //     rotvelbuff = 0;
+	    //     ifchange = 0;
+	    // }
+    	// else{
+	        CGeoPoint playerpos[4];
+	        int cur = 0;
+	        for(int irole = 0; irole <= Param::Field::MAX_PLAYER; irole++)
+	        {
+	            const PlayerVisionT& player = pVision->OurPlayer(irole);
+	            if(irole == num)    continue;
+	            if(player.Valid())
+	                playerpos[cur++] = player.Pos();
+	        }
+	        for(int irole = 0; irole <= Param::Field::MAX_PLAYER; irole++)
+	        {
+	            const PlayerVisionT& player = pVision->TheirPlayer(irole);
+	            if(player.Valid())
+	                playerpos[cur++] = player.Pos();
+	        }
+	        for(int i = 0; i <= 2; i++)
+	        {
+	            //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-420, 0 + 20*i), to_string(playerpos[i].x()).c_str(), COLOR_BLUE);
+	            //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-330, 0 + 20*i), to_string(playerpos[i].y()).c_str(), COLOR_BLUE);
+	            std::cout << playerpos[i].x() << " " << playerpos[i].y() << " " << num << std::endl;
+	        }
+	        //std::cout << num << " asdas" << postonum(playerpos[0], pVision) << " " << postonum(playerpos[1], pVision) << std::endl;
+	        num = postonum(passwho(pVision->OurPlayer(num).Pos(), playerpos[0], playerpos[1], playerpos[2]), pVision);
+	        buff = 0;
+	        ifstep2 = 0;
+	        rotvelbuff = 0;
+	        ifchange = 0;
+	        //所有buff刷新
+    	// }
     }
 }
 //============================================================================================passsho部分在新一轮传球开始前决定好将球传给谁
@@ -217,7 +266,7 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
                 setState(state_pass);
         break;
         case state_pass:
-            if(CVector(centre - ball.Pos()).mod() > 30)
+            if(CVector(centre - ball.Pos()).mod() > 40)
                 setState(state_ready);
         break;
     }
@@ -271,11 +320,11 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
             std:: cout << "ifchange " << ifchange << endl;
             // forcekickbuff++;
             if(fabs(receiver2me.dir() - ball2me.dir()) < 0.1) buff++;
-            if(fabs(me.RotVel()) < 0.1) {rotvelbuff++;}//CGeoPoint ORA(100,0);GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo" + std::to_string(me.RotVel())).c_str(), COLOR_YELLOW);
+            if(fabs(me.RotVel()) < 0.3) {rotvelbuff++;}//CGeoPoint ORA(100,0);GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo" + std::to_string(me.RotVel())).c_str(), COLOR_YELLOW);
             else rotvelbuff = 0;
             if((passwhen(pVision) || duration >= 20000) && BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && 
-                ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.05) || 
-                buff > 30) && rotvelbuff >= 7 )
+                ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.10) || 
+                buff > 5) && rotvelbuff >= 3 )
                 //------------------------------------------------------------------------------passwhen 有待完善
             {
                 setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
@@ -288,10 +337,10 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
                 //setSubTask(PlayerRole::makeItChaseKickV2(runner, dir.dir()));
             }
             else if(passwhen(pVision) && BallStatus::Instance()->getBallPossession(true, runner) > 0.8 &&
-             fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.15 && 
+             fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.10 && 
              duration >= 9000)
             {
-                setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
+                setSubTask(PlayerRole::makeItNoneTrajGetBall(runner,receiver2me.dir()));
                 buff = 0;
                 rotvelbuff = 0;
                 start = clock();
@@ -304,7 +353,9 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
 
                 subtask.player.flag = PlayerStatus::DRIBBLING;
                 subtask.player.pos = pVision->OurPlayer(runner).Pos();
-                subtask.player.angle = receiver2me.dir();
+                double Preceiver2me=processAngle(receiver2me.dir(),duration);
+            	drawDir0(pVision->OurPlayer(runner).Pos(),Preceiver2me,"Preceive");
+                subtask.player.angle = Preceiver2me;
                 setSubTask(TaskFactoryV2::Instance()->GotoPosition(subtask));
             }
             else

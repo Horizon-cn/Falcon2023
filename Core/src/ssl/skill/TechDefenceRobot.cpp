@@ -203,6 +203,7 @@ if (focusNum!=-1){
 //-------------------------------------------------SET TASK 
     taskR1.player.pos=Jampos;
     taskR1.player.angle=normalizeAngle1(DIR-M_PI);
+    // 
 }else{
     // CVector ball2me = ball.Pos() - OPptrs[0]->Pos();
 	// setSubTask(PlayerRole::makeItChaseKickV1(OProlenums[0],ball2me.dir()));
