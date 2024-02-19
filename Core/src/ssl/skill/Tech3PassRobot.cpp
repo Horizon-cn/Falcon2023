@@ -266,7 +266,7 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
                 setState(state_pass);
         break;
         case state_pass:
-            if(CVector(centre - ball.Pos()).mod() > 40)
+            if(CVector(centre - ball.Pos()).mod() > 38)
                 setState(state_ready);
         break;
     }
@@ -276,7 +276,8 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
     {
         case state_ready:
             //subtask.player.pos = limitpos(ball.Pos(), pVision);
-            subtask.player.pos = (limitpos(ball.Pos(), -1).midPoint(centre));
+            subtask.player.pos = (limitpos(ball.Pos(), -1));
+            	// .midPoint(centre));
             //subtask.player.pos = centre;
             subtask.player.angle = CVector(ball.Pos() - subtask.player.pos).dir();
             setSubTask(TaskFactoryV2::Instance()->GotoPosition(subtask));
@@ -320,11 +321,11 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
             std:: cout << "ifchange " << ifchange << endl;
             // forcekickbuff++;
             if(fabs(receiver2me.dir() - ball2me.dir()) < 0.1) buff++;
-            if(fabs(me.RotVel()) < 0.3) {rotvelbuff++;}//CGeoPoint ORA(100,0);GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo" + std::to_string(me.RotVel())).c_str(), COLOR_YELLOW);
+            if(fabs(me.RotVel()) < 0.5) {rotvelbuff++;}//CGeoPoint ORA(100,0);GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo" + std::to_string(me.RotVel())).c_str(), COLOR_YELLOW);
             else rotvelbuff = 0;
             if((passwhen(pVision) || duration >= 20000) && BallStatus::Instance()->getBallPossession(true, runner) > 0.8 && 
-                ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.10) || 
-                buff > 5) && rotvelbuff >= 3 )
+                ((fabs(receiver2me.dir() - pVision->OurPlayer(runner).Dir()) < 0.08) || 
+                buff > 3) && rotvelbuff >= 2 )
                 //------------------------------------------------------------------------------passwhen 有待完善
             {
                 setSubTask(PlayerRole::makeItNoneTrajGetBall(runner, receiver2me.dir()));
@@ -333,7 +334,7 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
                 buff = 0;
                 rotvelbuff = 0;
                 start = clock();
-                KickStatus::Instance()->setKick(runner, 600);
+                KickStatus::Instance()->setKick(runner, 550);
                 //setSubTask(PlayerRole::makeItChaseKickV2(runner, dir.dir()));
             }
             else if(passwhen(pVision) && BallStatus::Instance()->getBallPossession(true, runner) > 0.8 &&
