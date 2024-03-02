@@ -73,7 +73,7 @@ CGeoPoint CTech3Pass:: passwho(const CGeoPoint& A1, const CGeoPoint& A2, const C
     double cp = crossProduct(A1, AM, B1);
     double cp2 = crossProduct(A1, AM, A2);
     double cp3 = crossProduct(A1, AM, A3);
-    std::cout << cp << " " << cp2 << " " << cp3 << "point" << AM.x() << "mid" << AM.y() << endl;
+    // std::cout << cp << " " << cp2 << " " << cp3 << "point" << AM.x() << "mid" << AM.y() << endl;
     if((cp < 0) == (cp2 < 0))
         return A3;
     else
@@ -188,7 +188,7 @@ void CTech3Pass::passwho(const CVisionModule* pVision, int change, int passer)
 	        {
 	            //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-420, 0 + 20*i), to_string(playerpos[i].x()).c_str(), COLOR_BLUE);
 	            //GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-330, 0 + 20*i), to_string(playerpos[i].y()).c_str(), COLOR_BLUE);
-	            std::cout << playerpos[i].x() << " " << playerpos[i].y() << " " << num << std::endl;
+	            // std::cout << playerpos[i].x() << " " << playerpos[i].y() << " " << num << std::endl;
 	        }
 	        //std::cout << num << " asdas" << postonum(playerpos[0], pVision) << " " << postonum(playerpos[1], pVision) << std::endl;
 	        num = postonum(passwho(pVision->OurPlayer(num).Pos(), playerpos[0], playerpos[1], playerpos[2]), pVision);
@@ -224,11 +224,11 @@ bool CTech3Pass:: passwhen(const CVisionModule* pVision)
             }
             // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-460, 50), to_string(enemy2ball.dir()).c_str(), COLOR_BLUE);
             // GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(-460, 70), to_string(receiver2ball.dir()).c_str(), COLOR_BLUE);
-            std::cout << "enemy2ball " << enemy2ball.dir() << endl;
-            std::cout << "receiver2ball " << receiver2ball.dir() << endl; 
+            // std::cout << "enemy2ball " << enemy2ball.dir() << endl;
+            // std::cout << "receiver2ball " << receiver2ball.dir() << endl; 
         }
     }
-    std:: cout << "giaogiao" << endl;
+    // std:: cout << "giaogiao" << endl;
     ifchange++;
     return false;
 }
@@ -318,7 +318,7 @@ void CTech3Pass:: passto(const CVisionModule* pVision)
             ball2me = CVector(ball.Pos() - pVision->OurPlayer(runner).Pos());
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 120), to_string(duration).c_str(), COLOR_YELLOW);
             GDebugEngine::Instance()->gui_debug_msg(CGeoPoint(200, 140), to_string(passwhen(pVision)).c_str(), COLOR_YELLOW);
-            std:: cout << "ifchange " << ifchange << endl;
+            // std:: cout << "ifchange " << ifchange << endl;
             // forcekickbuff++;
             if(fabs(receiver2me.dir() - ball2me.dir()) < 0.1) buff++;
             if(fabs(me.RotVel()) < 0.5) {rotvelbuff++;}//CGeoPoint ORA(100,0);GDebugEngine::Instance()->gui_debug_msg(ORA, ("rotate velo" + std::to_string(me.RotVel())).c_str(), COLOR_YELLOW);
