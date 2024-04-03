@@ -8,10 +8,16 @@ gPlayTable.CreatePlay{
         return "start"
       end
     end,
+<<<<<<< HEAD
     Kicker  = task.techdefence(),
+=======
+    Special  = task.techdefence(1),
+    Assister=task.techdefence(2),
+    Leader=task.techdefence(3),
+>>>>>>> 6fc00ba2d41d4c28fe68f1337005ac8fe1a66584
     -- Assister = task.markingFront("First"),
     -- Special  = task.markingFront("Second"),
-    match    = ""
+    match    = "[L][S][A]"
   },
   name = "Test_TechDefence",
   applicable = {
@@ -22,8 +28,3 @@ gPlayTable.CreatePlay{
   timeout = 99999
 
 }
--- [1,2,3]
--- [1,2,3,2,3]
--- [,2]
--- [,3]
--- [3]

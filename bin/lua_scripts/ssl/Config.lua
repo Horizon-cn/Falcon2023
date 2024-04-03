@@ -20,6 +20,21 @@ else
 	OPPONENT_NAME = "NormalKick"
 end
 
+<<<<<<< HEAD
+=======
+gTestPlay = function ()
+	if not IS_YELLOW then
+		return "Test_TechDefence" -- Test_AdvanceV4 Test_NormalPass Test_play6 Test_Run
+		--犯规多的时候用"Test_play8_ManyFoul"
+		--犯规少的时候用"Test_play8_NotFoul"
+		--AutoChange用"Test_play8_AUTO"
+		-- NormalPlayPureDefence8   Test_play8_Strong_Tyh
+
+	else
+		return "Test_Tech3Pass" -- Test_Defence Test_PassEachOther Test_NormalMiddleDefend
+	end
+end
+>>>>>>> 6fc00ba2d41d4c28fe68f1337005ac8fe1a66584
 gNormalPlay = "Test_play8_AUTO"
 gSwitchNum = {
 	["normal"]  = 6,
@@ -30,10 +45,17 @@ gSwitchNum = {
 -- 有0号在场门将就是0号，没有0号在场，看这里设置的号码
 -- 建议比赛时只要上了0号，这里就写0号，否则万一0号视觉丢了，就会匹配其他车去当门将，犯规
 gRoleFixNum = {
+<<<<<<< HEAD
 	Goalie   = {0},
 	Kicker   = {1},
 	Tier	 = {2},
 	Receiver = {3}
+=======
+	["Kicker"]   = {7},
+	-- ["Goalie"]   = {0},
+	["Tier"]	 = {13},
+	["Receiver"] = {12}
+>>>>>>> 6fc00ba2d41d4c28fe68f1337005ac8fe1a66584
 }
 
 gSkill = {

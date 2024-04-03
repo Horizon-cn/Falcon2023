@@ -12,7 +12,7 @@ firstState = "touch",
 			return "touch";
 		end
 	end,
-	Leader = task.techdefence(),
+	Leader = task.passToPos(CGeoPoint:new_local(100,0),300)
 	-- Assister=task.goCmuRush(CGeoPoint:new_local(0,0)),
 	match = "[L]"
 },

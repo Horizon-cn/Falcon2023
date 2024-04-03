@@ -1329,8 +1329,8 @@ function techdefence()
 	local mexe,mpos=TechDefence{}
 	return {mexe,mpos}
 end
-function tech3pass()
-	local mexe,mpos=Tech3Pass{}
+function tech3pass(idx)
+	local mexe,mpos=Tech3Pass{idx=idx}
 	return {mexe,mpos}
 end
 function testChip()

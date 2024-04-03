@@ -390,12 +390,11 @@ namespace PlayerRole {
 		return TaskFactoryV2::Instance()->TechDefenceRobot(playerTask);
 
 	}
-	CPlayerTask* makeItTech3Pass(const int num)
+	CPlayerTask* makeItTech3Pass(const int num,const int idx)
 	{
 		static TaskT playerTask;
 		playerTask.executor =num;
 		return TaskFactoryV2::Instance()->Tech3PassRobot(playerTask);
-
 	}
 
 	CPlayerTask* makeItlightkick(const int num, const double dir, const double power)

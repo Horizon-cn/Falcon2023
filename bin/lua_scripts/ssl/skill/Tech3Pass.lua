@@ -1,6 +1,7 @@
 function Tech3Pass(task)
+	local idx=task.idx
 	execute=function(runner)
-		return CTech3Pass(runner)
+		return CTech3Pass(runner,idx)
 	end
 	matchPos=function()
 		return ball.pos()
