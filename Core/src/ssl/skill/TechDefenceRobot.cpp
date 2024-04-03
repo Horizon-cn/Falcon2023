@@ -78,12 +78,12 @@ double amidDir(double A, double B, double dir,double vel,double Vthreshold) {
     else                {return 0;}}
 double gotoAngle(double a,double b,double c,double d,double DIR,double VR,CGeoPoint A){
     double a_c=amidDir(a,c,DIR,VR,0.2);
-    // std::cout<<"amidDir("<<a<<c<<DIR<<VR<<0.1<<"->"<<a_c<<std::endl;
-    // if      (amidDir(a,d,DIR,1,0)){drawDir(A,DIR,"a d");return a;}
-    // else if (amidDir(d,c,DIR,1,0)){drawDir(A,DIR,"d c");return c;}
-    // else if (a_c)                 {drawDir(A,DIR,to_string(a_c).c_str());return a_c;}
-    // else if (amidDir(a,b,DIR,1,0)){drawDir(A,DIR,"a b");return a;}
-    // else if (amidDir(b,c,DIR,1,0)){drawDir(A,DIR,"b c");return c;}}
+    std::cout<<"amidDir("<<a<<c<<DIR<<VR<<0.1<<"->"<<a_c<<std::endl;
+    if      (amidDir(a,d,DIR,1,0)){drawDir(A,DIR,"a d");return a;}
+    else if (amidDir(d,c,DIR,1,0)){drawDir(A,DIR,"d c");return c;}
+    else if (a_c)                 {drawDir(A,DIR,to_string(a_c).c_str());return a_c;}
+    else if (amidDir(a,b,DIR,1,0)){drawDir(A,DIR,"a b");return a;}
+    else if (amidDir(b,c,DIR,1,0)){drawDir(A,DIR,"b c");return c;}
     return DIR;}
 CGeoPoint JamA2Jampos(CGeoPoint Apos,double DIR){   
     int icircle;
