@@ -181,6 +181,11 @@ CPlayerTask* CTaskFactoryV2::ChaseKickV1(const TaskT& task) {
 CPlayerTask* CTaskFactoryV2::ChaseKickV2(const TaskT& task) {
 	return MakeTask< CChaseKickV2>(task);
 }
+
+CPlayerTask* CTaskFactoryV2::ChaseToPenalty(const TaskT& task) {
+	return MakeTask< CChaseToPenalty>(task);
+}
+
 CPlayerTask* CTaskFactoryV2::ChaseToGetBall(const TaskT& task) {
 	return MakeTask< CChaseToGetBall>(task);
 }

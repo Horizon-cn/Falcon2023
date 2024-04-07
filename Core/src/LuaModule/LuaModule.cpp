@@ -614,6 +614,16 @@ extern "C" int Skill_ChaseKickV2(lua_State * L)
 	return 0;
 }
 
+extern "C" int Skill_ChaseToPenalty(lua_State * L)
+{
+	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
+	double angle = LuaModule::Instance()->GetNumberArgument(2, NULL);
+	int flag = LuaModule::Instance()->GetNumberArgument(3, NULL);
+	CPlayerTask* pTask = PlayerRole::makeItChaseToPenalty(runner, angle, flag);
+	TaskMediator::Instance()->setPlayerTask(runner, pTask, 1);
+	return 0;
+}
+
 extern "C" int Skill_DriftKick(lua_State * L)
 {
 	int runner = LuaModule::Instance()->GetNumberArgument(1, NULL);
@@ -1340,6 +1350,7 @@ luaDef GUIGlue[] =
 	{"CForceStartRush",		Skill_ForceStartRush},
 	{"CChaseKick",			Skill_ChaseKick},
 	{"CChaseKickV2",		Skill_ChaseKickV2},
+	{"CChaseToPenalty",     Skill_ChaseToPenalty},
 	{"CDriftKick",			Skill_DriftKick},
 	{"CInterKick",			Skill_InterKick},
 	{"CInterKickV2",		Skill_InterKickV2 },
