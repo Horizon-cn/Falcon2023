@@ -30,12 +30,19 @@ namespace
 
 CChaseToPenalty::CChaseToPenalty()
 {
-
+	_directCommand = NULL;
 }
 
 void CChaseToPenalty::plan(const CVisionModule* pVision)
 {
-
+	_directCommand = NULL;
+	const BallVisionT& ball = pVision->Ball();
+	const int robotNum = task().executor;
+	const int realNum = robotNum;
+	const PlayerVisionT& me = pVision->OurPlayer(robotNum);
+	const int playerFlag = task().player.flag;
+	const int enemyLeaderNum = DefenceInfoNew::Instance()->getBestBallChaser();          //?��???????��??
+	const PlayerVisionT& enemyLeader = pVision->TheirPlayer(enemyLeaderNum);
 }
 
 CPlayerCommand* CChaseToPenalty::execute(const CVisionModule* pVision)
